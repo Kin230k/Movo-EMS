@@ -1,6 +1,6 @@
 ---
-name: "🐞 Bug Report"
-about: "Report a bug, error, or unexpected behavior"
+name: "\U0001F41E Bug Report"
+about: Report a bug, error, or unexpected behavior
 title: "[Bug] <Short Description>"
 labels: bug
 assignees: ''

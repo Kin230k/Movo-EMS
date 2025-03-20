@@ -1,6 +1,6 @@
 ---
-name: "🚀 Feature Request"
-about: "Propose a new feature or improvement"
+name: "\U0001F680 Feature Request"
+about: Propose a new feature or improvement
 title: "[Feature] <Short Description>"
 labels: enhancement
 assignees: ''

@@ -1,6 +1,6 @@
 ---
-name: "👤 User Story"
-about: "Describe a feature from an end-user’s perspective"
+name: "\U0001F464 User Story"
+about: Describe a feature from an end-user’s perspective
 title: "[User Story] <Short Description>"
 labels: user story
 assignees: ''
