@@ -1,9 +1,12 @@
 ---
 name: "\U0001F4CC Task"
 about: A specific task or work item
-title: "[Task] <Short Description>"
+title: "task"
 labels: Task
 assignees: ''
+Type: ''
+Sprint: 'Development'
+
 
 ---
 
