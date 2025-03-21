@@ -1,0 +1,46 @@
+---
+name: Meeting Notes Template
+about: Template for recording meeting notes
+labels: ['meeting-notes']
+
+title: "Meeting Notes - {{date}}"
+
+body: |
+  **Meeting Title:** {{meeting_title}}
+  
+  **Date:** {{date}}
+
+  **Time:** {{time}}
+
+  **Location/Platform:** {{location_or_platform}}
+
+  **Attendees:**
+  - {{attendee_1}}
+  - {{attendee_2}}
+  - {{attendee_3}}
+  - {{attendee_4}}
+
+  **Agenda:**
+  - {{agenda_item_1}}
+  - {{agenda_item_2}}
+  - {{agenda_item_3}}
+
+  **Discussion:**
+  - **Topic 1:** 
+    - Notes: {{discussion_notes_1}}
+    - Actions: {{action_items_1}}
+  - **Topic 2:** 
+    - Notes: {{discussion_notes_2}}
+    - Actions: {{action_items_2}}
+
+  **Decisions Made:**
+  - {{decision_1}}
+  - {{decision_2}}
+
+  **Next Steps:**
+  - {{next_step_1}} (Assigned to {{assignee}})
+  - {{next_step_2}} (Assigned to {{assignee}})
+  
+  **Next Meeting:**
+  - Date: {{next_meeting_date}}
+  - Time: {{next_meeting_time}}
