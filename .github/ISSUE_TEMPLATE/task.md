@@ -4,8 +4,6 @@ about: A specific task or work item
 title: "task"
 labels: Task
 assignees: ''
-Type: ''
-Sprint: 'Development'
 
 
 ---
