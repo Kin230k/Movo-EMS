@@ -61,19 +61,27 @@ jobs:
                             fieldValues(first: 30) {
                               nodes {
                                 ... on ProjectV2ItemFieldTextValue {
-                                  field { id }
+                                  field {
+                                    ... on ProjectV2Field { id }
+                                  }
                                   text
                                 }
                                 ... on ProjectV2ItemFieldDateValue {
-                                  field { id }
+                                  field {
+                                    ... on ProjectV2Field { id }
+                                  }
                                   date
                                 }
                                 ... on ProjectV2ItemFieldNumberValue {
-                                  field { id }
+                                  field {
+                                    ... on ProjectV2Field { id }
+                                  }
                                   number
                                 }
                                 ... on ProjectV2ItemFieldSingleSelectValue {
-                                  field { id }
+                                  field {
+                                    ... on ProjectV2SingleSelectField { id }
+                                  }
                                   name
                                 }
                               }
@@ -108,7 +116,7 @@ jobs:
               return status !== "Done" && status !== "Cancelled";
             }
 
-            // Build a simplified structure for downstream use
+            // Build simplified structure
             const parsedItems = items
               .filter(i => i.content?.title)
               .map(item => ({
@@ -126,9 +134,9 @@ jobs:
                 }
               }));
 
-            // Store for later steps in this job
+            // Store for downstream logic
             global.projectItems = parsedItems;
-            console.log(`🔄 Loaded ${parsedItems.length} project items with pagination.`);
+            console.log(`✅ Loaded ${parsedItems.length} project items (with pagination & union fix).`);
 
             const updates = []; // For markdown summary
 
