@@ -10,7 +10,7 @@ jobs:
       - name: Load and process all project items
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           script: |
             const projectId = "PVT_kwHOCIyn784A0z80";
 
