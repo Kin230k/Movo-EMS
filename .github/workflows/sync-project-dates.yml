@@ -60,42 +60,42 @@ jobs:
                             }
                             fieldValues(first: 30) {
                               nodes {
-... on ProjectV2ItemFieldTextValue {
-      field {
-        id
-      }
-      text
-    }
-    ... on ProjectV2ItemFieldDateValue {
-      field {
-        id
-      }
-      date
-    }
-    ... on ProjectV2ItemFieldNumberValue {
-      field {
-        id
-      }
-      number
-    }
-    ... on ProjectV2ItemFieldSingleSelectValue {
-      field {
-        id
-      }
-      name
-    }
-    ... on ProjectV2ItemFieldIterationValue {
-      field {
-        id
-      }
-      iterationTitle
-    }
-    ... on ProjectV2ItemFieldMilestoneValue {
-      field {
-        id
-      }
-      milestoneTitle
-    }
+                            ... on ProjectV2ItemFieldTextValue {
+                                  field {
+                                    id
+                                  }
+                                  text
+                                }
+                                ... on ProjectV2ItemFieldDateValue {
+                                  field {
+                                    id
+                                  }
+                                  date
+                                }
+                                ... on ProjectV2ItemFieldNumberValue {
+                                  field {
+                                    id
+                                  }
+                                  number
+                                }
+                                ... on ProjectV2ItemFieldSingleSelectValue {
+                                  field {
+                                    id
+                                  }
+                                  name
+                                }
+                                ... on ProjectV2ItemFieldIterationValue {
+                                  field {
+                                    id
+                                  }
+                                  iterationTitle
+                                }
+                                ... on ProjectV2ItemFieldMilestoneValue {
+                                  field {
+                                    id
+                                  }
+                                  milestoneTitle
+                                }
                               }
                             }
                           }
