@@ -60,41 +60,21 @@ jobs:
                             }
                             fieldValues(first: 30) {
                               nodes {
-                            ... on ProjectV2ItemFieldTextValue {
-                                  field {
-                                    id
-                                  }
+                                ... on ProjectV2ItemFieldTextValue {
+                                  field { id }
                                   text
                                 }
                                 ... on ProjectV2ItemFieldDateValue {
-                                  field {
-                                    id
-                                  }
+                                  field { id }
                                   date
                                 }
                                 ... on ProjectV2ItemFieldNumberValue {
-                                  field {
-                                    id
-                                  }
+                                  field { id }
                                   number
                                 }
                                 ... on ProjectV2ItemFieldSingleSelectValue {
-                                  field {
-                                    id
-                                  }
+                                  field { id }
                                   name
-                                }
-                                ... on ProjectV2ItemFieldIterationValue {
-                                  field {
-                                    id
-                                  }
-                                  iterationTitle
-                                }
-                                ... on ProjectV2ItemFieldMilestoneValue {
-                                  field {
-                                    id
-                                  }
-                                  milestoneTitle
                                 }
                               }
                             }
@@ -146,7 +126,7 @@ jobs:
                 }
               }));
 
-            // Store for next steps
+            // Store for later steps in this job
             global.projectItems = parsedItems;
             console.log(`🔄 Loaded ${parsedItems.length} project items with pagination.`);
 
