@@ -1,207 +1,412 @@
-name: Sync Parent Issue Dates
+name: Sync Project Dates (Advanced)
 
 on:
-  issues:
-    types: [edited, labeled, unlabeled, milestoned, demilestoned]
   workflow_dispatch:
 
 jobs:
   sync-dates:
     runs-on: ubuntu-latest
     steps:
-      - name: Sync Parent Issue Dates
+      - name: Load and process all project items
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const projectId = "PVT_kwHOCIyn784A0z80";
-            const parentFieldId = "PVTF_lAHOCIyn784A0z80zgqYlP8"; // Parent issue field
-            const startsFieldId = "PVTF_lAHOCIyn784A0z80zgqYllU"; // Starts
-            const dueFieldId = "PVTF_lAHOCIyn784A0z80zgqYlpM";    // Due
 
-            const issueNumber = context.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const FIELD = {
+              TITLE: "PVTF_lAHOCIyn784A0z80zgqYlPU",
+              STATUS: "PVTSSF_lAHOCIyn784A0z80zgqYlPc",
+              PARENT: "PVTF_lAHOCIyn784A0z80zgqYlP8",
+              START: "PVTF_lAHOCIyn784A0z80zgqYllU",
+              DUE: "PVTF_lAHOCIyn784A0z80zgqYlpM",
+              DURATION: "PVTF_lAHOCIyn784A0z80zgqfYLE",
+              MILESTONE: "PVTF_lAHOCIyn784A0z80zgqYlPo"
+            };
 
             const graphql = github.graphql;
+            const formatDate = d => d.toISOString().split("T")[0];
+            const parseDate = s => s ? new Date(s) : null;
 
-            // Step 1: Get the project item ID for the current issue
-            const currentIssueInfo = await graphql(`
-              query($owner: String!, $repo: String!, $issueNumber: Int!) {
-                repository(owner: $owner, name: $repo) {
-                  issue(number: $issueNumber) {
-                    id
-                    projectItems(first: 10) {
-                      nodes {
-                        id
-                        project {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            `, { owner, repo, issueNumber });
-
-            const issueId = currentIssueInfo.repository.issue.id;
-            const projectItems = currentIssueInfo.repository.issue.projectItems.nodes;
-            const projectItemId = projectItems.find(item => item.project.id === projectId)?.id;
-
-            if (!projectItemId) {
-              console.log("No matching project item found for this issue.");
-              return;
+            function addDays(date, days) {
+              const result = new Date(date);
+              result.setDate(result.getDate() + days);
+              return result;
             }
 
-            // Step 2: Get all items in the project and filter sub-issues
-            const allProjectItems = await graphql(`
-              query($projectId: ID!) {
-                node(id: $projectId) {
-                  ... on ProjectV2 {
-                    items(first: 100) {
-                      nodes {
-                        id
-                        content {
-                          ... on Issue {
-                            number
-                            title
-                            id
+            async function fetchAllItems(projectId) {
+              let hasNextPage = true;
+              let endCursor = null;
+              let allItems = [];
+
+              while (hasNextPage) {
+                const result = await graphql(`
+                  query($projectId: ID!, $after: String) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $after) {
+                          pageInfo {
+                            hasNextPage
+                            endCursor
                           }
-                        }
-                        fieldValues(first: 20) {
                           nodes {
-                            ... on ProjectV2ItemFieldTextValue {
-                              field {
+                            id
+                            content {
+                              ... on Issue {
                                 id
-                                name
+                                number
+                                title
                               }
-                              text
+                            }
+                            fieldValues(first: 30) {
+                              nodes {
+                                ... on ProjectV2ItemFieldSingleSelectValue {
+                                  field { id }
+                                  name
+                                }
+                                ... on ProjectV2ItemFieldTextValue {
+                                  field { id }
+                                  text
+                                }
+                                ... on ProjectV2ItemFieldDateValue {
+                                  field { id }
+                                  date
+                                }
+                                ... on ProjectV2ItemFieldNumberValue {
+                                  field { id }
+                                  number
+                                }
+                              }
                             }
                           }
                         }
                       }
                     }
                   }
-                }
+                `, {
+                  projectId,
+                  after: endCursor
+                });
+
+                const page = result.node.items;
+                allItems = allItems.concat(page.nodes);
+                hasNextPage = page.pageInfo.hasNextPage;
+                endCursor = page.pageInfo.endCursor;
               }
-            `, { projectId });
 
-            const currentItem = allProjectItems.node.items.nodes.find(item => item.content?.number === issueNumber);
-            if (!currentItem) {
-              console.log("Current item not found in the project.");
-              return;
+              return allItems;
             }
 
-            // Step 3: Get the parent issue number from the current sub-issue's field
-            const parentIdField = currentItem.fieldValues.nodes.find(
-              field => field.field.id === parentFieldId
-            );
+            const items = await fetchAllItems(projectId);
 
-            if (!parentIdField || !parentIdField.text) {
-              console.log("No parent issue linked. Exiting.");
-              return;
+            function getFieldValue(item, fieldId) {
+              return item.fieldValues.nodes.find(f => f.field.id === fieldId);
             }
 
-            const parentIssueNumber = parseInt(parentIdField.text);
-
-            // Step 4: Find all sub-issues that reference the same parent
-            const subIssues = allProjectItems.node.items.nodes.filter(item => {
-              const parentField = item.fieldValues.nodes.find(field => field.field.id === parentFieldId);
-              return parentField && parseInt(parentField.text) === parentIssueNumber;
-            });
-
-            if (subIssues.length === 0) {
-              console.log("No sub-issues found for this parent.");
-              return;
+            function isActive(item) {
+              const status = getFieldValue(item, FIELD.STATUS)?.name;
+              return status !== "Done" && status !== "Cancelled";
             }
 
-            // Step 5: Extract and compare start/due dates
-            const dateFields = await Promise.all(subIssues.map(async (item) => {
-              const res = await graphql(`
-                query($itemId: ID!, $projectId: ID!) {
-                  node(id: $itemId) {
-                    ... on ProjectV2Item {
-                      fieldValues(first: 10) {
-                        nodes {
-                          ... on ProjectV2ItemFieldDateValue {
-                            field {
-                              id
-                            }
-                            date
-                          }
-                        }
-                      }
-                    }
+            // Build a simplified structure for downstream use
+            const parsedItems = items
+              .filter(i => i.content?.title)
+              .map(item => ({
+                id: item.id,
+                issueNumber: item.content.number,
+                title: item.content.title,
+                isActive: isActive(item),
+                fields: {
+                  status: getFieldValue(item, FIELD.STATUS)?.name || null,
+                  parent: getFieldValue(item, FIELD.PARENT)?.text || null,
+                  start: parseDate(getFieldValue(item, FIELD.START)?.date),
+                  due: parseDate(getFieldValue(item, FIELD.DUE)?.date),
+                  duration: parseInt(getFieldValue(item, FIELD.DURATION)?.number || "0"),
+                  milestone: getFieldValue(item, FIELD.MILESTONE)?.text || null
+                }
+              }));
+
+            // Store for next steps
+            global.projectItems = parsedItems;
+            console.log(`🔄 Loaded ${parsedItems.length} project items with pagination.`);
+
+            const updates = []; // For markdown summary
+
+            // === STEP 1: Sub-issue Auto-Scheduling ===
+            const groupedByParent = {};
+
+            for (const item of projectItems) {
+              if (item.fields.parent && item.isActive) {
+                if (!groupedByParent[item.fields.parent]) {
+                  groupedByParent[item.fields.parent] = [];
+                }
+                groupedByParent[item.fields.parent].push(item);
+              }
+            }
+
+            for (const [parentNum, subs] of Object.entries(groupedByParent)) {
+              // Sort sub-issues by title (you can change this to number if needed)
+              subs.sort((a, b) => a.title.localeCompare(b.title));
+              let previousDue = null;
+
+              for (const sub of subs) {
+                const { start, due, duration } = sub.fields;
+                let newStart = null;
+                let newDue = null;
+
+                if (!start && duration > 0) {
+                  newStart = previousDue ? addDays(previousDue, 1) : new Date();
+                  newDue = addDays(newStart, duration - 1);
+                } else if (start && duration > 0) {
+                  const expectedDue = addDays(start, duration - 1);
+                  if (!due || formatDate(due) !== formatDate(expectedDue)) {
+                    newStart = start;
+                    newDue = expectedDue;
                   }
                 }
-              `, {
-                itemId: item.id,
-                projectId
-              });
 
-              const values = res.node.fieldValues.nodes;
-              const start = values.find(f => f.field.id === startsFieldId)?.date;
-              const due = values.find(f => f.field.id === dueFieldId)?.date;
-
-              return {
-                start: start ? new Date(start) : null,
-                due: due ? new Date(due) : null
-              };
-            }));
-
-            const validStarts = dateFields.map(d => d.start).filter(Boolean);
-            const validDues = dateFields.map(d => d.due).filter(Boolean);
-
-            if (validStarts.length === 0 || validDues.length === 0) {
-              console.log("Missing date data in sub-issues.");
-              return;
-            }
-
-            const earliestStart = new Date(Math.min(...validStarts.map(d => d.getTime())));
-            const latestDue = new Date(Math.max(...validDues.map(d => d.getTime())));
-
-            const formatDate = date => date.toISOString().split("T")[0];
-
-            console.log(`Updating parent issue #${parentIssueNumber} with:`);
-            console.log(`Start: ${formatDate(earliestStart)}`);
-            console.log(`Due:   ${formatDate(latestDue)}`);
-
-            // Step 6: Find parent item ID
-            const parentItem = allProjectItems.node.items.nodes.find(
-              item => item.content?.number === parentIssueNumber
-            );
-
-            if (!parentItem) {
-              console.log("Parent issue not found in project.");
-              return;
-            }
-
-            // Step 7: Update parent issue's date fields
-            await graphql(`
-              mutation UpdateParentDates($projectId: ID!, $itemId: ID!, $start: String!, $due: String!) {
-                updateStart: updateProjectV2ItemFieldValue(input: {
-                  projectId: $projectId,
-                  itemId: $itemId,
-                  fieldId: "${startsFieldId}",
-                  value: { text: $start }
-                }) {
-                  projectV2Item { id }
+                if (newStart && (!start || formatDate(start) !== formatDate(newStart))) {
+                  await graphql(`
+                    mutation {
+                      updateStart: updateProjectV2ItemFieldValue(input: {
+                        projectId: "${projectId}",
+                        itemId: "${sub.id}",
+                        fieldId: "${FIELD.START}",
+                        value: { date: "${formatDate(newStart)}" }
+                      }) {
+                        projectV2Item { id }
+                      }
+                    }
+                  `);
+                  sub.fields.start = newStart;
                 }
 
-                updateDue: updateProjectV2ItemFieldValue(input: {
-                  projectId: $projectId,
-                  itemId: $itemId,
-                  fieldId: "${dueFieldId}",
-                  value: { text: $due }
-                }) {
-                  projectV2Item { id }
+                if (newDue && (!due || formatDate(due) !== formatDate(newDue))) {
+                  await graphql(`
+                    mutation {
+                      updateDue: updateProjectV2ItemFieldValue(input: {
+                        projectId: "${projectId}",
+                        itemId: "${sub.id}",
+                        fieldId: "${FIELD.DUE}",
+                        value: { date: "${formatDate(newDue)}" }
+                      }) {
+                        projectV2Item { id }
+                      }
+                    }
+                  `);
+                  sub.fields.due = newDue;
+                }
+
+                if (newStart || newDue) {
+                  updates.push({
+                    title: sub.title,
+                    type: "Sub",
+                    start: newStart ? formatDate(newStart) : "-",
+                    due: newDue ? formatDate(newDue) : "-"
+                  });
+                }
+
+                previousDue = sub.fields.due || previousDue;
+              }
+            }
+
+            // === STEP 2: Update Parent Start/Due Based on Sub-Issues ===
+
+            const parentMap = {};
+            for (const item of projectItems) {
+              if (!item.fields.parent && item.title.match(/^\d{2}\. /) && item.isActive) {
+                parentMap[item.issueNumber] = {
+                  item,
+                  subs: []
+                };
+              }
+            }
+
+            for (const item of projectItems) {
+              if (item.fields.parent && parentMap[item.fields.parent]) {
+                parentMap[item.fields.parent].subs.push(item);
+              }
+            }
+
+            for (const { item: parent, subs } of Object.values(parentMap)) {
+              const validStarts = subs.map(i => i.fields.start).filter(Boolean);
+              const validDues = subs.map(i => i.fields.due).filter(Boolean);
+
+              if (validStarts.length === 0 || validDues.length === 0) continue;
+
+              const earliestStart = new Date(Math.min(...validStarts));
+              const latestDue = new Date(Math.max(...validDues));
+
+              let changed = false;
+
+              if (!parent.fields.start || formatDate(parent.fields.start) !== formatDate(earliestStart)) {
+                await graphql(`
+                  mutation {
+                    updateStart: updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${parent.id}",
+                      fieldId: "${FIELD.START}",
+                      value: { date: "${formatDate(earliestStart)}" }
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }
+                `);
+                parent.fields.start = earliestStart;
+                changed = true;
+              }
+
+              if (!parent.fields.due || formatDate(parent.fields.due) !== formatDate(latestDue)) {
+                await graphql(`
+                  mutation {
+                    updateDue: updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${parent.id}",
+                      fieldId: "${FIELD.DUE}",
+                      value: { date: "${formatDate(latestDue)}" }
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }
+                `);
+                parent.fields.due = latestDue;
+                changed = true;
+              }
+
+              if (changed) {
+                updates.push({
+                  title: parent.title,
+                  type: "Parent",
+                  start: formatDate(earliestStart),
+                  due: formatDate(latestDue)
+                });
+              }
+            }
+
+            // === STEP 3: Sequence Parent Issues ===
+            const orderedParents = Object.values(parentMap)
+              .map(p => p.item)
+              .sort((a, b) => a.title.localeCompare(b.title));
+
+            let currentStart = orderedParents[0].fields.start || new Date();
+
+            for (const parent of orderedParents) {
+              const duration = parent.fields.due && parent.fields.start
+                ? Math.round((parent.fields.due - parent.fields.start) / (1000 * 3600 * 24)) + 1
+                : 1;
+
+              const newStart = currentStart;
+              const newDue = addDays(newStart, duration - 1);
+              const changed = (
+                !parent.fields.start || formatDate(parent.fields.start) !== formatDate(newStart) ||
+                !parent.fields.due || formatDate(parent.fields.due) !== formatDate(newDue)
+              );
+
+              if (changed) {
+                await graphql(`
+                  mutation {
+                    updateStart: updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${parent.id}",
+                      fieldId: "${FIELD.START}",
+                      value: { date: "${formatDate(newStart)}" }
+                    }) { projectV2Item { id } }
+
+                    updateDue: updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${parent.id}",
+                      fieldId: "${FIELD.DUE}",
+                      value: { date: "${formatDate(newDue)}" }
+                    }) { projectV2Item { id } }
+                  }
+                `);
+                updates.push({
+                  title: parent.title,
+                  type: "Parent",
+                  start: formatDate(newStart),
+                  due: formatDate(newDue)
+                });
+              }
+
+              currentStart = addDays(newDue, 1);
+              parent.fields.start = newStart;
+              parent.fields.due = newDue;
+            }
+
+            // === STEP 4: Reflow Sub-Issues to Preserve Delay from Parent Start ===
+            for (const { item: parent, subs } of Object.values(parentMap)) {
+              const parentStart = parent.fields.start;
+              for (const sub of subs) {
+                const oldParent = parentMap[sub.fields.parent]?.item;
+                const oldDelay = sub.fields.start && oldParent?.fields.start
+                  ? Math.round((sub.fields.start - oldParent.fields.start) / (1000 * 3600 * 24))
+                  : 0;
+
+                const newStart = addDays(parentStart, oldDelay);
+                const newDue = addDays(newStart, sub.fields.duration - 1);
+
+                const changed =
+                  !sub.fields.start || formatDate(sub.fields.start) !== formatDate(newStart) ||
+                  !sub.fields.due || formatDate(sub.fields.due) !== formatDate(newDue);
+
+                if (changed) {
+                  await graphql(`
+                    mutation {
+                      updateStart: updateProjectV2ItemFieldValue(input: {
+                        projectId: "${projectId}",
+                        itemId: "${sub.id}",
+                        fieldId: "${FIELD.START}",
+                        value: { date: "${formatDate(newStart)}" }
+                      }) { projectV2Item { id } }
+
+                      updateDue: updateProjectV2ItemFieldValue(input: {
+                        projectId: "${projectId}",
+                        itemId: "${sub.id}",
+                        fieldId: "${FIELD.DUE}",
+                        value: { date: "${formatDate(newDue)}" }
+                      }) { projectV2Item { id } }
+                    }
+                  `);
+
+                  updates.push({
+                    title: sub.title,
+                    type: "Sub",
+                    start: formatDate(newStart),
+                    due: formatDate(newDue)
+                  });
                 }
               }
-            `, {
-              projectId,
-              itemId: parentItem.id,
-              start: formatDate(earliestStart),
-              due: formatDate(latestDue)
-            });
+            }
 
-            console.log("Parent issue successfully updated.");
+            // === STEP 5: Update Milestone End Dates (if needed) ===
+            const milestoneMap = {};
+
+            for (const item of projectItems) {
+              const milestone = item.fields.milestone;
+              if (!milestone || !item.isActive) continue;
+              if (!milestoneMap[milestone]) milestoneMap[milestone] = [];
+              milestoneMap[milestone].push(item);
+            }
+
+            for (const [milestone, items] of Object.entries(milestoneMap)) {
+              const allDues = items.map(i => i.fields.due).filter(Boolean);
+              if (allDues.length === 0) continue;
+
+              const latestDue = new Date(Math.max(...allDues));
+              console.log(`📅 Milestone **${milestone}** should end by **${formatDate(latestDue)}**`);
+              // If you have a milestone-specific custom field, you can also update it here
+            }
+
+            // === STEP 6: Output Markdown Summary to GitHub Actions Log ===
+            if (updates.length > 0) {
+              const table = [
+                "| Issue | Type | New Start | New Due |",
+                "|-------|------|-----------|---------|",
+                ...updates.map(u =>
+                  `| ${u.title} | ${u.type} | ${u.start || "-"} | ${u.due || "-"} |`)
+              ].join("\n");
+
+              console.log(`\n### 📋 Summary of Updates\n\n${table}`);
+            } else {
+              console.log("✅ No updates were necessary — all values already in sync!");
+            }
