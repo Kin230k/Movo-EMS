@@ -1,0 +1,207 @@
+name: Sync Parent Issue Dates
+
+on:
+  issues:
+    types: [edited, labeled, unlabeled, milestoned, demilestoned]
+  workflow_dispatch:
+
+jobs:
+  sync-dates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Parent Issue Dates
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const projectId = "PVT_kwHOCIyn784A0z80";
+            const parentFieldId = "PVTF_lAHOCIyn784A0z80zgqYlP8"; // Parent issue field
+            const startsFieldId = "PVTF_lAHOCIyn784A0z80zgqYllU"; // Starts
+            const dueFieldId = "PVTF_lAHOCIyn784A0z80zgqYlpM";    // Due
+
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const graphql = github.graphql;
+
+            // Step 1: Get the project item ID for the current issue
+            const currentIssueInfo = await graphql(`
+              query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $issueNumber) {
+                    id
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `, { owner, repo, issueNumber });
+
+            const issueId = currentIssueInfo.repository.issue.id;
+            const projectItems = currentIssueInfo.repository.issue.projectItems.nodes;
+            const projectItemId = projectItems.find(item => item.project.id === projectId)?.id;
+
+            if (!projectItemId) {
+              console.log("No matching project item found for this issue.");
+              return;
+            }
+
+            // Step 2: Get all items in the project and filter sub-issues
+            const allProjectItems = await graphql(`
+              query($projectId: ID!) {
+                node(id: $projectId) {
+                  ... on ProjectV2 {
+                    items(first: 100) {
+                      nodes {
+                        id
+                        content {
+                          ... on Issue {
+                            number
+                            title
+                            id
+                          }
+                        }
+                        fieldValues(first: 20) {
+                          nodes {
+                            ... on ProjectV2ItemFieldTextValue {
+                              field {
+                                id
+                                name
+                              }
+                              text
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `, { projectId });
+
+            const currentItem = allProjectItems.node.items.nodes.find(item => item.content?.number === issueNumber);
+            if (!currentItem) {
+              console.log("Current item not found in the project.");
+              return;
+            }
+
+            // Step 3: Get the parent issue number from the current sub-issue's field
+            const parentIdField = currentItem.fieldValues.nodes.find(
+              field => field.field.id === parentFieldId
+            );
+
+            if (!parentIdField || !parentIdField.text) {
+              console.log("No parent issue linked. Exiting.");
+              return;
+            }
+
+            const parentIssueNumber = parseInt(parentIdField.text);
+
+            // Step 4: Find all sub-issues that reference the same parent
+            const subIssues = allProjectItems.node.items.nodes.filter(item => {
+              const parentField = item.fieldValues.nodes.find(field => field.field.id === parentFieldId);
+              return parentField && parseInt(parentField.text) === parentIssueNumber;
+            });
+
+            if (subIssues.length === 0) {
+              console.log("No sub-issues found for this parent.");
+              return;
+            }
+
+            // Step 5: Extract and compare start/due dates
+            const dateFields = await Promise.all(subIssues.map(async (item) => {
+              const res = await graphql(`
+                query($itemId: ID!, $projectId: ID!) {
+                  node(id: $itemId) {
+                    ... on ProjectV2Item {
+                      fieldValues(first: 10) {
+                        nodes {
+                          ... on ProjectV2ItemFieldDateValue {
+                            field {
+                              id
+                            }
+                            date
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `, {
+                itemId: item.id,
+                projectId
+              });
+
+              const values = res.node.fieldValues.nodes;
+              const start = values.find(f => f.field.id === startsFieldId)?.date;
+              const due = values.find(f => f.field.id === dueFieldId)?.date;
+
+              return {
+                start: start ? new Date(start) : null,
+                due: due ? new Date(due) : null
+              };
+            }));
+
+            const validStarts = dateFields.map(d => d.start).filter(Boolean);
+            const validDues = dateFields.map(d => d.due).filter(Boolean);
+
+            if (validStarts.length === 0 || validDues.length === 0) {
+              console.log("Missing date data in sub-issues.");
+              return;
+            }
+
+            const earliestStart = new Date(Math.min(...validStarts.map(d => d.getTime())));
+            const latestDue = new Date(Math.max(...validDues.map(d => d.getTime())));
+
+            const formatDate = date => date.toISOString().split("T")[0];
+
+            console.log(`Updating parent issue #${parentIssueNumber} with:`);
+            console.log(`Start: ${formatDate(earliestStart)}`);
+            console.log(`Due:   ${formatDate(latestDue)}`);
+
+            // Step 6: Find parent item ID
+            const parentItem = allProjectItems.node.items.nodes.find(
+              item => item.content?.number === parentIssueNumber
+            );
+
+            if (!parentItem) {
+              console.log("Parent issue not found in project.");
+              return;
+            }
+
+            // Step 7: Update parent issue's date fields
+            await graphql(`
+              mutation UpdateParentDates($projectId: ID!, $itemId: ID!, $start: String!, $due: String!) {
+                updateStart: updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $itemId,
+                  fieldId: "${startsFieldId}",
+                  value: { text: $start }
+                }) {
+                  projectV2Item { id }
+                }
+
+                updateDue: updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $itemId,
+                  fieldId: "${dueFieldId}",
+                  value: { text: $due }
+                }) {
+                  projectV2Item { id }
+                }
+              }
+            `, {
+              projectId,
+              itemId: parentItem.id,
+              start: formatDate(earliestStart),
+              due: formatDate(latestDue)
+            });
+
+            console.log("Parent issue successfully updated.");
