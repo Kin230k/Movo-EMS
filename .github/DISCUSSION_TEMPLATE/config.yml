@@ -1,0 +1,44 @@
+custom:
+  - name: Meeting Notes
+    description: Template for recording structured meeting notes
+    title: "Meeting Notes - [Enter Date]"
+    body: |
+      ## 📝 Meeting Notes
+
+      **Meeting Title:**  
+      _[Enter meeting title here]_
+
+      **Date:**  
+      _YYYY-MM-DD_
+
+      **Time:**  
+      _e.g. 10:00 AM – 11:00 AM_
+
+      **Location / Platform:**  
+      _e.g. Zoom, Teams, Room 101_
+
+      ---
+
+      ### 👥 Attendees
+      - Name 1
+      - Name 2
+
+      ### 🗂️ Agenda
+      - Item 1
+      - Item 2
+
+      ### 💬 Discussion
+      - Notes: 
+      - Action Items:
+
+      ### ✅ Decisions Made
+      - Decision 1
+      - Decision 2
+
+      ### 🚀 Next Steps
+      - Task 1 (Assigned to ...)
+      - Task 2 (Assigned to ...)
+
+      ### 📅 Next Meeting
+      - Date:
+      - Time:
