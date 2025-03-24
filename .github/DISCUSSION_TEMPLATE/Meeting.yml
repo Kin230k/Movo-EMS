@@ -1,70 +1,58 @@
-name: Meeting Notes Template
-description: Template for recording meeting notes
-title: "Meeting Notes - {{date}}"
-labels: ["meeting-notes"]
+type: custom
+title: "Meeting Notes - [Enter Date]"
+
 body:
   - type: input
-    id: meeting_title
     attributes:
       label: Meeting Title
       placeholder: e.g. Weekly Sync
 
   - type: input
-    id: date
     attributes:
       label: Date
       placeholder: YYYY-MM-DD
 
   - type: input
-    id: time
     attributes:
       label: Time
       placeholder: e.g. 10:00 AM - 11:00 AM
 
   - type: input
-    id: location
     attributes:
-      label: Location/Platform
-      placeholder: e.g. Zoom / Room 205
+      label: Location / Platform
+      placeholder: e.g. Zoom, MS Teams, Room 101
 
   - type: textarea
-    id: attendees
     attributes:
       label: Attendees
-      placeholder: List of people attending
+      placeholder: e.g. John, Sarah, Ahmed, Fatima
 
   - type: textarea
-    id: agenda
     attributes:
       label: Agenda
-      placeholder: Bullet points of agenda items
+      placeholder: • Topic 1\n• Topic 2\n• Topic 3
 
   - type: textarea
-    id: discussion
     attributes:
-      label: Discussion Notes
-      placeholder: Notes and actions from the discussion
+      label: Discussion
+      placeholder: Notes on each agenda topic and any key talking points
 
   - type: textarea
-    id: decisions
     attributes:
       label: Decisions Made
-      placeholder: Bullet points of decisions
+      placeholder: • Decision 1\n• Decision 2
 
   - type: textarea
-    id: next_steps
     attributes:
-      label: Next Steps
-      placeholder: Bullet points with assigned members
+      label: Action Items / Next Steps
+      placeholder: • Task 1 (Assigned to Ahmed)\n• Task 2 (Assigned to Sarah)
 
   - type: input
-    id: next_meeting_date
     attributes:
       label: Next Meeting Date
       placeholder: YYYY-MM-DD
 
   - type: input
-    id: next_meeting_time
     attributes:
       label: Next Meeting Time
       placeholder: e.g. 11:00 AM
