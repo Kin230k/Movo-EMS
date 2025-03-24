@@ -1,46 +1,70 @@
----
 name: Meeting Notes Template
-about: Template for recording meeting notes
-labels: ['meeting-notes']
-
+description: Template for recording meeting notes
 title: "Meeting Notes - {{date}}"
+labels: ["meeting-notes"]
+body:
+  - type: input
+    id: meeting_title
+    attributes:
+      label: Meeting Title
+      placeholder: e.g. Weekly Sync
 
-body: |
-  **Meeting Title:** {{meeting_title}}
-  
-  **Date:** {{date}}
+  - type: input
+    id: date
+    attributes:
+      label: Date
+      placeholder: YYYY-MM-DD
 
-  **Time:** {{time}}
+  - type: input
+    id: time
+    attributes:
+      label: Time
+      placeholder: e.g. 10:00 AM - 11:00 AM
 
-  **Location/Platform:** {{location_or_platform}}
+  - type: input
+    id: location
+    attributes:
+      label: Location/Platform
+      placeholder: e.g. Zoom / Room 205
 
-  **Attendees:**
-  - {{attendee_1}}
-  - {{attendee_2}}
-  - {{attendee_3}}
-  - {{attendee_4}}
+  - type: textarea
+    id: attendees
+    attributes:
+      label: Attendees
+      placeholder: List of people attending
 
-  **Agenda:**
-  - {{agenda_item_1}}
-  - {{agenda_item_2}}
-  - {{agenda_item_3}}
+  - type: textarea
+    id: agenda
+    attributes:
+      label: Agenda
+      placeholder: Bullet points of agenda items
 
-  **Discussion:**
-  - **Topic 1:** 
-    - Notes: {{discussion_notes_1}}
-    - Actions: {{action_items_1}}
-  - **Topic 2:** 
-    - Notes: {{discussion_notes_2}}
-    - Actions: {{action_items_2}}
+  - type: textarea
+    id: discussion
+    attributes:
+      label: Discussion Notes
+      placeholder: Notes and actions from the discussion
 
-  **Decisions Made:**
-  - {{decision_1}}
-  - {{decision_2}}
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Decisions Made
+      placeholder: Bullet points of decisions
 
-  **Next Steps:**
-  - {{next_step_1}} (Assigned to {{assignee}})
-  - {{next_step_2}} (Assigned to {{assignee}})
-  
-  **Next Meeting:**
-  - Date: {{next_meeting_date}}
-  - Time: {{next_meeting_time}}
+  - type: textarea
+    id: next_steps
+    attributes:
+      label: Next Steps
+      placeholder: Bullet points with assigned members
+
+  - type: input
+    id: next_meeting_date
+    attributes:
+      label: Next Meeting Date
+      placeholder: YYYY-MM-DD
+
+  - type: input
+    id: next_meeting_time
+    attributes:
+      label: Next Meeting Time
+      placeholder: e.g. 11:00 AM
