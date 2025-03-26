@@ -32,4 +32,4 @@ This project focuses on:
 - **Task & Issue Tracking:** Managed via **GitHub Issues**
 
 ## 🔍 More Information
-For more details, visit the **[Wiki](./wiki/home)**.
+For more details, visit the **[Wiki](https://github.com/Kin230k/Accreditation-System/wiki/home)**.
