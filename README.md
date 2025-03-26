@@ -1,28 +1,30 @@
-# 📌 Project Name
+# 📌 Accreditation System
 
 ## 📖 Overview
-[Briefly describe the project in 1-2 sentences. What is its purpose? Who is it for?]
+The Accreditation System streamlines recruitment, attendance tracking, and analytics for event personnel, enhancing operational efficiency and accuracy.
 
 ## 🎯 Objectives
-- [Main objective 1]
-- [Main objective 2]
-- [Main objective 3]
+- Reduce recruitment cycle time by 40%
+- Achieve 95% accuracy in attendance tracking
+- Provide real-time comprehensive analytics
 
 ## 📌 Key Features
-- ✅ [Feature 1]
-- ✅ [Feature 2]
-- ✅ [Feature 3]
+- ✅ Centralized recruitment module
+- ✅ Real-time digital attendance tracking
+- ✅ Comprehensive analytics reporting
 
 ## 🔗 Project Scope
 This project focuses on:
-- [Scope Item 1]
-- [Scope Item 2]
-- [Scope Item 3]
+- Stakeholder interviews and requirements gathering
+- Architecture, UI/UX design, and development
+- Integration, testing, and post-launch support
 
 ## 📋 Roles & Responsibilities
-- **Project Manager:** [Name]
-- **Team Members:** [Names]
-- **Stakeholders:** [Names or organizations involved]
+- **Project Manager:** Kinan Kassab (@Kin230k)
+- **Development Lead:** Redha (@mrabcom)
+- **Frontend Developer:** Aisha
+- **Developer:** Dema
+- **Stakeholders:** Nexsus Company
 
 ## 🛠 Workflow & Collaboration
 - **Project Management:** Managed using **GitHub Projects**
@@ -30,4 +32,4 @@ This project focuses on:
 - **Task & Issue Tracking:** Managed via **GitHub Issues**
 
 ## 🔍 More Information
-For more details, visit the **[Wiki](./wiki/home.md)**.
+For more details, visit the **[Wiki](./wiki/home)**.
