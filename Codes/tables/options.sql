@@ -1,0 +1,7 @@
+CREATE TABLE OPTIONS (
+    optionId UUID PRIMARY KEY,
+    optionText VARCHAR(500) NOT NULL,
+    questionId UUID NOT NULL REFERENCES QUESTIONS(questionId),
+    isCorrect BOOLEAN NOT NULL DEFAULT FALSE,
+    displayOrder INT NOT NULL DEFAULT 0
+);

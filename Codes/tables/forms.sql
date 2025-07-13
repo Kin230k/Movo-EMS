@@ -1,0 +1,5 @@
+CREATE TABLE FORMS (
+    formId UUID PRIMARY KEY,
+    projectId UUID NOT NULL REFERENCES PROJECTS(projectId),
+    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId)
+);

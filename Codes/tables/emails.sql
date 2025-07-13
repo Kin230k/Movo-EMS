@@ -1,0 +1,6 @@
+CREATE TABLE EMAILS (
+    emailId UUID PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    formId UUID NOT NULL REFERENCES FORMS(formId)
+);
