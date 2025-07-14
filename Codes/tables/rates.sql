@@ -1,0 +1,6 @@
+CREATE TABLE RATES (
+    rateId UUID PRIMARY KEY,
+    hourlyRate NUMERIC(10,2) NOT NULL,
+    userId UUID NOT NULL REFERENCES USERS(userId),
+    projectId UUID NOT NULL REFERENCES PROJECTS(projectId)
+);

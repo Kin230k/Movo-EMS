@@ -1,0 +1,8 @@
+CREATE TABLE CLIENTS (
+    clientId UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    logo VARCHAR(512),
+    company VARCHAR(255),
+    contactEmail VARCHAR(255) NOT NULL UNIQUE,
+    contactPhone VARCHAR(20) NOT NULL UNIQUE
+);
