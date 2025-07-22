@@ -14,7 +14,7 @@ BEGIN
         s.startTime,
         s.endTime,
         s.locationId
-    FROM SCHEDULE s
+    FROM SCHEDULES s
     WHERE s.projectId = p_project_id;
 END;
 $$;

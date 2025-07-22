@@ -18,7 +18,7 @@ BEGIN
         s.dateSubmitted,
         s.outcome,
         s.decisionNotes
-    FROM SUBMISSION s
+    FROM SUBMISSIONS s
     WHERE s.submissionId = p_submission_id;
 END;
 $$;

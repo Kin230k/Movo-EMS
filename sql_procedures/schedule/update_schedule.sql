@@ -8,7 +8,7 @@ CREATE OR REPLACE PROCEDURE update_schedule(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE SCHEDULE
+    UPDATE SCHEDULES
     SET 
         date = p_date,
         startTime = p_start_time,

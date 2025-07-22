@@ -9,7 +9,7 @@ CREATE OR REPLACE PROCEDURE update_attendance(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE ATTENDANCE
+    UPDATE ATTENDANCES
     SET 
         date = p_date,
         time = p_time,

@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE update_interview(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE INTERVIEW
+    UPDATE INTERVIEWS
     SET projectId = p_project_id
     WHERE interviewId = p_interview_id;
 END;

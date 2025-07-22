@@ -8,7 +8,7 @@ CREATE OR REPLACE PROCEDURE create_submission(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO SUBMISSION (
+    INSERT INTO SUBMISSIONS (
         formId, 
         userId, 
         interviewId, 

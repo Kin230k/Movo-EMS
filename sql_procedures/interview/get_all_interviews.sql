@@ -6,6 +6,6 @@ BEGIN
     SELECT 
         i.interviewId,
         i.projectId
-    FROM INTERVIEW i;
+    FROM INTERVIEWS i;
 END;
 $$;

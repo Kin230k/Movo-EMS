@@ -18,6 +18,6 @@ BEGIN
         a.signedBy,
         a.userId,
         a.areaId
-    FROM ATTENDANCE a;
+    FROM ATTENDANCES a;
 END;
 $$;

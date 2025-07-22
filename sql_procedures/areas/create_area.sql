@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE create_area(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO AREA (
+    INSERT INTO AREAS (
         name, 
         locationId
     ) VALUES (

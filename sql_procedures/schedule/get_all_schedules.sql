@@ -16,6 +16,6 @@ BEGIN
         s.endTime,
         s.projectId,
         s.locationId
-    FROM SCHEDULE s;
+    FROM SCHEDULES s;
 END;
 $$;

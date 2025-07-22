@@ -18,7 +18,7 @@ BEGIN
         a.signedBy,
         a.userId,
         a.areaId
-    FROM ATTENDANCE a
+    FROM ATTENDANCES a
     WHERE a.attendanceId = p_attendance_id;
 END;
 $$;

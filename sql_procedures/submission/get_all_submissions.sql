@@ -18,6 +18,6 @@ BEGIN
         s.dateSubmitted,
         s.outcome,
         s.decisionNotes
-    FROM SUBMISSION s;
+    FROM SUBMISSIONS s;
 END;
 $$;

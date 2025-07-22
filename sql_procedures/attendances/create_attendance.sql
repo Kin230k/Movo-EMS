@@ -8,7 +8,7 @@ CREATE OR REPLACE PROCEDURE create_attendance(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO ATTENDANCE (
+    INSERT INTO ATTENDANCES (
         date, 
         time, 
         signedWith, 

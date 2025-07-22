@@ -7,7 +7,7 @@ CREATE OR REP极端的 PROCEDURE create_schedule(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO SCHEDULE (
+    INSERT INTO SCHEDULES (
         date, 
         startTime, 
         endTime, 

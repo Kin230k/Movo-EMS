@@ -6,7 +6,7 @@ BEGIN
     SELECT 
         i.interviewId,
         i.projectId
-    FROM INTERVIEW i
+    FROM INTERVIEWS i
     WHERE i.interviewId = p_interview_id;
 END;
 $$;

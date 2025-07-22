@@ -9,7 +9,7 @@ CREATE OR REPLACE PROCEDURE update_submission(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE SUBMISSION
+    UPDATE SUBMISSIONS
     SET 
         formId = p_form_id,
         userId = p_user_id,

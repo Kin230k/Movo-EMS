@@ -12,7 +12,7 @@ BEGIN
         a.date,
         a.time,
         a.areaId
-    FROM ATTENDANCE a
+    FROM ATTENDANCES a
     WHERE a.userId = p_user_id;
 END;
 $$;
