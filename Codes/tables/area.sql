@@ -1,5 +1,11 @@
 CREATE TABLE AREAS (
     areaId UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId)
+    name JSONB NOT NULL CHECK (
+        name ? 'en' AND 
+        name ? 'ar' AND
+        jsonb_typeof(name->'en') = 'string' AND
+        jsonb_typeof(name->'ar') = 'string'
+    ),
+    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId),
+
 );
