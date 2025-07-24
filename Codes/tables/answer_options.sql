@@ -1,0 +1,5 @@
+CREATE TABLE ANSWER_OPTIONS (
+    answerOptionsId UUID PRIMARY KEY,
+    answerId UUID REFERENCES ANSWERS(answerId) NOT Null,
+    optionId UUID REFERENCES OPTIONS(optionId) NOT Null
+);

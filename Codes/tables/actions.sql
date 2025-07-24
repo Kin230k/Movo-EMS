@@ -1,0 +1,5 @@
+
+CREATE TABLE ACTIONS (
+    actionId UUID PRIMARY KEY,
+    actionType VARCHAR(100) NOT NULL UNIQUE
+);

@@ -1,0 +1,8 @@
+CREATE TABLE SCHEDULES (
+    scheduleId UUID PRIMARY KEY,
+    createdAt DATE NOT NULL DEFAULT CURRENT_DATE,
+    startTime TIME NOT NULL ,
+    endTime TIME NOT NULL ,
+    projectId UUID NOT NULL REFERENCES PROJECTS(projectId),
+    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId)
+);
