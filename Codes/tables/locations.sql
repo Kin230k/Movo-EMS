@@ -9,6 +9,5 @@ CREATE TABLE LOCATIONS (
     projectId UUID NOT NULL REFERENCES PROJECTS(projectId),
     siteMap VARCHAR(512),
     longitude NUMERIC,
-    latitude NUMERIC,
-
+    latitude NUMERIC
 );

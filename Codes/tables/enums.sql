@@ -8,6 +8,5 @@ CREATE TYPE user_role AS ENUM (
     'Senior Supervisor', 
     'Super Admin', 
     'Main User', 
-    'System Admin',
-    'Marshal'
+    'System Admin'
 );

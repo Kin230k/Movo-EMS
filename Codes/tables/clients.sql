@@ -7,14 +7,7 @@ CREATE TABLE CLIENTS (
         jsonb_typeof(name->'ar') = 'string'
     ),
     logo VARCHAR(512),
-    company JSONB CHECK (
-        company IS NULL OR (
-            company ? 'en' AND 
-            company ? 'ar' AND
-            jsonb_typeof(company->'en') = 'string' AND
-            jsonb_typeof(company->'ar') = 'string'
-        )
-    ),
+    company JSONB NOT NULL,
     contactEmail VARCHAR(255) NOT NULL UNIQUE,
     contactPhone VARCHAR(20) NOT NULL UNIQUE
 );

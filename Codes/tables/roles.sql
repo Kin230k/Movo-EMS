@@ -13,5 +13,5 @@ CREATE TABLE ROLES (
             jsonb_typeof(description->'en') = 'string' AND
             jsonb_typeof(description->'ar') = 'string'
         )
-    ),
+    )
 );

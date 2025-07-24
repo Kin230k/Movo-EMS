@@ -1,4 +1,4 @@
-CREATE TABLE emails (
+CREATE TABLE EMAILS (
     emailId   UUID    PRIMARY KEY,
     title     JSONB   NOT NULL CHECK (
         title  ? 'en' AND
@@ -13,5 +13,5 @@ CREATE TABLE emails (
         jsonb_typeof(body  -> 'ar') = 'string'
     ),
     formId    UUID    NOT NULL
-      REFERENCES forms(formId)
+      REFERENCES FORMS(formId)
 );

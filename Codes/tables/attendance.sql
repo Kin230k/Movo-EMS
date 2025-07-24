@@ -5,5 +5,5 @@ CREATE TABLE ATTENDANCES (
     signedWith signed_with_type NOT NULL,
     signedBy UUID NOT NULL REFERENCES USERS(userId),
     userId UUID NOT NULL REFERENCES USERS(userId),
-    areaId UUID NOT NULL REFERENCES AREA(areaId)
+    areaId UUID NOT NULL REFERENCES AREAS(areaId)
 );
