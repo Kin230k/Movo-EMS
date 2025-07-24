@@ -3,7 +3,7 @@ CREATE TABLE SUBMISSIONS (
     formId UUID NOT NULL REFERENCES FORMS(formId),
     userId UUID NOT NULL REFERENCES USERS(userId),
     interviewId UUID NOT NULL REFERENCES INTERVIEWS(interviewId),
-    dateSubmitted DATE NOT NULL DEFAULT CURRENT_DATE,
+    dateSubmitted TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     outcome submission_outcome,
     decisionNotes TEXT
 );
