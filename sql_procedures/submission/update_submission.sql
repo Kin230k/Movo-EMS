@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE update_submission(
     p_form_id UUID,
     p_user_id UUID,
     p_interview_id UUID,
-    p_date_submitted DATE,
+    p_date_submitted TIMESTAMP,
     p_outcome submission_outcome,
     p_decision_notes TEXT
 )

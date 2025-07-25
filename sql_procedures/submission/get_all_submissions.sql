@@ -4,7 +4,7 @@ RETURNS TABLE (
     formId UUID,
     userId UUID,
     interviewId UUID,
-    dateSubmitted DATE,
+    dateSubmitted TIMESTAMP,
     outcome submission_outcome,
     decisionNotes TEXT
 ) LANGUAGE plpgsql AS $$
