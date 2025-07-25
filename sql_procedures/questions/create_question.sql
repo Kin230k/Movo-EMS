@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE create_question(
     p_type_code VARCHAR(30),
-    p_question_text VARCHAR(1000),
+    p_question_text JSONB,
     p_form_id UUID,
     p_interview_id UUID
 )

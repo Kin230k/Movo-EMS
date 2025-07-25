@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE create_email(
-    p_title VARCHAR(255),
-    p_body TEXT,
+    p_title JSONB,
+    p_body JSONB,
     p_form_id UUID
 )
 LANGUAGE plpgsql AS $$

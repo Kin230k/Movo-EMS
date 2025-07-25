@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION get_question_by_id(p_question_id UUID)
 RETURNS TABLE (
     questionId UUID,
     typeCode VARCHAR(30),
-    questionText VARCHAR(1000),
+    questionText JSONB,
     formId UUID,
     interviewId UUID
 ) LANGUAGE plpgsql AS $$

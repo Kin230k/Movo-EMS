@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_area_by_id(p_area_id UUID)
 RETURNS TABLE (
     areaId UUID,
-    name VARCHAR(255),
+    name JSONB,
     locationId UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN
@@ -10,7 +10,7 @@ BEGIN
         a.areaId,
         a.name,
         a.locationId
-    FROM AREAS a
+    FROM AREA a
     WHERE a.areaId = p_area_id;
 END;
 $$;

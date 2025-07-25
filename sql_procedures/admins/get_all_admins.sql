@@ -1,8 +1,7 @@
 CREATE OR REPLACE FUNCTION get_all_admins()
 RETURNS TABLE (
     adminId UUID,
-    firstName VARCHAR(50),
-    lastName VARCHAR(50),
+    name JSONB,
     qid VARCHAR(20),
     dateOfBirth DATE,
     jobPosition VARCHAR(100)
@@ -11,8 +10,7 @@ BEGIN
     RETURN QUERY 
     SELECT 
         a.adminId,
-        a.firstName,
-        a.lastName,
+        a.name,
         a.qid,
         a.dateOfBirth,
         a.jobPosition

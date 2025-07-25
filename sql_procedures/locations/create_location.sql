@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_location(
-    p_name VARCHAR(255),
+    p_name JSONB,
     p_project_id UUID,
     p_site_map VARCHAR(512),
     p_longitude NUMERIC,

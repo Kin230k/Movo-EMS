@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_option_by_id(p_option_id UUID)
 RETURNS TABLE (
     optionId UUID,
-    optionText VARCHAR(500),
+    optionText JSONB,
     questionId UUID,
     isCorrect BOOLEAN,
     displayOrder INT

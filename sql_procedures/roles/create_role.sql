@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE create_role(
-    p_name VARCHAR(100),
-    p_description TEXT
+    p_name JSONB,
+    p_description JSONB
 )
 LANGUAGE plpgsql AS $$
 BEGIN

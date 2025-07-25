@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION get_all_emails()
 RETURNS TABLE (
     emailId UUID,
-    title VARCHAR(255),
-    body TEXT,
+    title JSONB,
+    body JSONB,
     formId UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN

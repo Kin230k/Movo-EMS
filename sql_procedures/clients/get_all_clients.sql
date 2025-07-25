@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION get_all_clients()
 RETURNS TABLE (
     clientId UUID,
-    name VARCHAR(255),
+    name JSONB,
     logo VARCHAR(512),
-    company VARCHAR(255),
+    company JSONB,
     contactEmail VARCHAR(255),
     contactPhone VARCHAR(20))
 LANGUAGE plpgsql AS $$

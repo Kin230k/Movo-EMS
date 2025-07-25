@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION get_all_projects()
 RETURNS TABLE (
     projectId UUID,
-    name VARCHAR(255),
+    name JSONB,
     badgeBackground VARCHAR(512),
     startingDate DATE,
     endingDate DATE,
-    description VARCHAR(2000)
+    description JSONB
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 

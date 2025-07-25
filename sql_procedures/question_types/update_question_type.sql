@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE update_question_type(
     p_type_code VARCHAR(30),
-    p_description VARCHAR(255)
+    p_description JSONB
 )
 LANGUAGE plpgsql AS $$
 BEGIN

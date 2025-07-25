@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION get_all_question_types()
-RETURNS TABLE (typeCode VARCHAR(30), description VARCHAR(255))
+RETURNS TABLE (typeCode VARCHAR(30), description JSONB)
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 

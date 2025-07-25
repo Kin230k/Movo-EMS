@@ -1,8 +1,8 @@
 CREATE OR REPLACE PROCEDURE update_client(
     p_client_id UUID,
-    p_name VARCHAR(255),
+    p_name JSONB,
     p_logo VARCHAR(512),
-    p_company VARCHAR(255),
+    p_company JSONB,
     p_contact_email VARCHAR(255),
     p_contact_phone VARCHAR(20)
 )

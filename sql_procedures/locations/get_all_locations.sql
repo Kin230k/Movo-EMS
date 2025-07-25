@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_all_locations()
 RETURNS TABLE (
     locationId UUID,
-    name VARCHAR(255),
+    name JSONB,
     projectId UUID,
     siteMap VARCHAR(512),
     longitude NUMERIC,

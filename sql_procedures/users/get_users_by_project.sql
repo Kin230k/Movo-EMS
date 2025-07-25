@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_users_by_project(p_project_id UUID)
 RETURNS TABLE (
     userId UUID,
-    name VARCHAR(100),
+    name JSONB,
     email VARCHAR(255),
     role user_role
 ) LANGUAGE plpgsql AS $$

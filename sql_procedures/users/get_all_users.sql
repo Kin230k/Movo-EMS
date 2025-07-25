@@ -1,13 +1,10 @@
 CREATE OR REPLACE FUNCTION get_all_users()
 RETURNS TABLE (
     userId UUID,
-    name VARCHAR(100),
+    name JSONB,
     email VARCHAR(255),
     phone VARCHAR(20),
-    picture VARCHAR(512),
-    role user_role,
-    status user_status,
-    twoFaEnabled BOOLEAN
+    picture VARCHAR(512)
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 
@@ -16,10 +13,7 @@ BEGIN
         u.name,
         u.email,
         u.phone,
-        u.picture,
-        u.role,
-        u.status,
-        u.twoFaEnabled
+        u.picture
     FROM USERS u;
 END;
 $$;

@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE update_option(
     p_option_id UUID,
-    p_option_text VARCHAR(500),
+    p_option_text JSONB,
     p_question_id UUID,
     p_is_correct BOOLEAN,
     p_display_order INT

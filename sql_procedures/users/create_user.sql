@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_user(
-    p_name VARCHAR(100),
+    p_name JSONB,
     p_email VARCHAR(255),
     p_phone VARCHAR(20),
     p_picture VARCHAR(512),

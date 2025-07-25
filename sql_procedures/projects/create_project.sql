@@ -1,9 +1,9 @@
 CREATE OR REPLACE PROCEDURE create_project(
-    p_name VARCHAR(255),
+    p_name JSONB,
     p_badge_background VARCHAR(512),
     p_starting_date DATE,
     p_ending_date DATE,
-    p_description VARCHAR(2000)
+    p_description JSONB
 )
 LANGUAGE plpgsql AS $$
 BEGIN

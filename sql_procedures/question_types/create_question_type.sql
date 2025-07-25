@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_question_type(
-    p_description VARCHAR(255)
+    p_description JSONB
 )
 LANGUAGE plpgsql AS $$
 BEGIN

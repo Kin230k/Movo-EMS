@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION get_role_by_id(p_role_id UUID)
-RETURNS TABLE (roleId UUID, name VARCHAR(100), description TEXT)
+RETURNS TABLE (roleId UUID, name JSONB, description JSONB)
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 

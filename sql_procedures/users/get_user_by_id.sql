@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_user_by_id(p_user_id UUID)
 RETURNS TABLE (
     userId UUID,
-    name VARCHAR(100),
+    name JSONB,
     email VARCHAR(255),
     phone VARCHAR(20),
     picture VARCHAR(512),
