@@ -6,13 +6,15 @@ CREATE OR REPLACE PROCEDURE create_email(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO EMAILS (
+        emailId,
         title, 
         body, 
         formId
     ) VALUES (
+        gen_random_uuid(),
         p_title,
         p_body,
         p_form_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

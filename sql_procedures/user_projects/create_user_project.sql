@@ -5,11 +5,13 @@ CREATE OR REPLACE PROCEDURE create_user_project(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO USER_PROJECT (
+        userProjectId,
         userId, 
         projectId
     ) VALUES (
+        gen_random_uuid(),
         p_user_id,
         p_project_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

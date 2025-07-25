@@ -9,6 +9,7 @@ CREATE OR REPLACE PROCEDURE create_attendance(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO ATTENDANCES (
+        attendanceId,
         date, 
         time, 
         signedWith, 
@@ -16,12 +17,13 @@ BEGIN
         userId, 
         areaId
     ) VALUES (
+        gen_random_uuid(),
         p_date,
         p_time,
         p_signed_with,
         p_signed_by,
         p_user_id,
         p_area_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

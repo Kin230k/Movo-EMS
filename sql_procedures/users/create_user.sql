@@ -10,6 +10,7 @@ CREATE OR REPLACE PROCEDURE create_user(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO USERS (
+        userId,
         name, 
         email, 
         phone, 
@@ -18,6 +19,7 @@ BEGIN
         status, 
         twoFaEnabled
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_email,
         p_phone,
@@ -25,6 +27,6 @@ BEGIN
         p_role,
         p_status,
         p_two_fa_enabled
-    ) RETURNING *;
+    ) ;
 END;
 $$;

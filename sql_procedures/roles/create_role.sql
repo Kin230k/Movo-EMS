@@ -4,8 +4,8 @@ CREATE OR REPLACE PROCEDURE create_role(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO ROLES (name, description) 
-    VALUES (p_name, p_description) 
-    RETURNING *;
+    INSERT INTO ROLES (roleId,name, description) 
+    VALUES (gen_random_uuid(),p_name, p_description) 
+    ;
 END;
 $$;

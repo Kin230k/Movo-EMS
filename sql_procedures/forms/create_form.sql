@@ -5,11 +5,13 @@ CREATE OR REPLACE PROCEDURE create_form(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO FORMS (
+        formId,
         projectId, 
         locationId
     ) VALUES (
+        gen_random_uuid(),
         p_project_id,
         p_location_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

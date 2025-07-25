@@ -8,12 +8,14 @@ CREATE OR REPLACE PROCEDURE create_location(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO LOCATIONS (
+        locationId,
         name, 
         projectId, 
         siteMap, 
         longitude, 
         latitude
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_project_id,
         p_site_map,

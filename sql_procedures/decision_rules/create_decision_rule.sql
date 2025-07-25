@@ -9,17 +9,19 @@ CREATE OR REPLACE PROCEDURE create_decision_rule(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO DECISION_RULES (
+        ruleId,
         name, 
         description, 
         formId, 
         priority, 
         outcomeOnPass
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_description,
         p_form_id,
         p_priority,
         p_outcome_on_pass
-    ) RETURNING *;
+    ) ;
 END;
 $$;

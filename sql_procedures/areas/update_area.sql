@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE update_area(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE AREA
+    UPDATE AREAS
     SET 
         name = p_name,
         locationId = p_location_id

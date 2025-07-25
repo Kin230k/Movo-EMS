@@ -5,11 +5,13 @@ CREATE OR REPLACE PROCEDURE create_area(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO AREAS (
+        areaId,
         name, 
         locationId
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_location_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

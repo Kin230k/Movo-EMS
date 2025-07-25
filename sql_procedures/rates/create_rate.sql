@@ -6,13 +6,15 @@ CREATE OR REPLACE PROCEDURE create_rate(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO RATES (
+        rateId,
         hourlyRate, 
         userId, 
         projectId
     ) VALUES (
+        gen_random_uuid(),
         p_hourly_rate,
         p_user_id,
         p_project_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

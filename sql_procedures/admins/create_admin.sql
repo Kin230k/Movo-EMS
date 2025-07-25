@@ -7,11 +7,13 @@ CREATE OR REPLACE PROCEDURE create_admin(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO ADMINS (
+        adminId,
         name, 
         qid, 
         dateOfBirth, 
         jobPosition
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_qid,
         p_date_of_birth,

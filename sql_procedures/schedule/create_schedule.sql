@@ -1,4 +1,4 @@
-CREATE OR REP极端的 PROCEDURE create_schedule(
+CREATE OR REPLACE PROCEDURE create_schedule(
     p_date DATE,
     p_start_time TIME,
     p_end_time TIME,
@@ -8,17 +8,19 @@ CREATE OR REP极端的 PROCEDURE create_schedule(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO SCHEDULES (
+        scheduleId,
         date, 
         startTime, 
         endTime, 
         projectId, 
         locationId
     ) VALUES (
+        gen_random_uuid(),
         p_date,
         p_start_time,
         p_end_time,
         p_project_id,
         p_location_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

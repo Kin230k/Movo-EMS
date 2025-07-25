@@ -8,17 +8,19 @@ CREATE OR REPLACE PROCEDURE create_project(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO PROJECTS (
+        projectId,
         name, 
         badgeBackground, 
         startingDate, 
         endingDate, 
         description
     ) VALUES (
+        gen_random_uuid(),
         p_name,
         p_badge_background,
         p_starting_date,
         p_ending_date,
         p_description
-    ) RETURNING *;
+    ) ;
 END;
 $$;

@@ -7,15 +7,17 @@ CREATE OR REPLACE PROCEDURE create_option(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO OPTIONS (
+        optionId,
         optionText, 
         questionId, 
         isCorrect, 
         displayOrder
     ) VALUES (
+        gen_random_uuid(),
         p_option_text,
         p_question_id,
         p_is_correct,
         p_display_order
-    ) RETURNING *;
+    ) ;
 END;
 $$;

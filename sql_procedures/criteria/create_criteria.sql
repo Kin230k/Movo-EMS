@@ -6,13 +6,15 @@ CREATE OR REPLACE PROCEDURE create_criterion(
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO CRITERIA (
+        criterionId,
         type, 
         value, 
         questionId
     ) VALUES (
+        gen_random_uuid(),
         p_type,
         p_value,
         p_question_id
-    ) RETURNING *;
+    ) ;
 END;
 $$;

@@ -4,8 +4,8 @@ CREATE OR REPLACE PROCEDURE create_admin_role(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO ADMINS_ROLES (adminId, roleId) 
-    VALUES (p_admin_id, p_role_id) 
-    RETURNING *;
+    INSERT INTO ADMINS_ROLES (adminRoleId,adminId, roleId) 
+    VALUES (gen_random_uuid(),p_admin_id, p_role_id) 
+    ;
 END;
 $$;
