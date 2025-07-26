@@ -1,9 +1,9 @@
 // user.ts
 import { Operation } from '../../operation.enum';
-
+import { Multilingual } from '../../multilingual.type';
 export class User {
   constructor(
-    public name: string,
+    public name: Multilingual,
     public email: string,
     public phone: string,
     public role: string,
@@ -11,9 +11,8 @@ export class User {
     public twoFaEnabled: boolean,
     public picture: string | null = null,
     public userId?: string,
-    
-    
   ) {}
+
 
   /** 
    * If there's an ID, we'll UPDATE; otherwise CREATE 

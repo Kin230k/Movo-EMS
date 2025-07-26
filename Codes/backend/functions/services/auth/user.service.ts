@@ -1,12 +1,13 @@
 import { UserMapper } from '../../models/auth/user/user.mapper';
 import { User } from '../../models/auth/user/user.class';
 import { Operation } from '../../models/operation.enum';
+import { Multilingual } from '../../models/multilingual.type';
 
 export class UserService {
   constructor(private readonly mapper: UserMapper) {}
 
   async registerUser(
-    name: string,
+    name: Multilingual,
     email: string,
     phone: string,
     role: string,
@@ -30,7 +31,7 @@ export class UserService {
 
   async updateUser(
     userId: string,
-    name: string,
+    name: Multilingual,
     email: string,
     phone: string,
     role: string,

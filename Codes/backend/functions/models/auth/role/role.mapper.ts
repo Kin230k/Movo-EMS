@@ -43,11 +43,11 @@ export class RoleMapper extends BaseMapper<Role> {
     await this.pool.query('CALL delete_role($1)', [id]);
   }
 
-  private mapRowToEntity = (row: any): Role => {
-    return new Role(
-      row.name,
-      row.roleId,
-      row.description
-    );
-  };
+private mapRowToEntity = (row: any): Role => {
+  return new Role(
+    row.name, // JSONB object
+    row.roleId,
+    row.description // JSONB object (nullable)
+  );
+};
 }

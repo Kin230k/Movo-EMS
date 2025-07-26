@@ -43,14 +43,14 @@ export class LocationMapper extends BaseMapper<Location> {
     await this.pool.query('CALL delete_location($1)', [id]);
   }
 
-  private mapRowToEntity = (row: any): Location => {
-    return new Location(
-      row.name,
-      row.projectId,
-      row.locationId,
-      row.siteMap,
-      row.longitude,
-      row.latitude
-    );
-  };
+ private mapRowToEntity = (row: any): Location => {
+  return new Location(
+    row.name, // JSONB object
+    row.projectId,
+    row.locationId,
+    row.siteMap,
+    row.longitude,
+    row.latitude
+  );
+};
 }

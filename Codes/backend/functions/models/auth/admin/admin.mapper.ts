@@ -8,23 +8,22 @@ export class AdminMapper extends BaseMapper<Admin> {
     super(pool);
   }
 
-  async save(entity: Admin): Promise<void> {
-    const op = entity.operation;
-    const { adminId, firstName, lastName, qid, dateOfBirth, jobPosition } = entity;
+ async save(entity: Admin): Promise<void> {
+  const op = entity.operation;
+  const { adminId, name, qid, dateOfBirth, jobPosition } = entity;
 
-    if (op === Operation.UPDATE) {
-      if (!entity.adminId) throw new Error('Admin ID is required for update');
-      await this.pool.query(
-        'CALL update_admin($1, $2, $3, $4, $5, $6)',
-        [adminId, firstName, lastName, qid, dateOfBirth, jobPosition]
-      );
-    } else {
-      await this.pool.query(
-        'CALL create_admin($1, $2, $3, $4, $5)',
-        [firstName, lastName, qid, dateOfBirth, jobPosition]
-      );
-    }
+  if (op === Operation.UPDATE) {
+    await this.pool.query(
+      'CALL update_admin($1, $2, $3, $4, $5)',
+      [adminId, name, qid, dateOfBirth, jobPosition]
+    );
+  } else {
+    await this.pool.query(
+      'CALL create_admin($1, $2, $3, $4)',
+      [name, qid, dateOfBirth, jobPosition]
+    );
   }
+}
 
   async getById(id: string): Promise<Admin | null> {
     const result: QueryResult = await this.pool.query(
@@ -46,9 +45,8 @@ export class AdminMapper extends BaseMapper<Admin> {
   private mapRowToEntity = (row: any): Admin => {
     return new Admin(
       row.qid,
+      row.name,
       row.adminId,
-      row.firstName,
-      row.lastName,
       row.dateOfBirth,
       row.jobPosition
     );

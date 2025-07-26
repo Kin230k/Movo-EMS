@@ -1,8 +1,9 @@
 import { Operation } from '../../operation.enum';
+import { Multilingual } from '../../multilingual.type';
 
 export class Area {
   constructor(
-    public name: string,
+    public name: Multilingual,
     public locationId: string,
     public areaId?: string
   ) {}

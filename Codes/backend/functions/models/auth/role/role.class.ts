@@ -1,10 +1,11 @@
 import { Operation } from '../../operation.enum';
+import { Multilingual } from '../../multilingual.type';
 
 export class Role {
   constructor(
-    public name: string,
+    public name: Multilingual,
     public roleId?: string,
-    public description?: string | null
+    public description?: Multilingual | null
   ) {}
 
   get operation(): Operation {
