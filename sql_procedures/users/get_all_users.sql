@@ -9,7 +9,7 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY 
     SELECT 
-        u.user极端的,
+        u.userId,
         u.name,
         u.email,
         u.phone,

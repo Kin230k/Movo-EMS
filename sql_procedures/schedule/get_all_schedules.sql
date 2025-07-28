@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION get_all_schedules()
 RETURNS TABLE (
-    schedule极端的 UUID,
+    scheduleId UUID,
     date DATE,
     startTime TIME,
     endTime TIME,

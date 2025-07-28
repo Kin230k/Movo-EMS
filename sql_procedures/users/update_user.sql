@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE update_user(
     p_user_id UUID,
-    p_name JSONB
+    p_name JSONB,
     p_email VARCHAR(255),
     p_phone VARCHAR(20),
     p_picture VARCHAR(512),

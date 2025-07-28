@@ -1,18 +1,19 @@
+
 CREATE OR REPLACE FUNCTION get_attendance_by_user(p_user_id UUID)
 RETURNS TABLE (
-    attendanceId UUID,
-    date DATE,
-    time TIME,
-    areaId UUID
+    attendance_id UUID,
+    attendance_date DATE,
+    attendance_time TIME,
+    area_id UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 
     SELECT 
-        a.attendanceId,
-        a.date,
-        a.time,
-        a.areaId
-    FROM ATTENDANCES a
-    WHERE a.userId = p_user_id;
+        a.attendance_id,
+        a.attendance_date,
+        a.attendance_time,
+        a.area_id
+    FROM attendances a
+    WHERE a.user_id = p_user_id;
 END;
 $$;

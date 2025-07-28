@@ -10,6 +10,6 @@ BEGIN
         a.areaId,
         a.name,
         a.locationId
-    FROM AREA a;
+    FROM AREAS a;
 END;
 $$;
