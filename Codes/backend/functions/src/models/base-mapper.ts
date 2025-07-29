@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-import { Operation } from './operation.enum';
 
 export abstract class BaseMapper<T> {
   constructor(protected pool: Pool) {}
