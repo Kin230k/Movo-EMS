@@ -1,6 +1,6 @@
-import { Operation } from "../../operation.enum";
-import { BaseMapper } from "../../base-mapper";
-import { Action } from "./action.class";
+import { Operation } from '../../operation.enum';
+import { BaseMapper } from '../../base-mapper';
+import { Action } from './action.class';
 import type { Pool, QueryResult } from 'pg';
 
 export class ActionMapper extends BaseMapper<Action> {
@@ -14,15 +14,12 @@ export class ActionMapper extends BaseMapper<Action> {
 
     if (op === Operation.UPDATE) {
       if (!entity.actionId) throw new Error('Action ID is required for update');
-      await this.pool.query(
-        'CALL update_action($1, $2)',
-        [actionId, actionType]
-      );
+      await this.pool.query('CALL update_action($1, $2)', [
+        actionId,
+        actionType,
+      ]);
     } else {
-      await this.pool.query(
-        'CALL create_action($1)',
-        [actionType]
-      );
+      await this.pool.query('CALL create_action($1)', [actionType]);
     }
   }
 
@@ -44,9 +41,6 @@ export class ActionMapper extends BaseMapper<Action> {
   }
 
   private mapRowToEntity = (row: any): Action => {
-    return new Action(
-      row.actionType, 
-      row.actionId
-    );
+    return new Action(row.actionType, row.actionId);
   };
 }
