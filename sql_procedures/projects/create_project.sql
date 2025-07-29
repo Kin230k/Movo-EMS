@@ -7,6 +7,12 @@ CREATE OR REPLACE PROCEDURE create_project(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Validate date logic
+    IF p_starting_date > p_ending_date THEN
+        RAISE EXCEPTION 'Starting date (%) cannot be after ending date (%)', 
+            p_starting_date, p_ending_date;
+    END IF;
+
     INSERT INTO PROJECTS (
         projectId,
         name, 
@@ -21,6 +27,6 @@ BEGIN
         p_starting_date,
         p_ending_date,
         p_description
-    ) ;
+    );
 END;
 $$;

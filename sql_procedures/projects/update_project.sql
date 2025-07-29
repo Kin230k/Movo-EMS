@@ -8,6 +8,12 @@ CREATE OR REPLACE PROCEDURE update_project(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Validate date logic
+    IF p_starting_date > p_ending_date THEN
+        RAISE EXCEPTION 'Starting date (%) cannot be after ending date (%)', 
+            p_starting_date, p_ending_date;
+    END IF;
+
     UPDATE PROJECTS
     SET 
         name = p_name,

@@ -5,7 +5,11 @@ CREATE OR REPLACE PROCEDURE create_numeric_answer(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Insert into NUMERIC_ANSWERS with foreign key constraint enforcement
+    -- Validate response
+    IF p_response IS NULL THEN
+        RAISE EXCEPTION 'Response value cannot be NULL';
+    END IF;
+
     INSERT INTO NUMERIC_ANSWERS (
         answerId,
         response

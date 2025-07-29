@@ -8,6 +8,11 @@ CREATE OR REPLACE PROCEDURE update_decision_rule(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Validate priority
+    IF p_priority < 0 THEN
+        RAISE EXCEPTION 'Priority cannot be negative (provided: %)', p_priority;
+    END IF;
+
     UPDATE DECISION_RULES
     SET 
         name = p_name,

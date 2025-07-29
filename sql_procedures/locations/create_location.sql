@@ -7,6 +7,15 @@ CREATE OR REPLACE PROCEDURE create_location(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Validate geographic coordinates
+    IF p_longitude < -180 OR p_longitude > 180 THEN
+        RAISE EXCEPTION 'Longitude must be between -180 and 180 (provided: %)', p_longitude;
+    END IF;
+    
+    IF p_latitude < -90 OR p_latitude > 90 THEN
+        RAISE EXCEPTION 'Latitude must be between -90 and 90 (provided: %)', p_latitude;
+    END IF;
+
     INSERT INTO LOCATIONS (
         locationId,
         name, 

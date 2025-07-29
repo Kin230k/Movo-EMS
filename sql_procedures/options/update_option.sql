@@ -7,6 +7,11 @@ CREATE OR REPLACE PROCEDURE update_option(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Validate display order
+    IF p_display_order < 0 THEN
+        RAISE EXCEPTION 'Display order cannot be negative (provided: %)', p_display_order;
+    END IF;
+
     UPDATE OPTIONS
     SET 
         optionText = p_option_text,

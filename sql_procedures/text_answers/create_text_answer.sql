@@ -5,12 +5,11 @@ CREATE OR REPLACE PROCEDURE create_text_answer(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Validate response first
+    -- Validate response
     IF p_response IS NULL OR TRIM(p_response) = '' THEN
         RAISE EXCEPTION 'Response cannot be empty';
     END IF;
 
-    -- Insert into TEXT_ANSWERS
     INSERT INTO TEXT_ANSWERS (
         answerId,
         response
