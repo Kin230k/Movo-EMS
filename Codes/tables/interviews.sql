@@ -1,0 +1,4 @@
+CREATE TABLE INTERVIEWS (
+    interviewId UUID PRIMARY KEY,
+    projectId UUID NOT NULL REFERENCES PROJECTS(projectId)
+);
