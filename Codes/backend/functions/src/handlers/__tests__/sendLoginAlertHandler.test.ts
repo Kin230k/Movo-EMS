@@ -1,73 +1,83 @@
+// src/handlers/__tests__/sendLoginAlertHandler.test.ts
+
 import { sendLoginAlertHandler } from '../sendLoginAlertHandler';
-import * as adminAuth from 'firebase-admin/auth';
+import { getAuth } from 'firebase-admin/auth';
+
 import * as emailService from '../../utils/emailService';
-import * as logger from 'firebase-functions/logger';
-import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
 jest.mock('../../utils/emailService');
-jest.mock('firebase-functions/logger', () => ({
-  error: jest.fn(),
-}));
 
-const mockedGetAuth = (adminAuth.getAuth as jest.Mock).mockReturnValue({
-  getUser: jest.fn(),
-});
-const mockedSendEmail = emailService.sendEmail as jest.Mock;
-const mockedLoggerError = logger.error as jest.Mock;
-
-const makeRequest = (data: any, uid?: string): CallableRequest<any> =>
-  ({
-    data,
-    auth: uid ? { uid } : undefined,
-    rawRequest: {} as any,
-    instanceIdToken: '',
-  } as CallableRequest<any>);
+const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
+const sendEmail = emailService.sendEmail as unknown as jest.Mock;
 
 describe('sendLoginAlertHandler', () => {
+  const fakeGetUser = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetAuth.mockReturnValue({ getUser: fakeGetUser } as any);
   });
 
-  it('throws unauthenticated if context.auth missing', async () => {
+  function makeReq(data: any, auth?: any) {
+    return { data, auth } as any;
+  }
+
+  it('throws unauthenticated if no auth', async () => {
+    await expect(sendLoginAlertHandler(makeReq({}))).rejects.toMatchObject({
+      code: 'unauthenticated',
+    });
+  });
+
+  it('throws failed-precondition if user.email missing', async () => {
+    fakeGetUser.mockResolvedValueOnce({
+      uid: 'u',
+      displayName: 'N',
+      email: undefined,
+    });
     await expect(
-      sendLoginAlertHandler(makeRequest({ device: 'Chrome' }))
-    ).rejects.toMatchObject({ code: 'unauthenticated' });
+      sendLoginAlertHandler(makeReq({ device: 'X' }, { uid: 'u' }))
+    ).rejects.toMatchObject({ code: 'failed-precondition' });
   });
 
-  it('sends email with provided device', async () => {
-    mockedGetAuth().getUser.mockResolvedValueOnce({
-      uid: 'u3',
-      email: 'user@x.com',
-      displayName: 'TestUser',
+  it('sends with Unknown device when none provided', async () => {
+    fakeGetUser.mockResolvedValueOnce({
+      uid: 'u',
+      displayName: 'User',
+      email: 'e@d',
     });
-    mockedSendEmail.mockResolvedValueOnce(undefined);
+    sendEmail.mockResolvedValueOnce(undefined);
 
-    const result = await sendLoginAlertHandler(
-      makeRequest({ device: 'Firefox on Mac' }, 'u3')
-    );
-
-    expect(mockedSendEmail).toHaveBeenCalledWith('user@x.com', 'LOGIN_ALERT', [
-      'TestUser',
-      'Firefox on Mac',
+    const res = await sendLoginAlertHandler(makeReq({}, { uid: 'u' }));
+    expect(res).toEqual({ success: true });
+    expect(sendEmail).toHaveBeenCalledWith('e@d', 'LOGIN_ALERT', [
+      'User',
+      'Unknown device',
     ]);
-    expect(result).toEqual({ success: true });
   });
 
-  it('uses "Unknown device" when device not provided', async () => {
-    mockedGetAuth().getUser.mockResolvedValueOnce({
-      uid: 'u4',
-      email: 'me@domain.com',
-      displayName: undefined,
+  it('sends with provided device', async () => {
+    fakeGetUser.mockResolvedValueOnce({
+      uid: 'u',
+      displayName: 'User',
+      email: 'e@d',
     });
-    mockedSendEmail.mockResolvedValueOnce(undefined);
+    sendEmail.mockResolvedValueOnce(undefined);
 
-    const result = await sendLoginAlertHandler(makeRequest({}, 'u4'));
-
-    expect(mockedSendEmail).toHaveBeenCalledWith(
-      'me@domain.com',
-      'LOGIN_ALERT',
-      ['User', 'Unknown device']
+    const res = await sendLoginAlertHandler(
+      makeReq({ device: 'iPhone' }, { uid: 'u' })
     );
+    expect(res).toEqual({ success: true });
+    expect(sendEmail).toHaveBeenCalledWith('e@d', 'LOGIN_ALERT', [
+      'User',
+      'iPhone',
+    ]);
+  });
+
+  it('wraps unknown errors as internal', async () => {
+    fakeGetUser.mockRejectedValueOnce(new Error('boom'));
+    await expect(
+      sendLoginAlertHandler(makeReq({}, { uid: 'u' }))
+    ).rejects.toMatchObject({ code: 'internal' });
   });
 });
