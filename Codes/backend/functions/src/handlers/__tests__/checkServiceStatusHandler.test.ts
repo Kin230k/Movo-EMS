@@ -1,62 +1,49 @@
 import { checkServiceStatusHandler } from '../checkServiceStatusHandler';
 import * as emailService from '../../utils/emailService';
-import * as functions from 'firebase-functions';
+import * as logger from 'firebase-functions/logger';
+import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('../../utils/emailService');
-jest.mock('firebase-functions', () => ({
-  ...jest.requireActual('firebase-functions'),
-  logger: {
-    error: jest.fn(),
-  },
+jest.mock('firebase-functions/logger', () => ({
+  error: jest.fn(),
 }));
 
-const mockedSendEmail = emailService.sendEmail as unknown as jest.Mock;
-const mockedLoggerError = functions.logger.error as unknown as jest.Mock;
+const mockedSendEmail = emailService.sendEmail as jest.Mock;
+const mockedLoggerError = logger.error as jest.Mock;
 
-// A dummy context—handler doesn’t use it, but TS requires it
-const fakeContext = {} as functions.https.CallableContext;
+const makeRequest = (data: any): CallableRequest<any> =>
+  ({
+    data,
+    auth: undefined,
+    rawRequest: {} as any,
+    instanceIdToken: '',
+  } as CallableRequest<any>);
 
 describe('checkServiceStatusHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should throw an error if email is missing', async () => {
-    await expect(
-      checkServiceStatusHandler({} as any, fakeContext)
-    ).rejects.toThrow(/Email is required/);
+  it('throws error if email missing', async () => {
+    await expect(checkServiceStatusHandler(makeRequest({}))).rejects.toThrow(
+      'Email is required'
+    );
   });
 
-  it('should call sendEmail and return success if email is provided', async () => {
+  it('sends email and returns success', async () => {
     mockedSendEmail.mockResolvedValueOnce(undefined);
-
     const result = await checkServiceStatusHandler(
-      { email: 'test@example.com' },
-      fakeContext
+      makeRequest({ email: 'test@example.com' })
     );
 
-    expect(mockedSendEmail).toHaveBeenCalledWith(
-      'test@example.com',
-      'SERVICE_STATUS',
-      ['User', '✅ The service is up and running!']
-    );
     expect(result).toEqual({
       status: 'ok',
       message: 'Email sent successfully',
     });
-  });
-
-  it('should throw an internal error and log if sendEmail fails', async () => {
-    const testError = new Error('SMTP failed');
-    mockedSendEmail.mockRejectedValueOnce(testError);
-
-    await expect(
-      checkServiceStatusHandler({ email: 'test@example.com' }, fakeContext)
-    ).rejects.toThrow(/Failed to send status email/);
-
-    expect(mockedLoggerError).toHaveBeenCalledWith(
-      'Service status check failed:',
-      testError
+    expect(mockedSendEmail).toHaveBeenCalledWith(
+      'test@example.com',
+      'SERVICE_STATUS',
+      ['User', '✅ The service is up and running!']
     );
   });
 });

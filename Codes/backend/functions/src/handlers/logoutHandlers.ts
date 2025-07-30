@@ -1,34 +1,27 @@
-// src/handlers/authHandlers.ts
 import { getAuth } from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
 
 export interface LogoutResult {
   success: true;
 }
 
 /**
- * Pure function handler for logout: revokes refresh tokens
+ * Handler for logout: revokes refresh tokens
  */
 export async function logoutHandler(
-  data: unknown,
-  context: functions.https.CallableContext
+  request: CallableRequest<unknown>
 ): Promise<LogoutResult> {
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-      'unauthenticated',
-      'Must be signed in to log out'
-    );
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Must be signed in to log out');
   }
 
-  const uid = context.auth.uid;
+  const uid = request.auth.uid;
   try {
     await getAuth().revokeRefreshTokens(uid);
     return { success: true };
   } catch (err: any) {
-    functions.logger.error('logoutHandler error:', err);
-    throw new functions.https.HttpsError(
-      'internal',
-      err.message || 'Failed to revoke tokens'
-    );
+    logger.error('logoutHandler error:', err);
+    throw new HttpsError('internal', err.message || 'Failed to revoke tokens');
   }
 }

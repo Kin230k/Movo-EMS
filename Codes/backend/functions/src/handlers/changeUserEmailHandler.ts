@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase-admin/auth';
 import { sendEmail } from '../utils/emailService';
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
 
 export interface ChangeEmailData {
   newEmail: string;
@@ -10,23 +11,21 @@ export interface ChangeEmailResult {
 }
 
 export async function changeUserEmailHandler(
-  data: ChangeEmailData,
-  context: functions.https.CallableContext
+  request: CallableRequest<ChangeEmailData>
 ): Promise<ChangeEmailResult> {
   // 1) auth check
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
+  if (!request.auth) {
+    throw new HttpsError(
       'permission-denied',
       'Must be signed in to change email'
     );
   }
-  const uid = context.auth.uid;
-  const { newEmail } = data;
+
+  const uid = request.auth.uid;
+  const { newEmail } = request.data;
+
   if (!newEmail) {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      'newEmail is required'
-    );
+    throw new HttpsError('invalid-argument', 'newEmail is required');
   }
 
   // 2) fetch old user
@@ -34,18 +33,15 @@ export async function changeUserEmailHandler(
   try {
     beforeUser = await getAuth().getUser(uid);
   } catch {
-    throw new functions.https.HttpsError('not-found', 'User not found');
+    throw new HttpsError('not-found', 'User not found');
   }
 
   // 3) update in Auth
   try {
     await getAuth().updateUser(uid, { email: newEmail });
   } catch (err: any) {
-    functions.logger.error('Auth update error:', err);
-    throw new functions.https.HttpsError(
-      'internal',
-      'Failed to update auth email'
-    );
+    logger.error('Auth update error:', err);
+    throw new HttpsError('internal', 'Failed to update auth email');
   }
 
   // 4) notify old email
@@ -56,12 +52,11 @@ export async function changeUserEmailHandler(
         newEmail,
       ]);
     } catch (err: any) {
-      functions.logger.error('Email notification error:', err);
+      logger.error('Email notification error:', err);
       // swallow
     }
   }
 
   // 5) (optional) update Postgres here…
-
   return { success: true };
 }
