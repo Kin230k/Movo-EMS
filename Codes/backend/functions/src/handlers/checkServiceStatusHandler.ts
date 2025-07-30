@@ -1,4 +1,5 @@
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../utils/emailService';
 
 export interface CheckServiceStatusData {
@@ -11,21 +12,14 @@ export interface CheckServiceStatusResult {
 }
 
 export async function checkServiceStatusHandler(
-  data: CheckServiceStatusData,
-  context: functions.https.CallableContext
+  request: CallableRequest<CheckServiceStatusData>
 ): Promise<CheckServiceStatusResult> {
-  // (You could inspect context.auth here if you ever want to restrict access)
+  const { email } = request.data;
 
-  // 1) Validate input
-  const { email } = data;
   if (!email) {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Email is required'
-    );
+    throw new HttpsError('invalid-argument', 'Email is required');
   }
 
-  // 2) Send status email
   try {
     await sendEmail(email, 'SERVICE_STATUS', [
       'User',
@@ -37,10 +31,7 @@ export async function checkServiceStatusHandler(
       message: 'Email sent successfully',
     };
   } catch (error: any) {
-    functions.logger.error('Service status check failed:', error);
-    throw new functions.https.HttpsError(
-      'internal',
-      'Failed to send status email'
-    );
+    logger.error('Service status check failed:', error);
+    throw new HttpsError('internal', 'Failed to send status email');
   }
 }

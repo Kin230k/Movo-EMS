@@ -1,16 +1,13 @@
-// __tests__/changeUserEmailHandler.test.ts
 import { changeUserEmailHandler } from '../changeUserEmailHandler';
 import * as emailService from '../../utils/emailService';
 import * as adminAuth from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import * as logger from 'firebase-functions/logger';
+import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('../../utils/emailService');
 jest.mock('firebase-admin/auth');
-jest.mock('firebase-functions', () => ({
-  ...jest.requireActual('firebase-functions'),
-  logger: {
-    error: jest.fn(),
-  },
+jest.mock('firebase-functions/logger', () => ({
+  error: jest.fn(),
 }));
 
 const mockedSendEmail = emailService.sendEmail as jest.Mock;
@@ -18,13 +15,15 @@ const mockedGetAuth = (adminAuth.getAuth as jest.Mock).mockReturnValue({
   getUser: jest.fn(),
   updateUser: jest.fn(),
 });
-const mockedLoggerError = functions.logger.error as jest.Mock;
+const mockedLoggerError = logger.error as jest.Mock;
 
-// helper to build a fake context with (optional) auth
-const makeContext = (uid?: string): functions.https.CallableContext =>
+const makeRequest = (data: any, uid?: string): CallableRequest<any> =>
   ({
-    auth: uid ? { uid, token: {}, getIdTokenResult: jest.fn() } : null,
-  } as any);
+    data,
+    auth: uid ? { uid } : undefined,
+    rawRequest: {} as any,
+    instanceIdToken: '',
+  } as CallableRequest<any>);
 
 describe('changeUserEmailHandler', () => {
   beforeEach(() => {
@@ -33,72 +32,68 @@ describe('changeUserEmailHandler', () => {
 
   it('throws permission-denied if not signed in', async () => {
     await expect(
-      changeUserEmailHandler({ newEmail: 'x@y.com' }, makeContext())
+      changeUserEmailHandler(makeRequest({ newEmail: 'x@y.com' }))
     ).rejects.toMatchObject({
       code: 'permission-denied',
-      message: expect.stringContaining('Must be signed in'),
+      message: 'Must be signed in to change email',
     });
   });
 
   it('throws invalid-argument if newEmail is missing', async () => {
     await expect(
-      changeUserEmailHandler({} as any, makeContext('uid123'))
+      changeUserEmailHandler(makeRequest({}, 'uid123'))
     ).rejects.toMatchObject({
       code: 'invalid-argument',
-      message: expect.stringContaining('newEmail is required'),
+      message: 'newEmail is required',
     });
   });
 
   it('throws not-found if getUser rejects', async () => {
-    (mockedGetAuth().getUser as jest.Mock).mockRejectedValueOnce(new Error());
+    mockedGetAuth().getUser.mockRejectedValueOnce(new Error());
     await expect(
-      changeUserEmailHandler({ newEmail: 'a@b.com' }, makeContext('uid123'))
+      changeUserEmailHandler(makeRequest({ newEmail: 'a@b.com' }, 'uid123'))
     ).rejects.toMatchObject({
       code: 'not-found',
-      message: expect.stringContaining('User not found'),
+      message: 'User not found',
     });
   });
 
   it('throws internal if updateUser fails', async () => {
-    // getUser succeeds
-    (mockedGetAuth().getUser as jest.Mock).mockResolvedValueOnce({
+    mockedGetAuth().getUser.mockResolvedValueOnce({
       uid: 'uid123',
       email: 'old@e.com',
       displayName: 'Old Name',
     });
-    // updateUser fails
+
     const err = new Error('update failed');
-    (mockedGetAuth().updateUser as jest.Mock).mockRejectedValueOnce(err);
+    mockedGetAuth().updateUser.mockRejectedValueOnce(err);
 
     await expect(
-      changeUserEmailHandler({ newEmail: 'new@e.com' }, makeContext('uid123'))
+      changeUserEmailHandler(makeRequest({ newEmail: 'new@e.com' }, 'uid123'))
     ).rejects.toMatchObject({
       code: 'internal',
-      message: expect.stringContaining('Failed to update auth email'),
+      message: 'Failed to update auth email',
     });
 
     expect(mockedLoggerError).toHaveBeenCalledWith('Auth update error:', err);
   });
 
-  it('swallows sendEmail errors when notifying old email and still returns success', async () => {
-    // getUser & updateUser succeed
-    (mockedGetAuth().getUser as jest.Mock).mockResolvedValueOnce({
+  it('swallows sendEmail errors and returns success', async () => {
+    mockedGetAuth().getUser.mockResolvedValueOnce({
       uid: 'uid123',
       email: 'old@e.com',
       displayName: 'Old Name',
     });
-    (mockedGetAuth().updateUser as jest.Mock).mockResolvedValueOnce({});
+    mockedGetAuth().updateUser.mockResolvedValueOnce({});
 
-    // notification fails
     const notifyErr = new Error('SMTP down');
     mockedSendEmail.mockRejectedValueOnce(notifyErr);
 
     const result = await changeUserEmailHandler(
-      { newEmail: 'new@e.com' },
-      makeContext('uid123')
+      makeRequest({ newEmail: 'new@e.com' }, 'uid123')
     );
-    expect(result).toEqual({ success: true });
 
+    expect(result).toEqual({ success: true });
     expect(mockedSendEmail).toHaveBeenCalledWith('old@e.com', 'EMAIL_CHANGE', [
       'Old Name',
       'new@e.com',
@@ -109,24 +104,20 @@ describe('changeUserEmailHandler', () => {
     );
   });
 
-  it('calls sendEmail for old email on success and returns success', async () => {
-    // getUser & updateUser succeed
-    (mockedGetAuth().getUser as jest.Mock).mockResolvedValueOnce({
+  it('sends email and returns success', async () => {
+    mockedGetAuth().getUser.mockResolvedValueOnce({
       uid: 'uid123',
       email: 'old@e.com',
       displayName: 'Old Name',
     });
-    (mockedGetAuth().updateUser as jest.Mock).mockResolvedValueOnce({});
-
-    // notification succeeds
+    mockedGetAuth().updateUser.mockResolvedValueOnce({});
     mockedSendEmail.mockResolvedValueOnce(undefined);
 
     const result = await changeUserEmailHandler(
-      { newEmail: 'new@e.com' },
-      makeContext('uid123')
+      makeRequest({ newEmail: 'new@e.com' }, 'uid123')
     );
-    expect(result).toEqual({ success: true });
 
+    expect(result).toEqual({ success: true });
     expect(mockedSendEmail).toHaveBeenCalledWith('old@e.com', 'EMAIL_CHANGE', [
       'Old Name',
       'new@e.com',

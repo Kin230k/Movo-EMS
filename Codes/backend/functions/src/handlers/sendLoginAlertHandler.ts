@@ -1,5 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../utils/emailService';
 import { LoginAlertData } from '../utils/types';
 
@@ -8,26 +9,22 @@ export interface SendLoginAlertResult {
 }
 
 export async function sendLoginAlertHandler(
-  data: LoginAlertData,
-  context: functions.https.CallableContext
+  request: CallableRequest<LoginAlertData>
 ): Promise<SendLoginAlertResult> {
   // 1) Ensure the caller is authenticated
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'Auth required');
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Auth required');
   }
 
   try {
     // 2) Fetch the user record
-    const user = await getAuth().getUser(context.auth.uid);
+    const user = await getAuth().getUser(request.auth.uid);
     if (!user.email) {
-      throw new functions.https.HttpsError(
-        'failed-precondition',
-        'User email missing'
-      );
+      throw new HttpsError('failed-precondition', 'User email missing');
     }
 
     // 3) Extract device info (if provided)
-    const deviceInfo = data.device || 'Unknown device';
+    const deviceInfo = request.data.device || 'Unknown device';
 
     // 4) Send the alert email
     await sendEmail(user.email, 'LOGIN_ALERT', [
@@ -37,15 +34,15 @@ export async function sendLoginAlertHandler(
 
     return { success: true };
   } catch (err: any) {
-    functions.logger.error('Login alert error:', err);
+    logger.error('Login alert error:', err);
 
     // 5) Rethrow known HttpsErrors
-    if (err instanceof functions.https.HttpsError) {
+    if (err instanceof HttpsError) {
       throw err;
     }
 
     // 6) Wrap unknown errors
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       'internal',
       err.message || 'Login notification failed'
     );

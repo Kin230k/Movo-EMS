@@ -1,14 +1,30 @@
-// src/handlers/registerUserHandler.ts
 import { getAuth, UserRecord } from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger'; // Updated logger import
+
 import { sendEmail } from '../utils/emailService';
+import userMapper from '../models/auth/user/user.mapper';
+import { User } from '../models/auth/user/user.class';
+import { Multilingual } from '../models/multilingual.type';
+import {
+  conflictError,
+  isValidEmail,
+  isValidPhone,
+  validationError,
+} from '../utils/validators';
+import { emailExists, phoneExists } from '../utils/authUtils';
+
 export interface RegisterUserData {
-  email: string;
   password: string;
   displayName?: string;
+  name: Multilingual;
+  email: string;
   phone: string;
-  pictureUrl?: string;
   role: string;
+  status: string;
+  twoFaEnabled: boolean;
+  picture?: string | null;
+  userId?: string | undefined;
 }
 
 export interface RegisterUserResult {
@@ -16,71 +32,116 @@ export interface RegisterUserResult {
 }
 
 export async function registerUserHandler(
-  data: RegisterUserData,
-  context: functions.https.CallableContext
+  request: CallableRequest<RegisterUserData>
 ): Promise<RegisterUserResult> {
-  const { email, password, displayName, phone, pictureUrl, role } = data;
-  if (!email || !password || !phone || !role) {
-    const err = new functions.https.HttpsError(
-      'invalid-argument',
-      'email, password, phone, and role are all required'
+  const data = request.data;
+  const {
+    name,
+    status,
+    twoFaEnabled,
+    email,
+    password,
+    displayName,
+    phone,
+    picture,
+    role,
+  } = data;
+
+  // Check required fields
+  if (
+    !name ||
+    !status ||
+    twoFaEnabled === undefined ||
+    !email ||
+    !password ||
+    !displayName ||
+    !phone ||
+    !role
+  ) {
+    throw validationError(
+      'name, status, twoFaEnabled, email, password, displayName, phone, and role are required'
     );
-    // make message enumerable
-    (err as any).message = err.message;
-    throw err;
   }
-  // const user = new User()
+
+  // Validate email format
+  if (!isValidEmail(email)) {
+    throw validationError('Invalid email format');
+  }
+
+  // Validate phone format
+  if (!isValidPhone(phone)) {
+    throw validationError('Phone must be in E.164 format (e.g., +1234567890)');
+  }
+
+  // Check for existing accounts
+  if (await emailExists(email)) {
+    throw conflictError('Email already registered');
+  }
+
+  if (await phoneExists(phone)) {
+    throw conflictError('Phone number already registered');
+  }
+
   try {
-    // ─── Phase A: Create the Auth user
+    // Create Auth user
     const userRecord: UserRecord = await getAuth().createUser({
       email,
       password,
       displayName,
       phoneNumber: phone,
-      photoURL: pictureUrl,
+      photoURL: picture || undefined,
     });
 
-    // ─── Phase B: Post‐creation work
+    const user = new User(
+      name,
+      email,
+      phone,
+      role,
+      status,
+      twoFaEnabled,
+      picture || undefined,
+      userRecord.uid
+    );
+
     try {
-      // 1) Generate verification link
+      // Generate verification link
       const verifyLink = await getAuth().generateEmailVerificationLink(email);
 
-      // 2) Send the email
+      // Send verification email
       await sendEmail(email, 'VERIFICATION', [
         displayName || 'User',
         verifyLink,
       ]);
 
-      // 3) Persist to your DB here:
-      //  await UserMapper({ uid: userRecord.uid, email, role, … });
+      // Save to database
+      await userMapper.save(user);
 
-      // Success!
       return { uid: userRecord.uid };
     } catch (postErr: any) {
-      // If anything in Phase B fails, clean up the newly created user
+      // Cleanup auth user on failure
       await getAuth()
         .deleteUser(userRecord.uid)
         .catch(() => {
-          /* ignore cleanup errors */
+          logger.error('Failed to cleanup user after DB error');
         });
 
-      const httpsErr = new functions.https.HttpsError(
+      logger.error('Post-creation error:', postErr);
+      throw new HttpsError(
         'internal',
-        postErr.message || 'Failed during registration post‐processing'
+        postErr.message || 'Registration completion failed'
       );
-      (httpsErr as any).message = postErr.message || httpsErr.message;
-      functions.logger.error('Post‐creation error:', postErr);
-      throw httpsErr;
     }
   } catch (err: any) {
-    // Catch any errors from Phase A or our rethrown Phase B errors
-    functions.logger.error('registerUser error:', err);
+    logger.error('Registration error:', err);
 
-    const httpsErr = new functions.https.HttpsError(
-      'internal',
-      err.message || 'Failed to register user'
-    );
-    (httpsErr as any).message = err.message || httpsErr.message;
-    throw httpsErr;
+    // Handle Firebase Auth errors
+    if (err.code === 'auth/email-already-exists') {
+      throw conflictError('Email already registered');
+    }
+    if (err.code === 'auth/phone-number-already-exists') {
+      throw conflictError('Phone number already registered');
+    }
+
+    throw new HttpsError('internal', err.message || 'User registration failed');
   }
 }

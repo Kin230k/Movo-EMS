@@ -1,34 +1,87 @@
-// src/handlers/authHandlers.ts
-import { getAuth } from 'firebase-admin/auth';
-import * as functions from 'firebase-functions';
+import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
+import userMapper from '../models/auth/user/user.mapper';
+import { User } from '../models/auth/user/user.class';
 
 export interface LoginData {
-  uid: string;
+  email: string;
+  password: string;
 }
+
 export interface LoginResult {
-  token: string;
+  idToken: string;
+  refreshToken: string;
+  user: User;
 }
 
-/**
- * Pure function handler for login: issues a custom token
- */
 export async function loginHandler(
-  data: LoginData,
-  context: functions.https.CallableContext
+  request: CallableRequest<LoginData>
 ): Promise<LoginResult> {
-  const { uid } = data;
-  if (!uid) {
-    throw new functions.https.HttpsError('invalid-argument', 'uid is required');
-  }
+  const { email, password } = request.data;
 
-  try {
-    const token = await getAuth().createCustomToken(uid);
-    return { token };
-  } catch (err: any) {
-    functions.logger.error('loginHandler error:', err);
-    throw new functions.https.HttpsError(
-      'internal',
-      err.message || 'Failed to create custom token'
+  if (!email || !password) {
+    throw new HttpsError(
+      'invalid-argument',
+      'Email and password are both required.'
     );
   }
+
+  const apiKey = process.env.FIREBASE_API_KEY;
+  if (!apiKey) {
+    throw new HttpsError(
+      'failed-precondition',
+      'Missing Firebase API key in environment.'
+    );
+  }
+
+  let idToken: string;
+  let refreshToken: string;
+  let uid: string;
+
+  try {
+    const resp = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, returnSecureToken: true }),
+      }
+    );
+
+    const body = await resp.json();
+
+    if (!resp.ok) {
+      const msg: string = body.error?.message;
+      if (msg === 'EMAIL_NOT_FOUND' || msg === 'INVALID_PASSWORD') {
+        throw new HttpsError('unauthenticated', 'Invalid email or password.');
+      }
+      if (msg === 'USER_DISABLED') {
+        throw new HttpsError('permission-denied', 'User account is disabled.');
+      }
+      logger.error('signInWithPassword failed:', body);
+      throw new HttpsError('internal', 'Failed to authenticate user.');
+    }
+
+    idToken = body.idToken;
+    refreshToken = body.refreshToken;
+    uid = body.localId;
+  } catch (err: any) {
+    if (err instanceof HttpsError) throw err;
+    logger.error('loginHandler → fetch error:', err);
+    throw new HttpsError('internal', 'Authentication request failed.');
+  }
+
+  let user: User | null;
+  try {
+    user = await userMapper.getById(uid);
+  } catch (dbErr: any) {
+    logger.error('loginHandler → userMapper.getById error:', dbErr);
+    throw new HttpsError('internal', 'Failed to fetch user profile.');
+  }
+
+  if (!user) {
+    throw new HttpsError('not-found', `No user profile found for uid=${uid}.`);
+  }
+
+  return { idToken, refreshToken, user };
 }

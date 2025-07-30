@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { onCall } from 'firebase-functions/v2/https';
 import { loginHandler } from '../handlers/loginHandlers';
 
-export const login = functions.https.onCall(loginHandler);
+export const login = onCall({ maxInstances: 10 }, loginHandler);

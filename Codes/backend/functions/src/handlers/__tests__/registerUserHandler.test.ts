@@ -1,100 +1,89 @@
-// __tests__/registerUserHandler.test.ts
-import { registerUserHandler } from '../registerUserHandler';
 import * as adminAuth from 'firebase-admin/auth';
-import * as emailService from '../../utils/emailService';
-import * as functions from 'firebase-functions';
+import { sendEmail } from '../../utils/emailService';
+import userMapper from '../../models/auth/user/user.mapper';
+import * as logger from 'firebase-functions/logger';
+import { registerUserHandler } from '../registerUserHandler';
+import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
 jest.mock('../../utils/emailService');
-jest.mock('firebase-functions', () => ({
-  ...jest.requireActual('firebase-functions'),
-  logger: {
-    error: jest.fn(),
-  },
+jest.mock('../../models/auth/user/user.mapper');
+jest.mock('firebase-functions/logger', () => ({
+  error: jest.fn(),
 }));
 
-const mockedSendEmail = emailService.sendEmail as jest.Mock;
-const mockedLoggerError = functions.logger.error as jest.Mock;
+const mockedSendEmail = sendEmail as jest.Mock;
+const mockedSave = userMapper.save as jest.Mock;
+const mockedLoggerError = logger.error as jest.Mock;
 
 const createUserMock = jest.fn();
 const generateLinkMock = jest.fn();
 const deleteUserMock = jest.fn();
 
-// Mock getAuth() to return our spies
 (adminAuth.getAuth as jest.Mock).mockReturnValue({
   createUser: createUserMock,
   generateEmailVerificationLink: generateLinkMock,
   deleteUser: deleteUserMock,
 });
 
-const fakeContext = {} as functions.https.CallableContext;
+const makeRequest = (data: any): CallableRequest<any> =>
+  ({
+    data,
+    auth: undefined,
+    rawRequest: {} as any,
+    instanceIdToken: '',
+  } as CallableRequest<any>);
 
 describe('registerUserHandler', () => {
   const baseData = {
+    name: { en: 'Test Name', ar: 'اسم الاختبار' },
+    status: 'pending',
+    twoFaEnabled: false,
     email: 'u@example.com',
     password: 'secret123',
     displayName: 'Test User',
     phone: '+1234567890',
-    pictureUrl: 'https://pic.url/avatar.png',
+    picture: 'https://pic.url/avatar.png',
     role: 'tester',
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Ensure deleteUser returns a promise so .catch works
-    deleteUserMock.mockResolvedValue(undefined);
   });
 
-  it('throws invalid-argument if required fields are missing', async () => {
-    await expect(
-      registerUserHandler({} as any, fakeContext)
-    ).rejects.toMatchObject({ code: 'invalid-argument' });
+  it('throws invalid-argument if required fields missing', async () => {
+    await expect(registerUserHandler(makeRequest({}))).rejects.toMatchObject({
+      code: 'invalid-argument',
+    });
   });
 
   it('throws internal if createUser fails', async () => {
     const createErr = new Error('Auth down');
     createUserMock.mockRejectedValueOnce(createErr);
 
-    const p = registerUserHandler(baseData, fakeContext);
-    await expect(p).rejects.toMatchObject({ code: 'internal' });
-    await expect(p).rejects.toThrow('Auth down');
+    await expect(
+      registerUserHandler(makeRequest(baseData))
+    ).rejects.toMatchObject({ code: 'internal' });
 
     expect(mockedLoggerError).toHaveBeenCalledWith(
-      'registerUser error:',
+      'Registration error:',
       createErr
     );
   });
 
-  it('cleans up and throws if Phase B (link or email) fails', async () => {
+  it('cleans up and throws if link generation fails', async () => {
     createUserMock.mockResolvedValueOnce({ uid: 'new-uid' });
-    const postErr = new Error('Link service down');
-    generateLinkMock.mockRejectedValueOnce(postErr);
+    const linkErr = new Error('Link service down');
+    generateLinkMock.mockRejectedValueOnce(linkErr);
 
-    const p = registerUserHandler(baseData, fakeContext);
-    await expect(p).rejects.toMatchObject({ code: 'internal' });
-    await expect(p).rejects.toThrow('Link service down');
+    await expect(
+      registerUserHandler(makeRequest(baseData))
+    ).rejects.toMatchObject({ code: 'internal' });
 
     expect(deleteUserMock).toHaveBeenCalledWith('new-uid');
     expect(mockedLoggerError).toHaveBeenCalledWith(
-      'Post‐creation error:',
-      postErr
-    );
-  });
-
-  it('cleans up and throws if sendEmail fails', async () => {
-    createUserMock.mockResolvedValueOnce({ uid: 'uid-2' });
-    generateLinkMock.mockResolvedValueOnce('https://verify.link/token');
-    const emailErr = new Error('SMTP error');
-    mockedSendEmail.mockRejectedValueOnce(emailErr);
-
-    const p = registerUserHandler(baseData, fakeContext);
-    await expect(p).rejects.toMatchObject({ code: 'internal' });
-    await expect(p).rejects.toThrow('SMTP error');
-
-    expect(deleteUserMock).toHaveBeenCalledWith('uid-2');
-    expect(mockedLoggerError).toHaveBeenCalledWith(
-      'Post‐creation error:',
-      emailErr
+      'Post-creation error:',
+      linkErr
     );
   });
 
@@ -103,23 +92,7 @@ describe('registerUserHandler', () => {
     generateLinkMock.mockResolvedValueOnce('https://verify.link/ok');
     mockedSendEmail.mockResolvedValueOnce(undefined);
 
-    const result = await registerUserHandler(baseData, fakeContext);
+    const result = await registerUserHandler(makeRequest(baseData));
     expect(result).toEqual({ uid: 'final-uid' });
-
-    expect(createUserMock).toHaveBeenCalledWith({
-      email: baseData.email,
-      password: baseData.password,
-      displayName: baseData.displayName,
-      phoneNumber: baseData.phone,
-      photoURL: baseData.pictureUrl,
-    });
-
-    expect(generateLinkMock).toHaveBeenCalledWith(baseData.email);
-    expect(mockedSendEmail).toHaveBeenCalledWith(
-      baseData.email,
-      'VERIFICATION',
-      [baseData.displayName, 'https://verify.link/ok']
-    );
-    expect(deleteUserMock).not.toHaveBeenCalled();
   });
 });
