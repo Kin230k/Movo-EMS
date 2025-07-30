@@ -1,35 +1,25 @@
 import { RateMapper } from '../../models/project/rate/rate.mapper';
 import { Rate } from '../../models/project/rate/rate.class';
-import { Operation } from '../../models/operation.enum';
 
 export class RateService {
   constructor(private readonly mapper: RateMapper) {}
 
   async createRate(
-    hourlyRate: number, 
-    userId: string, 
+    hourlyRate: number,
+    userId: string,
     projectId: string
   ): Promise<void> {
-    const entity = new Rate(
-      hourlyRate,
-      userId,
-      projectId
-    );
+    const entity = new Rate(hourlyRate, userId, projectId);
     await this.mapper.save(entity);
   }
 
   async updateRate(
-    rateId: string, 
-    hourlyRate: number, 
-    userId: string, 
+    rateId: string,
+    hourlyRate: number,
+    userId: string,
     projectId: string
   ): Promise<void> {
-    const entity = new Rate(
-      hourlyRate,
-      userId,
-      projectId,
-      rateId
-    );
+    const entity = new Rate(hourlyRate, userId, projectId, rateId);
     await this.mapper.save(entity);
   }
 

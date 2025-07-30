@@ -1,6 +1,5 @@
 import { AttendanceMapper } from '../../models/project/attendance/attendance.mapper';
 import { Attendance } from '../../models/project/attendance/attendance.class';
-import { Operation } from '../../models/operation.enum';
 
 export class AttendanceService {
   constructor(private readonly mapper: AttendanceMapper) {}
