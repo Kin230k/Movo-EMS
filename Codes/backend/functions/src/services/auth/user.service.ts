@@ -1,6 +1,5 @@
 import { UserMapper } from '../../models/auth/user/user.mapper';
 import { User } from '../../models/auth/user/user.class';
-import { Operation } from '../../models/operation.enum';
 import { Multilingual } from '../../models/multilingual.type';
 
 export class UserService {
@@ -24,7 +23,6 @@ export class UserService {
       twoFaEnabled,
       picture
     );
-    
 
     await this.mapper.save(user);
   }
@@ -49,7 +47,6 @@ export class UserService {
       picture,
       userId
     );
-    
 
     await this.mapper.save(user);
   }

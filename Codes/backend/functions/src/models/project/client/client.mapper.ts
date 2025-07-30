@@ -1,33 +1,38 @@
-import { Operation } from "../../operation.enum";
-import { BaseMapper } from "../../base-mapper";
-import { Client } from "./client.class";
-import type { Pool, QueryResult } from 'pg';
+import { Operation } from '../../operation.enum';
+import { BaseMapper } from '../../base-mapper';
+import { Client } from './client.class';
+import type { QueryResult } from 'pg';
+import pool from '../../../utils/pool';
 
 export class ClientMapper extends BaseMapper<Client> {
-  constructor(pool: Pool) {
-    super(pool);
-  }
-
   async save(entity: Client): Promise<void> {
     const op = entity.operation;
-    const { clientId, name, logo, company, contactEmail, contactPhone } = entity;
+    const { clientId, name, logo, company, contactEmail, contactPhone } =
+      entity;
 
     if (op === Operation.UPDATE) {
       if (!entity.clientId) throw new Error('Client ID is required for update');
-      await this.pool.query(
-        'CALL update_client($1, $2, $3, $4, $5, $6)',
-        [clientId, name, logo, company, contactEmail, contactPhone]
-      );
+      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6)', [
+        clientId,
+        name,
+        logo,
+        company,
+        contactEmail,
+        contactPhone,
+      ]);
     } else {
-      await this.pool.query(
-        'CALL create_client($1, $2, $3, $4, $5)',
-        [name, logo, company, contactEmail, contactPhone]
-      );
+      await pool.query('CALL create_client($1, $2, $3, $4, $5)', [
+        name,
+        logo,
+        company,
+        contactEmail,
+        contactPhone,
+      ]);
     }
   }
 
   async getById(id: string): Promise<Client | null> {
-    const result: QueryResult = await this.pool.query(
+    const result: QueryResult = await pool.query(
       'SELECT * FROM get_client_by_id($1)',
       [id]
     );
@@ -35,12 +40,12 @@ export class ClientMapper extends BaseMapper<Client> {
   }
 
   async getAll(): Promise<Client[]> {
-    const result = await this.pool.query('SELECT * FROM get_all_clients()');
+    const result = await pool.query('SELECT * FROM get_all_clients()');
     return result.rows.map(this.mapRowToEntity);
   }
 
   async delete(id: string): Promise<void> {
-    await this.pool.query('CALL delete_client($1)', [id]);
+    await pool.query('CALL delete_client($1)', [id]);
   }
 
   private mapRowToEntity = (row: any): Client => {
@@ -54,3 +59,5 @@ export class ClientMapper extends BaseMapper<Client> {
     );
   };
 }
+const clientMapper = new ClientMapper();
+export default clientMapper;

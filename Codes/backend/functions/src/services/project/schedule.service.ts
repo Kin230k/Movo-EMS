@@ -1,15 +1,14 @@
 import { ScheduleMapper } from '../../models/project/schedule/schedule.mapper';
 import { Schedule } from '../../models/project/schedule/schedule.class';
-import { Operation } from '../../models/operation.enum';
 
 export class ScheduleService {
   constructor(private readonly mapper: ScheduleMapper) {}
 
   async createSchedule(
-    createdAt: string, 
-    startTime: string, 
-    endTime: string, 
-    projectId: string, 
+    createdAt: string,
+    startTime: string,
+    endTime: string,
+    projectId: string,
     locationId: string
   ): Promise<void> {
     const entity = new Schedule(
@@ -23,11 +22,11 @@ export class ScheduleService {
   }
 
   async updateSchedule(
-    scheduleId: string, 
-    createdAt: string, 
-    startTime: string, 
-    endTime: string, 
-    projectId: string, 
+    scheduleId: string,
+    createdAt: string,
+    startTime: string,
+    endTime: string,
+    projectId: string,
     locationId: string
   ): Promise<void> {
     const entity = new Schedule(

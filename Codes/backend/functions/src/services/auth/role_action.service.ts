@@ -1,28 +1,20 @@
 import { RoleActionMapper } from '../../models/auth/role_action/role_action.mapper';
 import { RoleAction } from '../../models/auth/role_action/role_action.class';
-import { Operation } from '../../models/operation.enum';
 
 export class RoleActionService {
   constructor(private readonly mapper: RoleActionMapper) {}
 
-  async createRoleAction(
-    roleId: string, actionId: string
-  ): Promise<void> {
-    const entity = new RoleAction(
-      roleId,
-      actionId
-    );
+  async createRoleAction(roleId: string, actionId: string): Promise<void> {
+    const entity = new RoleAction(roleId, actionId);
     await this.mapper.save(entity);
   }
 
   async updateRoleAction(
-    roleActionsId: string, roleId: string, actionId: string
+    roleActionsId: string,
+    roleId: string,
+    actionId: string
   ): Promise<void> {
-    const entity = new RoleAction(
-      roleId,
-      actionId,
-      roleActionsId
-    );
+    const entity = new RoleAction(roleId, actionId, roleActionsId);
     await this.mapper.save(entity);
   }
 

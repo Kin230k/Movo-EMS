@@ -1,28 +1,20 @@
 import { AdminsRoleMapper } from '../../models/auth/admins_role/admins_role.mapper';
 import { AdminsRole } from '../../models/auth/admins_role/admins_role.class';
-import { Operation } from '../../models/operation.enum';
 
 export class AdminsRoleService {
   constructor(private readonly mapper: AdminsRoleMapper) {}
 
-  async createAdminsRole(
-    adminId: string, roleId: string
-  ): Promise<void> {
-    const entity = new AdminsRole(
-      adminId,
-      roleId
-    );
+  async createAdminsRole(adminId: string, roleId: string): Promise<void> {
+    const entity = new AdminsRole(adminId, roleId);
     await this.mapper.save(entity);
   }
 
   async updateAdminsRole(
-    adminRoleId: string, adminId: string, roleId: string
+    adminRoleId: string,
+    adminId: string,
+    roleId: string
   ): Promise<void> {
-    const entity = new AdminsRole(
-      adminId,
-      roleId,
-      adminRoleId
-    );
+    const entity = new AdminsRole(adminId, roleId, adminRoleId);
     await this.mapper.save(entity);
   }
 
