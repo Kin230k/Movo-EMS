@@ -11,8 +11,9 @@ export class LocationMapper extends BaseMapper<Location> {
       entity;
 
     if (op === Operation.UPDATE) {
-      if (!entity.locationId)
+      if (!locationId) {
         throw new Error('Location ID is required for update');
+      }
       await pool.query('CALL update_location($1, $2, $3, $4, $5, $6)', [
         locationId,
         name,
@@ -22,13 +23,24 @@ export class LocationMapper extends BaseMapper<Location> {
         latitude,
       ]);
     } else {
-      await pool.query('CALL create_location($1, $2, $3, $4, $5)', [
-        name,
-        projectId,
-        siteMap,
-        longitude,
-        latitude,
-      ]);
+      // create_location is now a FUNCTION → use SELECT to get back the inserted row
+      const { rows } = await pool.query(
+        'SELECT * FROM create_location($1, $2, $3, $4, $5)',
+        [name, projectId, siteMap, longitude, latitude]
+      );
+
+      if (rows.length === 0) {
+        throw new Error('Failed to create location');
+      }
+
+      // assign the generated ID (and any other returned fields) back to our entity
+      const created = rows[0];
+      entity.locationId = created.locationid; // note: PG returns lowercase keys
+      // if you need to sync other fields:
+      // entity.name      = created.name;
+      // entity.siteMap   = created.sitemap;
+      // entity.longitude = created.longitude;
+      // entity.latitude  = created.latitude;
     }
   }
 

@@ -1,24 +1,24 @@
 CREATE OR REPLACE FUNCTION get_all_attendances()
 RETURNS TABLE (
-    attendance_id UUID,  -- Changed from attendanceId (use snake_case convention)
-    attendance_date DATE,  -- Avoid reserved word "date"
-    attendance_time TIMESTAMP,  -- Avoid reserved word "time"
-    signed_with signed_with_type,
-    signed_by UUID,  -- Changed from signedBy
-    user_id UUID,  -- Changed from userId
-    area_id UUID  -- Changed from areaId
-) 
+    attendanceId UUID,
+    attendanceDate         DATE,
+    attendanceTime         TIME,
+    signedWith   signed_with_type,
+    signedBy     UUID,
+    userId       UUID,
+    areaId       UUID
+)
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    RETURN QUERY
     SELECT 
-        a.attendance_id,  -- Match corrected column name
-        a.attendance_date,
-        a.attendance_time,
-        a.signed_with,
-        a.signed_by,
-        a.user_id,
-        a.area_id
-    FROM attendances a;  -- Use lowercase table name
+        a.attendanceId,
+        a.date as attendanceDate,
+        a.time as attendanceTime,
+        a.signedWith,
+        a.signedBy,
+        a.userId,
+        a.areaId
+    FROM ATTENDANCES a;            -- ← use ATTENDANCES everywhere
 END;
 $$;

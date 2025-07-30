@@ -10,7 +10,7 @@ BEGIN
         a.areaId,
         a.name,
         a.locationId
-    FROM AREA a
+    FROM AREAS a
     WHERE a.areaId = p_area_id;
 END;
 $$;

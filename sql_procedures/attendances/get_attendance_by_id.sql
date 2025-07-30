@@ -1,25 +1,25 @@
-
 CREATE OR REPLACE FUNCTION get_attendance_by_id(p_attendance_id UUID)
 RETURNS TABLE (
-    attendance_id UUID,
-    attendance_date DATE,
-    attendance_time TIME,
-    signed_with signed_with_type,
-    signed_by UUID,
-    user_id UUID,
-    area_id UUID
-) LANGUAGE plpgsql AS $$
+    attendanceId UUID,
+    attendanceDate         DATE,
+    attendanceTime         TIME,
+    signedWith   signed_with_type,
+    signedBy     UUID,
+    userId       UUID,
+    areaId       UUID
+)
+LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    RETURN QUERY
     SELECT 
-        a.attendance_id,
-        a.attendance_date,
-        a.attendance_time,
-        a.signed_with,
-        a.signed_by,
-        a.user_id,
-        a.area_id
-    FROM attendances a
-    WHERE a.attendance_id = p_attendance_id;
+        a.attendanceId,
+        a.date as attendanceDate,
+        a.time as attendanceTime,
+        a.signedWith,
+        a.signedBy,
+        a.userId,
+        a.areaId
+    FROM ATTENDANCES a             -- ← consistent table name
+    WHERE a.attendanceId = p_attendance_id;
 END;
 $$;
