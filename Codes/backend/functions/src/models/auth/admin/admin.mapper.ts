@@ -53,4 +53,7 @@ export class AdminMapper extends BaseMapper<Admin> {
       row.jobPosition
     );
   };
+
 }
+const adminMapper = new AdminMapper();
+export default adminMapper;

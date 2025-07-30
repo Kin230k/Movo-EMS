@@ -1,19 +1,19 @@
-import { ProjectUserRoleMapper } from '../../models/auth/project_user_role/project_user_role.mapper';
+import  projectUserRoleMapper  from '../../models/auth/project_user_role/project_user_role.mapper';
 import { ProjectUserRole } from '../../models/auth/project_user_role/project_user_role.class';
 
 export class ProjectUserRoleService {
-  constructor(private readonly mapper: ProjectUserRoleMapper) {}
+  constructor() {}
 
-  async createProjectUserRole(
+ static async createProjectUserRole(
     userId: string,
     projectId: string,
     roleId: string
   ): Promise<void> {
     const entity = new ProjectUserRole(userId, projectId, roleId);
-    await this.mapper.save(entity);
+    await projectUserRoleMapper.save(entity);
   }
 
-  async updateProjectUserRole(
+ static async updateProjectUserRole(
     projectUserRoleId: string,
     userId: string,
     projectId: string,
@@ -25,18 +25,18 @@ export class ProjectUserRoleService {
       roleId,
       projectUserRoleId
     );
-    await this.mapper.save(entity);
+    await projectUserRoleMapper.save(entity);
   }
 
-  async getProjectUserRoleById(id: string): Promise<ProjectUserRole | null> {
-    return await this.mapper.getById(id);
+  static async getProjectUserRoleById(id: string): Promise<ProjectUserRole | null> {
+    return await projectUserRoleMapper.getById(id);
   }
 
-  async getAllProjectUserRoles(): Promise<ProjectUserRole[]> {
-    return await this.mapper.getAll();
+  static async getAllProjectUserRoles(): Promise<ProjectUserRole[]> {
+    return await projectUserRoleMapper.getAll();
   }
 
-  async deleteProjectUserRole(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteProjectUserRole(id: string): Promise<void> {
+    await projectUserRoleMapper.delete(id);
   }
 }

@@ -1,37 +1,37 @@
-import { RateMapper } from '../../models/project/rate/rate.mapper';
+import  rateMapper  from '../../models/project/rate/rate.mapper';
 import { Rate } from '../../models/project/rate/rate.class';
 
 export class RateService {
-  constructor(private readonly mapper: RateMapper) {}
+  constructor() {}
 
-  async createRate(
+ static async createRate(
     hourlyRate: number,
     userId: string,
     projectId: string
   ): Promise<void> {
     const entity = new Rate(hourlyRate, userId, projectId);
-    await this.mapper.save(entity);
+    await rateMapper.save(entity);
   }
 
-  async updateRate(
+  static async updateRate(
     rateId: string,
     hourlyRate: number,
     userId: string,
     projectId: string
   ): Promise<void> {
     const entity = new Rate(hourlyRate, userId, projectId, rateId);
-    await this.mapper.save(entity);
+    await rateMapper.save(entity);
   }
 
-  async getRateById(id: string): Promise<Rate | null> {
-    return await this.mapper.getById(id);
+ static async getRateById(id: string): Promise<Rate | null> {
+    return await rateMapper.getById(id);
   }
 
-  async getAllRates(): Promise<Rate[]> {
-    return await this.mapper.getAll();
+ static async getAllRates(): Promise<Rate[]> {
+    return await rateMapper.getAll();
   }
 
-  async deleteRate(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteRate(id: string): Promise<void> {
+    await rateMapper.delete(id);
   }
 }

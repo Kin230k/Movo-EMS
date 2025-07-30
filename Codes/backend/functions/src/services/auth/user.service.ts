@@ -1,11 +1,11 @@
-import { UserMapper } from '../../models/auth/user/user.mapper';
+import userMapper  from '../../models/auth/user/user.mapper';
 import { User } from '../../models/auth/user/user.class';
 import { Multilingual } from '../../models/multilingual.type';
 
 export class UserService {
-  constructor(private readonly mapper: UserMapper) {}
+  constructor() {}
 
-  async registerUser(
+  static async registerUser(
     name: Multilingual,
     email: string,
     phone: string,
@@ -24,10 +24,10 @@ export class UserService {
       picture
     );
 
-    await this.mapper.save(user);
+    await userMapper.save(user);
   }
 
-  async updateUser(
+ static async updateUser(
     userId: string,
     name: Multilingual,
     email: string,
@@ -48,22 +48,22 @@ export class UserService {
       userId
     );
 
-    await this.mapper.save(user);
+    await userMapper.save(user);
   }
 
-  async getUserById(userId: string): Promise<User | null> {
-    return await this.mapper.getById(userId);
+ static async getUserById(userId: string): Promise<User | null> {
+    return await userMapper.getById(userId);
   }
 
-  async getUserByEmail(email: string): Promise<User | null> {
-    return await this.mapper.getByEmail(email);
+ static async getUserByEmail(email: string): Promise<User | null> {
+    return await userMapper.getByEmail(email);
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return await this.mapper.getAll();
+  static async getAllUsers(): Promise<User[]> {
+    return await userMapper.getAll();
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    await this.mapper.delete(userId);
+  static async deleteUser(userId: string): Promise<void> {
+    await userMapper.delete(userId);
   }
 }

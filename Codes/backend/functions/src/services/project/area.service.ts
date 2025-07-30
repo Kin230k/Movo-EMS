@@ -1,32 +1,32 @@
-import { AreaMapper } from '../../models/project/area/area.mapper';
+import  areaMapper  from '../../models/project/area/area.mapper';
 import { Area } from '../../models/project/area/area.class';
 import { Multilingual } from '../../models/multilingual.type';
 
 export class AreaService {
-  constructor(private readonly mapper: AreaMapper) {}
+  constructor() {}
 
-  async createArea(name: Multilingual, locationId: string): Promise<void> {
+static async createArea(name: Multilingual, locationId: string): Promise<void> {
     const entity = new Area(name, locationId);
-    await this.mapper.save(entity);
+    await areaMapper.save(entity);
   }
 
-  async updateArea(
+ static async updateArea(
     areaId: string,
     name: Multilingual,
     locationId: string
   ): Promise<void> {
     const entity = new Area(name, locationId, areaId);
-    await this.mapper.save(entity);
+    await areaMapper.save(entity);
   }
-  async getAreaById(id: string): Promise<Area | null> {
-    return await this.mapper.getById(id);
-  }
-
-  async getAllAreas(): Promise<Area[]> {
-    return await this.mapper.getAll();
+  static async getAreaById(id: string): Promise<Area | null> {
+    return await areaMapper.getById(id);
   }
 
-  async deleteArea(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async getAllAreas(): Promise<Area[]> {
+    return await areaMapper.getAll();
+  }
+
+  static async deleteArea(id: string): Promise<void> {
+    await areaMapper.delete(id);
   }
 }

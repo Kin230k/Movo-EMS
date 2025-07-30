@@ -1,10 +1,10 @@
-import { AttendanceMapper } from '../../models/project/attendance/attendance.mapper';
+import  attendanceMapper  from '../../models/project/attendance/attendance.mapper';
 import { Attendance } from '../../models/project/attendance/attendance.class';
 
 export class AttendanceService {
-  constructor(private readonly mapper: AttendanceMapper) {}
+  constructor() {}
 
-  async createAttendance(
+  static async createAttendance(
     date: string,
     time: string,
     signedWith: any,
@@ -20,10 +20,10 @@ export class AttendanceService {
       userId,
       areaId
     );
-    await this.mapper.save(entity);
+    await attendanceMapper.save(entity);
   }
 
-  async updateAttendance(
+  static async updateAttendance(
     attendanceId: string,
     date: string,
     time: string,
@@ -41,18 +41,18 @@ export class AttendanceService {
       areaId,
       attendanceId
     );
-    await this.mapper.save(entity);
+    await attendanceMapper.save(entity);
   }
 
-  async getAttendanceById(id: string): Promise<Attendance | null> {
-    return await this.mapper.getById(id);
+  static async getAttendanceById(id: string): Promise<Attendance | null> {
+    return await attendanceMapper.getById(id);
   }
 
-  async getAllAttendances(): Promise<Attendance[]> {
-    return await this.mapper.getAll();
+  static async getAllAttendances(): Promise<Attendance[]> {
+    return await attendanceMapper.getAll();
   }
 
-  async deleteAttendance(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteAttendance(id: string): Promise<void> {
+    await attendanceMapper.delete(id);
   }
 }

@@ -1,10 +1,10 @@
-import { ProjectMapper } from '../../models/project/project/project.mapper';
+import projectMapper  from '../../models/project/project/project.mapper';
 import { Project } from '../../models/project/project/project.class';
 import { Multilingual } from '../../models/multilingual.type';
 export class ProjectService {
-  constructor(private readonly mapper: ProjectMapper) {}
+  constructor() {}
 
-  async createProject(
+  static async createProject(
     clientId: string,
     name: Multilingual,
     startingDate: string,
@@ -21,10 +21,10 @@ export class ProjectService {
       endingDate,
       description
     );
-    await this.mapper.save(entity);
+    await projectMapper.save(entity);
   }
 
-  async updateProject(
+  static async updateProject(
     projectId: string,
     clientId: string,
     name: Multilingual,
@@ -42,18 +42,18 @@ export class ProjectService {
       endingDate,
       description
     );
-    await this.mapper.save(entity);
+    await projectMapper.save(entity);
   }
 
-  async getProjectById(id: string): Promise<Project | null> {
-    return await this.mapper.getById(id);
+  static async getProjectById(id: string): Promise<Project | null> {
+    return await projectMapper.getById(id);
   }
 
-  async getAllProjects(): Promise<Project[]> {
-    return await this.mapper.getAll();
+  static async getAllProjects(): Promise<Project[]> {
+    return await projectMapper.getAll();
   }
 
-  async deleteProject(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteProject(id: string): Promise<void> {
+    await projectMapper.delete(id);
   }
 }

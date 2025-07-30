@@ -1,10 +1,10 @@
-import { ClientMapper } from '../../models/project/client/client.mapper';
+import  clientMapper  from '../../models/project/client/client.mapper';
 import { Client } from '../../models/project/client/client.class';
 import { Multilingual } from '../../models/multilingual.type';
 export class ClientService {
-  constructor(private readonly mapper: ClientMapper) {}
+  constructor() {}
 
-  async createClient(
+ static async createClient(
     name: Multilingual,
     contactEmail: string,
     contactPhone: string,
@@ -19,10 +19,10 @@ export class ClientService {
       logo,
       company
     );
-    await this.mapper.save(entity);
+    await clientMapper.save(entity);
   }
 
-  async updateClient(
+ static async updateClient(
     clientId: string,
     name: Multilingual,
     contactEmail: string,
@@ -38,18 +38,18 @@ export class ClientService {
       logo,
       company
     );
-    await this.mapper.save(entity);
+    await clientMapper.save(entity);
   }
 
-  async getClientById(id: string): Promise<Client | null> {
-    return await this.mapper.getById(id);
+ static async getClientById(id: string): Promise<Client | null> {
+    return await clientMapper.getById(id);
   }
 
-  async getAllClients(): Promise<Client[]> {
-    return await this.mapper.getAll();
+  static async getAllClients(): Promise<Client[]> {
+    return await clientMapper.getAll();
   }
 
-  async deleteClient(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteClient(id: string): Promise<void> {
+    await clientMapper.delete(id);
   }
 }

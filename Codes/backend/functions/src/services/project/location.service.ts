@@ -1,17 +1,18 @@
-import { LocationMapper } from '../../models/project/location/location.mapper';
+import  locationMapper  from '../../models/project/location/location.mapper';
 import { Location } from '../../models/project/location/location.class';
 import { Multilingual } from '../../models/multilingual.type';
-export class LocationService {
-  constructor(private readonly mapper: LocationMapper) {}
 
-  async createLocation(
+export class LocationService {
+  constructor() {}
+
+static async createLocation(
     name: Multilingual,
     projectId: string,
     siteMap?: string,
     longitude?: number,
     latitude?: number
   ): Promise<void> {
-    const entity = new Location(
+ const entity = new Location(
       name,
       projectId,
       undefined,
@@ -19,10 +20,10 @@ export class LocationService {
       longitude,
       latitude
     );
-    await this.mapper.save(entity);
+    await locationMapper.save(entity);
   }
 
-  async updateLocation(
+ static async updateLocation(
     locationId: string,
     name: Multilingual,
     projectId: string,
@@ -38,17 +39,17 @@ export class LocationService {
       longitude,
       latitude
     );
-    await this.mapper.save(entity);
+    await locationMapper.save(entity);
   }
-  async getLocationById(id: string): Promise<Location | null> {
-    return await this.mapper.getById(id);
-  }
-
-  async getAllLocations(): Promise<Location[]> {
-    return await this.mapper.getAll();
+ static async getLocationById(id: string): Promise<Location | null> {
+    return await locationMapper.getById(id);
   }
 
-  async deleteLocation(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async getAllLocations(): Promise<Location[]> {
+    return await locationMapper.getAll();
+  }
+
+  static async deleteLocation(id: string): Promise<void> {
+    await locationMapper.delete(id);
   }
 }

@@ -1,7 +1,7 @@
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import userMapper from '../models/auth/user/user.mapper';
 import { User } from '../models/auth/user/user.class';
+import { UserService } from '../services/auth/user.service';
 
 export interface LoginData {
   email: string;
@@ -73,7 +73,7 @@ export async function loginHandler(
 
   let user: User | null;
   try {
-    user = await userMapper.getById(uid);
+    user = await UserService.getUserById(uid);
   } catch (dbErr: any) {
     logger.error('loginHandler → userMapper.getById error:', dbErr);
     throw new HttpsError('internal', 'Failed to fetch user profile.');

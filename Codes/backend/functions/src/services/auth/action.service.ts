@@ -1,28 +1,38 @@
-import { ActionMapper } from '../../models/auth/action/action.mapper';
+import actionMapper from '../../models/auth/action/action.mapper';
 import { Action } from '../../models/auth/action/action.class';
 
+
 export class ActionService {
-  constructor(private readonly mapper: ActionMapper) {}
+  constructor() {}
 
-  async createAction(actionType: string): Promise<void> {
-    const entity = new Action(actionType);
-    await this.mapper.save(entity);
+  static async createAction(
+    actionType: string
+  ): Promise<void> {
+    const entity = new Action(
+      actionType
+    );
+    await actionMapper.save(entity);
   }
 
-  async updateAction(actionId: string, actionType: string): Promise<void> {
-    const entity = new Action(actionType, actionId);
-    await this.mapper.save(entity);
+  static async updateAction(
+    actionId: string, actionType: string
+  ): Promise<void> {
+    const entity = new Action(
+      actionType,
+      actionId
+    );
+    await actionMapper.save(entity);
   }
 
-  async getActionById(id: string): Promise<Action | null> {
-    return await this.mapper.getById(id);
+  static async getActionById(id: string): Promise<Action | null> {
+    return await actionMapper.getById(id);
   }
 
-  async getAllActions(): Promise<Action[]> {
-    return await this.mapper.getAll();
+  static async getAllActions(): Promise<Action[]> {
+    return await actionMapper.getAll();
   }
 
-  async deleteAction(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteAction(id: string): Promise<void> {
+    await actionMapper.delete(id);
   }
 }

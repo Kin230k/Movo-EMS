@@ -3,7 +3,6 @@ import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger'; // Updated logger import
 
 import { sendEmail } from '../utils/emailService';
-import userMapper from '../models/auth/user/user.mapper';
 import { User } from '../models/auth/user/user.class';
 import { Multilingual } from '../models/multilingual.type';
 import {
@@ -13,6 +12,7 @@ import {
   validationError,
 } from '../utils/validators';
 import { emailExists, phoneExists } from '../utils/authUtils';
+import { UserService } from '../services/auth/user.service';
 
 export interface RegisterUserData {
   password: string;
@@ -114,7 +114,7 @@ export async function registerUserHandler(
       ]);
 
       // Save to database
-      await userMapper.save(user);
+      await UserService.registerUser(user.name,user.email,user.phone,user.role,user.status,user.twoFaEnabled,user.picture);
 
       return { uid: userRecord.uid };
     } catch (postErr: any) {

@@ -1,10 +1,10 @@
-import { ScheduleMapper } from '../../models/project/schedule/schedule.mapper';
+import  scheduleMapper  from '../../models/project/schedule/schedule.mapper';
 import { Schedule } from '../../models/project/schedule/schedule.class';
 
 export class ScheduleService {
-  constructor(private readonly mapper: ScheduleMapper) {}
+  constructor() {}
 
-  async createSchedule(
+  static async createSchedule(
     createdAt: string,
     startTime: string,
     endTime: string,
@@ -18,10 +18,10 @@ export class ScheduleService {
       projectId,
       locationId
     );
-    await this.mapper.save(entity);
+    await scheduleMapper.save(entity);
   }
 
-  async updateSchedule(
+  static async updateSchedule(
     scheduleId: string,
     createdAt: string,
     startTime: string,
@@ -37,18 +37,18 @@ export class ScheduleService {
       locationId,
       scheduleId
     );
-    await this.mapper.save(entity);
+    await scheduleMapper.save(entity);
   }
 
-  async getScheduleById(id: string): Promise<Schedule | null> {
-    return await this.mapper.getById(id);
+  static async getScheduleById(id: string): Promise<Schedule | null> {
+    return await scheduleMapper.getById(id);
   }
 
-  async getAllSchedules(): Promise<Schedule[]> {
-    return await this.mapper.getAll();
+  static async getAllSchedules(): Promise<Schedule[]> {
+    return await scheduleMapper.getAll();
   }
 
-  async deleteSchedule(id: string): Promise<void> {
-    await this.mapper.delete(id);
+  static async deleteSchedule(id: string): Promise<void> {
+    await scheduleMapper.delete(id);
   }
 }
