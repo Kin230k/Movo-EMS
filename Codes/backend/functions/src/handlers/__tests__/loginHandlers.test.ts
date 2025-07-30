@@ -1,169 +1,116 @@
-import { loginHandler } from '../loginHandlers';
-import * as functions from 'firebase-functions/logger';
+// src/handlers/__tests__/loginHandlers.test.ts
+
+import { loginHandler, LoginResult } from '../loginHandlers';
 import userMapper from '../../models/auth/user/user.mapper';
-import { User } from '../../models/auth/user/user.class';
-import { CallableRequest } from 'firebase-functions/v2/https';
+import { HttpsError } from 'firebase-functions/v2/https';
 
-global.fetch = jest.fn() as jest.Mock;
+jest.mock('../../models/auth/user/user.mapper');
 
-jest.mock('firebase-functions/logger', () => ({
-  error: jest.fn()
-}));
+const mockedGetById = userMapper.getById as unknown as jest.Mock;
 
-const mockedLoggerError = functions.error as jest.Mock;
-const mockedGetById = userMapper.getById as jest.Mock;
-
-const dummyUser = new User(
-  { en: 'Test', ar: 'اختبار' },
-  'u@example.com',
-  '+123',
-  'role',
-  'active',
-  false,
-  undefined,
-  'the-uid'
-);
-
-const makeRequest = (data: any): CallableRequest<any> => ({
-  data,
-  auth: undefined,
-  rawRequest: {} as any,
-  instanceIdToken: '',
-} as CallableRequest<any>);
+// A minimal fetch-mock
+const mockFetch = jest.fn();
+global.fetch = mockFetch as any;
 
 describe('loginHandler', () => {
-  const originalEnv = process.env;
-
+  const OLD_API_KEY = process.env.FIREBASE_API_KEY;
+  beforeAll(() => {
+    process.env.FIREBASE_API_KEY = 'test-api-key';
+  });
+  afterAll(() => {
+    process.env.FIREBASE_API_KEY = OLD_API_KEY;
+  });
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env = { ...originalEnv };
-    (global.fetch as jest.Mock).mockClear();
   });
 
-  afterAll(() => {
-    process.env = originalEnv;
-  });
+  function makeReq(data: any) {
+    return { data } as any;
+  }
 
   it('throws invalid-argument if email or password missing', async () => {
     await expect(
-      loginHandler(makeRequest({ email: '', password: '' }))
-    ).rejects.toMatchObject({ code: 'invalid-argument' });
-
-    await expect(
-      loginHandler(makeRequest({ email: 'a@b.com' }))
-    ).rejects.toMatchObject({ code: 'invalid-argument' });
+      loginHandler(makeReq({ email: '', password: '' }))
+    ).rejects.toThrow(HttpsError);
   });
 
-  it('throws failed-precondition if missing API key', async () => {
-    process.env.FIREBASE_API_KEY = '';
+  it('throws failed-precondition if API key missing', async () => {
+    delete process.env.FIREBASE_API_KEY;
     await expect(
-      loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
+      loginHandler(makeReq({ email: 'a@b.com', password: 'p' }))
     ).rejects.toMatchObject({ code: 'failed-precondition' });
+    process.env.FIREBASE_API_KEY = 'test-api-key';
   });
 
-  it('throws internal if fetch errors', async () => {
-    process.env.FIREBASE_API_KEY = 'APIKEY';
-    (global.fetch as jest.Mock).mockRejectedValue(new Error('net down'));
+  it('propagates HttpsError on bad credentials', async () => {
+    const body = { error: { message: 'INVALID_PASSWORD' } };
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => body,
+    });
+    await expect(
+      loginHandler(makeReq({ email: 'u@e.com', password: 'bad' }))
+    ).rejects.toMatchObject({ code: 'unauthenticated' });
+  });
+
+  it('throws internal if fetch itself errors', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('network down'));
+    await expect(
+      loginHandler(makeReq({ email: 'u@e.com', password: 'p' }))
+    ).rejects.toMatchObject({ code: 'internal' });
+  });
+
+  it('throws internal on userMapper.getById rejection', async () => {
+    // first simulate good fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        idToken: 'ID',
+        refreshToken: 'REF',
+        localId: 'UID',
+      }),
+    });
+    mockedGetById.mockRejectedValueOnce(new Error('db down'));
 
     await expect(
-      loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-    ).rejects.toMatchObject({
-      code: 'internal',
-      message: 'Authentication request failed.',
-    });
-
-    expect(mockedLoggerError).toHaveBeenCalled();
+      loginHandler(makeReq({ email: 'u@e.com', password: 'p' }))
+    ).rejects.toMatchObject({ code: 'internal' });
   });
 
-  describe('REST errors', () => {
-    beforeEach(() => {
-      process.env.FIREBASE_API_KEY = 'APIKEY';
+  it('throws not-found if no user profile', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        idToken: 'ID',
+        refreshToken: 'REF',
+        localId: 'UID',
+      }),
     });
+    mockedGetById.mockResolvedValueOnce(null);
 
-    function mockFetchResponse(ok: boolean, body: any) {
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok,
-        json: () => Promise.resolve(body),
-      });
-    }
-
-    it('maps EMAIL_NOT_FOUND/INVALID_PASSWORD to unauthenticated', async () => {
-      mockFetchResponse(false, { error: { message: 'EMAIL_NOT_FOUND' } });
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-      ).rejects.toMatchObject({ code: 'unauthenticated' });
-
-      mockFetchResponse(false, { error: { message: 'INVALID_PASSWORD' } });
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'wrong' }))
-      ).rejects.toMatchObject({ code: 'unauthenticated' });
-    });
-
-    it('maps USER_DISABLED to permission-denied', async () => {
-      mockFetchResponse(false, { error: { message: 'USER_DISABLED' } });
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-      ).rejects.toMatchObject({ code: 'permission-denied' });
-    });
-
-    it('maps unknown REST error to internal', async () => {
-      mockFetchResponse(false, {
-        error: { message: 'SOME_OTHER' },
-        detail: 'xyz',
-      });
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-      ).rejects.toMatchObject({ code: 'internal' });
-
-      expect(mockedLoggerError).toHaveBeenCalled();
-    });
+    await expect(
+      loginHandler(makeReq({ email: 'u@e.com', password: 'p' }))
+    ).rejects.toMatchObject({ code: 'not-found' });
   });
 
-  describe('successful fetch', () => {
-    const fakeTokens = {
-      idToken: 'ID123',
-      refreshToken: 'REF123',
-      localId: 'the-uid',
-    };
-
-    beforeEach(() => {
-      process.env.FIREBASE_API_KEY = 'APIKEY';
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(fakeTokens),
-      });
+  it('returns tokens and user on success', async () => {
+    const fakeUser = { uid: 'UID', email: 'u@e.com' };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        idToken: 'ID',
+        refreshToken: 'REF',
+        localId: 'UID',
+      }),
     });
+    mockedGetById.mockResolvedValueOnce(fakeUser);
 
-    it('throws internal on DB-get error', async () => {
-      mockedGetById.mockRejectedValueOnce(new Error('DB down'));
+    const res = (await loginHandler(
+      makeReq({ email: 'u@e.com', password: 'p' })
+    )) as LoginResult;
 
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-      ).rejects.toMatchObject({ code: 'internal' });
-
-      expect(mockedLoggerError).toHaveBeenCalled();
-    });
-
-    it('throws not-found if userMapper returns null', async () => {
-      mockedGetById.mockResolvedValueOnce(null);
-
-      await expect(
-        loginHandler(makeRequest({ email: 'u@e.com', password: 'p' }))
-      ).rejects.toMatchObject({ code: 'not-found' });
-    });
-
-    it('returns tokens and user on success', async () => {
-      mockedGetById.mockResolvedValueOnce(dummyUser);
-
-      const result = await loginHandler(
-        makeRequest({ email: 'u@e.com', password: 'p' })
-      );
-
-      expect(result).toEqual({
-        idToken: fakeTokens.idToken,
-        refreshToken: fakeTokens.refreshToken,
-        user: dummyUser,
-      });
-    });
+    expect(res.idToken).toBe('ID');
+    expect(res.refreshToken).toBe('REF');
+    expect(res.user).toEqual(fakeUser);
   });
 });

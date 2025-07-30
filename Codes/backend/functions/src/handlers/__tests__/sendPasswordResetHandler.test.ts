@@ -1,7 +1,6 @@
 import { sendPasswordResetHandler } from '../sendPasswordResetHandler';
 import * as adminAuth from 'firebase-admin/auth';
 import * as emailService from '../../utils/emailService';
-import * as logger from 'firebase-functions/logger';
 import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
@@ -16,7 +15,6 @@ const generateLinkMock = jest.fn();
 });
 
 const mockedSendEmail = emailService.sendEmail as jest.Mock;
-const mockedLoggerError = logger.error as jest.Mock;
 
 const makeRequest = (data: any): CallableRequest<any> =>
   ({

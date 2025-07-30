@@ -1,6 +1,5 @@
 import { checkServiceStatusHandler } from '../checkServiceStatusHandler';
 import * as emailService from '../../utils/emailService';
-import * as logger from 'firebase-functions/logger';
 import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('../../utils/emailService');
@@ -9,7 +8,6 @@ jest.mock('firebase-functions/logger', () => ({
 }));
 
 const mockedSendEmail = emailService.sendEmail as jest.Mock;
-const mockedLoggerError = logger.error as jest.Mock;
 
 const makeRequest = (data: any): CallableRequest<any> =>
   ({

@@ -1,6 +1,5 @@
 import { logoutHandler } from '../logoutHandlers';
 import * as adminAuth from 'firebase-admin/auth';
-import * as logger from 'firebase-functions/logger';
 import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
@@ -8,7 +7,6 @@ jest.mock('firebase-functions/logger', () => ({
   error: jest.fn(),
 }));
 
-const mockedLoggerError = logger.error as jest.Mock;
 const revokeRefreshTokensMock = jest.fn();
 
 (adminAuth.getAuth as jest.Mock).mockReturnValue({

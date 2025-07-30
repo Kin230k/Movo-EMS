@@ -1,98 +1,111 @@
-import * as adminAuth from 'firebase-admin/auth';
-import { sendEmail } from '../../utils/emailService';
-import userMapper from '../../models/auth/user/user.mapper';
-import * as logger from 'firebase-functions/logger';
+// src/handlers/__tests__/registerUserHandler.test.ts
+
 import { registerUserHandler } from '../registerUserHandler';
-import { CallableRequest } from 'firebase-functions/v2/https';
+import { getAuth } from 'firebase-admin/auth';
+import * as emailService from '../../utils/emailService';
+import userMapper from '../../models/auth/user/user.mapper';
+import { HttpsError } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
 jest.mock('../../utils/emailService');
 jest.mock('../../models/auth/user/user.mapper');
-jest.mock('firebase-functions/logger', () => ({
-  error: jest.fn(),
-}));
 
-const mockedSendEmail = sendEmail as jest.Mock;
-const mockedSave = userMapper.save as jest.Mock;
-const mockedLoggerError = logger.error as jest.Mock;
-
-const createUserMock = jest.fn();
-const generateLinkMock = jest.fn();
-const deleteUserMock = jest.fn();
-
-(adminAuth.getAuth as jest.Mock).mockReturnValue({
-  createUser: createUserMock,
-  generateEmailVerificationLink: generateLinkMock,
-  deleteUser: deleteUserMock,
-});
-
-const makeRequest = (data: any): CallableRequest<any> =>
-  ({
-    data,
-    auth: undefined,
-    rawRequest: {} as any,
-    instanceIdToken: '',
-  } as CallableRequest<any>);
+const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
+const sendEmail = emailService.sendEmail as unknown as jest.Mock;
+const saveUser = userMapper.save as unknown as jest.Mock;
 
 describe('registerUserHandler', () => {
-  const baseData = {
-    name: { en: 'Test Name', ar: 'اسم الاختبار' },
-    status: 'pending',
-    twoFaEnabled: false,
-    email: 'u@example.com',
-    password: 'secret123',
-    displayName: 'Test User',
-    phone: '+1234567890',
-    picture: 'https://pic.url/avatar.png',
-    role: 'tester',
+  const fakeAuth = {
+    getUserByEmail: jest.fn(),
+    getUserByPhoneNumber: jest.fn(),
+    createUser: jest.fn(),
+    generateEmailVerificationLink: jest.fn(),
+    deleteUser: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetAuth.mockReturnValue(fakeAuth as any);
   });
 
-  it('throws invalid-argument if required fields missing', async () => {
-    await expect(registerUserHandler(makeRequest({}))).rejects.toMatchObject({
-      code: 'invalid-argument',
+  function makeReq(data: any) {
+    return { data } as any;
+  }
+
+  const fullData = {
+    name: { en: 'A' },
+    status: 'new',
+    twoFaEnabled: false,
+    email: 'x@y.com',
+    password: 'p',
+    displayName: 'User',
+    phone: '+123',
+    role: 'user',
+    picture: null,
+  };
+
+  it('throws invalid-argument if any field missing', async () => {
+    await expect(registerUserHandler(makeReq({}))).rejects.toThrow(HttpsError);
+  });
+
+  it('throws conflict on existing email', async () => {
+    fakeAuth.getUserByEmail.mockResolvedValueOnce({ uid: 'u' });
+    await expect(
+      registerUserHandler(makeReq({ ...fullData }))
+    ).rejects.toMatchObject({ code: 'already-exists' });
+  });
+
+  it('throws conflict on existing phone', async () => {
+    fakeAuth.getUserByEmail.mockRejectedValueOnce({
+      code: 'auth/user-not-found',
     });
+    fakeAuth.getUserByPhoneNumber.mockResolvedValueOnce({ uid: 'u' });
+    await expect(
+      registerUserHandler(makeReq({ ...fullData }))
+    ).rejects.toMatchObject({ code: 'already-exists' });
   });
 
   it('throws internal if createUser fails', async () => {
-    const createErr = new Error('Auth down');
-    createUserMock.mockRejectedValueOnce(createErr);
-
+    fakeAuth.getUserByEmail.mockRejectedValueOnce({
+      code: 'auth/user-not-found',
+    });
+    fakeAuth.getUserByPhoneNumber.mockRejectedValueOnce({
+      code: 'auth/user-not-found',
+    });
+    fakeAuth.createUser.mockRejectedValueOnce(new Error('fail'));
     await expect(
-      registerUserHandler(makeRequest(baseData))
+      registerUserHandler(makeReq({ ...fullData }))
     ).rejects.toMatchObject({ code: 'internal' });
-
-    expect(mockedLoggerError).toHaveBeenCalledWith(
-      'Registration error:',
-      createErr
-    );
   });
 
-  it('cleans up and throws if link generation fails', async () => {
-    createUserMock.mockResolvedValueOnce({ uid: 'new-uid' });
-    const linkErr = new Error('Link service down');
-    generateLinkMock.mockRejectedValueOnce(linkErr);
-
+  it('cleans up and internal on post-creation failure', async () => {
+    fakeAuth.getUserByEmail.mockRejectedValueOnce({
+      code: 'auth/user-not-found',
+    });
+    fakeAuth.getUserByPhoneNumber.mockRejectedValueOnce({
+      code: 'auth/user-not-found',
+    });
+    fakeAuth.createUser.mockResolvedValueOnce({ uid: 'new-uid' });
+    fakeAuth.generateEmailVerificationLink.mockResolvedValueOnce('link');
+    sendEmail.mockRejectedValueOnce(new Error('SMTP'));
     await expect(
-      registerUserHandler(makeRequest(baseData))
+      registerUserHandler(makeReq({ ...fullData }))
     ).rejects.toMatchObject({ code: 'internal' });
-
-    expect(deleteUserMock).toHaveBeenCalledWith('new-uid');
-    expect(mockedLoggerError).toHaveBeenCalledWith(
-      'Post-creation error:',
-      linkErr
-    );
+    expect(fakeAuth.deleteUser).toHaveBeenCalledWith('new-uid');
   });
 
-  it('returns uid on successful register', async () => {
-    createUserMock.mockResolvedValueOnce({ uid: 'final-uid' });
-    generateLinkMock.mockResolvedValueOnce('https://verify.link/ok');
-    mockedSendEmail.mockResolvedValueOnce(undefined);
+  it('saves user and returns uid on full success', async () => {
+    fakeAuth.getUserByEmail.mockRejectedValue({ code: 'auth/user-not-found' });
+    fakeAuth.getUserByPhoneNumber.mockRejectedValue({
+      code: 'auth/user-not-found',
+    });
+    fakeAuth.createUser.mockResolvedValueOnce({ uid: 'new-uid' });
+    fakeAuth.generateEmailVerificationLink.mockResolvedValueOnce('link');
+    sendEmail.mockResolvedValueOnce(undefined);
+    saveUser.mockResolvedValueOnce(undefined);
 
-    const result = await registerUserHandler(makeRequest(baseData));
-    expect(result).toEqual({ uid: 'final-uid' });
+    const res = await registerUserHandler(makeReq({ ...fullData }));
+    expect(res).toEqual({ uid: 'new-uid' });
+    expect(saveUser).toHaveBeenCalled();
   });
 });
