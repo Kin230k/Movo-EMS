@@ -7,25 +7,29 @@ import pool from '../../../utils/pool';
 export class AttendanceMapper extends BaseMapper<Attendance> {
   async save(entity: Attendance): Promise<void> {
     const op = entity.operation;
-    const { attendanceId, date, time, signedWith, signedBy, userId, areaId } =
-      entity;
+    const {
+      attendanceId,
+      attendanceTimestamp,
+      signedWith,
+      signedBy,
+      userId,
+      areaId,
+    } = entity;
 
     if (op === Operation.UPDATE) {
-      if (!entity.attendanceId)
+      if (!attendanceId)
         throw new Error('Attendance ID is required for update');
-      await pool.query('CALL update_attendance($1, $2, $3, $4, $5, $6, $7)', [
+      await pool.query('CALL update_attendance($1, $2, $3, $4, $5, $6)', [
         attendanceId,
-        date,
-        time,
+        attendanceTimestamp,
         signedWith,
         signedBy,
         userId,
         areaId,
       ]);
     } else {
-      await pool.query('CALL create_attendance($1, $2, $3, $4, $5, $6)', [
-        date,
-        time,
+      await pool.query('CALL create_attendance($1, $2, $3, $4, $5)', [
+        attendanceTimestamp,
         signedWith,
         signedBy,
         userId,
@@ -53,8 +57,7 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
 
   private mapRowToEntity = (row: any): Attendance => {
     return new Attendance(
-      row.date,
-      row.time,
+      row.attendanceTimestamp,
       row.signedWith,
       row.signedBy,
       row.userId,
@@ -63,5 +66,6 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
     );
   };
 }
+
 const attendanceMapper = new AttendanceMapper();
 export default attendanceMapper;

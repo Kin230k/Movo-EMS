@@ -1,24 +1,23 @@
-CREATE OR REPLACE FUNCTION get_all_attendances()
+CREATE OR REPLACE FUNCTION get_attendance_by_id(p_attendance_id UUID)
 RETURNS TABLE (
-    attendanceId UUID,
-    attendanceDate         DATE,
-    attendanceTime         TIME,
-    signedWith   signed_with_type,
-    signedBy     UUID,
-    userId       UUID,
-    areaId       UUID
+    attendanceId         UUID,
+    attendanceTimestamp  TIMESTAMP,
+    signedWith           signed_with_type,
+    signedBy             UUID,
+    userId               UUID,
+    areaId               UUID
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         a.attendanceId,
-        a.date as attendanceDate,
-        a.time as attendanceTime,
+        a.attendanceTimestamp,
         a.signedWith,
         a.signedBy,
         a.userId,
         a.areaId
-    FROM ATTENDANCES a;            -- ← use ATTENDANCES everywhere
+    FROM ATTENDANCES a
+    WHERE a.attendanceId = p_attendance_id;
 END;
 $$;

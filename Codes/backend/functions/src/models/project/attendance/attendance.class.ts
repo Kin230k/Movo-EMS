@@ -2,8 +2,7 @@ import { Operation } from '../../operation.enum';
 
 export class Attendance {
   constructor(
-    public date: string,
-    public time: string,
+    public attendanceTimestamp: string,
     public signedWith: any,
     public signedBy: string,
     public userId: string,
