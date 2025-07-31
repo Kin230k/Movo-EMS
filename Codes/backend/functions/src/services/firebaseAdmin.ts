@@ -11,7 +11,6 @@ if (!getApps().length) {
   if (process.env.FUNCTIONS_EMULATOR === 'true') {
     initializeApp({
       credential: applicationDefault(),
-      projectId: 'demo-project',
     });
     console.log('🔥 Firebase Admin using AUTH emulator');
   } else {

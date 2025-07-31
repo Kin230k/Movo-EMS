@@ -1,6 +1,6 @@
 // src/handlers/__tests__/sendLoginAlertHandler.test.ts
 
-import { sendLoginAlertHandler } from '../../sendLoginAlertHandler';
+import { sendLoginAlertHandler } from '../sendLoginAlertHandler';
 import { getAuth } from 'firebase-admin/auth';
 
 import * as emailService from '../../../services/emailService';

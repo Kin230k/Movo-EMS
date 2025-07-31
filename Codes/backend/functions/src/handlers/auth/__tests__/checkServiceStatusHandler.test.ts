@@ -1,4 +1,4 @@
-import { checkServiceStatusHandler } from '../../checkServiceStatusHandler';
+import { checkServiceStatusHandler } from '../checkServiceStatusHandler';
 import * as emailService from '../../../services/emailService';
 
 import { CallableRequest } from 'firebase-functions/v2/https';

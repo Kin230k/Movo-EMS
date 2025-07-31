@@ -1,6 +1,6 @@
 // src/handlers/__tests__/registerUserHandler.test.ts
 
-import { registerUserHandler } from '../../registerUserHandler';
+import { registerUserHandler } from '../registerUserHandler';
 import { getAuth } from 'firebase-admin/auth';
 import * as emailService from '../../../services/emailService';
 import userMapper from '../../../models/auth/user/user.mapper';
