@@ -3,15 +3,15 @@ import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger'; // Updated logger import
 
 import { sendEmail } from '../utils/emailService';
-import { User } from '../models/auth/user/user.class';
-import { Multilingual } from '../models/multilingual.type';
+import { User } from '../../models/auth/user/user.class';
+import { Multilingual } from '../../models/multilingual.type';
 import {
   conflictError,
   isValidEmail,
   isValidPhone,
   validationError,
-} from '../utils/validators';
-import { emailExists, phoneExists } from '../utils/authUtils';
+} from '../../utils/validators';
+import { emailExists, phoneExists } from '../../utils/authUtils';
 import { UserService } from '../services/auth/user.service';
 
 export interface RegisterUserData {
@@ -114,7 +114,15 @@ export async function registerUserHandler(
       ]);
 
       // Save to database
-      await UserService.registerUser(user.name,user.email,user.phone,user.role,user.status,user.twoFaEnabled,user.picture);
+      await UserService.registerUser(
+        user.name,
+        user.email,
+        user.phone,
+        user.role,
+        user.status,
+        user.twoFaEnabled,
+        user.picture
+      );
 
       return { uid: userRecord.uid };
     } catch (postErr: any) {

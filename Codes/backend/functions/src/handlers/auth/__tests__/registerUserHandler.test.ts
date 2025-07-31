@@ -1,9 +1,9 @@
 // src/handlers/__tests__/registerUserHandler.test.ts
 
-import { registerUserHandler } from '../registerUserHandler';
+import { registerUserHandler } from '../../registerUserHandler';
 import { getAuth } from 'firebase-admin/auth';
 import * as emailService from '../../utils/emailService';
-import userMapper from '../../models/auth/user/user.mapper';
+import userMapper from '../../../models/auth/user/user.mapper';
 import { HttpsError } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');

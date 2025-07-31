@@ -2,7 +2,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../utils/emailService';
-import { PasswordResetData } from '../utils/types';
+import { PasswordResetData } from '../../utils/types';
 
 export interface SendPasswordResetResult {
   success: true;

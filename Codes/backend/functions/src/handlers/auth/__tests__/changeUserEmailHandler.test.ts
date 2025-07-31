@@ -1,4 +1,4 @@
-import { changeUserEmailHandler } from '../changeUserEmailHandler';
+import { changeUserEmailHandler } from '../../changeUserEmailHandler';
 import * as emailService from '../../utils/emailService';
 import * as adminAuth from 'firebase-admin/auth';
 import * as logger from 'firebase-functions/logger';

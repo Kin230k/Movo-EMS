@@ -1,6 +1,6 @@
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import { User } from '../models/auth/user/user.class';
+import { User } from '../../models/auth/user/user.class';
 import { UserService } from '../services/auth/user.service';
 
 export interface LoginData {

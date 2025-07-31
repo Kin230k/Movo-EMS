@@ -1,7 +1,7 @@
 // src/handlers/__tests__/loginHandlers.test.ts
 
-import { loginHandler, LoginResult } from '../loginHandlers';
-import userMapper from '../../models/auth/user/user.mapper';
+import { loginHandler, LoginResult } from '../../loginHandlers';
+import userMapper from '../../../models/auth/user/user.mapper';
 import { HttpsError } from 'firebase-functions/v2/https';
 
 jest.mock('../../models/auth/user/user.mapper');

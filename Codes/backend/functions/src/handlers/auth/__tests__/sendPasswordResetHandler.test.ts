@@ -1,4 +1,4 @@
-import { sendPasswordResetHandler } from '../sendPasswordResetHandler';
+import { sendPasswordResetHandler } from '../../sendPasswordResetHandler';
 import * as adminAuth from 'firebase-admin/auth';
 import * as emailService from '../../utils/emailService';
 import { CallableRequest } from 'firebase-functions/v2/https';
