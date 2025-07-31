@@ -1,5 +1,5 @@
-import  scheduleMapper  from '../../models/project/schedule/schedule.mapper';
-import { Schedule } from '../../models/project/schedule/schedule.class';
+import { Schedule } from './schedule.class';
+import scheduleMapper from './schedule.mapper';
 
 export class ScheduleService {
   constructor() {}

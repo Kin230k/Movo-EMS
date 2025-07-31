@@ -1,6 +1,6 @@
-import userMapper  from '../../models/auth/user/user.mapper';
-import { User } from '../../models/auth/user/user.class';
-import { Multilingual } from '../../models/multilingual.type';
+import userMapper from './user.mapper';
+import { User } from './user.class';
+import { Multilingual } from '../../multilingual.type';
 
 export class UserService {
   constructor() {}
@@ -27,7 +27,7 @@ export class UserService {
     await userMapper.save(user);
   }
 
- static async updateUser(
+  static async updateUser(
     userId: string,
     name: Multilingual,
     email: string,
@@ -51,11 +51,11 @@ export class UserService {
     await userMapper.save(user);
   }
 
- static async getUserById(userId: string): Promise<User | null> {
+  static async getUserById(userId: string): Promise<User | null> {
     return await userMapper.getById(userId);
   }
 
- static async getUserByEmail(email: string): Promise<User | null> {
+  static async getUserByEmail(email: string): Promise<User | null> {
     return await userMapper.getByEmail(email);
   }
 

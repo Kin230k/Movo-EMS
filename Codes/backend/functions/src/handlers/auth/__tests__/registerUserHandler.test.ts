@@ -2,13 +2,13 @@
 
 import { registerUserHandler } from '../../registerUserHandler';
 import { getAuth } from 'firebase-admin/auth';
-import * as emailService from '../../utils/emailService';
+import * as emailService from '../../../services/emailService';
 import userMapper from '../../../models/auth/user/user.mapper';
 import { HttpsError } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
-jest.mock('../../utils/emailService');
-jest.mock('../../models/auth/user/user.mapper');
+jest.mock('../../../services/emailService');
+jest.mock('../../../models/auth/user/user.mapper');
 
 const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
 const sendEmail = emailService.sendEmail as unknown as jest.Mock;

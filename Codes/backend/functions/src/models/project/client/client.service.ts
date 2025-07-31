@@ -1,10 +1,11 @@
-import  clientMapper  from '../../models/project/client/client.mapper';
-import { Client } from '../../models/project/client/client.class';
-import { Multilingual } from '../../models/multilingual.type';
+import { Multilingual } from '../../multilingual.type';
+import { Client } from './client.class';
+import clientMapper from './client.mapper';
+
 export class ClientService {
   constructor() {}
 
- static async createClient(
+  static async createClient(
     name: Multilingual,
     contactEmail: string,
     contactPhone: string,
@@ -22,7 +23,7 @@ export class ClientService {
     await clientMapper.save(entity);
   }
 
- static async updateClient(
+  static async updateClient(
     clientId: string,
     name: Multilingual,
     contactEmail: string,
@@ -41,7 +42,7 @@ export class ClientService {
     await clientMapper.save(entity);
   }
 
- static async getClientById(id: string): Promise<Client | null> {
+  static async getClientById(id: string): Promise<Client | null> {
     return await clientMapper.getById(id);
   }
 

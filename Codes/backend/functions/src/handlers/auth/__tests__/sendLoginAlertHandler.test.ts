@@ -3,10 +3,10 @@
 import { sendLoginAlertHandler } from '../../sendLoginAlertHandler';
 import { getAuth } from 'firebase-admin/auth';
 
-import * as emailService from '../../utils/emailService';
+import * as emailService from '../../../services/emailService';
 
 jest.mock('firebase-admin/auth');
-jest.mock('../../utils/emailService');
+jest.mock('../../../services/emailService');
 
 const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
 const sendEmail = emailService.sendEmail as unknown as jest.Mock;

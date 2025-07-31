@@ -1,16 +1,19 @@
-import  areaMapper  from '../../models/project/area/area.mapper';
-import { Area } from '../../models/project/area/area.class';
-import { Multilingual } from '../../models/multilingual.type';
+import { Multilingual } from '../../multilingual.type';
+import areaMapper from './area.mapper';
+import { Area } from './area.class';
 
 export class AreaService {
   constructor() {}
 
-static async createArea(name: Multilingual, locationId: string): Promise<void> {
+  static async createArea(
+    name: Multilingual,
+    locationId: string
+  ): Promise<void> {
     const entity = new Area(name, locationId);
     await areaMapper.save(entity);
   }
 
- static async updateArea(
+  static async updateArea(
     areaId: string,
     name: Multilingual,
     locationId: string

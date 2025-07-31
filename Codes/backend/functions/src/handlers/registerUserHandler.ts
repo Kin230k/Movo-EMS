@@ -2,17 +2,17 @@ import { getAuth, UserRecord } from 'firebase-admin/auth';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger'; // Updated logger import
 
-import { User } from '../../models/auth/user/user.class';
-import { Multilingual } from '../../models/multilingual.type';
+import { User } from '../models/auth/user/user.class';
+import { Multilingual } from '../models/multilingual.type';
 import {
   conflictError,
   isValidEmail,
   isValidPhone,
   validationError,
-} from '../../utils/validators';
-import { emailExists, phoneExists } from '../../utils/authUtils';
-import { sendEmail } from '../../services/emailService';
-import { UserService } from '../../models/auth/user/user.service';
+} from '../utils/validators';
+import { emailExists, phoneExists } from '../utils/authUtils';
+import { sendEmail } from '../services/emailService';
+import { UserService } from '../models/auth/user/user.service';
 
 export interface RegisterUserData {
   password: string;

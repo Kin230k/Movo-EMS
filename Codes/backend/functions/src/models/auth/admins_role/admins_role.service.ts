@@ -1,10 +1,13 @@
-import  adminsRoleMapper  from '../../models/auth/admins_role/admins_role.mapper';
-import { AdminsRole } from '../../models/auth/admins_role/admins_role.class';
+import adminsRoleMapper from './admins_role.mapper';
+import { AdminsRole } from './admins_role.class';
 
 export class AdminsRoleService {
   constructor() {}
 
-  static async createAdminsRole(adminId: string, roleId: string): Promise<void> {
+  static async createAdminsRole(
+    adminId: string,
+    roleId: string
+  ): Promise<void> {
     const entity = new AdminsRole(adminId, roleId);
     await adminsRoleMapper.save(entity);
   }

@@ -1,8 +1,9 @@
 import { checkServiceStatusHandler } from '../../checkServiceStatusHandler';
-import * as emailService from '../../utils/emailService';
+import * as emailService from '../../../services/emailService';
+
 import { CallableRequest } from 'firebase-functions/v2/https';
 
-jest.mock('../../utils/emailService');
+jest.mock('../../../services/emailService');
 jest.mock('firebase-functions/logger', () => ({
   error: jest.fn(),
 }));

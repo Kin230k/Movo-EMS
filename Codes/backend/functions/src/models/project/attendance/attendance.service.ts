@@ -1,5 +1,5 @@
-import  attendanceMapper  from '../../models/project/attendance/attendance.mapper';
-import { Attendance } from '../../models/project/attendance/attendance.class';
+import { Attendance } from './attendance.class';
+import attendanceMapper from './attendance.mapper';
 
 export class AttendanceService {
   constructor() {}
@@ -25,16 +25,14 @@ export class AttendanceService {
 
   static async updateAttendance(
     attendanceId: string,
-    date: string,
-    time: string,
+    attendanceTimestamp: string,
     signedWith: any,
     signedBy: string,
     userId: string,
     areaId: string
   ): Promise<void> {
     const entity = new Attendance(
-      date,
-      time,
+      attendanceTimestamp,
       signedWith,
       signedBy,
       userId,

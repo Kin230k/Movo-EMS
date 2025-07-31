@@ -1,10 +1,10 @@
 import { sendPasswordResetHandler } from '../../sendPasswordResetHandler';
 import * as adminAuth from 'firebase-admin/auth';
-import * as emailService from '../../utils/emailService';
+import * as emailService from '../../../services/emailService';
 import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('firebase-admin/auth');
-jest.mock('../../utils/emailService');
+jest.mock('../../../services/emailService');
 jest.mock('firebase-functions/logger', () => ({
   error: jest.fn(),
 }));

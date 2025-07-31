@@ -1,18 +1,18 @@
-import  locationMapper  from '../../models/project/location/location.mapper';
-import { Location } from '../../models/project/location/location.class';
-import { Multilingual } from '../../models/multilingual.type';
+import { Multilingual } from '../../multilingual.type';
+import locationMapper from './location.mapper';
+import { Location } from './location.class';
 
 export class LocationService {
   constructor() {}
 
-static async createLocation(
+  static async createLocation(
     name: Multilingual,
     projectId: string,
     siteMap?: string,
     longitude?: number,
     latitude?: number
   ): Promise<void> {
- const entity = new Location(
+    const entity = new Location(
       name,
       projectId,
       undefined,
@@ -23,7 +23,7 @@ static async createLocation(
     await locationMapper.save(entity);
   }
 
- static async updateLocation(
+  static async updateLocation(
     locationId: string,
     name: Multilingual,
     projectId: string,
@@ -41,7 +41,7 @@ static async createLocation(
     );
     await locationMapper.save(entity);
   }
- static async getLocationById(id: string): Promise<Location | null> {
+  static async getLocationById(id: string): Promise<Location | null> {
     return await locationMapper.getById(id);
   }
 

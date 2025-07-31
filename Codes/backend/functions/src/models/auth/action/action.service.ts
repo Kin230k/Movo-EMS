@@ -1,26 +1,19 @@
-import actionMapper from '../../models/auth/action/action.mapper';
-import { Action } from '../../models/auth/action/action.class';
-
+import actionMapper from './action.mapper';
+import { Action } from './action.class';
 
 export class ActionService {
   constructor() {}
 
-  static async createAction(
-    actionType: string
-  ): Promise<void> {
-    const entity = new Action(
-      actionType
-    );
+  static async createAction(actionType: string): Promise<void> {
+    const entity = new Action(actionType);
     await actionMapper.save(entity);
   }
 
   static async updateAction(
-    actionId: string, actionType: string
+    actionId: string,
+    actionType: string
   ): Promise<void> {
-    const entity = new Action(
-      actionType,
-      actionId
-    );
+    const entity = new Action(actionType, actionId);
     await actionMapper.save(entity);
   }
 

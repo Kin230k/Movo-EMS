@@ -1,10 +1,10 @@
 // src/handlers/__tests__/loginHandlers.test.ts
 
-import { loginHandler, LoginResult } from '../../loginHandlers';
 import userMapper from '../../../models/auth/user/user.mapper';
 import { HttpsError } from 'firebase-functions/v2/https';
+import { loginHandler, LoginResult } from '../loginHandlers';
 
-jest.mock('../../models/auth/user/user.mapper');
+jest.mock('../../../models/auth/user/user.mapper');
 
 const mockedGetById = userMapper.getById as unknown as jest.Mock;
 

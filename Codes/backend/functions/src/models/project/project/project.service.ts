@@ -1,6 +1,6 @@
-import projectMapper  from '../../models/project/project/project.mapper';
-import { Project } from '../../models/project/project/project.class';
-import { Multilingual } from '../../models/multilingual.type';
+import projectMapper from './project.mapper';
+import { Project } from './project.class';
+import { Multilingual } from '../../multilingual.type';
 export class ProjectService {
   constructor() {}
 

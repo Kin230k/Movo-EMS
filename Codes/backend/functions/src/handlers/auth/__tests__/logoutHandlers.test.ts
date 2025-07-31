@@ -1,4 +1,4 @@
-import { logoutHandler } from '../../logoutHandlers';
+import { logoutHandler } from '../logoutHandlers';
 import * as adminAuth from 'firebase-admin/auth';
 import { CallableRequest } from 'firebase-functions/v2/https';
 

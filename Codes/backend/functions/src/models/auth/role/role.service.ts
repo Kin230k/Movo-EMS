@@ -1,6 +1,6 @@
-import  roleMapper  from '../../models/auth/role/role.mapper';
-import { Role } from '../../models/auth/role/role.class';
-import { Multilingual } from '../../models/multilingual.type';
+import roleMapper from './role.mapper';
+import { Role } from './role.class';
+import { Multilingual } from '../../multilingual.type';
 
 export class RoleService {
   constructor() {}
@@ -26,7 +26,7 @@ export class RoleService {
     return await roleMapper.getById(id);
   }
 
- static async getAllRoles(): Promise<Role[]> {
+  static async getAllRoles(): Promise<Role[]> {
     return await roleMapper.getAll();
   }
 

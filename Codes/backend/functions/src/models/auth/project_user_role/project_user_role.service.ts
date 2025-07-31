@@ -1,10 +1,10 @@
-import  projectUserRoleMapper  from '../../models/auth/project_user_role/project_user_role.mapper';
-import { ProjectUserRole } from '../../models/auth/project_user_role/project_user_role.class';
+import projectUserRoleMapper from './project_user_role.mapper';
+import { ProjectUserRole } from './project_user_role.class';
 
 export class ProjectUserRoleService {
   constructor() {}
 
- static async createProjectUserRole(
+  static async createProjectUserRole(
     userId: string,
     projectId: string,
     roleId: string
@@ -13,7 +13,7 @@ export class ProjectUserRoleService {
     await projectUserRoleMapper.save(entity);
   }
 
- static async updateProjectUserRole(
+  static async updateProjectUserRole(
     projectUserRoleId: string,
     userId: string,
     projectId: string,
@@ -28,7 +28,9 @@ export class ProjectUserRoleService {
     await projectUserRoleMapper.save(entity);
   }
 
-  static async getProjectUserRoleById(id: string): Promise<ProjectUserRole | null> {
+  static async getProjectUserRoleById(
+    id: string
+  ): Promise<ProjectUserRole | null> {
     return await projectUserRoleMapper.getById(id);
   }
 

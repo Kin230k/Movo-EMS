@@ -1,11 +1,11 @@
-import  adminMapper  from '../../models/auth/admin/admin.mapper';
-import { Admin } from '../../models/auth/admin/admin.class';
-import { Multilingual } from '../../models/multilingual.type';
+import adminMapper from './admin.mapper';
+import { Admin } from './admin.class';
+import { Multilingual } from '../../multilingual.type';
 
 export class AdminService {
   constructor() {}
 
- static async createAdmin(
+  static async createAdmin(
     qid: string,
     name: Multilingual,
     dateOfBirth?: string | null,
@@ -15,7 +15,7 @@ export class AdminService {
     await adminMapper.save(entity);
   }
 
- static async updateAdmin(
+  static async updateAdmin(
     adminId: string,
     qid: string,
     name: Multilingual,

@@ -1,10 +1,10 @@
-import  rateMapper  from '../../models/project/rate/rate.mapper';
-import { Rate } from '../../models/project/rate/rate.class';
+import { Rate } from './rate.class';
+import rateMapper from './rate.mapper';
 
 export class RateService {
   constructor() {}
 
- static async createRate(
+  static async createRate(
     hourlyRate: number,
     userId: string,
     projectId: string
@@ -23,11 +23,11 @@ export class RateService {
     await rateMapper.save(entity);
   }
 
- static async getRateById(id: string): Promise<Rate | null> {
+  static async getRateById(id: string): Promise<Rate | null> {
     return await rateMapper.getById(id);
   }
 
- static async getAllRates(): Promise<Rate[]> {
+  static async getAllRates(): Promise<Rate[]> {
     return await rateMapper.getAll();
   }
 
