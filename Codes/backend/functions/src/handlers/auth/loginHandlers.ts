@@ -78,10 +78,25 @@ export async function loginHandler(
     logger.error('loginHandler → userMapper.getById error:', dbErr);
     throw new HttpsError('internal', 'Failed to fetch user profile.');
   }
-
+  
   if (!user) {
     throw new HttpsError('not-found', `No user profile found for uid=${uid}.`);
   }
+  
+try {
+  if (!UserService.isUserActive(user)) {
+    throw new HttpsError(
+      'permission-denied',
+      'Your account is inactive. Please contact support.'
+    );
+  }
+} catch (err: any) {
+  logger.error('loginHandler → user status check error:', err);
+  throw err instanceof HttpsError
+    ? err
+    : new HttpsError('internal', 'Failed to verify user status.');
+}
 
   return { idToken, refreshToken, user };
 }
+
