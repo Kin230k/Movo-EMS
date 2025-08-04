@@ -4,8 +4,6 @@ import { sendPasswordReset } from './callables/auth/sendPasswordReset';
 import { registerUser } from './callables/auth/registerUser';
 import { changeUserEmail } from './callables/auth/changeUserEmail';
 import { checkServiceStatus } from './callables/auth/checkServiceStatus';
-import { login } from './callables/auth/login';
-import { logout } from './callables/auth/logout';
 // Export callables
 export {
   sendPasswordReset,
@@ -13,6 +11,4 @@ export {
   registerUser,
   changeUserEmail,
   checkServiceStatus,
-  login,
-  logout,
 };

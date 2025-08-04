@@ -13,6 +13,7 @@ export class UserService {
     role: string,
     status: string,
     twoFaEnabled: boolean,
+    userId: string,
     picture?: string
   ): Promise<void> {
     const user = new User(
@@ -22,7 +23,8 @@ export class UserService {
       role,
       status,
       twoFaEnabled,
-      picture
+      picture,
+      userId
     );
 
     await userMapper.save(user);
@@ -68,8 +70,7 @@ export class UserService {
   static async deleteUser(userId: string): Promise<void> {
     await userMapper.delete(userId);
   }
-  static async isUserActive(user:User):Promise<boolean>
-  {
-   return user?.getStatus === UserStatus.Active;
+  static async isUserActive(user: User): Promise<boolean> {
+    return user?.getStatus === UserStatus.Active;
   }
 }

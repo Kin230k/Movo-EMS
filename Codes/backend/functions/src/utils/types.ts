@@ -24,3 +24,7 @@ export type PasswordResetData = {
 export type LoginAlertData = {
   device?: string;
 };
+export interface FieldIssue {
+  field: string;
+  message: string;
+}
