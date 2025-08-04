@@ -35,17 +35,8 @@ export async function registerUserHandler(
   request: CallableRequest<RegisterUserData>
 ): Promise<RegisterUserResult> {
   const data = request.data;
-  const {
-    name,
-    status,
-    twoFaEnabled,
-    email,
-    password,
-    displayName,
-    phone,
-    picture,
-    role,
-  } = data;
+  const { name, status, twoFaEnabled, email, password, phone, picture, role } =
+    data;
 
   // Check required fields
   if (
@@ -54,7 +45,6 @@ export async function registerUserHandler(
     twoFaEnabled === undefined ||
     !email ||
     !password ||
-    !displayName ||
     !phone ||
     !role
   ) {
@@ -87,7 +77,6 @@ export async function registerUserHandler(
     const userRecord: UserRecord = await getAuth().createUser({
       email,
       password,
-      displayName,
       phoneNumber: phone,
       photoURL: picture || undefined,
     });
