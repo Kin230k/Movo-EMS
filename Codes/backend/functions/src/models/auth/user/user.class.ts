@@ -1,6 +1,8 @@
 // user.ts
 import { Operation } from '../../operation.enum';
 import { Multilingual } from '../../multilingual.type';
+import { UserStatus } from './user_status.enum';
+
 export class User {
   constructor(
     public name: Multilingual,
@@ -9,7 +11,7 @@ export class User {
     public role: string,
     public status: string,
     public twoFaEnabled: boolean,
-    public picture: string | null = null,
+    public picture: string | undefined,
     public userId?: string,
   ) {}
 
@@ -19,5 +21,9 @@ export class User {
    */
    get operation(): Operation {
     return this.userId ? Operation.UPDATE : Operation.CREATE;
+  }
+  // Converts string status to enum representation
+  get getStatus():UserStatus{
+   return this.status.toLowerCase()=="active"?UserStatus.Active:UserStatus.Inactive
   }
 }

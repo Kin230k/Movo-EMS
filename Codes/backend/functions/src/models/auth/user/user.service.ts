@@ -1,6 +1,7 @@
 import userMapper from './user.mapper';
 import { User } from './user.class';
 import { Multilingual } from '../../multilingual.type';
+import { UserStatus } from './user_status.enum';
 
 export class UserService {
   constructor() {}
@@ -66,5 +67,9 @@ export class UserService {
 
   static async deleteUser(userId: string): Promise<void> {
     await userMapper.delete(userId);
+  }
+  static async isUserActive(user:User):Promise<boolean>
+  {
+   return user?.getStatus === UserStatus.Active;
   }
 }
