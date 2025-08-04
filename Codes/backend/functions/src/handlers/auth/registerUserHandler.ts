@@ -11,8 +11,8 @@ import {
   validationError,
 } from '../../utils/validators';
 import { emailExists, phoneExists } from '../../utils/authUtils';
-import { sendEmail } from '../../services/emailService';
 import { UserService } from '../../models/auth/user/user.service';
+import { sendVerificationEmailHandler } from './sendVerificationEmailHandler';
 
 export interface RegisterUserData {
   password: string;
@@ -104,14 +104,7 @@ export async function registerUserHandler(
     );
 
     try {
-      // Generate verification link
-      const verifyLink = await getAuth().generateEmailVerificationLink(email);
-
-      // Send verification email
-      await sendEmail(email, 'VERIFICATION', [
-        displayName || 'User',
-        verifyLink,
-      ]);
+      sendVerificationEmailHandler(request);
 
       // Save to database
       await UserService.registerUser(
