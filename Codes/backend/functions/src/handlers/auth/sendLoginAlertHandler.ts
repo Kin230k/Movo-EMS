@@ -1,50 +1,57 @@
 import { getAuth } from 'firebase-admin/auth';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { LoginAlertData } from '../../utils/types';
 import { sendEmail } from '../../services/emailService';
+import { FieldIssue } from '../../utils/types';
 
 export interface SendLoginAlertResult {
-  success: true;
+  success: boolean;
+  issues?: FieldIssue[];
 }
 
 export async function sendLoginAlertHandler(
   request: CallableRequest<LoginAlertData>
 ): Promise<SendLoginAlertResult> {
-  // 1) Ensure the caller is authenticated
+  const issues: FieldIssue[] = [];
+
   if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Auth required');
+    issues.push({
+      field: 'auth',
+      message: 'Must be signed in to send login alert',
+    });
+  }
+
+  if (issues.length > 0) {
+    return { success: false, issues };
   }
 
   try {
-    // 2) Fetch the user record
-    const user = await getAuth().getUser(request.auth.uid);
+    const user = await getAuth().getUser(request.auth!.uid);
     if (!user.email) {
-      throw new HttpsError('failed-precondition', 'User email missing');
+      return {
+        success: false,
+        issues: [{ field: 'email', message: 'User email missing' }],
+      };
     }
 
-    // 3) Extract device info (if provided)
     const deviceInfo = request.data.device || 'Unknown device';
-
-    // 4) Send the alert email
     await sendEmail(user.email, 'LOGIN_ALERT', [
       user.displayName || 'User',
       deviceInfo,
     ]);
 
     return { success: true };
-  } catch (err: any) {
-    logger.error('Login alert error:', err);
-
-    // 5) Rethrow known HttpsErrors
-    if (err instanceof HttpsError) {
-      throw err;
-    }
-
-    // 6) Wrap unknown errors
-    throw new HttpsError(
-      'internal',
-      err.message || 'Login notification failed'
-    );
+  } catch (error: any) {
+    logger.error('Login alert error:', error);
+    return {
+      success: false,
+      issues: [
+        {
+          field: 'general',
+          message: error.message || 'Login notification failed',
+        },
+      ],
+    };
   }
 }

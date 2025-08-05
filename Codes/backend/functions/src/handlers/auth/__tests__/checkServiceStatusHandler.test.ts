@@ -1,6 +1,5 @@
 import { checkServiceStatusHandler } from '../checkServiceStatusHandler';
 import * as emailService from '../../../services/emailService';
-
 import { CallableRequest } from 'firebase-functions/v2/https';
 
 jest.mock('../../../services/emailService');
@@ -23,26 +22,28 @@ describe('checkServiceStatusHandler', () => {
     jest.clearAllMocks();
   });
 
-  it('throws error if email missing', async () => {
-    await expect(checkServiceStatusHandler(makeRequest({}))).rejects.toThrow(
-      'Email is required'
-    );
-  });
-
-  it('sends email and returns success', async () => {
-    mockedSendEmail.mockResolvedValueOnce(undefined);
-    const result = await checkServiceStatusHandler(
-      makeRequest({ email: 'test@example.com' })
-    );
-
+  it('returns issues if email missing', async () => {
+    const result = await checkServiceStatusHandler(makeRequest({}));
     expect(result).toEqual({
-      status: 'ok',
-      message: 'Email sent successfully',
+      success: false,
+      issues: [
+        { field: 'email', message: 'Email is required' },
+        { field: 'email', message: 'Invalid email format' },
+      ],
     });
-    expect(mockedSendEmail).toHaveBeenCalledWith(
-      'test@example.com',
-      'SERVICE_STATUS',
-      ['User', '✅ The service is up and running!']
-    );
   });
+});
+
+it('sends email and returns success', async () => {
+  mockedSendEmail.mockResolvedValueOnce(undefined);
+  const result = await checkServiceStatusHandler(
+    makeRequest({ email: 'test@example.com' })
+  );
+
+  expect(result).toEqual({ success: true });
+  expect(mockedSendEmail).toHaveBeenCalledWith(
+    'test@example.com',
+    'SERVICE_STATUS',
+    ['User', '✅ The service is up and running!']
+  );
 });

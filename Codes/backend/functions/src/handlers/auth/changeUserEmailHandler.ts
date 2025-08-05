@@ -1,62 +1,79 @@
 import { getAuth } from 'firebase-admin/auth';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../../services/emailService';
+import { FieldIssue } from '../../utils/types';
+import { isValidEmail } from '../../utils/validators';
 
 export interface ChangeEmailData {
   newEmail: string;
 }
 export interface ChangeEmailResult {
-  success: true;
+  success: boolean;
+  issues?: FieldIssue[];
 }
 
 export async function changeUserEmailHandler(
   request: CallableRequest<ChangeEmailData>
 ): Promise<ChangeEmailResult> {
-  // 1) auth check
+  const issues: FieldIssue[] = [];
+
   if (!request.auth) {
-    throw new HttpsError(
-      'permission-denied',
-      'Must be signed in to change email'
-    );
+    issues.push({
+      field: 'auth',
+      message: 'Must be signed in to change email',
+    });
   }
 
-  const uid = request.auth.uid;
+  if (!request.data.newEmail) {
+    issues.push({ field: 'newEmail', message: 'newEmail is required' });
+  }
+  if (!isValidEmail(request.data.newEmail)) {
+    issues.push({ field: 'newEmail', message: 'Invalid newEmail format' });
+  }
+  if (issues.length > 0) {
+    return { success: false, issues };
+  }
+
+  const uid = request.auth!.uid;
   const { newEmail } = request.data;
 
-  if (!newEmail) {
-    throw new HttpsError('invalid-argument', 'newEmail is required');
-  }
-
-  // 2) fetch old user
   let beforeUser;
   try {
     beforeUser = await getAuth().getUser(uid);
-  } catch {
-    throw new HttpsError('not-found', 'User not found');
+  } catch (error: any) {
+    logger.error('User fetch error:', error);
+    return {
+      success: false,
+      issues: [{ field: 'uid', message: 'User not found' }],
+    };
   }
 
-  // 3) update in Auth
   try {
     await getAuth().updateUser(uid, { email: newEmail });
-  } catch (err: any) {
-    logger.error('Auth update error:', err);
-    throw new HttpsError('internal', 'Failed to update auth email');
+  } catch (error: any) {
+    logger.error('Auth update error:', error);
+    return {
+      success: false,
+      issues: [
+        {
+          field: 'newEmail',
+          message: error.message || 'Failed to update auth email',
+        },
+      ],
+    };
   }
 
-  // 4) notify old email
   if (beforeUser.email) {
     try {
       await sendEmail(beforeUser.email, 'EMAIL_CHANGE', [
         beforeUser.displayName ?? 'User',
         newEmail,
       ]);
-    } catch (err: any) {
-      logger.error('Email notification error:', err);
-      // swallow
+    } catch (error: any) {
+      logger.error('Email notification error:', error);
     }
   }
 
-  // 5) (optional) update Postgres here…
   return { success: true };
 }

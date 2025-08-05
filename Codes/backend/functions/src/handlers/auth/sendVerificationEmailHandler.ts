@@ -1,12 +1,14 @@
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { EmailTemplateKey } from '../../utils/types';
 import { sendEmail } from '../../services/emailService';
 import { ActionCodeSettings } from 'firebase-admin/auth';
 import { auth } from 'firebase-admin';
 import { isValidEmail } from '../../utils/validators';
+import { FieldIssue } from '../../utils/types';
+
 const actionCodeSettings: ActionCodeSettings = {
-  url: 'https://your-app.domain.com/finishSignUp', // your front‑end URL
+  url: process.env.urlFinishSignUp ?? '',
   handleCodeInApp: true,
 };
 
@@ -16,21 +18,26 @@ export interface VerificationRequest {
 
 export interface VerificationResult {
   success: boolean;
-  message: string;
+  issues?: FieldIssue[];
+  message?: string;
 }
+
 export async function sendVerificationEmailHandler(
   request: CallableRequest<VerificationRequest>
 ): Promise<VerificationResult> {
+  const issues: FieldIssue[] = [];
   const { email } = request.data;
 
-  // Validate input
   if (!email) {
-    throw new HttpsError('invalid-argument', 'Email address is required.');
+    issues.push({ field: 'email', message: 'Email address is required.' });
+  } else if (!isValidEmail(email)) {
+    issues.push({ field: 'email', message: 'Email address is not correct.' });
   }
-  if (isValidEmail(email)) {
-    throw new HttpsError('invalid-argument', 'Email address is not correct.');
+
+  if (issues.length > 0) {
+    return { success: false, issues };
   }
-  // Generate the email verification link
+
   let link: string;
   try {
     link = await auth().generateEmailVerificationLink(
@@ -38,27 +45,35 @@ export async function sendVerificationEmailHandler(
       actionCodeSettings
     );
     logger.log('Generated email verification link for', email);
-  } catch (err: any) {
-    logger.error('Error generating email verification link:', err);
-    throw new HttpsError(
-      'internal',
-      'Failed to generate email verification link.'
-    );
+  } catch (error: any) {
+    logger.error('Error generating email verification link:', error);
+    return {
+      success: false,
+      issues: [
+        {
+          field: 'general',
+          message: 'Failed to generate email verification link.',
+        },
+      ],
+    };
   }
 
-  // Send the email via your helper
   try {
     const displayName = email.split('@')[0];
     const templateKey: EmailTemplateKey = 'VERIFICATION';
     await sendEmail(email, templateKey, [displayName, link]);
     logger.log(`Verification email sent to ${email}`);
-  } catch (err: any) {
-    logger.error('Failed to send verification email:', err);
-    throw new HttpsError('internal', 'Failed to send verification email.');
+    return {
+      success: true,
+      message: `Verification email sent to ${email}.`,
+    };
+  } catch (error: any) {
+    logger.error('Failed to send verification email:', error);
+    return {
+      success: false,
+      issues: [
+        { field: 'general', message: 'Failed to send verification email.' },
+      ],
+    };
   }
-
-  return {
-    success: true,
-    message: `Verification email sent to ${email}.`,
-  };
 }

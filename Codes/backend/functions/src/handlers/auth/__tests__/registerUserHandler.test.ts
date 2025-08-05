@@ -1,111 +1,92 @@
-// src/handlers/__tests__/registerUserHandler.test.ts
+import { CallableRequest } from 'firebase-functions/https';
 
-import { registerUserHandler } from '../registerUserHandler';
-import { getAuth } from 'firebase-admin/auth';
-import * as emailService from '../../../services/emailService';
-import userMapper from '../../../models/auth/user/user.mapper';
-import { HttpsError } from 'firebase-functions/v2/https';
+import { RegisterUserData, registerUserHandler } from '../registerUserHandler';
+import { UserService } from '../../../models/auth/user/user.service';
+import * as validators from '../../../utils/validators';
+import * as authUtils from '../../../utils/authUtils';
+import { sendVerificationEmailHandler } from '../sendVerificationEmailHandler';
 
-jest.mock('firebase-admin/auth');
-jest.mock('../../../services/emailService');
-jest.mock('../../../models/auth/user/user.mapper');
+jest.mock('../../../models/auth/user/user.service');
+jest.mock('../../../utils/validators');
+jest.mock('../../../utils/authUtils');
+jest.mock('../sendVerificationEmailHandler');
 
-const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
-const sendEmail = emailService.sendEmail as unknown as jest.Mock;
-const saveUser = userMapper.save as unknown as jest.Mock;
+const mockRegisterUser = UserService.registerUser as jest.Mock;
+const mockIsValidEmail = validators.isValidEmail as jest.Mock;
+const mockIsValidPhone = validators.isValidPhone as jest.Mock;
+const mockEmailExists = authUtils.emailExists as jest.Mock;
+const mockPhoneExists = authUtils.phoneExists as jest.Mock;
+const mockSendVerificationEmail = sendVerificationEmailHandler as jest.Mock;
 
 describe('registerUserHandler', () => {
-  const fakeAuth = {
-    getUserByEmail: jest.fn(),
-    getUserByPhoneNumber: jest.fn(),
-    createUser: jest.fn(),
-    generateEmailVerificationLink: jest.fn(),
-    deleteUser: jest.fn(),
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetAuth.mockReturnValue(fakeAuth as any);
+    mockIsValidEmail.mockReturnValue(true);
+    mockIsValidPhone.mockReturnValue(true);
+    mockEmailExists.mockResolvedValue(false);
+    mockPhoneExists.mockResolvedValue(false);
   });
 
   function makeReq(data: any) {
-    return { data } as any;
+    return { data } as CallableRequest<RegisterUserData>;
   }
 
-  const fullData = {
-    name: { en: 'A' },
-    status: 'new',
-    twoFaEnabled: false,
-    email: 'x@y.com',
-    password: 'p',
-    displayName: 'User',
-    phone: '+123',
+  const validData = {
+    uid: 'uid123',
+    name: { en: 'Test User' },
+    email: 'test@example.com',
+    phone: '+1234567890',
     role: 'user',
-    picture: null,
+    status: 'active',
+    twoFaEnabled: false,
   };
 
-  it('throws invalid-argument if any field missing', async () => {
-    await expect(registerUserHandler(makeReq({}))).rejects.toThrow(HttpsError);
+  it('returns issues for missing fields', async () => {
+    const result = await registerUserHandler(makeReq({}));
+    expect(result.success).toBe(false);
+    expect(result.issues).toHaveLength(7);
   });
 
-  it('throws conflict on existing email', async () => {
-    fakeAuth.getUserByEmail.mockResolvedValueOnce({ uid: 'u' });
-    await expect(
-      registerUserHandler(makeReq({ ...fullData }))
-    ).rejects.toMatchObject({ code: 'already-exists' });
+  it('returns issues for invalid email format', async () => {
+    mockIsValidEmail.mockReturnValue(false);
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result).toEqual({
+      success: false,
+      issues: [{ field: 'email', message: 'Invalid email format' }],
+    });
   });
 
-  it('throws conflict on existing phone', async () => {
-    fakeAuth.getUserByEmail.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
+  it('returns issues for duplicate email', async () => {
+    mockEmailExists.mockResolvedValue(true);
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result).toEqual({
+      success: false,
+      issues: [{ field: 'email', message: 'Email already registered' }],
     });
-    fakeAuth.getUserByPhoneNumber.mockResolvedValueOnce({ uid: 'u' });
-    await expect(
-      registerUserHandler(makeReq({ ...fullData }))
-    ).rejects.toMatchObject({ code: 'already-exists' });
   });
 
-  it('throws internal if createUser fails', async () => {
-    fakeAuth.getUserByEmail.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
-    });
-    fakeAuth.getUserByPhoneNumber.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
-    });
-    fakeAuth.createUser.mockRejectedValueOnce(new Error('fail'));
-    await expect(
-      registerUserHandler(makeReq({ ...fullData }))
-    ).rejects.toMatchObject({ code: 'internal' });
+  it('returns success on valid registration', async () => {
+    mockRegisterUser.mockResolvedValue(undefined);
+    mockSendVerificationEmail.mockResolvedValue({ success: true });
+
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result).toEqual({ success: true, emailSent: true });
   });
 
-  it('cleans up and internal on post-creation failure', async () => {
-    fakeAuth.getUserByEmail.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
-    });
-    fakeAuth.getUserByPhoneNumber.mockRejectedValueOnce({
-      code: 'auth/user-not-found',
-    });
-    fakeAuth.createUser.mockResolvedValueOnce({ uid: 'new-uid' });
-    fakeAuth.generateEmailVerificationLink.mockResolvedValueOnce('link');
-    sendEmail.mockRejectedValueOnce(new Error('SMTP'));
-    await expect(
-      registerUserHandler(makeReq({ ...fullData }))
-    ).rejects.toMatchObject({ code: 'internal' });
-    expect(fakeAuth.deleteUser).toHaveBeenCalledWith('new-uid');
+  it('returns database issues on persistence failure', async () => {
+    const dbError = new Error('DB constraint');
+    mockRegisterUser.mockRejectedValue(dbError);
+
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result.success).toBe(false);
+    expect(result.issues).toBeDefined();
   });
 
-  it('saves user and returns uid on full success', async () => {
-    fakeAuth.getUserByEmail.mockRejectedValue({ code: 'auth/user-not-found' });
-    fakeAuth.getUserByPhoneNumber.mockRejectedValue({
-      code: 'auth/user-not-found',
-    });
-    fakeAuth.createUser.mockResolvedValueOnce({ uid: 'new-uid' });
-    fakeAuth.generateEmailVerificationLink.mockResolvedValueOnce('link');
-    sendEmail.mockResolvedValueOnce(undefined);
-    saveUser.mockResolvedValueOnce(undefined);
+  it('returns success but emailSent=false when verification fails', async () => {
+    mockRegisterUser.mockResolvedValue(undefined);
+    mockSendVerificationEmail.mockRejectedValue(new Error('Email failed'));
 
-    const res = await registerUserHandler(makeReq({ ...fullData }));
-    expect(res).toEqual({ uid: 'new-uid' });
-    expect(saveUser).toHaveBeenCalled();
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result).toEqual({ success: true, emailSent: false });
   });
 });

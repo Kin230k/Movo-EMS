@@ -1,23 +1,34 @@
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../../services/emailService';
+import { FieldIssue } from '../../utils/types';
+import { isValidEmail } from '../../utils/validators';
 
 export interface CheckServiceStatusData {
   email: string;
 }
 
 export interface CheckServiceStatusResult {
-  status: 'ok';
-  message: string;
+  success: boolean;
+  issues?: FieldIssue[];
 }
 
 export async function checkServiceStatusHandler(
   request: CallableRequest<CheckServiceStatusData>
 ): Promise<CheckServiceStatusResult> {
+  const issues: FieldIssue[] = [];
   const { email } = request.data;
 
   if (!email) {
-    throw new HttpsError('invalid-argument', 'Email is required');
+    issues.push({ field: 'email', message: 'Email is required' });
+  }
+
+  if (!isValidEmail(request.data.email)) {
+    issues.push({ field: 'email', message: 'Invalid email format' });
+  }
+
+  if (issues.length > 0) {
+    return { success: false, issues };
   }
 
   try {
@@ -26,12 +37,17 @@ export async function checkServiceStatusHandler(
       '✅ The service is up and running!',
     ]);
 
-    return {
-      status: 'ok',
-      message: 'Email sent successfully',
-    };
+    return { success: true };
   } catch (error: any) {
     logger.error('Service status check failed:', error);
-    throw new HttpsError('internal', 'Failed to send status email');
+    return {
+      success: false,
+      issues: [
+        {
+          field: 'email',
+          message: error.message || 'Failed to send status email',
+        },
+      ],
+    };
   }
 }

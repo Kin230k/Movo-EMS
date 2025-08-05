@@ -1,83 +1,84 @@
-// src/handlers/__tests__/sendLoginAlertHandler.test.ts
-
 import { sendLoginAlertHandler } from '../sendLoginAlertHandler';
-import { getAuth } from 'firebase-admin/auth';
-
+import * as adminAuth from 'firebase-admin/auth';
 import * as emailService from '../../../services/emailService';
+import { CallableRequest } from 'firebase-functions/https';
 
 jest.mock('firebase-admin/auth');
 jest.mock('../../../services/emailService');
+jest.mock('firebase-functions/logger', () => ({
+  error: jest.fn(),
+}));
 
-const mockGetAuth = getAuth as unknown as jest.MockedFunction<typeof getAuth>;
-const sendEmail = emailService.sendEmail as unknown as jest.Mock;
+const mockedGetAuth = adminAuth.getAuth as jest.Mock;
+const mockedSendEmail = emailService.sendEmail as jest.Mock;
+
+const makeRequest = (data: any, uid?: string): CallableRequest<any> =>
+  ({
+    data,
+    auth: uid ? { uid } : undefined,
+    rawRequest: {} as any,
+    instanceIdToken: '',
+  } as CallableRequest<any>);
 
 describe('sendLoginAlertHandler', () => {
-  const fakeGetUser = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetAuth.mockReturnValue({ getUser: fakeGetUser } as any);
-  });
-
-  function makeReq(data: any, auth?: any) {
-    return { data, auth } as any;
-  }
-
-  it('throws unauthenticated if no auth', async () => {
-    await expect(sendLoginAlertHandler(makeReq({}))).rejects.toMatchObject({
-      code: 'unauthenticated',
+    mockedGetAuth.mockReturnValue({
+      getUser: jest.fn(),
     });
   });
 
-  it('throws failed-precondition if user.email missing', async () => {
-    fakeGetUser.mockResolvedValueOnce({
+  it('returns issues if not signed in', async () => {
+    const result = await sendLoginAlertHandler(makeRequest({}));
+    expect(result).toEqual({
+      success: false,
+      issues: [
+        { field: 'auth', message: 'Must be signed in to send login alert' },
+      ],
+    });
+  });
+
+  it('returns issues if user email missing', async () => {
+    mockedGetAuth().getUser.mockResolvedValueOnce({
       uid: 'u',
       displayName: 'N',
       email: undefined,
     });
-    await expect(
-      sendLoginAlertHandler(makeReq({ device: 'X' }, { uid: 'u' }))
-    ).rejects.toMatchObject({ code: 'failed-precondition' });
+
+    const result = await sendLoginAlertHandler(
+      makeRequest({ device: 'X' }, 'u')
+    );
+
+    expect(result).toEqual({
+      success: false,
+      issues: [{ field: 'email', message: 'User email missing' }],
+    });
   });
 
   it('sends with Unknown device when none provided', async () => {
-    fakeGetUser.mockResolvedValueOnce({
+    mockedGetAuth().getUser.mockResolvedValueOnce({
       uid: 'u',
       displayName: 'User',
       email: 'e@d',
     });
-    sendEmail.mockResolvedValueOnce(undefined);
+    mockedSendEmail.mockResolvedValueOnce(undefined);
 
-    const res = await sendLoginAlertHandler(makeReq({}, { uid: 'u' }));
-    expect(res).toEqual({ success: true });
-    expect(sendEmail).toHaveBeenCalledWith('e@d', 'LOGIN_ALERT', [
+    const result = await sendLoginAlertHandler(makeRequest({}, 'u'));
+    expect(result).toEqual({ success: true });
+    expect(mockedSendEmail).toHaveBeenCalledWith('e@d', 'LOGIN_ALERT', [
       'User',
       'Unknown device',
     ]);
   });
 
-  it('sends with provided device', async () => {
-    fakeGetUser.mockResolvedValueOnce({
-      uid: 'u',
-      displayName: 'User',
-      email: 'e@d',
+  it('returns general error on failure', async () => {
+    mockedGetAuth().getUser.mockRejectedValueOnce(new Error('boom'));
+
+    const result = await sendLoginAlertHandler(makeRequest({}, 'u'));
+
+    expect(result).toEqual({
+      success: false,
+      issues: [{ field: 'general', message: 'boom' }],
     });
-    sendEmail.mockResolvedValueOnce(undefined);
-
-    const res = await sendLoginAlertHandler(
-      makeReq({ device: 'iPhone' }, { uid: 'u' })
-    );
-    expect(res).toEqual({ success: true });
-    expect(sendEmail).toHaveBeenCalledWith('e@d', 'LOGIN_ALERT', [
-      'User',
-      'iPhone',
-    ]);
-  });
-
-  it('wraps unknown errors as internal', async () => {
-    fakeGetUser.mockRejectedValueOnce(new Error('boom'));
-    await expect(
-      sendLoginAlertHandler(makeReq({}, { uid: 'u' }))
-    ).rejects.toMatchObject({ code: 'internal' });
   });
 });
