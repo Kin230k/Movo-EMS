@@ -12,18 +12,18 @@ export class User {
     public status: string,
     public twoFaEnabled: boolean,
     public picture: string | undefined,
-    public userId?: string,
+    public operation: Operation,
+    public userId?: string
   ) {}
 
-
-  /** 
-   * If there's an ID, we'll UPDATE; otherwise CREATE 
+  /**
+   * If there's an ID, we'll UPDATE; otherwise CREATE
    */
-   get operation(): Operation {
-    return this.userId ? Operation.UPDATE : Operation.CREATE;
-  }
+
   // Converts string status to enum representation
-  get getStatus():UserStatus{
-   return this.status.toLowerCase()=="active"?UserStatus.Active:UserStatus.Inactive
+  get getStatus(): UserStatus {
+    return this.status.toLowerCase() == 'active'
+      ? UserStatus.Active
+      : UserStatus.Inactive;
   }
 }

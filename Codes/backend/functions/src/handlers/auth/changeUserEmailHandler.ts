@@ -4,6 +4,8 @@ import * as logger from 'firebase-functions/logger';
 import { sendEmail } from '../../services/emailService';
 import { FieldIssue } from '../../utils/types';
 import { isValidEmail } from '../../utils/validators';
+import { UserService } from '../../models/auth/user/user.service';
+import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
 
 export interface ChangeEmailData {
   newEmail: string;
@@ -50,7 +52,10 @@ export async function changeUserEmailHandler(
   }
 
   try {
+    // Update auth email
     await getAuth().updateUser(uid, { email: newEmail });
+
+    await UserService.changeEmail(firebaseUidToUuid(uid), newEmail);
   } catch (error: any) {
     logger.error('Auth update error:', error);
     return {

@@ -8,7 +8,7 @@ import { isValidEmail } from '../../utils/validators';
 import { FieldIssue } from '../../utils/types';
 
 const actionCodeSettings: ActionCodeSettings = {
-  url: process.env.urlFinishSignUp ?? '',
+  url: process.env.URL_FINISH_SIGNUP ?? '',
   handleCodeInApp: true,
 };
 

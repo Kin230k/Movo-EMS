@@ -1,10 +1,46 @@
+import type { QueryResult } from 'pg';
+
 import { Operation } from '../../operation.enum';
 import { BaseMapper } from '../../base-mapper';
 import { User } from './user.class';
-import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
+import { Multilingual } from '../../multilingual.type';
 
 export class UserMapper extends BaseMapper<User> {
+  /**
+   * Change a user's email
+   */
+  static async changeEmail(uid: string, email: string): Promise<QueryResult> {
+    if (!uid) throw new Error('User ID is required for update');
+    if (!email) throw new Error('Email is required for update');
+    return pool.query('CALL edit_user_email($1, $2)', [uid, email]);
+  }
+  static async changePhone(uid: string, phone: string): Promise<QueryResult> {
+    if (!uid) throw new Error('User ID is required for update');
+    if (!phone) throw new Error('Phone is required for update');
+    return pool.query('CALL edit_user_phone($1, $2)', [uid, phone]);
+  }
+  static async editUserInfo(
+    uid: string,
+    name: Multilingual,
+    picture?: string
+  ): Promise<QueryResult> {
+    if (!uid) {
+      throw new Error('User ID is required for update');
+    }
+    if (!name || Object.keys(name).length === 0) {
+      throw new Error('Name is required for update');
+    }
+    // picture is optional, so no check here
+
+    // Call the stored procedure: edit_user_info(uid, name_json, picture_url)
+    return pool.query('CALL edit_user_info($1, $2, $3)', [
+      uid,
+      name,
+      picture ?? null,
+    ]);
+  }
+
   /**
    * save() now infers create vs update from User.operation getter.
    */
@@ -76,5 +112,6 @@ export class UserMapper extends BaseMapper<User> {
     );
   };
 }
+
 const userMapper = new UserMapper();
 export default userMapper;

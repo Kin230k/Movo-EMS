@@ -1,7 +1,9 @@
-import userMapper from './user.mapper';
+import userMapper, { UserMapper } from './user.mapper';
 import { User } from './user.class';
 import { Multilingual } from '../../multilingual.type';
 import { UserStatus } from './user_status.enum';
+import type { QueryResult } from 'pg';
+import { Operation } from '../../operation.enum';
 
 export class UserService {
   constructor() {}
@@ -24,6 +26,7 @@ export class UserService {
       status,
       twoFaEnabled,
       picture,
+      Operation.CREATE,
       userId
     );
 
@@ -48,10 +51,31 @@ export class UserService {
       status,
       twoFaEnabled,
       picture,
+      Operation.UPDATE,
       userId
     );
 
     await userMapper.save(user);
+  }
+  static async changeEmail(
+    userId: string,
+    email: string
+  ): Promise<QueryResult> {
+    return await UserMapper.changeEmail(userId, email);
+  }
+  static async changePhone(
+    userId: string,
+    phone: string
+  ): Promise<QueryResult> {
+    return await UserMapper.changePhone(userId, phone);
+  }
+
+  static async editUserInfo(
+    userId: string,
+    name: Multilingual,
+    picture?: string
+  ) {
+    UserMapper.editUserInfo(userId, name, picture);
   }
 
   static async getUserById(userId: string): Promise<User | null> {
