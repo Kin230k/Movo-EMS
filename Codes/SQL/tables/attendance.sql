@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS ATTENDANCES (
+    attendanceId UUID PRIMARY KEY,
+    attendanceTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    signedWith signed_with_type NOT NULL,
+    signedBy    UUID NOT NULL REFERENCES USERS(userId),
+    userId      UUID NOT NULL REFERENCES USERS(userId),
+    areaId      UUID NOT NULL REFERENCES AREAS(areaId)
+);
