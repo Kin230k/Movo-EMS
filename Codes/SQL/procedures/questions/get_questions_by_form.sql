@@ -5,7 +5,9 @@ RETURNS TABLE (
     questionText JSONB
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_questions_by_form');
+
+RETURN QUERY 
     SELECT 
         q.questionId,
         q.typeCode,

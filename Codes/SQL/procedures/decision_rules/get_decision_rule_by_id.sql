@@ -8,7 +8,9 @@ RETURNS TABLE (
     outcomeOnPass submission_outcome
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_decision_rule_by_id');
+
+RETURN QUERY 
     SELECT 
         dr.ruleId,
         dr.name,

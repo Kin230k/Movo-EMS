@@ -5,7 +5,9 @@ RETURNS TABLE (
     locationId UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_area_by_id');
+
+RETURN QUERY 
     SELECT 
         a.areaId,
         a.name,

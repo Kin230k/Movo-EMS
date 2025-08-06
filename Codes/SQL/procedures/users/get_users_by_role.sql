@@ -6,7 +6,9 @@ RETURNS TABLE (
     status user_status
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_users_by_role');
+
+RETURN QUERY 
     SELECT 
         u.userId,
         u.name,

@@ -7,7 +7,9 @@ RETURNS TABLE (
     evaluatedAt TIMESTAMP
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_criteria_result_by_id');
+
+RETURN QUERY 
     SELECT 
         cr.criterionResultId,
         cr.answerId,

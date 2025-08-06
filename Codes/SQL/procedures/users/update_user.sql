@@ -1,5 +1,5 @@
 -- change update_user to patch only non-null params
-CREATE OR REPLACE PROCEDURE update_user(
+CREATE OR REPLACE PROCEDURE update_user(p_auth_user_id UUID, 
   p_user_id       UUID,
   p_name          JSONB        DEFAULT NULL,
   p_email         VARCHAR(255) DEFAULT NULL,
@@ -11,7 +11,9 @@ CREATE OR REPLACE PROCEDURE update_user(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-  UPDATE users
+  CALL check_user_permission(p_auth_user_id, 'update_user');
+
+UPDATE users
     SET
       name          = COALESCE(p_name,         name),
       email         = COALESCE(p_email,        email),

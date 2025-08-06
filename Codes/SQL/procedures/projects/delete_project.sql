@@ -1,7 +1,9 @@
-CREATE OR REPLACE PROCEDURE delete_project(p_project_id UUID)
+CREATE OR REPLACE PROCEDURE delete_project(p_auth_user_id UUID, p_project_id UUID)
 LANGUAGE plpgsql AS $$
 BEGIN
-    DELETE FROM PROJECTS
+    CALL check_user_permission(p_auth_user_id, 'delete_project');
+
+DELETE FROM PROJECTS
     WHERE projectId = p_project_id;
 END;
 $$;

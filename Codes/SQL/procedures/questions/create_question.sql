@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_question(
+CREATE OR REPLACE PROCEDURE create_question(p_auth_user_id UUID, 
     p_type_code VARCHAR(30),
     p_question_text JSONB,
     p_form_id UUID,
@@ -6,7 +6,9 @@ CREATE OR REPLACE PROCEDURE create_question(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO QUESTIONS (
+    CALL check_user_permission(p_auth_user_id, 'create_question');
+
+INSERT INTO QUESTIONS (
         questionId,
         typeCode, 
         questionText, 

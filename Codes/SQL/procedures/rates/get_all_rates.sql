@@ -6,7 +6,9 @@ RETURNS TABLE (
     projectId UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_rates');
+
+RETURN QUERY 
     SELECT 
         r.rateId,
         r.hourlyRate,

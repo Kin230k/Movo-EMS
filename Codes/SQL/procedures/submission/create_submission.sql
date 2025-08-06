@@ -17,7 +17,9 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY
+    CALL check_user_permission(p_auth_user_id, 'create_submission');
+
+RETURN QUERY
     INSERT INTO SUBMISSIONS (
         submissionId, formId, userId, interviewId, dateSubmitted, outcome, decisionNotes
     ) VALUES (

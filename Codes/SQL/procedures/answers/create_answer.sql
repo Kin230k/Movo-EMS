@@ -11,7 +11,9 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    IF p_submission_id IS NULL THEN
+    CALL check_user_permission(p_auth_user_id, 'create_answer');
+
+IF p_submission_id IS NULL THEN
         RAISE EXCEPTION 'Submission ID cannot be null';
     END IF;
     IF p_question_id IS NULL THEN

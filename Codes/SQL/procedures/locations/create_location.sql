@@ -15,7 +15,9 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    IF p_longitude < -180 OR p_longitude > 180 THEN
+    CALL check_user_permission(p_auth_user_id, 'create_location');
+
+IF p_longitude < -180 OR p_longitude > 180 THEN
         RAISE EXCEPTION 'Longitude must be between -180 and 180 (provided: %)', p_longitude;
     END IF;
     IF p_latitude < -90 OR p_latitude > 90 THEN

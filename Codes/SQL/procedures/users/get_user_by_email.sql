@@ -8,7 +8,9 @@ RETURNS TABLE (
     status user_status
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_user_by_email');
+
+RETURN QUERY 
     SELECT 
         u.userId,
         u.name,

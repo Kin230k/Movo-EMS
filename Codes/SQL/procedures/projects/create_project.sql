@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_project(
+CREATE OR REPLACE PROCEDURE create_project(p_auth_user_id UUID, 
     p_name JSONB,
     p_badge_background VARCHAR(512),
     p_starting_date DATE,
@@ -7,7 +7,9 @@ CREATE OR REPLACE PROCEDURE create_project(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    -- Validate date logic
+    CALL check_user_permission(p_auth_user_id, 'create_project');
+
+-- Validate date logic
     IF p_starting_date > p_ending_date THEN
         RAISE EXCEPTION 'Starting date (%) cannot be after ending date (%)', 
             p_starting_date, p_ending_date;

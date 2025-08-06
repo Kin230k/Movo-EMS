@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_rule_criterion(
+CREATE OR REPLACE PROCEDURE create_rule_criterion(p_auth_user_id UUID, 
     IN p_ruleId UUID,
     IN p_criterionId UUID,
     IN p_required BOOLEAN DEFAULT TRUE
@@ -6,7 +6,9 @@ CREATE OR REPLACE PROCEDURE create_rule_criterion(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Validate existence of ruleId and criterionId first
+    CALL check_user_permission(p_auth_user_id, 'create_rule_criteria');
+
+-- Validate existence of ruleId and criterionId first
     IF NOT EXISTS (SELECT 1 FROM DECISION_RULES WHERE ruleId = p_ruleId) THEN
         RAISE EXCEPTION 'Invalid ruleId: % does not exist in DECISION_RULES', p_ruleId;
     END IF;

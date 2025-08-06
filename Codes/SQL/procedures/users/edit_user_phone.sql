@@ -1,12 +1,14 @@
 -- src/db/procedures/edit_user_phone.sql
-CREATE OR REPLACE PROCEDURE edit_user_phone(
+CREATE OR REPLACE PROCEDURE edit_user_phone(p_auth_user_id UUID, 
   p_uid    UUID,
   p_phone  TEXT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- Only update the phone field; all other columns are left as-is.
+  CALL check_user_permission(p_auth_user_id, 'edit_user_phone');
+
+-- Only update the phone field; all other columns are left as-is.
   PERFORM update_user(
     p_uid,
     NULL,     -- name_json

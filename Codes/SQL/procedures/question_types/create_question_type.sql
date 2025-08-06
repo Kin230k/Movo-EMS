@@ -1,11 +1,13 @@
-CREATE OR REPLACE PROCEDURE create_question_type(
+CREATE OR REPLACE PROCEDURE create_question_type(p_auth_user_id UUID, 
     IN p_typeCode VARCHAR(30),
     IN p_description JSONB
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Attempt to insert new question type
+    CALL check_user_permission(p_auth_user_id, 'create_question_type');
+
+-- Attempt to insert new question type
     INSERT INTO QUESTION_TYPES (
         typeCode,
         description

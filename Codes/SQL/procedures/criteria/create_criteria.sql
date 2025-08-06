@@ -1,11 +1,13 @@
-CREATE OR REPLACE PROCEDURE create_criterion(
+CREATE OR REPLACE PROCEDURE create_criterion(p_auth_user_id UUID, 
     p_type criteria_operator,
     p_value VARCHAR(255),
     p_question_id UUID
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO CRITERIA (
+    CALL check_user_permission(p_auth_user_id, 'create_criteria');
+
+INSERT INTO CRITERIA (
         criterionId,
         type, 
         value, 

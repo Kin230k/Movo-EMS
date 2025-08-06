@@ -7,7 +7,9 @@ RETURNS TABLE (
     picture VARCHAR(512)
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_users');
+
+RETURN QUERY 
     SELECT 
         u.userId,
         u.name,

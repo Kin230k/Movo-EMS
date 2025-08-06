@@ -1,10 +1,12 @@
-CREATE OR REPLACE PROCEDURE create_user_project(
+CREATE OR REPLACE PROCEDURE create_user_project(p_auth_user_id UUID, 
     p_user_id UUID,
     p_project_id UUID
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO USER_PROJECT (
+    CALL check_user_permission(p_auth_user_id, 'create_user_project');
+
+INSERT INTO USER_PROJECT (
         userProjectId,
         userId, 
         projectId

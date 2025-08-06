@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_rating_answer(
+CREATE OR REPLACE PROCEDURE create_rating_answer(p_auth_user_id UUID, 
     p_answer_id UUID,
     p_rating SMALLINT,
     p_min_rating SMALLINT DEFAULT 1,
@@ -6,7 +6,9 @@ CREATE OR REPLACE PROCEDURE create_rating_answer(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    -- Validate rating range with parameters
+    CALL check_user_permission(p_auth_user_id, 'create_rating_answer');
+
+-- Validate rating range with parameters
     IF p_rating NOT BETWEEN p_min_rating AND p_max_rating THEN
         RAISE EXCEPTION 'Rating must be between % and % (got %)', 
             p_min_rating, p_max_rating, p_rating;

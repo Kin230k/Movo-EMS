@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_client(
+CREATE OR REPLACE PROCEDURE create_client(p_auth_user_id UUID, 
     p_name JSONB,
     p_logo VARCHAR(512),
     p_company JSONB,
@@ -7,7 +7,9 @@ CREATE OR REPLACE PROCEDURE create_client(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO CLIENTS (
+    CALL check_user_permission(p_auth_user_id, 'create_client');
+
+INSERT INTO CLIENTS (
         clientId,
         name, 
         logo, 
