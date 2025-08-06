@@ -1,123 +1,140 @@
-CREATE EXTENSION IF NOT EXISTS plpgsql;
+-- ############################################################
+-- FULL TEST SCRIPT: SELF-CONTAINED SETUP & TESTS FOR ALL QUESTION TYPES
+-- ############################################################
 
-CREATE OR REPLACE FUNCTION test_plpgsql() 
-  RETURNS TEXT
-  LANGUAGE plpgsql
-AS $$
+-- 0. Clear all tables
+DO $$
+DECLARE 
+    tables TEXT;
 BEGIN
-  RETURN 'PL/pgSQL is working';
-END;
-$$;
+    SELECT string_agg(format('%I.%I', schemaname, tablename), ', ')
+    INTO tables
+    FROM pg_tables
+    WHERE schemaname NOT IN ('pg_catalog', 'information_schema');
+    
+    IF tables IS NOT NULL THEN
+        EXECUTE 'TRUNCATE ' || tables || ' RESTART IDENTITY CASCADE';
+    END IF;
+END $$;
 
-SELECT test_plpgsql();
+-- 1. Create minimal parent hierarchy
 
-
--- Insert a question of type RATING
--- Ensure pgcrypto is enabled for UUIDs
--- Enable pgcrypto if needed
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
--- Create dummy client
+-- 1.1 CLIENT
 INSERT INTO CLIENTS (clientId, name, company, contactEmail, contactPhone)
 VALUES (
-  gen_random_uuid(),
-  '{"en": "Test Client", "ar": "عميل تجريبي"}',
-  '{"en": "Test Co", "ar": "شركة الاختبار"}',
-  'client@example.com',
-  '1001001001'
+  '11111111-1111-1111-1111-111111111111',
+  '{"en":"Test Client","ar":"عميل"}',
+  '{"en":"Test Co","ar":"شركة"}',
+  'client@test.com',
+  '0100000000'
 );
 
--- Create project
+-- 1.2 PROJECT
 INSERT INTO PROJECTS (projectId, clientId, name)
 VALUES (
+  '22222222-2222-2222-2222-222222222222',
   '11111111-1111-1111-1111-111111111111',
-  (SELECT clientId FROM CLIENTS LIMIT 1),
-  '{"en": "Demo Project", "ar": "مشروع تجريبي"}'
+  '{"en":"Test Project","ar":"المشروع"}'
 );
 
--- Create location
+-- 1.3 LOCATION
 INSERT INTO LOCATIONS (locationId, name, projectId)
 VALUES (
-  '22222222-2222-2222-2222-222222222222',
-  '{"en": "Main Site", "ar": "الموقع الرئيسي"}',
-  '11111111-1111-1111-1111-111111111111'
-);
-
--- Create form
-INSERT INTO FORMS (formId, locationId)
-VALUES (
-  '33333333-3333-3333-3333-333333333333',
+  '44444444-4444-4444-4444-444444444444',
+  '{"en":"Site","ar":"الموقع"}',
   '22222222-2222-2222-2222-222222222222'
 );
 
--- Create interview
-INSERT INTO INTERVIEWS (interviewId, projectId)
-VALUES (
-  '44444444-4444-4444-4444-444444444444',
-  '11111111-1111-1111-1111-111111111111'
-);
-
--- Insert question type
-INSERT INTO QUESTION_TYPES (typeCode, description)
-VALUES (
-  'RATE',
-  '{"en": "Rating", "ar": "تقييم"}'
-)
-ON CONFLICT DO NOTHING;
-
--- Create question
-INSERT INTO QUESTIONS (questionId, typeCode, questionText, formId, interviewId)
+-- 1.4 FORM
+INSERT INTO FORMS (formId, locationId)
 VALUES (
   '55555555-5555-5555-5555-555555555555',
-  'RATE',
-  '{"en": "How do you rate the service?", "ar": "كيف تقيم الخدمة؟"}',
-  '33333333-3333-3333-3333-333333333333',
   '44444444-4444-4444-4444-444444444444'
 );
 
--- Add criteria: pass if >= 4
-INSERT INTO CRITERIA (criterionId, questionId, type, value)
+-- 1.5 INTERVIEW
+INSERT INTO INTERVIEWS (interviewId, projectId)
 VALUES (
   '66666666-6666-6666-6666-666666666666',
-  '55555555-5555-5555-5555-555555555555',
-  '>=',
-  '4'
+  '22222222-2222-2222-2222-222222222222'
 );
 
--- Create user
+-- 1.6 USER
 INSERT INTO USERS (userId, name, email, phone, role)
 VALUES (
   '77777777-7777-7777-7777-777777777777',
-  '{"en": "Test User", "ar": "مستخدم تجريبي"}',
-  'test@example.com',
-  '0500000000',
+  '{"en":"Tester","ar":"مختبر"}',
+  'user@test.com',
+  '0550000000',
   'Supervisor'
 );
 
--- Create submission
+-- 1.7 SUBMISSION
 INSERT INTO SUBMISSIONS (submissionId, formId, userId, interviewId)
 VALUES (
   '88888888-8888-8888-8888-888888888888',
-  '33333333-3333-3333-3333-333333333333',
+  '55555555-5555-5555-5555-555555555555',
   '77777777-7777-7777-7777-777777777777',
-  '44444444-4444-4444-4444-444444444444'
+  '66666666-6666-6666-6666-666666666666'
 );
 
--- Insert answer
-INSERT INTO ANSWERS (answerId, submissionId, questionId)
+-- 2. Define QUESTION_TYPES
+INSERT INTO QUESTION_TYPES (typeCode, description) VALUES
+  ('OPEN_ENDED',      '{"en":"Open ended","ar":"مفتوح"}'),
+  ('SHORT_ANSWER',    '{"en":"Short answer","ar":"إجابة قصيرة"}'),
+  ('NUMBER',          '{"en":"Number","ar":"رقم"}'),
+  ('RATE',            '{"en":"Rating","ar":"تقييم"}'),
+  ('DROPDOWN',        '{"en":"Dropdown","ar":"قائمة"}'),
+  ('RADIO',           '{"en":"Radio","ar":"اختيار"}'),
+  ('MULTIPLE_CHOICE', '{"en":"Multiple choice","ar":"اختيارات"}');
+
+-- 3. TEST EACH QUESTION TYPE
+
+-- 3.1 OPEN_ENDED: should PASS on "good"
+INSERT INTO QUESTIONS(questionId,typeCode,questionText,formId,interviewId)
+VALUES ('10000001-0001-4000-8000-000000000001','OPEN_ENDED',
+  '{"en":"Say something good","ar":"قل شيئاً جيداً"}',
+  '55555555-5555-5555-5555-555555555555',
+  '66666666-6666-6666-6666-666666666666'
+);
+INSERT INTO CRITERIA(criterionId,questionId,type,value,effect) VALUES
+  ('20000001-0001-4000-8000-000000000001','10000001-0001-4000-8000-000000000001','contains','good','PASS'),
+  ('20000001-0001-4000-8000-000000000002','10000001-0001-4000-8000-000000000001','contains','bad','FAIL');
+INSERT INTO ANSWERS(answerId,submissionId,questionId)
+VALUES ('30000001-0001-4000-8000-000000000001','88888888-8888-8888-8888-888888888888','10000001-0001-4000-8000-000000000001');
+INSERT INTO TEXT_ANSWERS(answerId,response)
+VALUES ('30000001-0001-4000-8000-000000000001','It was a good test.');
+SELECT * FROM CRITERIA_RESULTS WHERE answerId='30000001-0001-4000-8000-000000000001';
+SELECT * FROM ANSWER_RESULTS   WHERE answerId='30000001-0001-4000-8000-000000000001';
+
+-- 3.1b OPEN_ENDED: should be MANUAL
+INSERT INTO ANSWERS(answerId,submissionId,questionId)
 VALUES (
-  '99999999-9999-9999-9999-999999999999',
+  '30000001-0001-4000-8000-000000000009',
   '88888888-8888-8888-8888-888888888888',
-  '55555555-5555-5555-5555-555555555555'
+  '10000001-0001-4000-8000-000000000001'
 );
-
--- Trigger test: rating >= 4
-INSERT INTO RATING_ANSWERS (answerId, rating)
+INSERT INTO TEXT_ANSWERS(answerId,response)
 VALUES (
-  '99999999-9999-9999-9999-999999999999',
-  4
+  '30000001-0001-4000-8000-000000000009',
+  'just okay'
 );
+SELECT * FROM CRITERIA_RESULTS WHERE answerId='30000001-0001-4000-8000-000000000009';
+SELECT * FROM ANSWER_RESULTS   WHERE answerId='30000001-0001-4000-8000-000000000009';
 
--- ✅ Check criteria results
-SELECT * FROM CRITERIA_RESULTS
-WHERE answerId = '99999999-9999-9999-9999-999999999999';
+-- 3.2 SHORT_ANSWER: should PASS on "yes"
+INSERT INTO QUESTIONS(questionId,typeCode,questionText,formId,interviewId)
+VALUES ('10000001-0002-4000-8000-000000000002','SHORT_ANSWER',
+  '{"en":"Shortly describe","ar":"وصف باختصار"}',
+  '55555555-5555-5555-5555-555555555555',
+  '66666666-6666-6666-6666-666666666666'
+);
+INSERT INTO CRITERIA(criterionId,questionId,type,value,effect) VALUES
+  ('20000001-0002-4000-8000-000000000003','10000001-0002-4000-8000-000000000002','contains','yes','PASS'),
+  ('20000001-0002-4000-8000-000000000004','10000001-0002-4000-8000-000000000002','contains','no','FAIL');
+INSERT INTO ANSWERS(answerId,submissionId,questionId)
+VALUES ('30000001-0002-4000-8000-000000000002','88888888-8888-8888-8888-888888888888','10000001-0002-4000-8000-000000000002');
+INSERT INTO TEXT_ANSWERS(answerId,response)
+VALUES ('30000001-0002-4000-8000-000000000002','yes definitely');
+SELECT * FROM CRITERIA_RESULTS WHERE answerId='30000001-0002-4000-8000-000000000002';
+SELECT * FROM ANSWER_RESULTS   WHERE answerId='30000001-0002-4000-8000-000000000002';

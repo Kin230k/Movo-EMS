@@ -1,109 +1,127 @@
 CREATE OR REPLACE FUNCTION evaluate_criteria_for_answer()
 RETURNS TRIGGER AS $$
 DECLARE
-    answer_data     RECORD;
-    criterion       RECORD;
-    passed          BOOLEAN;
-    question_type_code TEXT;
-    option_text_val TEXT;
+  answer_qid     UUID;
+  criterion       RECORD;
+  question_type   TEXT;
+  raw_text        TEXT;
+  raw_numeric     NUMERIC;
+  eval_result     BOOLEAN;
+  crit_effect     criterion_effect;
+  answer_outcome  answer_result_outcome := 'MANUAL';
+  found_match     BOOLEAN := FALSE;
 BEGIN
-    -- Get question type for the answer
-    SELECT q.typeCode INTO question_type_code
-    FROM QUESTIONS q
-    JOIN ANSWERS a ON q.questionId = a.questionId
-    WHERE a.answerId = NEW.answerId;
+  -- Lookup the questionId for this answer
+  SELECT questionId
+    INTO answer_qid
+    FROM ANSWERS
+   WHERE answerId = NEW.answerId;
 
-    -- Evaluate all criteria for this question
-    FOR criterion IN 
-        SELECT c.* 
-        FROM CRITERIA c
-        WHERE c.questionId = (
-            SELECT questionId 
-            FROM ANSWERS 
-            WHERE answerId = NEW.answerId
-        )
-    LOOP
-        passed := FALSE;
+  -- Fetch the question type
+  SELECT typeCode
+    INTO question_type
+    FROM QUESTIONS
+   WHERE questionId = answer_qid;
 
-        -- Handle different answer types
-        CASE 
-            WHEN question_type_code IN ('OPEN_ENDED', 'SHORT_ANSWER') THEN
-                SELECT response INTO answer_data 
-                FROM TEXT_ANSWERS 
-                WHERE answerId = NEW.answerId;
+  -- Loop through all criteria for this question
+  FOR criterion IN
+    SELECT * FROM CRITERIA WHERE questionId = answer_qid
+  LOOP
+    -- extract raw answer & evaluate
+    CASE question_type
+      WHEN 'OPEN_ENDED','SHORT_ANSWER' THEN
+        SELECT response INTO raw_text
+          FROM TEXT_ANSWERS WHERE answerId = NEW.answerId;
+        eval_result := evaluate_text_criteria(
+                         criterion.type, criterion.value, raw_text
+                       );
 
-                passed := evaluate_text_criteria(
-                    criterion.type, 
-                    criterion.value, 
-                    answer_data.response
-                );
+      WHEN 'NUMBER' THEN
+        SELECT response INTO raw_numeric
+          FROM NUMERIC_ANSWERS WHERE answerId = NEW.answerId;
+        eval_result := evaluate_numeric_criteria(
+                         criterion.type, criterion.value, raw_numeric
+                       );
 
-            WHEN question_type_code = 'NUMBER' THEN
-                SELECT response INTO answer_data 
-                FROM NUMERIC_ANSWERS 
-                WHERE answerId = NEW.answerId;
+      WHEN 'RATE' THEN
+        SELECT rating::NUMERIC INTO raw_numeric
+          FROM RATING_ANSWERS WHERE answerId = NEW.answerId;
+        eval_result := evaluate_numeric_criteria(
+                         criterion.type, criterion.value, raw_numeric
+                       );
 
-                passed := evaluate_numeric_criteria(
-                    criterion.type, 
-                    criterion.value, 
-                    answer_data.response
-                );
+      WHEN 'DROPDOWN','RADIO' THEN
+        SELECT o.optionText->>current_setting('app.locale',true)
+          INTO raw_text
+        FROM ANSWER_OPTIONS ao
+        JOIN OPTIONS o USING (optionId)
+        WHERE ao.answerId = NEW.answerId
+        LIMIT 1;
+        eval_result := evaluate_text_criteria(
+                         criterion.type, criterion.value, raw_text
+                       );
 
-            WHEN question_type_code = 'RATE' THEN
-                SELECT rating INTO answer_data 
-                FROM RATING_ANSWERS 
-                WHERE answerId = NEW.answerId;
+      WHEN 'MULTIPLE_CHOICE' THEN
+        SELECT STRING_AGG(
+                 o.optionText->>current_setting('app.locale',true), ','
+               ) INTO raw_text
+        FROM ANSWER_OPTIONS ao
+        JOIN OPTIONS o USING (optionId)
+        WHERE ao.answerId = NEW.answerId;
+        eval_result := evaluate_text_criteria(
+                         criterion.type, criterion.value, raw_text
+                       );
 
-                passed := evaluate_numeric_criteria(
-                    criterion.type, 
-                    criterion.value, 
-                    answer_data.rating::NUMERIC
-                );
+      ELSE
+        eval_result := NULL;
+    END CASE;
 
-            WHEN question_type_code IN ('DROPDOWN', 'RADIO') THEN
-                SELECT o.optionText->>current_setting('app.locale', true)
-                INTO option_text_val
-                FROM ANSWER_OPTIONS ao
-                JOIN OPTIONS o ON ao.optionId = o.optionId
-                WHERE ao.answerId = NEW.answerId
-                LIMIT 1;
-
-                passed := evaluate_text_criteria(
-                    criterion.type, 
-                    criterion.value, 
-                    option_text_val
-                );
-
-            WHEN question_type_code = 'MULTIPLE_CHOICE' THEN
-                SELECT STRING_AGG(
-                    o.optionText->>current_setting('app.locale', true),
-                    ','
-                )
-                INTO option_text_val
-                FROM ANSWER_OPTIONS ao
-                JOIN OPTIONS o ON ao.optionId = o.optionId
-                WHERE ao.answerId = NEW.answerId;
-
-                passed := evaluate_text_criteria(
-                    criterion.type, 
-                    criterion.value, 
-                    option_text_val
-                );
-        END CASE;
-
-        -- Insert result
-        INSERT INTO CRITERIA_RESULTS (
-            criterionResultId, answerId, criterionId, passed
-        ) VALUES (
-            gen_random_uuid(), NEW.answerId, criterion.criterionId, passed
-        );
-    END LOOP;
-
-    -- Update submission outcome
-    PERFORM update_submission_outcome(
-        (SELECT submissionId FROM ANSWERS WHERE answerId = NEW.answerId)
+    -- insert per-criterion result, casting each branch to the enum
+    INSERT INTO CRITERIA_RESULTS (
+      criterionResultId,
+      answerId,
+      criterionId,
+      outcome
+    ) VALUES (
+      gen_random_uuid(),
+      NEW.answerId,
+      criterion.criterionId,
+      CASE
+        WHEN eval_result IS NULL 
+          THEN 'MANUAL'::answer_result_outcome
+        WHEN criterion.effect = 'PASS' AND eval_result 
+          THEN 'PASSED'::answer_result_outcome
+        WHEN criterion.effect = 'PASS' AND NOT eval_result 
+          THEN 'FAILED'::answer_result_outcome
+        WHEN criterion.effect = 'FAIL' AND eval_result 
+          THEN 'FAILED'::answer_result_outcome
+        WHEN criterion.effect = 'FAIL' AND NOT eval_result 
+          THEN 'PASSED'::answer_result_outcome
+      END
     );
 
-    RETURN NEW;
+    -- capture first TRUE for the overall answer outcome
+    IF NOT found_match AND eval_result IS TRUE THEN
+      found_match := TRUE;
+      answer_outcome := CASE 
+                          WHEN criterion.effect = 'PASS'
+                            THEN 'PASSED'::answer_result_outcome
+                          ELSE 'FAILED'::answer_result_outcome
+                        END;
+    END IF;
+  END LOOP;
+
+  -- upsert combined answer‐level result (already enum, no cast needed)
+  INSERT INTO ANSWER_RESULTS(answerId, outcome)
+    VALUES (NEW.answerId, answer_outcome)
+  ON CONFLICT (answerId) DO UPDATE
+    SET outcome = EXCLUDED.outcome;
+
+  -- recompute submission outcome
+  PERFORM update_submission_outcome(
+    (SELECT submissionId FROM ANSWERS WHERE answerId = NEW.answerId)
+  );
+
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
