@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_user(
+CREATE OR REPLACE PROCEDURE create_user(p_auth_user_id UUID, 
     p_name JSONB,
     p_email VARCHAR(255),
     p_phone VARCHAR(20),
@@ -9,7 +9,9 @@ CREATE OR REPLACE PROCEDURE create_user(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO USERS (
+    CALL check_user_permission(p_auth_user_id, 'create_user');
+
+INSERT INTO USERS (
         userId,
         name, 
         email, 

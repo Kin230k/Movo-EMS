@@ -6,7 +6,9 @@ RETURNS TABLE (
     questionId UUID
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_criteria_by_id');
+
+RETURN QUERY 
     SELECT 
         c.criterionId,
         c.type,

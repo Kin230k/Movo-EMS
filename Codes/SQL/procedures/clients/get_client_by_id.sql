@@ -8,7 +8,9 @@ RETURNS TABLE (
     contactPhone VARCHAR(20))
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_client_by_id');
+
+RETURN QUERY 
     SELECT 
         c.clientId,
         c.name,

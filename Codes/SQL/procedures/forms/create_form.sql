@@ -1,10 +1,12 @@
-CREATE OR REPLACE PROCEDURE create_form(
+CREATE OR REPLACE PROCEDURE create_form(p_auth_user_id UUID, 
     p_project_id UUID,
     p_location_id UUID
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO FORMS (
+    CALL check_user_permission(p_auth_user_id, 'create_form');
+
+INSERT INTO FORMS (
         formId,
         projectId, 
         locationId

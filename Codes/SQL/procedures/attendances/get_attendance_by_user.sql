@@ -6,7 +6,9 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY
+    CALL check_user_permission(p_auth_user_id, 'get_attendance_by_user');
+
+RETURN QUERY
     SELECT
         a.attendanceId,
         a.attendanceTimestamp,

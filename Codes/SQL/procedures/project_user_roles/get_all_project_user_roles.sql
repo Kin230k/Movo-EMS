@@ -8,7 +8,9 @@ RETURNS TABLE (
 
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_project_user_roles');
+
+RETURN QUERY 
     SELECT pur.projectUserRoleId, pur.userId, pur.projectId, pur.roleId
     FROM PROJECT_USER_ROLES pur;
 END;

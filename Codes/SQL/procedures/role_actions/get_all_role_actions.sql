@@ -6,7 +6,9 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_role_actions');
+
+RETURN QUERY 
     SELECT 
         ra.roleActionsId,
         ra.roleId,

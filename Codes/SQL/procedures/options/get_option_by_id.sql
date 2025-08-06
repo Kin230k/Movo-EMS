@@ -7,7 +7,9 @@ RETURNS TABLE (
     displayOrder INT
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_option_by_id');
+
+RETURN QUERY 
     SELECT 
         o.optionId,
         o.optionText,

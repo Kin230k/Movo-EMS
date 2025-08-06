@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_schedule(
+CREATE OR REPLACE PROCEDURE create_schedule(p_auth_user_id UUID, 
     p_date DATE,
     p_start_time TIME,
     p_end_time TIME,
@@ -7,7 +7,9 @@ CREATE OR REPLACE PROCEDURE create_schedule(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    -- Validate time logic
+    CALL check_user_permission(p_auth_user_id, 'create_schedule');
+
+-- Validate time logic
     IF p_start_time >= p_end_time THEN
         RAISE EXCEPTION 'Start time (%) must be before end time (%)', 
             p_start_time, p_end_time;

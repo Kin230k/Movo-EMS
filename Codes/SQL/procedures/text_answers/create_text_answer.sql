@@ -1,11 +1,13 @@
-CREATE OR REPLACE PROCEDURE create_text_answer(
+CREATE OR REPLACE PROCEDURE create_text_answer(p_auth_user_id UUID, 
     IN p_answerId UUID,
     IN p_response TEXT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Validate response
+    CALL check_user_permission(p_auth_user_id, 'create_text_answer');
+
+-- Validate response
     IF p_response IS NULL OR TRIM(p_response) = '' THEN
         RAISE EXCEPTION 'Response cannot be empty';
     END IF;

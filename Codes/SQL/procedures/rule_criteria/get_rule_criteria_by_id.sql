@@ -5,7 +5,9 @@ CREATE OR REPLACE FUNCTION get_rule_criterion_by_id(
 RETURNS TABLE (ruleId UUID, criterionId UUID, required BOOLEAN)
 LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_rule_criteria_by_id');
+
+RETURN QUERY 
     SELECT 
         rc.ruleId,
         rc.criterionId,

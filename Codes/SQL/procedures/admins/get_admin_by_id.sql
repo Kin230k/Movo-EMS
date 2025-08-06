@@ -7,7 +7,9 @@ RETURNS TABLE (
     jobPosition VARCHAR(100)
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_admin_by_id');
+
+RETURN QUERY 
     SELECT 
         a.adminId,
         a.name,

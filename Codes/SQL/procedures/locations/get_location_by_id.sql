@@ -8,7 +8,9 @@ RETURNS TABLE (
     latitude NUMERIC
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_location_by_id');
+
+RETURN QUERY 
     SELECT 
         l.locationId,
         l.name,

@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_decision_rule(
+CREATE OR REPLACE PROCEDURE create_decision_rule(p_auth_user_id UUID, 
     p_name JSONB,
     p_description JSONB,
     p_form_id UUID,
@@ -7,7 +7,9 @@ CREATE OR REPLACE PROCEDURE create_decision_rule(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO DECISION_RULES (
+    CALL check_user_permission(p_auth_user_id, 'create_decision_rule');
+
+INSERT INTO DECISION_RULES (
         ruleId,
         name, 
         description, 

@@ -1,11 +1,13 @@
-CREATE OR REPLACE PROCEDURE create_numeric_answer(
+CREATE OR REPLACE PROCEDURE create_numeric_answer(p_auth_user_id UUID, 
     IN p_answerId UUID,
     IN p_response NUMERIC
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Validate response
+    CALL check_user_permission(p_auth_user_id, 'create_numeric_answer');
+
+-- Validate response
     IF p_response IS NULL THEN
         RAISE EXCEPTION 'Response value cannot be NULL';
     END IF;

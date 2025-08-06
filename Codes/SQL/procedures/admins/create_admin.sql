@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_admin(
+CREATE OR REPLACE PROCEDURE create_admin(p_auth_user_id UUID, 
     p_name JSONB,
     p_qid VARCHAR(20),
     p_date_of_birth DATE,
@@ -6,7 +6,9 @@ CREATE OR REPLACE PROCEDURE create_admin(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO ADMINS (
+    CALL check_user_permission(p_auth_user_id, 'create_admin');
+
+INSERT INTO ADMINS (
         adminId,
         name, 
         qid, 

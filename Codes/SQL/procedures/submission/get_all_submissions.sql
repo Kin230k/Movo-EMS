@@ -9,7 +9,9 @@ RETURNS TABLE (
     decisionNotes TEXT
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_submissions');
+
+RETURN QUERY 
     SELECT 
         s.submissionId,
         s.formId,

@@ -8,7 +8,9 @@ RETURNS TABLE (
 	description JSONB
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_active_projects');
+
+RETURN QUERY 
     SELECT 
         p.projectId,
         p.name,

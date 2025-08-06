@@ -5,7 +5,9 @@ RETURNS TABLE (
     answeredAt TIMESTAMP
 ) LANGUAGE plpgsql AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_answers_by_submission');
+
+RETURN QUERY 
     SELECT 
         a.answerId,
         a.questionId,

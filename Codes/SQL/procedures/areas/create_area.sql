@@ -1,10 +1,12 @@
-CREATE OR REPLACE PROCEDURE create_area(
+CREATE OR REPLACE PROCEDURE create_area(p_auth_user_id UUID, 
     p_name JSONB,
     p_location_id UUID
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO AREAS (
+    CALL check_user_permission(p_auth_user_id, 'create_area');
+
+INSERT INTO AREAS (
         areaId,
         name, 
         locationId

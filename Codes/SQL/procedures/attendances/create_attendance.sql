@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_attendance(
+CREATE OR REPLACE PROCEDURE create_attendance(p_auth_user_id UUID, 
     p_timestamp      TIMESTAMP,
     p_signed_with    signed_with_type,
     p_signed_by      UUID,
@@ -7,7 +7,9 @@ CREATE OR REPLACE PROCEDURE create_attendance(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO ATTENDANCES (
+    CALL check_user_permission(p_auth_user_id, 'create_attendance');
+
+INSERT INTO ATTENDANCES (
         attendanceId,
         attendanceTimestamp,
         signedWith,

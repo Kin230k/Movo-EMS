@@ -1,14 +1,16 @@
-CREATE OR REPLACE PROCEDURE update_role_action(
+CREATE OR REPLACE PROCEDURE update_role_action(p_auth_user_id UUID, 
     p_roleActionsId UUID,
-    p_roleId UUID,
-    p_actionId UUID
+    p_roleId UUID DEFAULT NULL,
+    p_actionId UUID DEFAULT NULL
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    UPDATE ROLE_ACTIONS
+    CALL check_user_permission(p_auth_user_id, 'update_role_action');
+
+UPDATE ROLE_ACTIONS
     SET 
-        roleId = p_roleId,
-        actionId = p_actionId
+        roleId = COALESCE(p_roleId, roleId),
+        actionId = COALESCE(p_actionId, actionId)
     WHERE roleActionsId = p_roleActionsId;
     
     -- Check if any row was updated

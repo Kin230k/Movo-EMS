@@ -1,19 +1,21 @@
-CREATE OR REPLACE PROCEDURE update_answer(
+CREATE OR REPLACE PROCEDURE update_answer(p_auth_user_id UUID, 
     p_answer_id UUID,
-    p_submission_id UUID,
-    p_question_id UUID
+    p_submission_id UUID DEFAULT NULL,
+    p_question_id UUID DEFAULT NULL
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    -- Validate inputs
+    CALL check_user_permission(p_auth_user_id, 'update_answer');
+
+-- Validate inputs only when provided
     IF p_answer_id IS NULL THEN
         RAISE EXCEPTION 'Answer ID cannot be null';
     END IF;
     
     UPDATE ANSWERS
     SET 
-        submissionId = p_submission_id,
-        questionId = p_question_id
+        submissionId = COALESCE(p_submission_id, submissionId),
+        questionId = COALESCE(p_question_id, questionId)
     WHERE answerId = p_answer_id;
     
     EXCEPTION

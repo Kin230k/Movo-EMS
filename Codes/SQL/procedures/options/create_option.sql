@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE create_option(
+CREATE OR REPLACE PROCEDURE create_option(p_auth_user_id UUID, 
     p_option_text JSONB,
     p_question_id UUID,
     p_is_correct BOOLEAN,
@@ -6,7 +6,9 @@ CREATE OR REPLACE PROCEDURE create_option(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO OPTIONS (
+    CALL check_user_permission(p_auth_user_id, 'create_option');
+
+INSERT INTO OPTIONS (
         optionId,
         optionText, 
         questionId, 
