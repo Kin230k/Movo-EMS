@@ -13,5 +13,5 @@ CREATE TABLE EMAILS (
         jsonb_typeof(body  -> 'ar') = 'string'
     ),
     formId    UUID    NOT NULL
-      REFERENCES FORMS(formId)
+      REFERENCES FORMS(formId) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -6,6 +6,5 @@ CREATE TABLE AREAS (
         jsonb_typeof(name->'en') = 'string' AND
         jsonb_typeof(name->'ar') = 'string'
     ),
-    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId)
-
+    locationId UUID NOT NULL REFERENCES LOCATIONS(locationId) ON DELETE CASCADE ON UPDATE CASCADE
 );
