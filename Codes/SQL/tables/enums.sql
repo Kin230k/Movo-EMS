@@ -10,3 +10,9 @@ CREATE TYPE user_role AS ENUM (
     'Main User', 
     'System Admin'
 );
+CREATE TYPE answer_result_outcome AS ENUM (
+      'PASSED',
+      'FAILED',
+      'MANUAL'
+    );
+CREATE TYPE criterion_effect AS ENUM ('PASS', 'FAIL');
