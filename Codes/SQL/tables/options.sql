@@ -6,7 +6,7 @@ CREATE TABLE OPTIONS (
         jsonb_typeof(optionText->'en') = 'string' AND
         jsonb_typeof(optionText->'ar') = 'string'
     ),
-    questionId UUID NOT NULL REFERENCES QUESTIONS(questionId),
+    questionId UUID NOT NULL REFERENCES QUESTIONS(questionId) ON DELETE CASCADE ON UPDATE CASCADE,
     isCorrect BOOLEAN NOT NULL DEFAULT FALSE,
     displayOrder INT NOT NULL DEFAULT 0
 );
