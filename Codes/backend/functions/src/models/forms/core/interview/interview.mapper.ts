@@ -5,49 +5,40 @@ import type { QueryResult } from 'pg';
 import pool from '../../../../utils/pool';
 
 export class InterviewMapper extends BaseMapper<Interview> {
-  constructor() {
-    super(pool);
-  }
-
   async save(entity: Interview): Promise<void> {
     const op = entity.operation;
     const { interviewId, projectId } = entity;
 
     if (op === Operation.UPDATE) {
       if (!interviewId) throw new Error('Interview ID required for update');
-      await this.pool.query(
-        'CALL update_interview($1, $2)',
-        [interviewId, projectId]
-      );
+      await pool.query('CALL update_interview($1, $2)', [
+        interviewId,
+        projectId,
+      ]);
     } else {
-      await this.pool.query(
-        'CALL create_interview($1)',
-        [projectId]
-      );
+      await pool.query('CALL create_interview($1)', [projectId]);
     }
   }
 
   async getById(id: string): Promise<Interview | null> {
-    const result: QueryResult = await this.pool.query(
+    const result: QueryResult = await pool.query(
       'SELECT * FROM get_interview_by_id($1)',
       [id]
     );
-    return result.rows.length ? new Interview(
-      result.rows[0].projectId,
-      result.rows[0].interviewId
-    ) : null;
+    return result.rows.length
+      ? new Interview(result.rows[0].projectId, result.rows[0].interviewId)
+      : null;
   }
 
   async getAll(): Promise<Interview[]> {
-    const result = await this.pool.query('SELECT * FROM get_all_interviews()');
-    return result.rows.map(row => new Interview(
-      row.projectId,
-      row.interviewId
-    ));
+    const result = await pool.query('SELECT * FROM get_all_interviews()');
+    return result.rows.map(
+      (row) => new Interview(row.projectId, row.interviewId)
+    );
   }
 
   async delete(id: string): Promise<void> {
-    await this.pool.query('CALL delete_interview($1)', [id]);
+    await pool.query('CALL delete_interview($1)', [id]);
   }
 }
 
