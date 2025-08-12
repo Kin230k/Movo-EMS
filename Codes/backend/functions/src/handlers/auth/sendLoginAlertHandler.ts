@@ -15,7 +15,7 @@ export async function sendLoginAlertHandler(
 ): Promise<SendLoginAlertResult> {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth) {
+  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
     issues.push({
       field: 'auth',
       message: 'Must be signed in to send login alert',

@@ -21,7 +21,7 @@ export async function changeUserPhoneHandler(
   const issues: FieldIssue[] = [];
 
   // 1) Must be signed in
-  if (!request.auth) {
+  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
     issues.push({
       field: 'auth',
       message: 'Must be signed in to change phone number',
