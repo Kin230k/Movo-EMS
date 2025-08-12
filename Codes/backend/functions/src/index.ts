@@ -1,15 +1,5 @@
-import './services/firebaseAdmin'; // ensure initializeApp() has run
-import { sendLoginAlert } from './callables/auth/sendLoginAlert';
-import { sendPasswordReset } from './callables/auth/sendPasswordReset';
-import { sendVerificationEmail } from './callables/auth/sendVerificationEmail';
-import { registerUser } from './callables/auth/registerUser';
-import { changeUserEmail } from './callables/auth/changeUserEmail';
-import { changeUserPhone } from './callables/auth/changeUserPhone';
-import { checkServiceStatus } from './callables/auth/checkServiceStatus';
-import { getUserInfo } from './callables/auth/getUserInfo';
-import { editUserInfo } from './callables/auth/editUserInfo';
-// Export callables
-export {
+// Import auth callables
+import {
   sendPasswordReset,
   sendVerificationEmail,
   sendLoginAlert,
@@ -19,4 +9,58 @@ export {
   checkServiceStatus,
   getUserInfo,
   editUserInfo,
+} from './callables/auth/authCallable';
+
+// Import forms callables
+import {
+  createForm,
+  createFormWithQuestions,
+  deleteForm,
+  getForm,
+  updateForm,
+  createQuestion,
+  deleteQuestion,
+  getAllQuestions,
+  getQuestion,
+  updateQuestion,
+  createSubmission,
+  deleteSubmission,
+  getSubmission,
+  updateSubmission,
+} from './callables/form/formsCallable';
+
+import './services/firebaseAdmin'; // ensure initializeApp() has run
+
+// Export all callables
+export {
+  // Auth
+  sendPasswordReset,
+  sendVerificationEmail,
+  sendLoginAlert,
+  registerUser,
+  changeUserEmail,
+  changeUserPhone,
+  checkServiceStatus,
+  getUserInfo,
+  editUserInfo,
+
+  // Forms - core
+  createForm,
+  createFormWithQuestions,
+  deleteForm,
+  getForm,
+  updateForm,
+
+  // Forms - questions
+  createQuestion,
+  deleteQuestion,
+  getAllQuestions,
+  getQuestion,
+  updateQuestion,
+
+  // Forms - submissions
+  createSubmission,
+  deleteSubmission,
+  getSubmission,
+  updateSubmission,
 };

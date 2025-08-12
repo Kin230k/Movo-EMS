@@ -12,7 +12,15 @@ export class SubmissionService {
     outcome?: SubmissionOutcome,
     decisionNotes?: string
   ): Promise<void> {
-    const entity = new Submission(formId, userId, interviewId, dateSubmitted,Operation.CREATE, outcome, decisionNotes);
+    const entity = new Submission(
+      formId,
+      userId,
+      interviewId,
+      dateSubmitted,
+      Operation.CREATE,
+      outcome,
+      decisionNotes
+    );
     await submissionMapper.save(entity);
   }
 
@@ -25,7 +33,16 @@ export class SubmissionService {
     outcome?: SubmissionOutcome,
     decisionNotes?: string
   ): Promise<void> {
-    const entity = new Submission(formId, userId, interviewId, dateSubmitted,Operation.UPDATE, outcome, decisionNotes, submissionId);
+    const entity = new Submission(
+      formId,
+      userId,
+      interviewId,
+      dateSubmitted,
+      Operation.UPDATE,
+      outcome,
+      decisionNotes,
+      submissionId
+    );
     await submissionMapper.save(entity);
   }
 
