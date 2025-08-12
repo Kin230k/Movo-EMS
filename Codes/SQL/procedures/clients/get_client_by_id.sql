@@ -5,7 +5,10 @@ RETURNS TABLE (
     logo VARCHAR(512),
     company JSONB,
     contactEmail VARCHAR(255),
-    contactPhone VARCHAR(20))
+    contactPhone VARCHAR(20),
+    status client_status,
+    userId UUID
+)
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY 
@@ -15,7 +18,9 @@ BEGIN
         c.logo,
         c.company,
         c.contactEmail,
-        c.contactPhone
+        c.contactPhone,
+        c.status,
+        c.userId
     FROM CLIENTS c
     WHERE c.clientId = p_client_id;
 END;

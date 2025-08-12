@@ -9,7 +9,7 @@ export class CriteriaService {
     value: string,
     questionId: string
   ): Promise<void> {
-    const entity = new Criteria(type, value,Operation.CREATE, questionId);
+    const entity = new Criteria(type, value, Operation.CREATE, questionId);
     await criteriaMapper.save(entity);
   }
 
@@ -19,7 +19,13 @@ export class CriteriaService {
     value: string,
     questionId: string
   ): Promise<void> {
-    const entity = new Criteria(type, value,Operation.UPDATE, questionId, criterionId);
+    const entity = new Criteria(
+      type,
+      value,
+      Operation.UPDATE,
+      questionId,
+      criterionId
+    );
     await criteriaMapper.save(entity);
   }
 

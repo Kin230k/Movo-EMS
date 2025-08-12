@@ -1,5 +1,5 @@
-import { Operation } from '../../operation.enum';
 import { Multilingual } from '../../multilingual.type';
+import { Operation } from '../../operation.enum';
 export class Admin {
   constructor(
     public qid: string,
@@ -8,8 +8,5 @@ export class Admin {
     public dateOfBirth?: string | null,
     public jobPosition?: string | null
   ) {}
-
-  get operation(): Operation {
-    return this.adminId ? Operation.UPDATE : Operation.CREATE;
-  }
+  public operation = Operation.CREATE;
 }

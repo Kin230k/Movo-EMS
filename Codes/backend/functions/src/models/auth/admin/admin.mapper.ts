@@ -32,12 +32,18 @@ export class AdminMapper extends BaseMapper<Admin> {
       'SELECT * FROM get_admin_by_id($1)',
       [id]
     );
-    return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
+    const admin = this.mapRowToEntity(result.rows[0]);
+    admin.operation = Operation.UPDATE;
+    return result.rows.length ? admin : null;
   }
 
   async getAll(): Promise<Admin[]> {
     const result = await pool.query('SELECT * FROM get_all_admins()');
-    return result.rows.map(this.mapRowToEntity);
+    return result.rows.map((row) => {
+      const admin = this.mapRowToEntity(row);
+      admin.operation = Operation.UPDATE;
+      return admin;
+    });
   }
 
   async delete(id: string): Promise<void> {
@@ -53,7 +59,6 @@ export class AdminMapper extends BaseMapper<Admin> {
       row.jobPosition
     );
   };
-
 }
 const adminMapper = new AdminMapper();
 export default adminMapper;

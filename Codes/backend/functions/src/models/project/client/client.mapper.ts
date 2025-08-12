@@ -3,30 +3,42 @@ import { BaseMapper } from '../../base-mapper';
 import { Client } from './client.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
-
+import { ClientStatus } from '../../client_status.enum';
 export class ClientMapper extends BaseMapper<Client> {
   async save(entity: Client): Promise<void> {
     const op = entity.operation;
-    const { clientId, name, logo, company, contactEmail, contactPhone } =
-      entity;
+    const {
+      clientId,
+      name,
+      logo,
+      company,
+      contactEmail,
+      contactPhone,
+      status,
+      userId,
+    } = entity;
 
     if (op === Operation.UPDATE) {
       if (!entity.clientId) throw new Error('Client ID is required for update');
-      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6)', [
+      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6, $7, $8)', [
         clientId,
         name,
         logo,
         company,
         contactEmail,
         contactPhone,
+        status,
+        userId,
       ]);
     } else {
-      await pool.query('CALL create_client($1, $2, $3, $4, $5)', [
+      await pool.query('CALL create_client($1, $2, $3, $4, $5, $6, $7)', [
         name,
         logo,
         company,
         contactEmail,
         contactPhone,
+        status,
+        userId,
       ]);
     }
   }
@@ -51,13 +63,16 @@ export class ClientMapper extends BaseMapper<Client> {
   private mapRowToEntity = (row: any): Client => {
     return new Client(
       row.name,
-      row.contactEmail,
-      row.contactPhone,
-      row.clientId,
+      row.contactemail,
+      row.contactphone,
+      row.clientid,
       row.logo,
-      row.company
+      row.company,
+      row.status as ClientStatus,
+      row.userid
     );
   };
 }
+
 const clientMapper = new ClientMapper();
 export default clientMapper;

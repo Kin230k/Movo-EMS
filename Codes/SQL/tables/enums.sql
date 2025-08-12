@@ -16,3 +16,9 @@ CREATE TYPE answer_result_outcome AS ENUM (
       'MANUAL'
     );
 CREATE TYPE criterion_effect AS ENUM ('PASS', 'FAIL');
+
+CREATE TYPE client_status AS ENUM (
+    'pending',
+    'accepted',
+    'rejected'
+);

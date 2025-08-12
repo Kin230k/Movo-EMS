@@ -3,13 +3,22 @@ import { Form } from './form.class';
 import { Operation } from '../../../operation.enum';
 
 export class FormService {
-  static async createForm(projectId: string | null, locationId: string | null): Promise<void> {
-    const entity = new Form(projectId, locationId,Operation.CREATE);
+  constructor() {}
+
+  static async createForm(
+    projectId: string | null,
+    locationId: string | null
+  ): Promise<void> {
+    const entity = new Form(projectId, locationId, Operation.CREATE);
     await formMapper.save(entity);
   }
 
-  static async updateForm(formId: string, projectId: string | null, locationId: string | null): Promise<void> {
-    const entity = new Form(projectId, locationId,Operation.UPDATE, formId);
+  static async updateForm(
+    formId: string,
+    projectId: string | null,
+    locationId: string | null
+  ): Promise<void> {
+    const entity = new Form(projectId, locationId, Operation.UPDATE, formId);
     await formMapper.save(entity);
   }
 
