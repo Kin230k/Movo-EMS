@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_user_by_email(p_email VARCHAR(255))
+CREATE OR REPLACE FUNCTION get_user_by_email(p_auth_user_id UUID,p_email VARCHAR(255))
 RETURNS TABLE (
     userId UUID,
     name JSONB,
@@ -6,7 +6,7 @@ RETURNS TABLE (
     picture VARCHAR(512),
     role user_role,
     status user_status
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_user_by_email');
 

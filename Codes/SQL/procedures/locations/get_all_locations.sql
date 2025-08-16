@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_all_locations()
+CREATE OR REPLACE FUNCTION get_all_locations(p_auth_user_id UUID)
 RETURNS TABLE (
     locationId UUID,
     name JSONB,
@@ -6,7 +6,7 @@ RETURNS TABLE (
     siteMap VARCHAR(512),
     longitude NUMERIC,
     latitude NUMERIC
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_all_locations');
 

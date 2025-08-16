@@ -1,10 +1,10 @@
-CREATE OR REPLACE FUNCTION get_users_by_status(p_status user_status)
+CREATE OR REPLACE FUNCTION get_users_by_status(p_auth_user_id UUID,p_status user_status)
 RETURNS TABLE (
     userId UUID,
     name JSONB,
     email VARCHAR(255),
     role user_role
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_users_by_status');
 

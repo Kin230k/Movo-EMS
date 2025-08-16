@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_all_submissions()
+CREATE OR REPLACE FUNCTION get_all_submissions(p_auth_user_id UUID)
 RETURNS TABLE (
     submissionId UUID,
     formId UUID,
@@ -7,7 +7,7 @@ RETURNS TABLE (
     dateSubmitted TIMESTAMP,
     outcome submission_outcome,
     decisionNotes TEXT
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_all_submissions');
 

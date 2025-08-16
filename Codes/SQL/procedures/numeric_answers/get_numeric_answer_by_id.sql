@@ -1,14 +1,15 @@
-CREATE OR REPLACE FUNCTION get_numeric_answer_by_id(p_answer_id UUID)
+CREATE OR REPLACE FUNCTION get_numeric_answer_by_id(p_auth_user_id UUID,p_answer_id UUID)
 RETURNS TABLE (answerId UUID, response NUMERIC)
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    CALL check_user_permission(p_auth_user_id, 'get_numeric_answer_by_id');
+ CALL check_user_permission(p_auth_user_id, 'get_numeric_answer_by_id');
 
-RETURN QUERY 
-    SELECT 
-        na.answerId,
-        na.response
-    FROM NUMERIC_ANSWERS na
-    WHERE na.answerId = p_answer_id;
+RETURN QUERY
+ SELECT
+ na.answerId,
+ na.response
+ FROM NUMERIC_ANSWERS na
+ WHERE na.answerId = p_answer_id;
 END;
 $$;

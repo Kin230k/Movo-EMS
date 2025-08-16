@@ -3,14 +3,19 @@ import { BaseMapper } from '../../base-mapper';
 import { Admin } from './admin.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
+import { CurrentUser } from '../../../utils/currentUser.class';
 
 export class AdminMapper extends BaseMapper<Admin> {
   async save(entity: Admin): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    
     const op = entity.operation;
     const { adminId, name, qid, dateOfBirth, jobPosition } = entity;
 
     if (op === Operation.UPDATE) {
-      await pool.query('CALL update_admin($1, $2, $3, $4, $5)', [
+      await pool.query('CALL update_admin($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
         adminId,
         name,
         qid,
@@ -18,7 +23,8 @@ export class AdminMapper extends BaseMapper<Admin> {
         jobPosition,
       ]);
     } else {
-      await pool.query('CALL create_admin($1, $2, $3, $4)', [
+      await pool.query('CALL create_admin($1, $2, $3, $4, $5)', [
+        currentUserId,
         name,
         qid,
         dateOfBirth,
@@ -28,20 +34,29 @@ export class AdminMapper extends BaseMapper<Admin> {
   }
 
   async getById(id: string): Promise<Admin | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_admin_by_id($1)',
-      [id]
+      'SELECT * FROM get_admin_by_id($1, $2)',
+      [currentUserId, id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async getAll(): Promise<Admin[]> {
-    const result = await pool.query('SELECT * FROM get_all_admins()');
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    
+    const result = await pool.query('SELECT * FROM get_all_admins($1)', [currentUserId]);
     return result.rows.map(this.mapRowToEntity);
   }
 
   async delete(id: string): Promise<void> {
-    await pool.query('CALL delete_admin($1)', [id]);
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    
+    await pool.query('CALL delete_admin($1, $2)', [currentUserId, id]);
   }
 
   private mapRowToEntity = (row: any): Admin => {
@@ -53,7 +68,6 @@ export class AdminMapper extends BaseMapper<Admin> {
       row.jobPosition
     );
   };
-
 }
 const adminMapper = new AdminMapper();
 export default adminMapper;

@@ -1,14 +1,14 @@
-CREATE OR REPLACE FUNCTION get_action_by_id(p_action_id UUID)
+CREATE OR REPLACE FUNCTION get_action_by_id(p_auth_user_id UUID, p_action_id UUID)
 RETURNS TABLE (actionId UUID, actionType VARCHAR(100))
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    CALL check_user_permission(p_auth_user_id, 'get_action_by_id');
-
-RETURN QUERY 
-    SELECT 
-        a.actionId,
-        a.actionType
-    FROM ACTIONS a
-    WHERE a.actionId = p_action_id;
+ CALL check_user_permission(p_auth_user_id, 'get_action_by_id');
+RETURN QUERY
+ SELECT
+ a.actionId,
+ a.actionType
+ FROM ACTIONS a
+ WHERE a.actionId = p_action_id;
 END;
 $$;

@@ -3,9 +3,13 @@ import { BaseMapper } from '../../base-mapper';
 import { Project } from './project.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
+import { CurrentUser } from '../../../utils/currentUser.class';
 
 export class ProjectMapper extends BaseMapper<Project> {
   async save(entity: Project): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
     const op = entity.operation;
     const {
       projectId,
@@ -17,58 +21,65 @@ export class ProjectMapper extends BaseMapper<Project> {
       description,
     } = entity;
 
+    // Validation
+    if (!clientId) throw new Error('Client ID is required');
+    if (!name) throw new Error('Project name is required');
+    if (!startingDate) throw new Error('Starting date is required');
+  
     if (op === Operation.UPDATE) {
-      if (!entity.projectId)
-        throw new Error('Project ID is required for update');
-      await pool.query('CALL update_project($1, $2, $3, $4, $5, $6, $7)', [
-        projectId,
-        clientId,
-        name,
-        badgeBackground,
-        startingDate,
-        endingDate,
-        description,
-      ]);
+      if (!projectId) throw new Error('Project ID is required for update');
+      await pool.query(
+        'CALL update_project($1, $2, $3, $4, $5, $6, $7, $8)',
+        [currentUserId, projectId, clientId, name, badgeBackground, startingDate, endingDate, description]
+      );
     } else {
-      await pool.query('CALL create_project($1, $2, $3, $4, $5, $6)', [
-        clientId,
-        name,
-        badgeBackground,
-        startingDate,
-        endingDate,
-        description,
-      ]);
+      await pool.query(
+        'CALL create_project($1, $2, $3, $4, $5, $6, $7)',
+        [currentUserId, clientId, name, badgeBackground, startingDate, endingDate, description]
+      );
     }
   }
 
   async getById(id: string): Promise<Project | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!id) throw new Error('Project ID is required');
+
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_project_by_id($1)',
-      [id]
+      'SELECT * FROM get_project_by_id($1, $2)',
+      [currentUserId, id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async getAll(): Promise<Project[]> {
-    const result = await pool.query('SELECT * FROM get_all_projects()');
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    const result = await pool.query('SELECT * FROM get_all_projects($1)', [currentUserId]);
     return result.rows.map(this.mapRowToEntity);
   }
 
   async delete(id: string): Promise<void> {
-    await pool.query('CALL delete_project($1)', [id]);
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!id) throw new Error('Project ID is required');
+
+    await pool.query('CALL delete_project($1, $2)', [currentUserId, id]);
   }
 
   private mapRowToEntity = (row: any): Project => {
     return new Project(
-      row.clientId,
+      row.clientid,
       row.name,
-      row.startingDate,
-      row.projectId,
-      row.badgeBackground,
-      row.endingDate,
+      row.startingdate,
+      row.projectid,
+      row.badgebackground,
+      row.endingdate,
       row.description
     );
   };
 }
+
 const projectMapper = new ProjectMapper();
 export default projectMapper;

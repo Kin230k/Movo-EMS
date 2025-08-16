@@ -1,14 +1,13 @@
-CREATE OR REPLACE FUNCTION get_all_admins()
+CREATE OR REPLACE FUNCTION get_all_admins(p_auth_user_id UUID)
 RETURNS TABLE (
     adminId UUID,
     name JSONB,
     qid VARCHAR(20),
     dateOfBirth DATE,
     jobPosition VARCHAR(100)
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_all_admins');
-
 RETURN QUERY 
     SELECT 
         a.adminId,

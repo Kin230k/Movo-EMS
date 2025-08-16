@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_user_by_id(p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_by_id(p_auth_user_id UUID,p_user_id UUID)
 RETURNS TABLE (
     userId UUID,
     name JSONB,
@@ -8,7 +8,7 @@ RETURNS TABLE (
     role user_role,
     status user_status,
     twoFaEnabled BOOLEAN
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_user_by_id');
 
