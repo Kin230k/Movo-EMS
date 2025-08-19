@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_all_schedules()
+CREATE OR REPLACE FUNCTION get_all_schedules(p_auth_user_id UUID)
 RETURNS TABLE (
     scheduleId UUID,
     date DATE,
@@ -6,9 +6,11 @@ RETURNS TABLE (
     endTime TIME,
     projectId UUID,
     locationId UUID
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_all_schedules');
+
+RETURN QUERY 
     SELECT 
         s.scheduleId,
         s.date,

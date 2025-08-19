@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_project_by_id(p_project_id UUID)
+CREATE OR REPLACE FUNCTION get_project_by_id(p_auth_user_id UUID,p_project_id UUID)
 RETURNS TABLE (
     projectId UUID,
     name JSONB,
@@ -6,9 +6,11 @@ RETURNS TABLE (
     startingDate DATE,
     endingDate DATE,
     description JSONB
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_project_by_id');
+
+RETURN QUERY 
     SELECT 
         p.projectId,
         p.name,

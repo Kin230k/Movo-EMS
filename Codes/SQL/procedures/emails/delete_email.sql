@@ -1,7 +1,10 @@
-CREATE OR REPLACE PROCEDURE delete_email(p_email_id UUID)
-LANGUAGE plpgsql AS $$
+CREATE OR REPLACE PROCEDURE delete_email(p_auth_user_id UUID, p_email_id UUID)
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    DELETE FROM EMAILS
-    WHERE emailId = p_email_id;
+ CALL check_user_permission(p_auth_user_id, 'delete_email');
+
+DELETE FROM EMAILS
+ WHERE emailId = p_email_id;
 END;
 $$;

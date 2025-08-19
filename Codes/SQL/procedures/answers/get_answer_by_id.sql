@@ -1,12 +1,13 @@
-CREATE OR REPLACE FUNCTION get_answer_by_id(p_answer_id UUID)
+CREATE OR REPLACE FUNCTION get_answer_by_id(p_auth_user_id UUID, p_answer_id UUID)
 RETURNS TABLE (
     answerId UUID,
     submissionId UUID,
     questionId UUID,
     answeredAt TIMESTAMP
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_answer_by_id');
+RETURN QUERY 
     SELECT 
         a.answerId,
         a.submissionId,

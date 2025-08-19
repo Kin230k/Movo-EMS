@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_location_by_id(p_location_id UUID)
+CREATE OR REPLACE FUNCTION get_location_by_id(p_auth_user_id UUID,p_location_id UUID)
 RETURNS TABLE (
     locationId UUID,
     name JSONB,
@@ -6,9 +6,11 @@ RETURNS TABLE (
     siteMap VARCHAR(512),
     longitude NUMERIC,
     latitude NUMERIC
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_location_by_id');
+
+RETURN QUERY 
     SELECT 
         l.locationId,
         l.name,
