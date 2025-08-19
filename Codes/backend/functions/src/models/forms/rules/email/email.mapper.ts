@@ -19,15 +19,20 @@ export class EmailMapper extends BaseMapper<Email> {
 
     if (op === Operation.UPDATE) {
       if (!emailId) throw new Error('Email ID is required for update');
-      await pool.query(
-        'CALL update_email($1, $2, $3, $4, $5)',
-        [currentUserId, emailId, title, body, formId]
-      );
+      await pool.query('CALL update_email($1, $2, $3, $4, $5)', [
+        currentUserId,
+        emailId,
+        title,
+        body,
+        formId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_email($1, $2, $3, $4)',
-        [currentUserId, title, body, formId]
-      );
+      await pool.query('CALL create_email($1, $2, $3, $4)', [
+        currentUserId,
+        title,
+        body,
+        formId,
+      ]);
     }
   }
 
@@ -47,7 +52,9 @@ export class EmailMapper extends BaseMapper<Email> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_emails($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_emails($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEmail);
   }
 
@@ -60,12 +67,7 @@ export class EmailMapper extends BaseMapper<Email> {
   }
 
   private mapRowToEmail = (row: any): Email => {
-    return new Email(
-      row.title,
-      row.body,
-      row.formid,
-      row.emailid
-    );
+    return new Email(row.title, row.body, row.formid, row.emailid);
   };
 }
 

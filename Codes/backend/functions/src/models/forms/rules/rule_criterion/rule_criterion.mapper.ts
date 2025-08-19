@@ -15,19 +15,26 @@ export class RuleCriterionMapper extends BaseMapper<RuleCriterion> {
 
     if (!ruleId) throw new Error('Rule ID is required');
     if (!criterionId) throw new Error('Criterion ID is required');
-    if (required === undefined || required === null) throw new Error('Required flag is required');
+    if (required === undefined || required === null)
+      throw new Error('Required flag is required');
 
     if (op === Operation.UPDATE) {
-      if (!ruleCriterionId) throw new Error('RuleCriterion ID is required for update');
-      await pool.query(
-        'CALL update_rule_criterion($1, $2, $3, $4, $5)',
-        [currentUserId, ruleCriterionId, ruleId, criterionId, required]
-      );
+      if (!ruleCriterionId)
+        throw new Error('RuleCriterion ID is required for update');
+      await pool.query('CALL update_rule_criterion($1, $2, $3, $4, $5)', [
+        currentUserId,
+        ruleCriterionId,
+        ruleId,
+        criterionId,
+        required,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_rule_criterion($1, $2, $3, $4)',
-        [currentUserId, ruleId, criterionId, required]
-      );
+      await pool.query('CALL create_rule_criterion($1, $2, $3, $4)', [
+        currentUserId,
+        ruleId,
+        criterionId,
+        required,
+      ]);
     }
   }
 
@@ -40,14 +47,19 @@ export class RuleCriterionMapper extends BaseMapper<RuleCriterion> {
       'SELECT * FROM get_rule_criterion_by_id($1, $2)',
       [currentUserId, id]
     );
-    return result.rows.length ? this.mapRowToRuleCriterion(result.rows[0]) : null;
+    return result.rows.length
+      ? this.mapRowToRuleCriterion(result.rows[0])
+      : null;
   }
 
   async getAll(): Promise<RuleCriterion[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_rule_criterions($1)', [currentUserId]);
+    const result = await pool.query(
+      'SELECT * FROM get_all_rule_criterions($1)',
+      [currentUserId]
+    );
     return result.rows.map(this.mapRowToRuleCriterion);
   }
 

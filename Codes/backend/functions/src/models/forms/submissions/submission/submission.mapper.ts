@@ -11,7 +11,15 @@ export class SubmissionMapper extends BaseMapper<Submission> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { submissionId, formId, userId, interviewId, dateSubmitted, outcome, decisionNotes } = entity;
+    const {
+      submissionId,
+      formId,
+      userId,
+      interviewId,
+      dateSubmitted,
+      outcome,
+      decisionNotes,
+    } = entity;
 
     if (!formId) throw new Error('Form ID is required');
     if (!userId) throw new Error('User ID is required');
@@ -19,16 +27,31 @@ export class SubmissionMapper extends BaseMapper<Submission> {
     if (!dateSubmitted) throw new Error('Date Submitted is required');
 
     if (op === Operation.UPDATE) {
-      if (!submissionId) throw new Error('Submission ID is required for update');
+      if (!submissionId)
+        throw new Error('Submission ID is required for update');
       await pool.query(
         'CALL update_submission($1, $2, $3, $4, $5, $6, $7, $8)',
-        [currentUserId, submissionId, formId, userId, interviewId, dateSubmitted, outcome, decisionNotes]
+        [
+          currentUserId,
+          submissionId,
+          formId,
+          userId,
+          interviewId,
+          dateSubmitted,
+          outcome,
+          decisionNotes,
+        ]
       );
     } else {
-      await pool.query(
-        'CALL create_submission($1, $2, $3, $4, $5, $6, $7)',
-        [currentUserId, formId, userId, interviewId, dateSubmitted, outcome, decisionNotes]
-      );
+      await pool.query('CALL create_submission($1, $2, $3, $4, $5, $6, $7)', [
+        currentUserId,
+        formId,
+        userId,
+        interviewId,
+        dateSubmitted,
+        outcome,
+        decisionNotes,
+      ]);
     }
   }
 
@@ -48,7 +71,9 @@ export class SubmissionMapper extends BaseMapper<Submission> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_submissions($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_submissions($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToSubmission);
   }
 

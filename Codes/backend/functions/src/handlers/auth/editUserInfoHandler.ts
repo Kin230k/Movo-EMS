@@ -19,7 +19,7 @@ export interface EditUserInfoResult {
 export async function editUserInfoHandler(
   request: CallableRequest<EditUserInfoData>
 ): Promise<EditUserInfoResult> {
-  if (!request.auth) {
+  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
     return {
       success: false,
       issues: [
@@ -41,7 +41,7 @@ export async function editUserInfoHandler(
 
   try {
     await UserService.editUserInfo(
-      firebaseUidToUuid(request.auth.uid),
+      firebaseUidToUuid(request.auth!.uid),
       name,
       picture
     );

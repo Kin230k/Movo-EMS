@@ -17,15 +17,16 @@ export class QuestionTypeMapper extends BaseMapper<QuestionType> {
 
     if (op === Operation.UPDATE) {
       if (!typeCode) throw new Error('QuestionType ID is required for update');
-      await pool.query(
-        'CALL update_question_type($1, $2, $3)',
-        [currentUserId, typeCode, description]
-      );
+      await pool.query('CALL update_question_type($1, $2, $3)', [
+        currentUserId,
+        typeCode,
+        description,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_question_type($1, $2)',
-        [currentUserId, description]
-      );
+      await pool.query('CALL create_question_type($1, $2)', [
+        currentUserId,
+        description,
+      ]);
     }
   }
 
@@ -38,14 +39,19 @@ export class QuestionTypeMapper extends BaseMapper<QuestionType> {
       'SELECT * FROM get_question_type_by_id($1, $2)',
       [currentUserId, id]
     );
-    return result.rows.length ? this.mapRowToQuestionType(result.rows[0]) : null;
+    return result.rows.length
+      ? this.mapRowToQuestionType(result.rows[0])
+      : null;
   }
 
   async getAll(): Promise<QuestionType[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_question_types($1)', [currentUserId]);
+    const result = await pool.query(
+      'SELECT * FROM get_all_question_types($1)',
+      [currentUserId]
+    );
     return result.rows.map(this.mapRowToQuestionType);
   }
 

@@ -1,6 +1,6 @@
-import { Operation } from "../../../operation.enum";
-import { BaseMapper } from "../../../base-mapper";
-import { Criteria } from "./criteria.class";
+import { Operation } from '../../../operation.enum';
+import { BaseMapper } from '../../../base-mapper';
+import { Criteria } from './criteria.class';
 import pool from '../../../../utils/pool';
 import type { QueryResult } from 'pg';
 import { CurrentUser } from '../../../../utils/currentUser.class';
@@ -19,15 +19,20 @@ export class CriteriaMapper extends BaseMapper<Criteria> {
 
     if (op === Operation.UPDATE) {
       if (!criterionId) throw new Error('Criteria ID is required for update');
-      await pool.query(
-        'CALL update_criteria($1, $2, $3, $4, $5)',
-        [currentUserId, criterionId, type, value, questionId]
-      );
+      await pool.query('CALL update_criteria($1, $2, $3, $4, $5)', [
+        currentUserId,
+        criterionId,
+        type,
+        value,
+        questionId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_criteria($1, $2, $3, $4)',
-        [currentUserId, type, value, questionId]
-      );
+      await pool.query('CALL create_criteria($1, $2, $3, $4)', [
+        currentUserId,
+        type,
+        value,
+        questionId,
+      ]);
     }
   }
 
@@ -47,7 +52,9 @@ export class CriteriaMapper extends BaseMapper<Criteria> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_criteria($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_criteria($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToCriteria);
   }
 
@@ -60,12 +67,7 @@ export class CriteriaMapper extends BaseMapper<Criteria> {
   }
 
   private mapRowToCriteria = (row: any): Criteria => {
-    return new Criteria(
-      row.criterionid,
-      row.type,
-      row.value,
-      row.questionid
-    );
+    return new Criteria(row.criterionid, row.type, row.value, row.questionid);
   };
 }
 

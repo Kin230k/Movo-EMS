@@ -13,22 +13,29 @@ export class QuestionMapper extends BaseMapper<Question> {
     const op = entity.operation;
     const { questionId, typeCode, questionText, formId, interviewId } = entity;
 
-  if (!typeCode) throw new Error('Question type code is required');
-  if (!questionText) throw new Error('Question text is required');
-  if (!formId) throw new Error('Form ID is required');
-  if (!interviewId) throw new Error('Interview ID is required');
+    if (!typeCode) throw new Error('Question type code is required');
+    if (!questionText) throw new Error('Question text is required');
+    if (!formId) throw new Error('Form ID is required');
+    if (!interviewId) throw new Error('Interview ID is required');
 
     if (op === Operation.UPDATE) {
       if (!questionId) throw new Error('Question ID is required for update');
-      await pool.query(
-        'CALL update_question($1, $2, $3, $4, $5, $6)',
-        [currentUserId, questionId, typeCode, questionText, formId, interviewId]
-      );
+      await pool.query('CALL update_question($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
+        questionId,
+        typeCode,
+        questionText,
+        formId,
+        interviewId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_question($1, $2, $3, $4, $5)',
-        [currentUserId, typeCode, questionText, formId, interviewId]
-      );
+      await pool.query('CALL create_question($1, $2, $3, $4, $5)', [
+        currentUserId,
+        typeCode,
+        questionText,
+        formId,
+        interviewId,
+      ]);
     }
   }
 
@@ -48,7 +55,9 @@ export class QuestionMapper extends BaseMapper<Question> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_questions($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_questions($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToQuestion);
   }
 
