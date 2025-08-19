@@ -12,8 +12,16 @@ export class ClientMapper extends BaseMapper<Client> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { clientId, name, logo, company, contactEmail, contactPhone } =
-      entity;
+    const {
+      clientId,
+      name,
+      logo,
+      company,
+      contactEmail,
+      contactPhone,
+      status,
+      userId,
+    } = entity;
 
     // Validation
     if (!name) throw new Error('Client name is required');
@@ -28,6 +36,8 @@ export class ClientMapper extends BaseMapper<Client> {
         company,
         contactEmail,
         contactPhone,
+        status,
+        userId,
       ]);
     } else {
       await pool.query('CALL create_client($1, $2, $3, $4, $5, $6)', [
@@ -37,6 +47,8 @@ export class ClientMapper extends BaseMapper<Client> {
         company,
         contactEmail,
         contactPhone,
+        status,
+        userId,
       ]);
     }
   }
