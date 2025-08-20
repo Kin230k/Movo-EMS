@@ -2,6 +2,8 @@ import * as logger from 'firebase-functions/logger';
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+import { authenticateAdmin } from '../../../utils/authUtils';
+import { CallableRequest } from 'firebase-functions/https';
 
 export interface OperationResult {
   success: boolean;
@@ -12,7 +14,11 @@ export interface GetAllClientsResult extends OperationResult {
   clients?: Awaited<ReturnType<typeof ClientService.getAllClients>>;
 }
 
-export async function getAllClientsHandler(): Promise<GetAllClientsResult> {
+export async function getAllClientsHandler(
+  request: CallableRequest
+): Promise<GetAllClientsResult> {
+  const auth = await authenticateAdmin(request);
+  if (!auth.success) return auth; // returns the same shape { success:false, issues }
   try {
     const clients = await ClientService.getAllClients();
     return { success: true, clients };

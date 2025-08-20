@@ -4,6 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+import { authenticateAdmin } from '../../../utils/authUtils';
 
 export interface DeleteClientData {
   clientId: string;
@@ -17,6 +18,8 @@ export interface OperationResult {
 export async function deleteClientHandler(
   request: CallableRequest<DeleteClientData>
 ): Promise<OperationResult> {
+  const auth = await authenticateAdmin(request);
+  if (!auth.success) return auth; // returns the same shape { success:false, issues }
   const { clientId } = request.data;
 
   if (!clientId) {

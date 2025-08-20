@@ -24,24 +24,21 @@ import { updateSubmissionHandler } from '../../handlers/forms/submissions/update
 // Export callable functions
 
 // Form core
-export const createForm = onCall({}, createFormHandler);
-export const createFormWithQuestions = onCall(
-  {},
-  createFormWithQuestionsHandler
-);
-export const deleteForm = onCall({}, deleteFormHandler);
-export const getForm = onCall({}, getFormHandler);
-export const updateForm = onCall({}, updateFormHandler);
+export const createForm = onCall(createFormHandler);
+export const createFormWithQuestions = onCall(createFormWithQuestionsHandler);
+export const deleteForm = onCall(deleteFormHandler);
+export const getForm = onCall(getFormHandler);
+export const updateForm = onCall(updateFormHandler);
 
 // Question
-export const createQuestion = onCall({}, createQuestionHandler);
-export const deleteQuestion = onCall({}, deleteQuestionHandler);
-export const getAllQuestions = onCall({}, getAllQuestionsHandler);
-export const getQuestion = onCall({}, getQuestionHandler);
-export const updateQuestion = onCall({}, updateQuestionHandler);
+export const createQuestion = onCall(createQuestionHandler);
+export const deleteQuestion = onCall(deleteQuestionHandler);
+export const getAllQuestions = onCall(getAllQuestionsHandler);
+export const getQuestion = onCall(getQuestionHandler);
+export const updateQuestion = onCall(updateQuestionHandler);
 
 // Submission
-export const createSubmission = onCall({}, createSubmissionHandler);
-export const deleteSubmission = onCall({}, deleteSubmissionHandler);
-export const getSubmission = onCall({}, getSubmissionHandler);
-export const updateSubmission = onCall({}, updateSubmissionHandler);
+export const createSubmission = onCall(createSubmissionHandler);
+export const deleteSubmission = onCall(deleteSubmissionHandler);
+export const getSubmission = onCall(getSubmissionHandler);
+export const updateSubmission = onCall(updateSubmissionHandler);

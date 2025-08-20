@@ -5,14 +5,23 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
-
-export async function updateSubmissionHandler(request: CallableRequest) {
+import { authenticateUser } from '../../../utils/authUtils';
+interface UpdateSubmissionRequestData {
+  submissionId: string;
+  formId: string;
+  userId: string;
+  interviewId: string;
+  dateSubmitted: Date;
+  outcome?: SubmissionOutcome;
+  decisionNotes?: string;
+}
+export async function updateSubmissionHandler(
+  request: CallableRequest<UpdateSubmissionRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   const {
     submissionId,

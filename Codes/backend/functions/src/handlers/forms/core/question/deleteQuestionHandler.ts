@@ -3,15 +3,17 @@ import * as logger from 'firebase-functions/logger';
 import { QuestionService } from '../../../../models/forms/core/question/question.service';
 import { parseDbError } from '../../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../../utils/types';
-
-export async function deleteQuestionHandler(request: CallableRequest) {
+import { authenticateUser } from '../../../../utils/authUtils';
+interface DeleteQuestionRequestData {
+  questionId: string;
+}
+export async function deleteQuestionHandler(
+  request: CallableRequest<DeleteQuestionRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  // 1) Auth check
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   // 2) Input extraction and validation
   const { questionId } = request.data || {};

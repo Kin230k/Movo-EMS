@@ -10,7 +10,13 @@ export class QuestionService {
     formId: string,
     interviewId: string
   ): Promise<void> {
-    const entity = new Question(typeCode, questionText, formId, interviewId,Operation.CREATE);
+    const entity = new Question(
+      typeCode,
+      questionText,
+      formId,
+      interviewId,
+      Operation.CREATE
+    );
     await questionMapper.save(entity);
   }
 
@@ -21,7 +27,14 @@ export class QuestionService {
     formId: string,
     interviewId: string
   ): Promise<void> {
-    const entity = new Question(typeCode, questionText, formId, interviewId,Operation.UPDATE, questionId);
+    const entity = new Question(
+      typeCode,
+      questionText,
+      formId,
+      interviewId,
+      Operation.UPDATE,
+      questionId
+    );
     await questionMapper.save(entity);
   }
 
@@ -31,6 +44,9 @@ export class QuestionService {
 
   static async getAllQuestions(): Promise<Question[]> {
     return await questionMapper.getAll();
+  }
+  static async getAllQuestionsByFormId(formId: string): Promise<Question[]> {
+    return await questionMapper.getAllByFormId(formId);
   }
 
   static async deleteQuestion(id: string): Promise<void> {

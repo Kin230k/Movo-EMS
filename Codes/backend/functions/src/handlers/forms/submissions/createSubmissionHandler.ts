@@ -6,15 +6,21 @@ import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 import { parseDbError } from '../../../utils/dbErrorParser';
-
-export async function createSubmissionHandler(request: CallableRequest) {
+import { authenticateUser } from '../../../utils/authUtils';
+export interface CreateSubmissionRequestData {
+  formId?: string;
+  interviewId?: string;
+  dateSubmitted?: string;
+  outcome?: string;
+  decisionNotes?: string;
+}
+export async function createSubmissionHandler(
+  request: CallableRequest<CreateSubmissionRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  // 1) Auth validation
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   // 2) Extract and validate input
   const { formId, interviewId, dateSubmitted, outcome, decisionNotes } =

@@ -9,7 +9,7 @@ export async function updateQuestionHandler(request: CallableRequest) {
   const issues: FieldIssue[] = [];
 
   // 1) Auth check
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
+  if (!request.auth?.uid) {
     issues.push({ field: 'auth', message: 'Must be signed in' });
     return { success: false, issues };
   }

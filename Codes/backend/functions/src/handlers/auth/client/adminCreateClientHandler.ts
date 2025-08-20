@@ -1,5 +1,3 @@
-// adminCreateClientHandler.ts
-
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import * as admin from 'firebase-admin';
@@ -9,6 +7,8 @@ import { ClientStatus } from '../../../models/client_status.enum';
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+
+import { authenticateAdmin } from '../../../utils/authUtils';
 
 export interface AdminCreateClientData {
   name: Multilingual;
@@ -28,8 +28,11 @@ export interface OperationResult {
 export async function adminCreateClientHandler(
   request: CallableRequest<AdminCreateClientData>
 ): Promise<OperationResult> {
+  const auth = await authenticateAdmin(request);
+  if (!auth.success) return auth; // returns the same shape { success:false, issues }
+  // safe-read request.data
   const { name, contactEmail, contactPhone, password, logo, company } =
-    request.data;
+    request.data || ({} as AdminCreateClientData);
 
   const issues: FieldIssue[] = [];
 
@@ -43,6 +46,7 @@ export async function adminCreateClientHandler(
 
   if (issues.length > 0) return { success: false, issues };
 
+  // create Firebase Auth user
   let userRecord: admin.auth.UserRecord;
   try {
     userRecord = await admin.auth().createUser({
@@ -52,18 +56,22 @@ export async function adminCreateClientHandler(
       disabled: false,
     });
   } catch (err: any) {
-    logger.error('Firebase Auth createUser failed:', err);
+    logger.error(
+      'adminCreateClientHandler: Firebase Auth createUser failed',
+      err
+    );
     return {
       success: false,
       issues: [
         {
           field: 'contactEmail',
-          message: `Firebase Auth error: ${err.message}`,
+          message: `Firebase Auth error: ${err.message || 'createUser failed'}`,
         },
       ],
     };
   }
 
+  // create client in DB; cleanup Firebase user on failure
   try {
     await ClientService.createClient(
       name,
@@ -75,19 +83,21 @@ export async function adminCreateClientHandler(
       ClientStatus.Accepted // admin-created clients are active immediately
     );
   } catch (dbErr: any) {
-    logger.error('Failed to create client in DB:', dbErr);
-    // Cleanup: delete Firebase user if DB save fails
+    logger.error(
+      'adminCreateClientHandler: Failed to create client in DB',
+      dbErr
+    );
     try {
       await admin.auth().deleteUser(userRecord.uid);
     } catch (cleanupErr) {
       logger.error(
-        'Failed to cleanup Firebase user after DB failure:',
+        'adminCreateClientHandler: Failed to cleanup Firebase user after DB failure',
         cleanupErr
       );
     }
     return { success: false, issues: parseDbError(dbErr) };
   }
-  // sends verfication and congrationlation for the client via email
 
+  // optionally: send verification email / welcome here (omitted)
   return { success: true, uid: userRecord.uid };
 }

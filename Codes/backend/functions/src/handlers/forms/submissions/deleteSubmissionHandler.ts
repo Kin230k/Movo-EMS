@@ -3,14 +3,17 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
-
-export async function deleteSubmissionHandler(request: CallableRequest) {
+import { authenticateUser } from '../../../utils/authUtils';
+interface DeleteSubmissionRequestData {
+  submissionId?: string;
+}
+export async function deleteSubmissionHandler(
+  request: CallableRequest<DeleteSubmissionRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   const { submissionId } = request.data || {};
   if (!submissionId) {

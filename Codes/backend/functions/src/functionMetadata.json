@@ -1,0 +1,689 @@
+[
+  {
+    "name": "createAdmin",
+    "description": "",
+    "parameters": [
+      {
+        "name": "qid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "jobPosition",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAdmin",
+    "description": "Any caller with an admin record may fetch another admin's record.\r\nIf no adminId is provided, the caller's own admin record is returned.",
+    "parameters": [
+      {
+        "name": "adminId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllAdmins",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "updateAdmin",
+    "description": "",
+    "parameters": [
+      {
+        "name": "adminId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "qid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "jobPosition",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "changeUserEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "newEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "changeUserPhone",
+    "description": "",
+    "parameters": [
+      {
+        "name": "newPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "checkServiceStatus",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "editUserInfo",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "picture",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getUserInfo",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "registerUser",
+    "description": "",
+    "parameters": [
+      {
+        "name": "uid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "phone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "role",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "twoFaEnabled",
+        "type": "boolean",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "picture",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendLoginAlert",
+    "description": "",
+    "parameters": [
+      {
+        "name": "device",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendPasswordReset",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendVerificationEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "firebaseUid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "logo",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "company",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "status",
+        "type": "\"ACTIVE\" | \"INACTIVE\" | \"PENDING\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "approveRejectClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "approve",
+        "type": "boolean",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllClients",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "firebaseUid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "logo",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "company",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "status",
+        "type": "\"ACTIVE\" | \"INACTIVE\" | \"PENDING\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createFormWithQuestions",
+    "description": "Handler (typed + validated)",
+    "parameters": []
+  },
+  {
+    "name": "deleteForm",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "typeCode",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "questionText",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllQuestions",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateQuestion",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "createSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "{ toString: function toString() { [native code] }; toDateString: () => string; toTimeString: () => string; toLocaleString: function toLocaleString() { [native code] }; toLocaleDateString: { (): string; (locales?: string | string[] | undefined, options?: Intl.DateTimeFormatOptions | undefined): string; (locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions | undefined): string; }; toLocaleTimeString: { (): string; (locales?: string | string[] | undefined, options?: Intl.DateTimeFormatOptions | undefined): string; (locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions | undefined): string; }; valueOf: function valueOf() { [native code] }; getTime: () => number; getFullYear: () => number; getUTCFullYear: () => number; getMonth: () => number; getUTCMonth: () => number; getDate: () => number; getUTCDate: () => number; getDay: () => number; getUTCDay: () => number; getHours: () => number; getUTCHours: () => number; getMinutes: () => number; getUTCMinutes: () => number; getSeconds: () => number; getUTCSeconds: () => number; getMilliseconds: () => number; getUTCMilliseconds: () => number; getTimezoneOffset: () => number; setTime: (time: number) => number; setMilliseconds: (ms: number) => number; setUTCMilliseconds: (ms: number) => number; setSeconds: (sec: number, ms?: number | undefined) => number; setUTCSeconds: (sec: number, ms?: number | undefined) => number; setMinutes: (min: number, sec?: number | undefined, ms?: number | undefined) => number; setUTCMinutes: (min: number, sec?: number | undefined, ms?: number | undefined) => number; setHours: (hours: number, min?: number | undefined, sec?: number | undefined, ms?: number | undefined) => number; setUTCHours: (hours: number, min?: number | undefined, sec?: number | undefined, ms?: number | undefined) => number; setDate: (date: number) => number; setUTCDate: (date: number) => number; setMonth: (month: number, date?: number | undefined) => number; setUTCMonth: (month: number, date?: number | undefined) => number; setFullYear: (year: number, month?: number | undefined, date?: number | undefined) => number; setUTCFullYear: (year: number, month?: number | undefined, date?: number | undefined) => number; toUTCString: () => string; toISOString: () => string; toJSON: (key?: any) => string; getVarDate: () => VarDate; __@toPrimitive@3158: { (hint: \"default\"): string; (hint: \"string\"): string; (hint: \"number\"): number; (hint: string): string | number; } }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "import(\"C:/projects/MOVO/Movo-EMS/Codes/backend/functions/src/models/submission_outcome.enum\").SubmissionOutcome | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createForm",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "deleteForm",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startingDate",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "badgeBackground",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "endingDate",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "description",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  }
+]

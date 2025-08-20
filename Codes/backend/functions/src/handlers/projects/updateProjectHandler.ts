@@ -5,18 +5,26 @@ import { parseDbError } from '../../utils/dbErrorParser';
 
 import { Multilingual } from '../../models/multilingual.type';
 import { ProjectService } from '../../models/project/project/project.service';
+import { authenticateClient } from '../../utils/authUtils';
+interface UpdateProjectData {
+  projectId: string;
 
-export async function updateProjectHandler(request: CallableRequest) {
+  name: Multilingual;
+  startingDate: string;
+  badgeBackground?: string;
+  endingDate?: string;
+  description?: Multilingual | null;
+}
+export async function updateProjectHandler(
+  request: CallableRequest<UpdateProjectData>
+) {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth?.uid) {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
-
+  const auth = await authenticateClient(request);
+  if (!auth.success) return auth;
+  const clientId = auth.callerUuid;
   const {
     projectId,
-    clientId,
     name,
     startingDate,
     badgeBackground,

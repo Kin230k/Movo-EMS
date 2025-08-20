@@ -1,8 +1,10 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
+
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+import { authorizeClientAccess } from '../../../utils/authUtils';
 
 export interface GetClientByIdData {
   clientId: string;
@@ -20,7 +22,7 @@ export interface GetClientByIdResult extends OperationResult {
 export async function getClientByIdHandler(
   request: CallableRequest<GetClientByIdData>
 ): Promise<GetClientByIdResult> {
-  const { clientId } = request.data;
+  const { clientId } = request.data || ({} as GetClientByIdData);
 
   if (!clientId) {
     return {
@@ -28,6 +30,10 @@ export async function getClientByIdHandler(
       issues: [{ field: 'clientId', message: 'Client ID is required' }],
     };
   }
+
+  // use the helper to authorize access
+  const authz = await authorizeClientAccess(request, clientId);
+  if (!authz.success) return authz;
 
   try {
     const client = await ClientService.getClientById(clientId);
@@ -39,7 +45,7 @@ export async function getClientByIdHandler(
     }
     return { success: true, client };
   } catch (dbErr: any) {
-    logger.error('Failed to get client:', dbErr);
+    logger.error('getClientByIdHandler: failed to fetch client', dbErr);
     return { success: false, issues: parseDbError(dbErr) };
   }
 }

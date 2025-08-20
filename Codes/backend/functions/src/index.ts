@@ -1,5 +1,19 @@
 // Import auth callables
 import {
+  createAdmin,
+  getAdmin,
+  getAllAdmins,
+  updateAdmin,
+} from './callables/auth/admin.callable';
+import {
+  createClient,
+  approveRejectClient,
+  deleteClient,
+  getAllClients,
+  getClient,
+  updateClient,
+} from './callables/auth/client.callable';
+import {
   sendPasswordReset,
   sendVerificationEmail,
   sendLoginAlert,
@@ -9,7 +23,7 @@ import {
   checkServiceStatus,
   getUserInfo,
   editUserInfo,
-} from './callables/auth/authCallable';
+} from './callables/auth/auth.callable';
 
 // Import forms callables
 import {
@@ -27,13 +41,14 @@ import {
   deleteSubmission,
   getSubmission,
   updateSubmission,
-} from './callables/form/formsCallable';
+} from './callables/forms/forms.callable';
+import { getFunctions } from './callables/getFunctions';
 
 import './services/firebaseAdmin'; // ensure initializeApp() has run
 
 // Export all callables
 export {
-  // Auth
+  // Auth user
   sendPasswordReset,
   sendVerificationEmail,
   sendLoginAlert,
@@ -43,6 +58,20 @@ export {
   checkServiceStatus,
   getUserInfo,
   editUserInfo,
+
+  // Auth admin
+  createAdmin,
+  getAdmin,
+  getAllAdmins,
+  updateAdmin,
+
+  // Auth client
+  createClient,
+  approveRejectClient,
+  deleteClient,
+  getAllClients,
+  getClient,
+  updateClient,
 
   // Forms - core
   createForm,
@@ -63,4 +92,7 @@ export {
   deleteSubmission,
   getSubmission,
   updateSubmission,
+
+  //test
+  getFunctions,
 };

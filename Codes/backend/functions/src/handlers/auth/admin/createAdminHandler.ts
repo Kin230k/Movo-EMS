@@ -7,6 +7,7 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
 import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { AdminService } from '../../../models/auth/admin/admin.service';
+import { authenticateAdmin } from '../../../utils/authUtils';
 
 export interface AdminCreateData {
   qid: string;
@@ -26,17 +27,25 @@ export interface OperationResult {
 export async function createAdminHandler(
   request: CallableRequest<AdminCreateData>
 ): Promise<OperationResult> {
+  // --- AUTH: caller must be authenticated + admin ---
+  const authResult = await authenticateAdmin(request);
+  if (!authResult.success) {
+    return authResult; // already { success: false, issues }
+  }
+
   const { qid, name, dateOfBirth, jobPosition, email, password } = request.data;
   const issues: FieldIssue[] = [];
 
   if (!qid) issues.push({ field: 'qid', message: 'QID is required' });
   if (!name) issues.push({ field: 'name', message: 'Name is required' });
   if (!email) issues.push({ field: 'email', message: 'Email is required' });
-  if (!password)
+  if (!password) {
     issues.push({ field: 'password', message: 'Password is required' });
+  }
 
   if (issues.length > 0) return { success: false, issues };
 
+  // --- Create Firebase Auth user ---
   let userRecord: admin.auth.UserRecord;
   try {
     userRecord = await admin.auth().createUser({
@@ -49,7 +58,12 @@ export async function createAdminHandler(
     logger.error('Firebase Auth createUser failed:', err);
     return {
       success: false,
-      issues: [{ field: 'email', message: err.message }],
+      issues: [
+        {
+          field: 'email',
+          message: err.message || 'Failed to create Firebase user',
+        },
+      ],
     };
   }
 
@@ -64,6 +78,7 @@ export async function createAdminHandler(
     );
   } catch (dbErr: any) {
     logger.error('Failed to create admin in DB:', dbErr);
+    // rollback firebase user
     try {
       await admin.auth().deleteUser(userRecord.uid);
     } catch (cleanupErr) {

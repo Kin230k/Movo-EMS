@@ -3,8 +3,12 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../utils/types';
 import { parseDbError } from '../../utils/dbErrorParser';
 import { ProjectService } from '../../models/project/project/project.service';
-
-export async function getProjectByIdHandler(request: CallableRequest) {
+interface getProjectByIdData {
+  projectId: string;
+}
+export async function getProjectByIdHandler(
+  request: CallableRequest<getProjectByIdData>
+) {
   const issues: FieldIssue[] = [];
 
   const { projectId } = request.data || {};

@@ -1,5 +1,3 @@
-// approveRejectClientHandler.ts
-
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 
@@ -7,6 +5,8 @@ import { ClientStatus } from '../../../models/client_status.enum';
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+
+import { authenticateAdmin } from '../../../utils/authUtils';
 
 export interface ApproveRejectClientData {
   clientId: string;
@@ -21,7 +21,11 @@ export interface OperationResult {
 export async function approveRejectClientHandler(
   request: CallableRequest<ApproveRejectClientData>
 ): Promise<OperationResult> {
-  const { clientId, approve } = request.data;
+  const auth = await authenticateAdmin(request);
+  if (!auth.success) return auth; // returns the same shape { success:false, issues }
+
+  // safe-read request.data
+  const { clientId, approve } = request.data || ({} as ApproveRejectClientData);
   const issues: FieldIssue[] = [];
 
   if (!clientId)
@@ -44,7 +48,7 @@ export async function approveRejectClientHandler(
     }
 
     await ClientService.updateClient(
-      client.clientId!, // or clientId, assuming id field exists
+      client.clientId ?? clientId,
       client.name,
       client.contactEmail,
       client.contactPhone,
@@ -53,7 +57,10 @@ export async function approveRejectClientHandler(
       newStatus
     );
   } catch (dbErr: any) {
-    logger.error('Failed to update client status:', dbErr);
+    logger.error(
+      'approveRejectClientHandler: Failed to update client status:',
+      dbErr
+    );
     return { success: false, issues: parseDbError(dbErr) };
   }
 

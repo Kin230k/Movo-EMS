@@ -6,6 +6,7 @@ import { FieldIssue } from '../../utils/types';
 import { isValidEmail } from '../../utils/validators';
 import { UserService } from '../../models/auth/user/user.service';
 import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
+import { authenticateCaller } from '../../utils/authUtils';
 
 export interface ChangeEmailData {
   newEmail: string;
@@ -20,12 +21,8 @@ export async function changeUserEmailHandler(
 ): Promise<ChangeEmailResult> {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({
-      field: 'auth',
-      message: 'Must be signed in to change email',
-    });
-  }
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
 
   if (!request.data.newEmail) {
     issues.push({ field: 'newEmail', message: 'newEmail is required' });

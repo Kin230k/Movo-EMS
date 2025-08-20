@@ -5,6 +5,7 @@ import { Multilingual } from '../../../models/multilingual.type';
 import { ClientService } from '../../../models/project/client/client.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
+import { authenticateCaller } from '../../../utils/authUtils';
 
 export interface CreateClientData {
   name: Multilingual;
@@ -24,6 +25,10 @@ export interface OperationResult {
 export async function createClientHandler(
   request: CallableRequest<CreateClientData>
 ): Promise<OperationResult> {
+  // require that the caller is authenticated (logged in)
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth; // returns the same shape { success:false, issues }
+  // safe-read request.data
   const {
     name,
     contactEmail,
@@ -32,7 +37,7 @@ export async function createClientHandler(
     logo,
     company,
     status = ClientStatus.Pending,
-  } = request.data;
+  } = request.data || ({} as CreateClientData);
 
   const issues: FieldIssue[] = [];
 
@@ -57,7 +62,7 @@ export async function createClientHandler(
       status
     );
   } catch (dbErr: any) {
-    logger.error('Failed to create client:', dbErr);
+    logger.error('createClientHandler: Failed to create client:', dbErr);
     return { success: false, issues: parseDbError(dbErr) };
   }
 

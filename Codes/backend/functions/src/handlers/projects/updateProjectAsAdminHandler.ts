@@ -5,33 +5,47 @@ import { parseDbError } from '../../utils/dbErrorParser';
 
 import { Multilingual } from '../../models/multilingual.type';
 import { ProjectService } from '../../models/project/project/project.service';
-import { authenticateClient } from '../../utils/authUtils';
+import { authenticateAdmin } from '../../utils/authUtils';
 
-export async function createProjectHandler(request: CallableRequest) {
+interface UpdateProjectData {
+  projectId: string;
+  name: Multilingual;
+  startingDate: string;
+  badgeBackground?: string;
+  endingDate?: string;
+  description?: Multilingual | null;
+}
+
+export async function updateProjectAsAdminHandler(
+  request: CallableRequest<UpdateProjectData>
+) {
   const issues: FieldIssue[] = [];
 
-  const auth = await authenticateClient(request);
+  const auth = await authenticateAdmin(request);
   if (!auth.success) return auth;
 
+  const adminUserId = auth.callerUuid;
   const {
-    clientId,
+    projectId,
     name,
     startingDate,
     badgeBackground,
     endingDate,
     description,
   } = request.data || {};
-  if (!clientId || !name || !startingDate) {
+
+  if (!projectId || !adminUserId || !name || !startingDate) {
     issues.push({
       field: 'input',
-      message: 'Missing required fields: clientId, name, startingDate',
+      message: 'Missing required fields: projectId, name, startingDate',
     });
     return { success: false, issues };
   }
 
   try {
-    await ProjectService.createProject(
-      clientId,
+    await ProjectService.updateProjectAsAdmin(
+      projectId,
+      adminUserId,
       name as Multilingual,
       startingDate,
       badgeBackground,
@@ -40,7 +54,7 @@ export async function createProjectHandler(request: CallableRequest) {
     );
     return { success: true };
   } catch (err: any) {
-    logger.error('Project creation failed', err);
+    logger.error('Admin project update failed', err);
     return { success: false, issues: parseDbError(err) };
   }
 }

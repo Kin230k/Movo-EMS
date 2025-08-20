@@ -4,15 +4,20 @@ import { QuestionService } from '../../../../models/forms/core/question/question
 import { Multilingual } from '../../../../models/multilingual.type';
 import { parseDbError } from '../../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../../utils/types';
-
-export async function createQuestionHandler(request: CallableRequest) {
+import { authenticateUser } from '../../../../utils/authUtils';
+interface CreateQuestionRequestData {
+  typeCode: string;
+  questionText: Multilingual;
+  formId: string;
+  interviewId: string;
+}
+export async function createQuestionHandler(
+  request: CallableRequest<CreateQuestionRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  // 1) Auth check
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   // 2) Input extraction and validation
   const { typeCode, questionText, formId, interviewId } = request.data || {};

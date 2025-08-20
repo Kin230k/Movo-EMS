@@ -4,10 +4,18 @@ import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FormService } from '../../../models/forms/core/form/form.service';
 
-export async function updateFormHandler(request: CallableRequest) {
+export interface UpdateFormRequestData {
+  formId?: string | null;
+  projectId?: string | null;
+  locationId?: string | null;
+}
+
+export async function updateFormHandler(
+  request: CallableRequest<UpdateFormRequestData>
+) {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth?.uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
+  if (!request.auth?.uid) {
     issues.push({ field: 'auth', message: 'Must be signed in' });
     return { success: false, issues };
   }

@@ -3,9 +3,17 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
-
-export async function getSubmissionHandler(request: CallableRequest) {
+import { authenticateClient } from '../../../utils/authUtils';
+interface GetSubmissionRequestData {
+  submissionId?: string;
+}
+export async function getSubmissionHandler(
+  request: CallableRequest<GetSubmissionRequestData>
+) {
   const issues: FieldIssue[] = [];
+
+  const auth = await authenticateClient(request);
+  if (!auth.success) return auth;
 
   const { submissionId } = request.data || {};
   if (!submissionId) {

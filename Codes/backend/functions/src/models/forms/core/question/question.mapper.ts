@@ -60,6 +60,16 @@ export class QuestionMapper extends BaseMapper<Question> {
     ]);
     return result.rows.map(this.mapRowToQuestion);
   }
+  async getAllByFormId(formId: string): Promise<Question[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    const result = await pool.query(
+      'SELECT * FROM get_all_questions($1) WHERE formId = $2',
+      [currentUserId, formId]
+    );
+    return result.rows.map(this.mapRowToQuestion);
+  }
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
