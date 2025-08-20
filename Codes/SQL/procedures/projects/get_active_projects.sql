@@ -18,6 +18,6 @@ RETURN QUERY
         p.endingDate,
 		p.description
     FROM PROJECTS p
-    WHERE CURRENT_DATE BETWEEN p.startingDate AND p.endingDate;
+    WHERE CURRENT_DATE < p.endingDate;
 END;
 $$;

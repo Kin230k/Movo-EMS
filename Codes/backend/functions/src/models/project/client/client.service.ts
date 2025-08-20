@@ -1,6 +1,8 @@
 import { Multilingual } from '../../multilingual.type';
 import { Client } from './client.class';
 import clientMapper from './client.mapper';
+import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
+import { ClientStatus } from '../../client_status.enum';
 
 export class ClientService {
   constructor() {}
@@ -9,16 +11,21 @@ export class ClientService {
     name: Multilingual,
     contactEmail: string,
     contactPhone: string,
+    firebaseUid: string,
     logo?: string,
-    company?: Multilingual | null
+    company?: Multilingual | null,
+    status: ClientStatus = ClientStatus.Pending
   ): Promise<void> {
+    const userId = firebaseUidToUuid(firebaseUid);
     const entity = new Client(
       name,
       contactEmail,
       contactPhone,
       undefined,
       logo,
-      company
+      company,
+      status,
+      userId
     );
     await clientMapper.save(entity);
   }
@@ -29,7 +36,8 @@ export class ClientService {
     contactEmail: string,
     contactPhone: string,
     logo?: string,
-    company?: Multilingual | null
+    company?: Multilingual | null,
+    status: ClientStatus = ClientStatus.Pending
   ): Promise<void> {
     const entity = new Client(
       name,
@@ -37,7 +45,8 @@ export class ClientService {
       contactPhone,
       clientId,
       logo,
-      company
+      company,
+      status
     );
     await clientMapper.save(entity);
   }

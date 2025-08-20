@@ -1,4 +1,6 @@
+-- Active: 1753373235658@@127.0.0.1@5432@movo
 CREATE OR REPLACE PROCEDURE create_project(p_auth_user_id UUID,
+p_client_id UUID,
  p_name JSONB,
  p_badge_background VARCHAR(512),
  p_starting_date DATE,
@@ -18,6 +20,7 @@ BEGIN
 
  INSERT INTO PROJECTS (
  projectId,
+ clientId,
  name,
  badgeBackground,
  startingDate,
@@ -25,6 +28,7 @@ BEGIN
  description
  ) VALUES (
  gen_random_uuid(),
+ p_client_id,
  p_name,
  p_badge_background,
  p_starting_date,

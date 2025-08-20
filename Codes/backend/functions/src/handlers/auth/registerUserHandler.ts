@@ -3,7 +3,11 @@ import * as logger from 'firebase-functions/logger';
 
 import { Multilingual } from '../../models/multilingual.type';
 import { isValidEmail, isValidPhone } from '../../utils/validators';
-import { emailExists, phoneExists } from '../../utils/authUtils';
+import {
+  authenticateCaller,
+  emailExists,
+  phoneExists,
+} from '../../utils/authUtils';
 import { UserService } from '../../models/auth/user/user.service';
 import { sendVerificationEmailHandler } from './sendVerificationEmailHandler';
 import { parseDbError } from '../../utils/dbErrorParser';
@@ -31,8 +35,10 @@ export interface RegisterUserResult {
 export async function registerUserHandler(
   request: CallableRequest<RegisterUserData>
 ): Promise<RegisterUserResult> {
-  const { uid, name, twoFaEnabled, email, phone, picture, role } = request.data;
-
+  const { name, twoFaEnabled, email, phone, picture, role } = request.data;
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
+  const uid = request.auth!.uid;
   const issues: FieldIssue[] = [];
 
   // 1) Field-level validation
@@ -88,9 +94,7 @@ export async function registerUserHandler(
   // 6) Send verification email
   let emailSent = false;
   try {
-    let results = await sendVerificationEmailHandler({
-      data: { email },
-    } as any);
+    let results = await sendVerificationEmailHandler(request);
     if (!results.success) {
       throw results.message;
     }

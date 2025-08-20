@@ -4,6 +4,7 @@ import { Client } from './client.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
 import { CurrentUser } from '../../../utils/currentUser.class';
+import { ClientStatus } from '../../client_status.enum';
 
 export class ClientMapper extends BaseMapper<Client> {
   async save(entity: Client): Promise<void> {
@@ -11,22 +12,44 @@ export class ClientMapper extends BaseMapper<Client> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { clientId, name, logo, company, contactEmail, contactPhone } = entity;
+    const {
+      clientId,
+      name,
+      logo,
+      company,
+      contactEmail,
+      contactPhone,
+      status,
+      userId,
+    } = entity;
 
     // Validation
     if (!name) throw new Error('Client name is required');
 
     if (op === Operation.UPDATE) {
       if (!clientId) throw new Error('Client ID is required for update');
-      await pool.query(
-        'CALL update_client($1, $2, $3, $4, $5, $6, $7)',
-        [currentUserId, clientId, name, logo, company, contactEmail, contactPhone]
-      );
+      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6, $7)', [
+        currentUserId,
+        clientId,
+        name,
+        logo,
+        company,
+        contactEmail,
+        contactPhone,
+        status,
+        userId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_client($1, $2, $3, $4, $5, $6)',
-        [currentUserId, name, logo, company, contactEmail, contactPhone]
-      );
+      await pool.query('CALL create_client($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
+        name,
+        logo,
+        company,
+        contactEmail,
+        contactPhone,
+        status,
+        userId,
+      ]);
     }
   }
 
@@ -46,7 +69,9 @@ export class ClientMapper extends BaseMapper<Client> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_clients($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_clients($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
@@ -61,11 +86,13 @@ export class ClientMapper extends BaseMapper<Client> {
   private mapRowToEntity = (row: any): Client => {
     return new Client(
       row.name,
-      row.contactEmail,
-      row.contactPhone,
-      row.clientId,
+      row.contactemail,
+      row.contactphone,
+      row.clientid,
       row.logo,
-      row.company
+      row.company,
+      row.status as ClientStatus,
+      row.userid
     );
   };
 }

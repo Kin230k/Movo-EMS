@@ -6,6 +6,7 @@ import { UserStatus } from '../../models/auth/user/user_status.enum';
 import { parseDbError } from '../../utils/dbErrorParser';
 import { FieldIssue } from '../../utils/types';
 import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
+import { authenticateCaller } from '../../utils/authUtils';
 
 export interface GetUserInfoResult {
   success: boolean;
@@ -18,17 +19,10 @@ export async function getUserInfoHandler(
 ): Promise<GetUserInfoResult> {
   const issues: FieldIssue[] = [];
 
-  // 1) Validate auth context
-  if (!request.auth || !request.auth.uid) {
-    issues.push({
-      field: 'auth',
-      message: 'Must be signed in to get user info',
-    });
-    return { success: false, issues };
-  }
-
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
   // 2) Resolve target UID
-  const targetUserId = firebaseUidToUuid(request.auth.uid);
+  const targetUserId = firebaseUidToUuid(request.auth!.uid);
   if (!targetUserId) {
     issues.push({ field: 'uid', message: 'UID is required' });
     return { success: false, issues };

@@ -6,6 +6,7 @@ import { ActionCodeSettings } from 'firebase-admin/auth';
 import { auth } from 'firebase-admin';
 import { isValidEmail } from '../../utils/validators';
 import { FieldIssue } from '../../utils/types';
+import { authenticateCaller } from '../../utils/authUtils';
 
 const actionCodeSettings: ActionCodeSettings = {
   url: process.env.URL_FINISH_SIGNUP ?? '',
@@ -29,13 +30,9 @@ export async function sendVerificationEmailHandler(
   const { email } = request.data;
 
   // Get UID from authenticated caller context
-  const uid = request.auth?.uid;
-  if (!uid && process.env.FUNCTIONS_EMULATOR !== 'true') {
-    return {
-      success: false,
-      issues: [{ field: 'auth', message: 'User must be authenticated.' }],
-    };
-  }
+  const authz = await authenticateCaller(request);
+  if (!authz.success) return authz;
+  const uid = request.auth!.uid;
 
   if (!email) {
     issues.push({ field: 'email', message: 'Email address is required.' });

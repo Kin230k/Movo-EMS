@@ -10,20 +10,20 @@ import { registerUserHandler } from '../../handlers/auth/registerUserHandler';
 import { sendLoginAlertHandler } from '../../handlers/auth/sendLoginAlertHandler';
 import { sendPasswordResetHandler } from '../../handlers/auth/sendPasswordResetHandler';
 
-export const changeUserEmail = onCall({}, changeUserEmailHandler);
+export const changeUserEmail = onCall(changeUserEmailHandler);
 
-export const changeUserPhone = onCall({}, changeUserPhoneHandler);
+export const changeUserPhone = onCall(changeUserPhoneHandler);
 
-export const checkServiceStatus = onCall({}, checkServiceStatusHandler);
+export const checkServiceStatus = onCall(checkServiceStatusHandler);
 
-export const editUserInfo = onCall({}, editUserInfoHandler);
+export const editUserInfo = onCall(editUserInfoHandler);
 
-export const getUserInfo = onCall({}, getUserInfoHandler);
+export const getUserInfo = onCall(getUserInfoHandler);
 
-export const registerUser = onCall({}, registerUserHandler);
+export const registerUser = onCall(registerUserHandler);
 
-export const sendLoginAlert = onCall({}, sendLoginAlertHandler);
+export const sendLoginAlert = onCall(sendLoginAlertHandler);
 
-export const sendPasswordReset = onCall({}, sendPasswordResetHandler);
+export const sendPasswordReset = onCall(sendPasswordResetHandler);
 
-export const sendVerificationEmail = onCall({}, sendVerificationEmailHandler);
+export const sendVerificationEmail = onCall(sendVerificationEmailHandler);
