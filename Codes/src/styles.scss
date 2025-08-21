@@ -1,1 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+@use './app/styles/colors' as *;
+@use './app/styles/dimensions' as *;
+@use './app/styles/margin' as *;
+@use './app/styles/radius' as *;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}

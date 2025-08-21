@@ -1,0 +1,122 @@
+// components/pages/loginUser/login.scss و components/pages/loginAdmin/login.scss
+@use 'sass:color';
+@use '../../styles/colors.scss' as *;
+@use '../../styles/dimensions' as dim;
+@use '../../styles/margin' as mrg;
+@use '../../styles/radius' as rad;
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  background-color: $Bg-Dark;
+  padding: 5rem; 
+  border-radius: rad.$radius-form;
+  color: $color-font;
+  width: 100%;
+  max-width: 26rem ; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  
+  
+  
+  h1 {
+    color: $Secandary;
+    margin: 0;
+    font-size: 2.2rem;
+    text-align: center;
+    letter-spacing: 1px; 
+    font-weight: bold;
+  }
+}
+
+.login-title {
+  color: rgba($Secandary, 0.9);
+  margin: 0 0 2.5rem 0;  
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: 400;
+}
+
+.form-group {
+  margin-bottom: 1.2rem; 
+  
+  input {
+    width: 90%;
+    padding: 0.8rem 1.2rem; 
+    border-radius: rad.$radius-input;
+    border: 1px solid rgba($color-font, 0.2);
+    background-color: lighten($Bg-Dark, 10%);
+    color: $color-font;
+    font-size: 0.95rem;
+    
+    &::placeholder {
+      color: rgba($color-font, 0.5);
+    }
+
+    &:focus {
+      border-color: $Secandary;
+      outline: none;
+    }
+  }
+}
+
+
+.forgot-password {
+  text-align: right;
+  margin: -0.5rem 0 1.5rem 0;
+  
+  a {
+    color: $color-font;
+    text-decoration: none;
+    font-size: 0.9rem;
+    
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+
+.switch-login-type {
+  text-align: center;
+  margin: 1.5rem 0 0 0;
+  
+  a {
+    color: $Btn-color;
+    text-decoration: none;
+    font-size: 0.9rem;
+    
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+
+.login-btn {
+  background-color: $Btn-color;
+  color: $color-font;
+  width: 100%;
+  padding: 0.85rem; 
+  border-radius: rad.$radius-btn;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: color.adjust($Btn-color, $lightness: -10%);
+  }
+}

@@ -1,0 +1,9 @@
+<!-- components/shared/input/input.html -->
+<div class="form-group">
+  <input 
+    [type]="type" 
+    [placeholder]="placeholder" 
+    [value]="value"
+    (input)="onInputChange($event)"
+    class="form-input">
+</div>
