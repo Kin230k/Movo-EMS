@@ -20,7 +20,6 @@ export class ClientMapper extends BaseMapper<Client> {
       contactEmail,
       contactPhone,
       status,
-      userId,
     } = entity;
 
     // Validation
@@ -37,18 +36,17 @@ export class ClientMapper extends BaseMapper<Client> {
         contactEmail,
         contactPhone,
         status,
-        userId,
       ]);
     } else {
-      await pool.query('CALL create_client($1, $2, $3, $4, $5, $6)', [
+      await pool.query('CALL create_client($1, $2, $3, $4, $5, $6, $7, $8)', [
         currentUserId,
+        clientId,
         name,
         logo,
         company,
         contactEmail,
         contactPhone,
         status,
-        userId,
       ]);
     }
   }
@@ -84,16 +82,17 @@ export class ClientMapper extends BaseMapper<Client> {
   }
 
   private mapRowToEntity = (row: any): Client => {
-    return new Client(
+    const client = new Client(
       row.name,
       row.contactemail,
       row.contactphone,
       row.clientId,
       row.logo,
       row.company,
-      row.status as ClientStatus,
-      row.userId
+      row.status as ClientStatus
     );
+    client.operation = Operation.UPDATE;
+    return client;
   };
 }
 

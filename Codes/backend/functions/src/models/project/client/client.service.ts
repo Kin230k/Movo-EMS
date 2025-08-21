@@ -3,6 +3,7 @@ import { Client } from './client.class';
 import clientMapper from './client.mapper';
 import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { ClientStatus } from '../../client_status.enum';
+import { Operation } from '../../operation.enum';
 
 export class ClientService {
   constructor() {}
@@ -16,16 +17,15 @@ export class ClientService {
     company?: Multilingual | null,
     status: ClientStatus = ClientStatus.Pending
   ): Promise<void> {
-    const userId = firebaseUidToUuid(firebaseUid);
+    const clientId = firebaseUidToUuid(firebaseUid);
     const entity = new Client(
       name,
       contactEmail,
       contactPhone,
-      undefined,
+      clientId,
       logo,
       company,
-      status,
-      userId
+      status
     );
     await clientMapper.save(entity);
   }
@@ -48,6 +48,7 @@ export class ClientService {
       company,
       status
     );
+    entity.operation = Operation.UPDATE;
     await clientMapper.save(entity);
   }
 

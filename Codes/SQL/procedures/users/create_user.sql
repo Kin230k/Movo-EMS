@@ -1,4 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_user(
+ p_userId UUID,
  p_name JSONB,
  p_email VARCHAR(255),
  p_phone VARCHAR(20),
@@ -21,7 +22,7 @@ INSERT INTO USERS (
  status,
  twoFaEnabled
  ) VALUES (
- gen_random_uuid(),
+ p_userId,
  p_name,
  p_email,
  p_phone,

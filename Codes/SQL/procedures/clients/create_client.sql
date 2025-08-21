@@ -1,9 +1,11 @@
 CREATE OR REPLACE PROCEDURE create_client(p_auth_user_id UUID,
+ p_clientId UUID,
  p_name JSONB,
  p_logo VARCHAR(512),
  p_company JSONB,
  p_contact_email VARCHAR(255),
- p_contact_phone VARCHAR(20)
+ p_contact_phone VARCHAR(20),
+ p_status client_status
 )
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
@@ -16,14 +18,16 @@ INSERT INTO CLIENTS (
  logo,
  company,
  contactEmail,
- contactPhone
+ contactPhone,
+ status
  ) VALUES (
- gen_random_uuid(),
+p_clientId,
  p_name,
  p_logo,
  p_company,
  p_contact_email,
- p_contact_phone
+ p_contact_phone,
+ p_status
  );
 END;
 $$;

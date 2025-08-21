@@ -1,4 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_admin(p_auth_user_id UUID,
+p_adminId UUID,
  p_name JSONB,
  p_qid VARCHAR(20),
  p_date_of_birth DATE,
@@ -16,7 +17,7 @@ INSERT INTO ADMINS (
  dateOfBirth,
  jobPosition
  ) VALUES (
- gen_random_uuid(),
+ p_adminId,
  p_name,
  p_qid,
  p_date_of_birth,

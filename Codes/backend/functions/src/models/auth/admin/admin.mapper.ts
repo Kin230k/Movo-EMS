@@ -23,8 +23,9 @@ export class AdminMapper extends BaseMapper<Admin> {
         jobPosition,
       ]);
     } else {
-      await pool.query('CALL create_admin($1, $2, $3, $4, $5)', [
+      await pool.query('CALL create_admin($1, $2, $3, $4, $5, $6)', [
         currentUserId,
+        adminId,
         name,
         qid,
         dateOfBirth,

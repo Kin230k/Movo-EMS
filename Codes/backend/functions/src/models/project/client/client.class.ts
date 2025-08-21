@@ -10,11 +10,8 @@ export class Client {
     public clientId?: string,
     public logo?: string,
     public company?: Multilingual | null,
-    public status: ClientStatus = ClientStatus.Pending,
-    public userId?: string // This will be UUID v5 generated from Firebase UID
+    public status: ClientStatus = ClientStatus.Pending
   ) {}
 
-  get operation(): Operation {
-    return this.clientId ? Operation.UPDATE : Operation.CREATE;
-  }
+  public operation = Operation.CREATE;
 }
