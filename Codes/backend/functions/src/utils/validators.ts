@@ -7,10 +7,14 @@ export function isValidEmail(email: string): boolean {
 }
 
 // Validate E.164 phone format (e.g., +1234567890)
+// Validate phone number in two formats:
+// 1. Local (leading 0, total 7–15 digits e.g., 0953726430, 0441234567)
+// 2. International E.164 (+<countrycode><number>, e.g., +4915123456789)
 export function isValidPhone(phone: string): boolean {
-  const re = /^\+[1-9]\d{1,14}$/;
+  const re = /^(?:0\d{6,14}|\+[1-9]\d{1,14})$/;
   return re.test(phone);
 }
+
 // Helper: Validation Error (400)
 export function validationError(message: string): HttpsError {
   return new HttpsError('invalid-argument', message);
