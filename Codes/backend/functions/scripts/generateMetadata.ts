@@ -59,7 +59,7 @@ const metadata: Array<{
 function getFixedType(typeName: string): string | undefined {
   const KNOWN_TYPES: Record<string, string> = {
     Multilingual: '{ en: string; ar: string }',
-    ClientStatus: '"ACTIVE" | "INACTIVE" | "PENDING"',
+    ClientStatus: '"accepted" | "rejected" | "pending"',
     SubmissionOutcome: `"pass" | "fail" | "manual_review"`,
   };
 
