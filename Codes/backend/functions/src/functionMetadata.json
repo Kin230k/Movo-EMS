@@ -249,7 +249,7 @@
       },
       {
         "name": "status",
-        "type": "\"ACTIVE\" | \"INACTIVE\" | \"PENDING\" | undefined",
+        "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
         "required": false,
         "description": ""
       }
@@ -350,7 +350,7 @@
       },
       {
         "name": "status",
-        "type": "\"ACTIVE\" | \"INACTIVE\" | \"PENDING\" | undefined",
+        "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
         "required": false,
         "description": ""
       }
