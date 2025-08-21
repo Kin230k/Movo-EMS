@@ -8,26 +8,35 @@ import { parseDbError } from './dbErrorParser';
 import { FieldIssue } from './types';
 import { UserService } from '../models/auth/user/user.service';
 import { ClientService } from '../models/project/client/client.service';
+import { isValidEmail, isValidPhone } from './validators';
 
 // Check if email exists in Firebase Auth
 export async function emailExists(email: string): Promise<boolean> {
-  try {
-    await getAuth().getUserByEmail(email);
-    return true;
-  } catch (error: any) {
-    if (error.code === 'auth/user-not-found') return false;
-    throw error; // Re-throw other errors
+  if (isValidEmail(email)) {
+    try {
+      await getAuth().getUserByEmail(email);
+      return true;
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') return false;
+      throw error; // Re-throw other errors
+    }
+  } else {
+    return false;
   }
 }
 
 // Check if phone number exists in Firebase Auth
 export async function phoneExists(phone: string): Promise<boolean> {
-  try {
-    await getAuth().getUserByPhoneNumber(phone);
-    return true;
-  } catch (error: any) {
-    if (error.code === 'auth/user-not-found') return false;
-    throw error; // Re-throw other errors
+  if (isValidPhone(phone)) {
+    try {
+      await getAuth().getUserByPhoneNumber(phone);
+      return true;
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') return false;
+      throw error; // Re-throw other errors
+    }
+  } else {
+    return false;
   }
 }
 export interface AuthenticateResultSuccess {

@@ -80,11 +80,11 @@ export class CriteriaResultMapper extends BaseMapper<CriteriaResult> {
 
   private mapRowToCriteriaResult = (row: any): CriteriaResult => {
     return new CriteriaResult(
-      row.answerid,
-      row.criterionid,
+      row.answerId,
+      row.criterionId,
       row.passed,
-      row.evaluatedat,
-      row.criterionresultid
+      row.evaluatedAt,
+      row.criterionResultId
     );
   };
 }

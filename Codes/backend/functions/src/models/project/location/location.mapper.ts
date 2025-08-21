@@ -11,12 +11,14 @@ export class LocationMapper extends BaseMapper<Location> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { locationId, name, projectId, siteMap, longitude, latitude } = entity;
+    const { locationId, name, projectId, siteMap, longitude, latitude } =
+      entity;
 
     // Validation
     if (!name) throw new Error('Location name is required');
     if (!projectId) throw new Error('Project ID is required');
-    if (longitude == null || latitude == null) throw new Error('Longitude and latitude are required');
+    if (longitude == null || latitude == null)
+      throw new Error('Longitude and latitude are required');
 
     if (op === Operation.UPDATE) {
       if (!locationId) throw new Error('Location ID is required for update');
@@ -36,7 +38,7 @@ export class LocationMapper extends BaseMapper<Location> {
       );
 
       if (rows.length === 0) throw new Error('Failed to create location');
-      entity.locationId = rows[0].locationid;
+      entity.locationId = rows[0].locationId;
     }
   }
 
@@ -56,7 +58,9 @@ export class LocationMapper extends BaseMapper<Location> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_locations($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_locations($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
@@ -71,8 +75,8 @@ export class LocationMapper extends BaseMapper<Location> {
   private mapRowToEntity = (row: any): Location => {
     return new Location(
       row.name,
-      row.projectid,
-      row.locationid,
+      row.projectId,
+      row.locationId,
       row.siteMap,
       row.longitude,
       row.latitude

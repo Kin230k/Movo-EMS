@@ -81,11 +81,11 @@ export class QuestionMapper extends BaseMapper<Question> {
 
   private mapRowToQuestion = (row: any): Question => {
     return new Question(
-      row.typecode,
-      row.questiontext,
-      row.formid,
-      row.interviewid,
-      row.questionid
+      row.typeCode,
+      row.questionText,
+      row.formId,
+      row.interviewId,
+      row.questionId
     );
   };
 }

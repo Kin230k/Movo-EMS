@@ -6,8 +6,8 @@ import { UserStatus } from './user_status.enum';
 export class User {
   constructor(
     public name: Multilingual,
-    public email: string,
-    public phone: string,
+    public email: string | undefined,
+    public phone: string | undefined,
     public role: string,
     public status: string,
     public twoFaEnabled: boolean,

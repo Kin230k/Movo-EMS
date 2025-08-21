@@ -20,15 +20,20 @@ export class RateMapper extends BaseMapper<Rate> {
 
     if (op === Operation.UPDATE) {
       if (!rateId) throw new Error('Rate ID is required for update');
-      await pool.query(
-        'CALL update_rate($1, $2, $3, $4, $5)',
-        [currentUserId, rateId, hourlyRate, userId, projectId]
-      );
+      await pool.query('CALL update_rate($1, $2, $3, $4, $5)', [
+        currentUserId,
+        rateId,
+        hourlyRate,
+        userId,
+        projectId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_rate($1, $2, $3, $4)',
-        [currentUserId, hourlyRate, userId, projectId]
-      );
+      await pool.query('CALL create_rate($1, $2, $3, $4)', [
+        currentUserId,
+        hourlyRate,
+        userId,
+        projectId,
+      ]);
     }
   }
 
@@ -48,7 +53,9 @@ export class RateMapper extends BaseMapper<Rate> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_rates($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_rates($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
@@ -61,7 +68,7 @@ export class RateMapper extends BaseMapper<Rate> {
   }
 
   private mapRowToEntity = (row: any): Rate => {
-    return new Rate(row.hourlyrate, row.userid, row.projectid, row.rateid);
+    return new Rate(row.hourlyRate, row.userId, row.projectId, row.rateId);
   };
 }
 

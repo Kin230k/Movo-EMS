@@ -67,7 +67,7 @@ export class CriteriaMapper extends BaseMapper<Criteria> {
   }
 
   private mapRowToCriteria = (row: any): Criteria => {
-    return new Criteria(row.criterionid, row.type, row.value, row.questionid);
+    return new Criteria(row.criterionId, row.type, row.value, row.questionId);
   };
 }
 

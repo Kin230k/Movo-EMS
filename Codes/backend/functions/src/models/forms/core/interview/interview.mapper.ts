@@ -61,7 +61,7 @@ export class InterviewMapper extends BaseMapper<Interview> {
   }
 
   private mapRowToInterview = (row: any): Interview => {
-    return new Interview(row.projectid, row.interviewid);
+    return new Interview(row.projectId, row.interviewId);
   };
 }
 

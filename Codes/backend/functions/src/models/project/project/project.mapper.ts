@@ -116,12 +116,12 @@ export class ProjectMapper extends BaseMapper<Project> {
 
   private mapRowToEntity = (row: any): Project => {
     return new Project(
-      row.clientid,
+      row.clientId,
       row.name,
-      row.startingdate,
-      row.projectid,
-      row.badgebackground,
-      row.endingdate,
+      row.startingDate,
+      row.projectId,
+      row.badgeBackground,
+      row.endingDate,
       row.description
     );
   };

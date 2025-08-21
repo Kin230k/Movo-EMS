@@ -22,7 +22,7 @@ UPDATE users
  picture = COALESCE(p_picture, picture),
  role = COALESCE(p_role, role),
  status = COALESCE(p_status, status),
- twofaenabled = COALESCE(p_two_fa_enabled, twofaenabled)
+ twoFaEnabled = COALESCE(p_two_fa_enabled, twoFaEnabled)
  WHERE userId = p_user_id;
 END;
 $$;

@@ -94,9 +94,9 @@ export class DecisionRuleMapper extends BaseMapper<DecisionRule> {
     return new DecisionRule(
       row.name,
       row.priority,
-      row.formid,
-      row.outcomeonpass,
-      row.outcomeonfail,
+      row.formId,
+      row.outcomeOnPass,
+      row.outcomeOnFail,
       row.description,
       row.ruleid
     );

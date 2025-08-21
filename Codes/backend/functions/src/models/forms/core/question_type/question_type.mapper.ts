@@ -64,7 +64,7 @@ export class QuestionTypeMapper extends BaseMapper<QuestionType> {
   }
 
   private mapRowToQuestionType = (row: any): QuestionType => {
-    return new QuestionType(row.description, row.typecode);
+    return new QuestionType(row.description, row.typeCode);
   };
 }
 

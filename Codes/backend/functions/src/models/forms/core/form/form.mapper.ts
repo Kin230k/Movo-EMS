@@ -64,7 +64,7 @@ export class FormMapper extends BaseMapper<Form> {
   }
 
   private mapRowToForm = (row: any): Form => {
-    return new Form(row.projectid, row.locationid, row.formid);
+    return new Form(row.projectId, row.locationId, row.formId);
   };
 }
 
