@@ -164,24 +164,6 @@
         "description": ""
       },
       {
-        "name": "email",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "phone",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "role",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "twoFaEnabled",
         "type": "boolean",
         "required": true,
@@ -598,13 +580,13 @@
       },
       {
         "name": "dateSubmitted",
-        "type": "{ toString: function toString() { [native code] }; toDateString: () => string; toTimeString: () => string; toLocaleString: function toLocaleString() { [native code] }; toLocaleDateString: { (): string; (locales?: string | string[] | undefined, options?: Intl.DateTimeFormatOptions | undefined): string; (locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions | undefined): string; }; toLocaleTimeString: { (): string; (locales?: string | string[] | undefined, options?: Intl.DateTimeFormatOptions | undefined): string; (locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions | undefined): string; }; valueOf: function valueOf() { [native code] }; getTime: () => number; getFullYear: () => number; getUTCFullYear: () => number; getMonth: () => number; getUTCMonth: () => number; getDate: () => number; getUTCDate: () => number; getDay: () => number; getUTCDay: () => number; getHours: () => number; getUTCHours: () => number; getMinutes: () => number; getUTCMinutes: () => number; getSeconds: () => number; getUTCSeconds: () => number; getMilliseconds: () => number; getUTCMilliseconds: () => number; getTimezoneOffset: () => number; setTime: (time: number) => number; setMilliseconds: (ms: number) => number; setUTCMilliseconds: (ms: number) => number; setSeconds: (sec: number, ms?: number | undefined) => number; setUTCSeconds: (sec: number, ms?: number | undefined) => number; setMinutes: (min: number, sec?: number | undefined, ms?: number | undefined) => number; setUTCMinutes: (min: number, sec?: number | undefined, ms?: number | undefined) => number; setHours: (hours: number, min?: number | undefined, sec?: number | undefined, ms?: number | undefined) => number; setUTCHours: (hours: number, min?: number | undefined, sec?: number | undefined, ms?: number | undefined) => number; setDate: (date: number) => number; setUTCDate: (date: number) => number; setMonth: (month: number, date?: number | undefined) => number; setUTCMonth: (month: number, date?: number | undefined) => number; setFullYear: (year: number, month?: number | undefined, date?: number | undefined) => number; setUTCFullYear: (year: number, month?: number | undefined, date?: number | undefined) => number; toUTCString: () => string; toISOString: () => string; toJSON: (key?: any) => string; getVarDate: () => VarDate; __@toPrimitive@3157: { (hint: \"default\"): string; (hint: \"string\"): string; (hint: \"number\"): number; (hint: string): string | number; } }",
+        "type": "Date",
         "required": true,
         "description": ""
       },
       {
         "name": "outcome",
-        "type": "import(\"C:/projects/MOVO/Movo-EMS/Codes/backend/functions/src/models/submission_outcome.enum\").SubmissionOutcome | undefined",
+        "type": "\"pass\" | \"fail\" | \"manual_review\" | undefined",
         "required": false,
         "description": ""
       },

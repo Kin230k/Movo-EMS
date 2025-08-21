@@ -60,6 +60,7 @@ function getFixedType(typeName: string): string | undefined {
   const KNOWN_TYPES: Record<string, string> = {
     Multilingual: '{ en: string; ar: string }',
     ClientStatus: '"ACTIVE" | "INACTIVE" | "PENDING"',
+    SubmissionOutcome: `"pass" | "fail" | "manual_review"`,
   };
 
   return KNOWN_TYPES[typeName];
@@ -593,8 +594,33 @@ function expandImportedPatternsInTextGlobal(text: string, depth = 0): string {
 
 /** ---------- Type rendering ---------- **/
 
+/** Detect Date-like types to avoid inlining the Date prototype */
+function isDateLikeType(type: Type | undefined): boolean {
+  if (!type) return false;
+  try {
+    // Symbol name is the most reliable indicator (e.g. "Date")
+    const sym = type.getSymbol?.();
+    const symName =
+      typeof sym?.getName === 'function' ? (sym.getName() as string) : '';
+    if (symName === 'Date') return true;
+
+    // Some types may render to text with Date in them (fallback)
+    const txt = (type.getText?.() || '').toString();
+    if (/\bDate\b/.test(txt)) return true;
+
+    // If the expanded text looks like the Date prototype (has toISOString/getFullYear/etc.)
+    if (txt.includes('toISOString') || txt.includes('getFullYear')) return true;
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
 function renderObjectTypeInline(type: Type, depth = 0): string {
   try {
+    // NEW: if this is actually a Date-like type, return compact form
+    if (isDateLikeType(type)) return 'Date';
+
     const props = type.getProperties?.() ?? [];
     const parts: string[] = [];
     for (const p of props) {
@@ -653,8 +679,11 @@ function renderTypeInline(type: Type | undefined, depth = 0): string {
     }
   }
 
-  // Handle known types
+  // Handle known types (early)
   try {
+    // NEW: date detection to avoid inlining full Date prototype
+    if (isDateLikeType(type)) return 'Date';
+
     const typeName = type.getSymbol()?.getName();
     const fixedType = getFixedType(typeName || '');
     if (fixedType) return fixedType;
@@ -750,6 +779,18 @@ function extractPropertiesFromType(type: Type) {
     description: string;
   }> = [];
   try {
+    // If the provided type itself is Date-like, nothing to extract — return a single pseudo-field
+    if (isDateLikeType(type)) {
+      return [
+        {
+          name: '(value)',
+          type: 'Date',
+          required: true,
+          description: '',
+        },
+      ];
+    }
+
     const props = type.getProperties?.() ?? [];
     for (const prop of props) {
       const name = prop.getName();
@@ -788,14 +829,26 @@ function extractPropertiesFromType(type: Type) {
         }
       } else {
         const maybe = (prop as any).getType?.()?.getText?.() ?? 'any';
-        // Handle known types in text format
-        if (maybe.includes('Multilingual') && maybe.includes('import')) {
-          propTypeText = getFixedType('Multilingual') || maybe;
-        } else if (maybe.includes('ClientStatus') && maybe.includes('import')) {
-          propTypeText = getFixedType('ClientStatus') || maybe;
+        // NEW: collapse Date-like textual expansions
+        if (
+          maybe.includes('toISOString') ||
+          maybe.includes('getFullYear') ||
+          /\bDate\b/.test(maybe)
+        ) {
+          propTypeText = 'Date';
         } else {
-          const expanded = expandImportedPatternsInTextGlobal(maybe);
-          propTypeText = expanded !== maybe ? expanded : maybe;
+          // Handle known types in text format
+          if (maybe.includes('Multilingual') && maybe.includes('import')) {
+            propTypeText = getFixedType('Multilingual') || maybe;
+          } else if (
+            maybe.includes('ClientStatus') &&
+            maybe.includes('import')
+          ) {
+            propTypeText = getFixedType('ClientStatus') || maybe;
+          } else {
+            const expanded = expandImportedPatternsInTextGlobal(maybe);
+            propTypeText = expanded !== maybe ? expanded : maybe;
+          }
         }
       }
 
