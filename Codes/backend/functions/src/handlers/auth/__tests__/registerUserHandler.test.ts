@@ -1,9 +1,12 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
-import { RegisterUserData, registerUserHandler } from '../registerUserHandler';
+import { registerUserHandler, RegisterUserData } from '../registerUserHandler';
+
 import { UserService } from '../../../models/auth/user/user.service';
 import * as validators from '../../../utils/validators';
 import * as authUtils from '../../../utils/authUtils';
 import { sendVerificationEmailHandler } from '../sendVerificationEmailHandler';
+import * as dbErrorParser from '../../../utils/dbErrorParser';
+import * as firebaseUtils from '../../../utils/firebaseUidToUuid';
 
 type Mock = jest.Mock;
 
@@ -11,13 +14,18 @@ jest.mock('../../../models/auth/user/user.service');
 jest.mock('../../../utils/validators');
 jest.mock('../../../utils/authUtils');
 jest.mock('../sendVerificationEmailHandler');
+jest.mock('../../../utils/dbErrorParser');
+jest.mock('../../../utils/firebaseUidToUuid');
 
 const mockRegisterUser = UserService.registerUser as Mock;
 const mockIsValidEmail = validators.isValidEmail as Mock;
 const mockIsValidPhone = validators.isValidPhone as Mock;
 const mockEmailExists = authUtils.emailExists as Mock;
 const mockPhoneExists = authUtils.phoneExists as Mock;
+const mockAuthenticateCaller = authUtils.authenticateCaller as Mock;
 const mockSendVerificationEmail = sendVerificationEmailHandler as Mock;
+const mockParseDbError = dbErrorParser.parseDbError as Mock;
+const mockFirebaseUidToUuid = firebaseUtils.firebaseUidToUuid as Mock;
 
 describe('registerUserHandler', () => {
   beforeEach(() => {
@@ -26,14 +34,18 @@ describe('registerUserHandler', () => {
     mockIsValidPhone.mockReturnValue(true);
     mockEmailExists.mockResolvedValue(true);
     mockPhoneExists.mockResolvedValue(true);
+    mockAuthenticateCaller.mockResolvedValue({ success: true });
+    mockFirebaseUidToUuid.mockReturnValue('uuid-123');
   });
 
-  function makeReq(data: any) {
-    return { data } as CallableRequest<RegisterUserData>;
+  function makeReq(data: any, uid: string = 'uid123') {
+    return {
+      data,
+      auth: { uid },
+    } as unknown as CallableRequest<RegisterUserData>;
   }
 
   const validData: RegisterUserData = {
-    uid: 'uid123',
     name: { en: 'Test User', ar: 'تيمبت' },
     email: 'test@example.com',
     phone: '+1234567890',
@@ -44,7 +56,7 @@ describe('registerUserHandler', () => {
   it('returns issues for missing fields', async () => {
     const result = await registerUserHandler(makeReq({}));
     expect(result.success).toBe(false);
-    // Fixed: 6 required fields (uid, name, twoFaEnabled, email, phone, role)
+    // 6 required fields: uid, name, twoFaEnabled, email, phone, role
     expect(result.issues).toHaveLength(6);
   });
 
@@ -62,7 +74,6 @@ describe('registerUserHandler', () => {
     const result = await registerUserHandler(makeReq(validData));
     expect(result).toEqual({
       success: false,
-      // Fixed typo in error message
       issues: [{ field: 'email', message: 'Email has no record registered' }],
     });
   });
@@ -78,10 +89,11 @@ describe('registerUserHandler', () => {
   it('returns database issues on persistence failure', async () => {
     const dbError = new Error('DB constraint');
     mockRegisterUser.mockRejectedValue(dbError);
+    mockParseDbError.mockReturnValue([{ field: 'db', message: 'constraint' }]);
 
     const result = await registerUserHandler(makeReq(validData));
     expect(result.success).toBe(false);
-    expect(result.issues).toBeDefined();
+    expect(result.issues).toEqual([{ field: 'db', message: 'constraint' }]);
   });
 
   it('returns success but emailSent=false when verification fails', async () => {
@@ -90,5 +102,17 @@ describe('registerUserHandler', () => {
 
     const result = await registerUserHandler(makeReq(validData));
     expect(result).toEqual({ success: true, emailSent: false });
+  });
+
+  it('returns auth failure if authenticateCaller fails', async () => {
+    mockAuthenticateCaller.mockResolvedValue({
+      success: false,
+      issues: [{ field: 'auth', message: 'Unauthorized' }],
+    });
+    const result = await registerUserHandler(makeReq(validData));
+    expect(result).toEqual({
+      success: false,
+      issues: [{ field: 'auth', message: 'Unauthorized' }],
+    });
   });
 });

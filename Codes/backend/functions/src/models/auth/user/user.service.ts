@@ -10,8 +10,8 @@ export class UserService {
 
   static async registerUser(
     name: Multilingual,
-    email: string,
-    phone: string,
+    email: string | undefined,
+    phone: string | undefined,
     role: string,
     status: string,
     twoFaEnabled: boolean,
@@ -36,8 +36,8 @@ export class UserService {
   static async updateUser(
     userId: string,
     name: Multilingual,
-    email: string,
-    phone: string,
+    email: string | undefined,
+    phone: string | undefined,
     role: string,
     status: string,
     twoFaEnabled: boolean,

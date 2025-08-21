@@ -11,7 +11,8 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { scheduleId, createdAt, startTime, endTime, projectId, locationId } = entity;
+    const { scheduleId, createdAt, startTime, endTime, projectId, locationId } =
+      entity;
 
     // Validation
     if (!createdAt) throw new Error('Creation date is required');
@@ -22,15 +23,24 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
     if (op === Operation.UPDATE) {
       if (!scheduleId) throw new Error('Schedule ID is required for update');
-      await pool.query(
-        'CALL update_schedule($1, $2, $3, $4, $5, $6, $7)',
-        [currentUserId, scheduleId, createdAt, startTime, endTime, projectId, locationId]
-      );
+      await pool.query('CALL update_schedule($1, $2, $3, $4, $5, $6, $7)', [
+        currentUserId,
+        scheduleId,
+        createdAt,
+        startTime,
+        endTime,
+        projectId,
+        locationId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_schedule($1, $2, $3, $4, $5, $6)',
-        [currentUserId, createdAt, startTime, endTime, projectId, locationId]
-      );
+      await pool.query('CALL create_schedule($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
+        createdAt,
+        startTime,
+        endTime,
+        projectId,
+        locationId,
+      ]);
     }
   }
 
@@ -50,7 +60,9 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_schedules($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_schedules($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
@@ -64,12 +76,12 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
   private mapRowToEntity = (row: any): Schedule => {
     return new Schedule(
-      row.createdat,
-      row.starttime,
-      row.endtime,
-      row.projectid,
-      row.locationid,
-      row.scheduleid
+      row.createdAt,
+      row.startTime,
+      row.endTime,
+      row.projectId,
+      row.locationId,
+      row.scheduleId
     );
   };
 }

@@ -16,10 +16,9 @@ import { UserStatus } from '../../models/auth/user/user_status.enum';
 import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
 
 export interface RegisterUserData {
-  uid: string;
   name: Multilingual;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   role: string;
 
   twoFaEnabled: boolean;
@@ -47,19 +46,28 @@ export async function registerUserHandler(
 
   if (twoFaEnabled === undefined)
     issues.push({ field: 'twoFaEnabled', message: '2FA setting required' });
-  if (!email) issues.push({ field: 'email', message: 'Email is required' });
-  if (!phone) issues.push({ field: 'phone', message: 'Phone is required' });
+
   if (!role) issues.push({ field: 'role', message: 'Role is required' });
 
-  // 2) Format checks
+  // Require at least one contact method: email OR phone (or both)
+  if (!email && !phone) {
+    issues.push({
+      field: 'contact',
+      message: 'Either email or phone is required',
+    });
+  }
+
+  // 2) Format checks (only if provided)
   if (email && !isValidEmail(email))
     issues.push({ field: 'email', message: 'Invalid email format' });
+
   if (phone && !isValidPhone(phone))
     issues.push({ field: 'phone', message: 'Phone must be in E.164 format' });
 
-  // 3) Uniqueness checks
+  // 3) Uniqueness / existence checks (only if provided)
   if (email && !(await emailExists(email)))
     issues.push({ field: 'email', message: 'Email has no record registered' });
+
   if (phone && !(await phoneExists(phone)))
     issues.push({
       field: 'phone',
@@ -91,16 +99,21 @@ export async function registerUserHandler(
     return { success: false, issues: dbIssues };
   }
 
-  // 6) Send verification email
+  // 6) Send verification email (only if email provided)
   let emailSent = false;
-  try {
-    let results = await sendVerificationEmailHandler(request);
-    if (!results.success) {
-      throw results.message;
+  if (email) {
+    try {
+      let results = await sendVerificationEmailHandler({
+        ...request,
+        data: { email: email },
+      });
+      if (!results.success) {
+        throw results.message;
+      }
+      emailSent = true;
+    } catch (mailErr: any) {
+      logger.error('Verification email send failed:', mailErr);
     }
-    emailSent = true;
-  } catch (mailErr: any) {
-    logger.error('Verification email send failed:', mailErr);
   }
 
   // 7) Return success

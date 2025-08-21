@@ -67,7 +67,7 @@ export class EmailMapper extends BaseMapper<Email> {
   }
 
   private mapRowToEmail = (row: any): Email => {
-    return new Email(row.title, row.body, row.formid, row.emailid);
+    return new Email(row.title, row.body, row.formId, row.emailId);
   };
 }
 

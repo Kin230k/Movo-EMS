@@ -74,11 +74,11 @@ export class OptionMapper extends BaseMapper<Option> {
 
   private mapRowToOption = (row: any): Option => {
     return new Option(
-      row.optiontext,
-      row.questionid,
-      row.iscorrect,
-      row.displayorder,
-      row.optionid
+      row.optionText,
+      row.questionId,
+      row.isCorrect,
+      row.displayOrder,
+      row.optionId
     );
   };
 }

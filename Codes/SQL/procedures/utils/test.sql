@@ -1,6 +1,8 @@
 -- ############################################################
 -- FULL TEST SCRIPT: SELF-CONTAINED SETUP & TESTS FOR ALL QUESTION TYPES
 -- ############################################################
+SHOW client_encoding;
+
 
 -- 0. Clear all tables
 DO $$
@@ -22,18 +24,18 @@ END $$;
 -- 1.1 CLIENT
 INSERT INTO CLIENTS (clientId, name, company, contactEmail, contactPhone)
 VALUES (
-  '11111111-1111-1111-1111-111111111111',
-  '{"en":"Test Client","ar":"عميل"}',
-  '{"en":"Test Co","ar":"شركة"}',
-  'client@test.com',
-  '0100000000'
+  '11111111-1111-1111-1111-111111111110',
+  '{"en": "Test Client", "ar": "عميل"}'::jsonb,
+  '{"en": "Test Co", "ar": "شركة"}'::jsonb,
+  'client@test0.com',
+  '0100000001'
 );
 
 -- 1.2 PROJECT
 INSERT INTO PROJECTS (projectId, clientId, name)
 VALUES (
   '22222222-2222-2222-2222-222222222222',
-  '11111111-1111-1111-1111-111111111111',
+  '11111111-1111-1111-1111-111111111110',
   '{"en":"Test Project","ar":"المشروع"}'
 );
 

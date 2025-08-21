@@ -12,8 +12,8 @@ DECLARE
 BEGIN
     -- Get action names from ACTIONS table
     SELECT 
-        COALESCE(display_name->>'en', REPLACE(INITCAP(REPLACE(p_actionType, '_', ' ')), ' ', ' ')),
-        COALESCE(display_name->>'ar', 'إجراء غير معروف')
+        COALESCE(displayName->>'en', REPLACE(INITCAP(REPLACE(p_actionType, '_', ' ')), ' ', ' ')),
+        COALESCE(displayName->>'ar', 'إجراء غير معروف')
     INTO v_action_name_en, v_action_name_ar
     FROM ACTIONS
     WHERE actionType = p_actionType;

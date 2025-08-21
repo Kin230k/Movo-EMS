@@ -44,7 +44,8 @@ export class UserMapper extends BaseMapper<User> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!uid) throw new Error('User ID is required for update');
-    if (!name || Object.keys(name).length === 0) throw new Error('Name is required for update');
+    if (!name || Object.keys(name).length === 0)
+      throw new Error('Name is required for update');
 
     return pool.query('CALL edit_user_info($1, $2, $3, $4)', [
       currentUserId,
@@ -58,11 +59,9 @@ export class UserMapper extends BaseMapper<User> {
    * save() infers create vs update from User.operation getter.
    */
   async save(user: User): Promise<void> {
-    
-    
-
     const op = user.operation;
-    const { userId, name, email, phone, picture, role, status, twoFaEnabled } = user;
+    const { userId, name, email, phone, picture, role, status, twoFaEnabled } =
+      user;
 
     if (op === Operation.UPDATE) {
       const currentUserId = CurrentUser.uuid;
@@ -107,7 +106,9 @@ export class UserMapper extends BaseMapper<User> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_users($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_users($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToUser);
   }
 
@@ -136,9 +137,9 @@ export class UserMapper extends BaseMapper<User> {
       row.phone,
       row.role,
       row.status,
-      row.twofaenabled,
+      row.twoFaEnabled,
       row.picture,
-      row.userid
+      row.userId
     );
   };
 }

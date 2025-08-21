@@ -88,11 +88,11 @@ export class ClientMapper extends BaseMapper<Client> {
       row.name,
       row.contactemail,
       row.contactphone,
-      row.clientid,
+      row.clientId,
       row.logo,
       row.company,
       row.status as ClientStatus,
-      row.userid
+      row.userId
     );
   };
 }
