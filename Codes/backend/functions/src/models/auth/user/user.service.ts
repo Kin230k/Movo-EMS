@@ -79,7 +79,6 @@ export class UserService {
   }
 
   static async getUserById(userId: string): Promise<User | null> {
-    console.log(userId);
     return await userMapper.getById(userId);
   }
 
