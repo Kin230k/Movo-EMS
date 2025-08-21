@@ -1,4 +1,5 @@
 import { HttpsError } from 'firebase-functions/https';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 // Validate email format
 export function isValidEmail(email: string): boolean {
@@ -11,8 +12,8 @@ export function isValidEmail(email: string): boolean {
 // 1. Local (leading 0, total 7–15 digits e.g., 0953726430, 0441234567)
 // 2. International E.164 (+<countrycode><number>, e.g., +4915123456789)
 export function isValidPhone(phone: string): boolean {
-  const re = /^(?:0\d{6,14}|\+[1-9]\d{1,14})$/;
-  return re.test(phone);
+  const phoneNumber = parsePhoneNumberFromString(phone);
+  return phoneNumber?.isValid() ?? false;
 }
 
 // Helper: Validation Error (400)
