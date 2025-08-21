@@ -16,7 +16,7 @@ RETURN QUERY
  SELECT
  a.attendanceId,
  a.attendanceTimestamp,
- a.signedWith,
+ a.signedWith::signed_with_type,
  a.signedBy,
  a.userId,
  a.areaId

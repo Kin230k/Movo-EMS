@@ -17,7 +17,7 @@ RETURN QUERY
         dr.description,
         dr.formId,
         dr.priority,
-        dr.outcomeOnPass
+        dr.outcomeOnPass::submission_outcome
     FROM DECISION_RULES dr
     WHERE dr.ruleId = p_rule_id;
 END;

@@ -18,7 +18,7 @@ RETURN QUERY
         s.userId,
         s.interviewId,
         s.dateSubmitted,
-        s.outcome,
+        s.outcome::submission_outcome,
         s.decisionNotes
     FROM SUBMISSIONS s;
 END;

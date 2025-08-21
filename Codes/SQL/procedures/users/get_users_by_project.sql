@@ -13,7 +13,7 @@ RETURN QUERY
         u.userId,
         u.name,
         u.email,
-        u.role
+        u.role::user_role
     FROM USERS u
     JOIN USER_PROJECT up ON u.userId = up.userId
     WHERE up.projectId = p_project_id;
