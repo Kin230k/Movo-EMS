@@ -236,12 +236,6 @@
         "description": ""
       },
       {
-        "name": "firebaseUid",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "logo",
         "type": "string | undefined",
         "required": false,
