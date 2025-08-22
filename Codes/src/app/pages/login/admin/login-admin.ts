@@ -1,14 +1,14 @@
 // src/app/pages/login-admin/login-admin.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { InputComponent } from '../../components/shared/input/input';
-import { ButtonComponent } from '../../components/shared/button/button';
+import { InputComponent } from '../../../components/shared/input/input';
+import { ButtonComponent } from '../../../components/shared/button/button';
 
 @Component({
-    selector: 'app-login-admin',
-    imports: [InputComponent, ButtonComponent],
-    templateUrl: './login-admin.html',
-    styleUrl: './login-admin.scss'
+  selector: 'app-login-admin',
+  imports: [InputComponent, ButtonComponent],
+  templateUrl: './login-admin.html',
+  styleUrl: './login-admin.scss',
 })
 export class LoginAdmin {
   email: string = '';
