@@ -7,9 +7,9 @@ export class Client {
     public name: Multilingual,
     public contactEmail: string,
     public contactPhone: string,
-    public clientId?: string,
+    public company: Multilingual,
+    public clientId: string,
     public logo?: string,
-    public company?: Multilingual | null,
     public status: ClientStatus = ClientStatus.Pending
   ) {}
 

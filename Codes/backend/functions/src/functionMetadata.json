@@ -236,14 +236,14 @@
         "description": ""
       },
       {
-        "name": "logo",
-        "type": "string | undefined",
-        "required": false,
+        "name": "company",
+        "type": "{ en: string; ar: string }",
+        "required": true,
         "description": ""
       },
       {
-        "name": "company",
-        "type": "{ en: string; ar: string } | null | undefined",
+        "name": "logo",
+        "type": "string | undefined",
         "required": false,
         "description": ""
       },

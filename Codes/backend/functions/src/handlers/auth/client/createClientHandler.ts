@@ -11,8 +11,8 @@ export interface CreateClientData {
   name: Multilingual;
   contactEmail: string;
   contactPhone: string;
+  company: Multilingual;
   logo?: string;
-  company?: Multilingual | null;
   status?: ClientStatus;
 }
 
@@ -52,9 +52,9 @@ export async function createClientHandler(
       name,
       contactEmail,
       contactPhone,
+      company,
       auth.callerUuid,
       logo,
-      company,
       status
     );
   } catch (dbErr: any) {

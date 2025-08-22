@@ -11,18 +11,18 @@ export class ClientService {
     name: Multilingual,
     contactEmail: string,
     contactPhone: string,
+    company: Multilingual,
     clientId: string,
     logo?: string,
-    company?: Multilingual | null,
     status: ClientStatus = ClientStatus.Pending
   ): Promise<void> {
     const entity = new Client(
       name,
       contactEmail,
       contactPhone,
+      company,
       clientId,
       logo,
-      company,
       status
     );
     await clientMapper.save(entity);
@@ -32,18 +32,18 @@ export class ClientService {
     clientId: string,
     name: Multilingual,
     contactEmail: string,
+    company: Multilingual,
     contactPhone: string,
     logo?: string,
-    company?: Multilingual | null,
     status: ClientStatus = ClientStatus.Pending
   ): Promise<void> {
     const entity = new Client(
       name,
       contactEmail,
       contactPhone,
+      company,
       clientId,
       logo,
-      company,
       status
     );
     entity.operation = Operation.UPDATE;
