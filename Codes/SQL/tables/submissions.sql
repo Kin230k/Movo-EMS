@@ -5,5 +5,6 @@ CREATE TABLE SUBMISSIONS (
     interviewId UUID NOT NULL REFERENCES INTERVIEWS(interviewId) ON DELETE CASCADE ON UPDATE CASCADE,
     dateSubmitted TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     outcome submission_outcome,
-    decisionNotes TEXT
+    decisionNotes TEXT,
+    answer_count INTEGER NOT NULL DEFAULT 0
 );

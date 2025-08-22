@@ -33,5 +33,7 @@ BEGIN
   UPDATE submissions
      SET outcome = new_outcome
    WHERE submissionid = sub_id;
+
+   PERFORM notify_if_submission_complete_from_typed_answer(sub_id);
 END;
 $$ LANGUAGE plpgsql;
