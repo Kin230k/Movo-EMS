@@ -42,6 +42,33 @@ import {
   getSubmission,
   updateSubmission,
 } from './callables/forms/forms.callable';
+
+// Import project-related callables
+import {
+  createProject,
+  deleteProject,
+  getProject,
+  updateProject,
+  createLocation,
+  deleteLocation,
+  getLocation,
+  updateLocation,
+  createUserProject,
+  deleteUserProject,
+  getUserProject,
+  updateUserProject,
+  createSchedule,
+  deleteSchedule,
+  getSchedule,
+  updateSchedule,
+  createUserSchedule,
+  updateUserSchedule,
+  createAttendance,
+  deleteAttendance,
+  getAttendance,
+  updateAttendance,
+} from './callables/projects/projects.callable';
+
 import { getFunctions } from './callables/getFunctions';
 
 import './services/firebaseAdmin'; // ensure initializeApp() has run
@@ -93,6 +120,40 @@ export {
   getSubmission,
   updateSubmission,
 
-  //test
+  // Projects
+  createProject,
+  deleteProject,
+  getProject,
+  updateProject,
+
+  // Locations
+  createLocation,
+  deleteLocation,
+  getLocation,
+  updateLocation,
+
+  // User Projects
+  createUserProject,
+  deleteUserProject,
+  getUserProject,
+  updateUserProject,
+
+  // Schedules
+  createSchedule,
+  deleteSchedule,
+  getSchedule,
+  updateSchedule,
+
+  // User Schedules
+  createUserSchedule,
+  updateUserSchedule,
+
+  // Attendance
+  createAttendance,
+  deleteAttendance,
+  getAttendance,
+  updateAttendance,
+
+  // Test
   getFunctions,
 };
