@@ -50,7 +50,25 @@ export class UserProjectMapper extends BaseMapper<UserProject> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_user_project($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_user_projects($1)', [currentUserId]);
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getProjectsByUser(userId: string): Promise<UserProject[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!userId) throw new Error('User ID is required');
+
+    const result = await pool.query('SELECT * FROM get_projects_by_user($1, $2)', [currentUserId, userId]);
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getUsersByProject(projectId: string): Promise<UserProject[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
+
+    const result = await pool.query('SELECT * FROM get_users_by_project($1, $2)', [currentUserId, projectId]);
     return result.rows.map(this.mapRowToEntity);
   }
 
