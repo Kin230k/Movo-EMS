@@ -52,6 +52,18 @@ export class AreaMapper extends BaseMapper<Area> {
     const result = await pool.query('SELECT * FROM get_all_areas($1)', [currentUserId]);
     return result.rows.map(this.mapRowToEntity);
   }
+  async getByLocation(locationId: string): Promise<Area[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!locationId) throw new Error('Location ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_areas_by_location($1, $2)',
+      [currentUserId, locationId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
+
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;

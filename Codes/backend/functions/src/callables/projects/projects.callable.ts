@@ -35,6 +35,14 @@ import { deleteAttendanceHandler } from '../../handlers/projects/attendances/del
 import { getAttendanceByIdHandler } from '../../handlers/projects/attendances/getAttendanceByIdHandler';
 import { updateAttendanceHandler } from '../../handlers/projects/attendances/updateAttendanceHandler';
 
+// --- Area Handlers ---
+import { createAreaHandler } from '../../handlers/projects/areas/createAreaHandler';
+import { deleteAreaHandler } from '../../handlers/projects/areas/deleteAreaHandler';
+import { getAreaByIdHandler } from '../../handlers/projects/areas/getAreaByIdHandler';
+import { updateAreaHandler } from '../../handlers/projects/areas/updateAreaHandler';
+import { getAreasByLocationHandler } from '../../handlers/projects/areas/getAreasByLocationHandler';
+import { getAllAreasHandler } from '../../handlers/projects/areas/getAllAreasHandler';
+
 // --- Project Callables ---
 export const createProject = onCall(createProjectHandler);
 export const deleteProject = onCall(deleteProjectHandler);
@@ -68,3 +76,13 @@ export const createAttendance = onCall(createAttendanceHandler);
 export const deleteAttendance = onCall(deleteAttendanceHandler);
 export const getAttendance = onCall(getAttendanceByIdHandler);
 export const updateAttendance = onCall(updateAttendanceHandler);
+
+
+
+// --- Area Callables ---
+export const createArea = onCall(createAreaHandler);
+export const deleteArea = onCall(deleteAreaHandler);
+export const getArea = onCall(getAreaByIdHandler);
+export const updateArea = onCall(updateAreaHandler);
+export const getAreasByLocation = onCall(getAreasByLocationHandler);
+export const getAllAreas = onCall(getAllAreasHandler);
