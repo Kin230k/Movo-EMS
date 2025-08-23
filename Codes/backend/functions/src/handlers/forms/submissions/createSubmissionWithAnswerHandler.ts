@@ -1,14 +1,13 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
-import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { AnswerService } from '../../../models/forms/core/answer/answer.service';
 import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
-import { SubmissionReminderService } from './submissionReminder.service';
-import { v4 as uuidv4 } from 'uuid';
+import { scheduleReminder } from '../../../reminders/submissionReminder';
+import { UserService } from '../../../models/auth/user/user.service';
 
 export interface CreateSubmissionWithAnswerRequestData {
   // Submission fields
@@ -17,7 +16,7 @@ export interface CreateSubmissionWithAnswerRequestData {
   dateSubmitted?: string;
   outcome?: string;
   decisionNotes?: string;
-  
+
   // Answer fields
   questionId?: string;
   answeredAt?: string;
@@ -50,7 +49,7 @@ export async function createSubmissionWithAnswerHandler(
     textResponse,
     rating,
     numericResponse,
-    optionIds
+    optionIds,
   } = request.data || {};
 
   // Validate required fields
@@ -66,47 +65,57 @@ export async function createSubmissionWithAnswerHandler(
 
   // Validate answer type and corresponding data
   if (answerType === 'text' && !textResponse) {
-    issues.push({ field: 'textResponse', message: 'Text response is required for text answers' });
-  } else if (answerType === 'rating' && (rating === undefined || rating === null)) {
-    issues.push({ field: 'rating', message: 'Rating is required for rating answers' });
-  } else if (answerType === 'numeric' && (numericResponse === undefined || numericResponse === null)) {
-    issues.push({ field: 'numericResponse', message: 'Numeric response is required for numeric answers' });
-  } else if (answerType === 'options' && (!optionIds || optionIds.length === 0)) {
-    issues.push({ field: 'optionIds', message: 'Option IDs are required for options answers' });
+    issues.push({
+      field: 'textResponse',
+      message: 'Text response is required for text answers',
+    });
+  } else if (
+    answerType === 'rating' &&
+    (rating === undefined || rating === null)
+  ) {
+    issues.push({
+      field: 'rating',
+      message: 'Rating is required for rating answers',
+    });
+  } else if (
+    answerType === 'numeric' &&
+    (numericResponse === undefined || numericResponse === null)
+  ) {
+    issues.push({
+      field: 'numericResponse',
+      message: 'Numeric response is required for numeric answers',
+    });
+  } else if (
+    answerType === 'options' &&
+    (!optionIds || optionIds.length === 0)
+  ) {
+    issues.push({
+      field: 'optionIds',
+      message: 'Option IDs are required for options answers',
+    });
   }
 
   if (issues.length > 0) {
     return { success: false, issues };
   }
 
-  // Convert Firebase UID to UUID
-  const userId = firebaseUidToUuid(request.auth!.uid);
-  if (!userId) {
-    issues.push({ field: 'userId', message: 'Invalid user ID' });
-    return { success: false, issues };
-  }
-
   try {
-    // 3. Generate IDs
-    const submissionId = uuidv4();
-    const answerId = uuidv4();
-
-    // 4. Create submission
-    await SubmissionService.createSubmission(
-      submissionId,
+    // 4. Create submission and capture generated submissionId
+    const submissionId: string = await SubmissionService.createSubmission(
       formId!,
-      userId,
+      auth.callerUuid,
       interviewId!,
       new Date(dateSubmitted || Date.now()),
       outcome as SubmissionOutcome | undefined,
       decisionNotes
     );
 
-    // 5. Create answer based on type
+    // 5. Create answer based on type — AnswerService now returns generated answerId
+    let answerId: string | null = null;
+
     switch (answerType) {
       case 'text':
-        await AnswerService.createTextAnswer(
-          answerId,
+        answerId = await AnswerService.createTextAnswer(
           submissionId,
           questionId!,
           textResponse!,
@@ -114,8 +123,7 @@ export async function createSubmissionWithAnswerHandler(
         );
         break;
       case 'rating':
-        await AnswerService.createRatingAnswer(
-          answerId,
+        answerId = await AnswerService.createRatingAnswer(
           submissionId,
           questionId!,
           rating!,
@@ -123,8 +131,7 @@ export async function createSubmissionWithAnswerHandler(
         );
         break;
       case 'numeric':
-        await AnswerService.createNumericAnswer(
-          answerId,
+        answerId = await AnswerService.createNumericAnswer(
           submissionId,
           questionId!,
           numericResponse!,
@@ -132,8 +139,7 @@ export async function createSubmissionWithAnswerHandler(
         );
         break;
       case 'options':
-        await AnswerService.createOptionsAnswer(
-          answerId,
+        answerId = await AnswerService.createOptionsAnswer(
           submissionId,
           questionId!,
           optionIds!,
@@ -144,23 +150,19 @@ export async function createSubmissionWithAnswerHandler(
       default:
         throw new Error('Invalid answer type');
     }
-
+    const user = await UserService.getUserById(auth.callerUuid);
     // 6. Schedule reminder email after 10 minutes
-    await SubmissionReminderService.scheduleReminder(
-      submissionId,
-      userId,
-      request.auth!.token.email
-    );
+    await scheduleReminder(submissionId, auth.callerUuid, user?.email!);
 
     logger.info('Submission with answer created successfully', {
       submissionId,
-      answerId
+      answerId,
     });
 
-    return { 
-      success: true, 
-      submissionId, 
-      answerId 
+    return {
+      success: true,
+      submissionId,
+      answerId,
     };
   } catch (err: any) {
     logger.error('Submission with answer creation failed', err);

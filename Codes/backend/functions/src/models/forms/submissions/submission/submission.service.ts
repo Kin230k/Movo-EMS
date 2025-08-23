@@ -11,7 +11,8 @@ export class SubmissionService {
     dateSubmitted: Date,
     outcome?: SubmissionOutcome,
     decisionNotes?: string
-  ): Promise<void> {
+  ): Promise<string> {
+    // <- now returns the generated submissionId
     const entity = new Submission(
       formId,
       userId,
@@ -21,7 +22,16 @@ export class SubmissionService {
       outcome,
       decisionNotes
     );
+
     await submissionMapper.save(entity);
+
+    const createdId = entity.submissionId;
+    if (!createdId) {
+      throw new Error(
+        'Failed to create submission: no id returned from mapper/DB'
+      );
+    }
+    return createdId;
   }
 
   static async updateSubmission(

@@ -64,9 +64,9 @@ export async function updateClientHandler(
       clientId,
       name,
       contactEmail,
+      company!,
       contactPhone,
       logo,
-      company,
       status
     );
     return { success: true };

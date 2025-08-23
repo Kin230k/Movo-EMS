@@ -43,15 +43,55 @@ export class SubmissionMapper extends BaseMapper<Submission> {
         ]
       );
     } else {
-      await pool.query('CALL create_submission($1, $2, $3, $4, $5, $6, $7)', [
-        currentUserId,
-        formId,
-        userId,
-        interviewId,
-        dateSubmitted,
-        outcome,
-        decisionNotes,
-      ]);
+      // CREATE: call the DB function that RETURNS TABLE(...) and read the returned row
+      const result: QueryResult = await pool.query(
+        `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          currentUserId,
+          formId,
+          userId,
+          interviewId,
+          dateSubmitted,
+          outcome,
+          decisionNotes,
+        ]
+      );
+
+      const created = result.rows?.[0];
+      if (!created) {
+        throw new Error(
+          'Failed to create submission: create_submission returned no rows'
+        );
+      }
+
+      // normalize possible column name casing and attach to entity
+      const createdId =
+        created.submissionId ?? created.submissionid ?? created.submission_id;
+      if (!createdId) {
+        throw new Error('create_submission returned row without submissionId');
+      }
+
+      entity.submissionId = createdId;
+      entity.formId =
+        created.formId ?? created.formid ?? created.form_id ?? entity.formId;
+      entity.userId =
+        created.userId ?? created.userid ?? created.user_id ?? entity.userId;
+      entity.interviewId =
+        created.interviewId ??
+        created.interviewid ??
+        created.interview_id ??
+        entity.interviewId;
+      entity.dateSubmitted =
+        created.dateSubmitted ??
+        created.datesubmitted ??
+        created.date_submitted ??
+        entity.dateSubmitted;
+      entity.outcome = created.outcome ?? entity.outcome;
+      entity.decisionNotes =
+        created.decisionNotes ??
+        created.decisionnotes ??
+        created.decision_notes ??
+        entity.decisionNotes;
     }
   }
 
@@ -87,13 +127,14 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
   private mapRowToSubmission = (row: any): Submission => {
     return new Submission(
-      row.formId,
-      row.userId,
-      row.interviewId,
-      row.dateSubmitted,
-      row.outcome,
-      row.decisionNotes,
-      row.submissionId
+      row.formId ?? row.formid ?? row.form_id,
+      row.userId ?? row.userid ?? row.user_id,
+      row.interviewId ?? row.interviewid ?? row.interview_id,
+      row.dateSubmitted ?? row.datesubmitted ?? row.date_submitted,
+      Operation.UPDATE, // returned objects are update-ready
+      row.outcome ?? row.outcome,
+      row.decisionNotes ?? row.decisionnotes ?? row.decision_notes,
+      row.submissionId ?? row.submissionid ?? row.submission_id
     );
   };
 }

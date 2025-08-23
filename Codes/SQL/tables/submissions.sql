@@ -4,7 +4,7 @@ CREATE TABLE SUBMISSIONS (
     userId UUID NOT NULL REFERENCES USERS(userId) ON DELETE CASCADE ON UPDATE CASCADE,
     interviewId UUID NOT NULL REFERENCES INTERVIEWS(interviewId) ON DELETE CASCADE ON UPDATE CASCADE,
     dateSubmitted TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    outcome submission_outcome,
+    outcome submission_outcome DEFAULT 'MANUAL_REVIEW'::submission_outcome ,
     decisionNotes TEXT,
     answer_count INTEGER NOT NULL DEFAULT 0
 );
