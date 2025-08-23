@@ -38,7 +38,7 @@ export class LocationMapper extends BaseMapper<Location> {
       );
 
       if (rows.length === 0) throw new Error('Failed to create location');
-      entity.locationId = rows[0].locationid;
+      entity.locationId = rows[0].locationId;
     }
   }
 
