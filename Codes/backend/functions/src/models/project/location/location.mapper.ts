@@ -38,7 +38,7 @@ export class LocationMapper extends BaseMapper<Location> {
       );
 
       if (rows.length === 0) throw new Error('Failed to create location');
-      entity.locationId = rows[0].locationId;
+      entity.locationId = rows[0].locationid;
     }
   }
 
@@ -64,6 +64,18 @@ export class LocationMapper extends BaseMapper<Location> {
     return result.rows.map(this.mapRowToEntity);
   }
 
+  async getByProject(projectId: string): Promise<Location[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_locations_by_project($1, $2)',
+      [currentUserId, projectId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
+
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
@@ -75,9 +87,9 @@ export class LocationMapper extends BaseMapper<Location> {
   private mapRowToEntity = (row: any): Location => {
     return new Location(
       row.name,
-      row.projectId,
-      row.locationId,
-      row.siteMap,
+      row.projectid,
+      row.locationid,
+      row.sitemap,
       row.longitude,
       row.latitude
     );
