@@ -1,6 +1,5 @@
 CREATE OR REPLACE PROCEDURE update_schedule(p_auth_user_id UUID,
  p_schedule_id UUID,
- p_date DATE DEFAULT NULL,
  p_start_time TIME DEFAULT NULL,
  p_end_time TIME DEFAULT NULL,
  p_project_id UUID DEFAULT NULL,
@@ -19,7 +18,6 @@ BEGIN
 
  UPDATE SCHEDULES
  SET
- date = COALESCE(p_date, date),
  startTime = COALESCE(p_start_time, startTime),
  endTime = COALESCE(p_end_time, endTime),
  projectId = COALESCE(p_project_id, projectId),

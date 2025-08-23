@@ -15,7 +15,9 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
       entity;
 
     // Validation
-    if (!createdAt) throw new Error('Creation date is required');
+    if (op === Operation.CREATE) {
+      if (!createdAt) throw new Error('Creation date is required');
+    }
     if (!startTime) throw new Error('Start time is required');
     if (!endTime) throw new Error('End time is required');
     if (!projectId) throw new Error('Project ID is required');
@@ -23,10 +25,9 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
     if (op === Operation.UPDATE) {
       if (!scheduleId) throw new Error('Schedule ID is required for update');
-      await pool.query('CALL update_schedule($1, $2, $3, $4, $5, $6, $7)', [
+      await pool.query('CALL update_schedule($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         scheduleId,
-        createdAt,
         startTime,
         endTime,
         projectId,
@@ -76,11 +77,11 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
   private mapRowToEntity = (row: any): Schedule => {
     return new Schedule(
-      row.createdAt,
       row.startTime,
       row.endTime,
       row.projectId,
       row.locationId,
+      row.createdAt,
       row.scheduleId
     );
   };
