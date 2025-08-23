@@ -1,10 +1,130 @@
-@use './app/styles/colors' as *;
-@use './app/styles/dimensions' as *;
-@use './app/styles/margin' as *;
-@use './app/styles/radius' as *;
+@use "./app/styles/colors" as *;
+@use "./app/styles/dimensions" as *;
+@use "./app/styles/margin" as *;
+@use "./app/styles/radius" as *;
+/* src/styles.scss (paste this into your global stylesheet) */
 
+/* Font files should live at: src/assets/fonts/ */
+/* Example filenames (from your screenshot):
+   - Neue-Regrade-Regular.otf
+   - Neue-Regrade-Regular-Italic.otf
+   - Neue-Regrade-Light.otf
+   - Neue-Regrade-Light-Italic.otf
+   - Neue-Regrade-Medium.otf
+   - Neue-Regrade-Medium-Italic.otf
+   - Neue-Regrade-Semibold.otf
+   - Neue-Regrade-SemiBold-Italic.otf
+   - Neue-Regrade-Bold.otf
+   - Neue-Regrade-Bold-Italic.otf
+   - Neue-Regrade-Extrabold.otf  (some screenshots show ExtraBold/Extrabold — both handled below)
+   - Neue-Regrade-ExtraBold-Italic.otf
+*/
+
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Light-Italic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Regular-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Medium-Italic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* semibold / SemiBold variations (cover both casings) */
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-SemiBold-Italic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* bold */
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Bold-Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* extrabold / ExtraBold / Extrabold variations */
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-Extrabold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Regrade";
+  src: url("/assets/fonts/Neue-Regrade-ExtraBold-Italic.otf") format("opentype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Fallback/global font variable */
+:root {
+  --app-font: "Neue Regrade", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+/* apply globally */
+html,
 body {
+  font-family: var(--app-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
 }

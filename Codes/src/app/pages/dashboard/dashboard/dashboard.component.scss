@@ -1,0 +1,81 @@
+@use "sass:color";
+
+// relative path from:
+// src/app/pages/dashboard/components/profile-card/...  -> to -> src/app/styles = ../../../styles
+@use "../../../styles/colors.scss" as *;
+@use "../../../styles/dimensions" as dim;
+@use "../../../styles/margin" as mrg;
+@use "../../../styles/radius" as rad;
+
+/* now the rest of your styles — use rad.$radius-card / rad.$radius-img where the radius file defines them */
+.dashboard-root {
+  display: flex;
+}
+.profile-card {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  background: $Bg-Dark; /* colors.scss exported with `as *` so $Bg-Dark is available */
+  color: $color-font;
+  padding: 1.25rem;
+  border-radius: rad.$radius-card; /* use namespaced var from radius.scss */
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) inset;
+}
+
+.avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: rad.$radius-img;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.2)
+  );
+}
+
+.meta {
+  .meta-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .name {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+  .role {
+    padding: 0.25rem 0.6rem;
+    background: $Secandary;
+    border-radius: 1rem;
+    font-size: 0.7rem;
+    color: white;
+  }
+  .meta-body {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+  }
+  .salary {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 0.35rem 0.6rem;
+    background: #fff;
+    color: #000;
+    border-radius: 0.6rem;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+.edit {
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  background: $Btn-color;
+  color: white;
+}
+.dashboard-main {
+  margin-left: 2rem;
+  width: 75%;
+}

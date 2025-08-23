@@ -1,0 +1,52 @@
+<header class="topbar">
+  <div class="left">
+    <a class="brand-link" routerLink="/">
+      <img
+        src="assets/images/logo.png"
+        alt="MOVO logo"
+        class="logo-img"
+        loading="lazy"
+      />
+    </a>
+
+    <input class="search" placeholder="Search..." />
+  </div>
+
+  <div class="right">
+    <app-button class="btn-filter">Filter</app-button>
+    <app-button class="btn-events">Events</app-button>
+
+    <!-- notification icon button: svg uses currentColor so it's styleable from SCSS -->
+    <app-button class="icon" (onClick)="onNotifications()">
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M8.59728 19.1519C8.47482 21.4785 8.6156 23.9551 6.53689 25.5142C5.56939 26.2398 5 27.3786 5 28.5879C5 30.2515 6.303 31.6668 8 31.6668H32C33.697 31.6668 35 30.2515 35 28.5879C35 27.3786 34.4306 26.2398 33.4631 25.5142C31.3844 23.9551 31.5252 21.4785 31.4027 19.1519C31.0835 13.0872 26.073 8.3335 20 8.3335C13.927 8.3335 8.91647 13.0872 8.59728 19.1519Z"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M17.5 5.2085C17.5 6.58921 18.6193 8.3335 20 8.3335C21.3807 8.3335 22.5 6.58921 22.5 5.2085C22.5 3.82778 21.3807 3.3335 20 3.3335C18.6193 3.3335 17.5 3.82778 17.5 5.2085Z"
+          stroke="currentColor"
+          stroke-width="2.5"
+        />
+        <path
+          d="M25 31.6667C25 34.4282 22.7614 36.6667 20 36.6667C17.2386 36.6667 15 34.4282 15 31.6667"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </app-button>
+  </div>
+</header>

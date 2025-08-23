@@ -1,40 +1,36 @@
 <!-- src/app/pages/login-user/login-user.html -->
 <div class="login-container">
   <div class="login-form">
-    
     <div class="logo">
-      <div class="logo-svg">
-
-      </div>
+      <div class="logo-svg"></div>
     </div>
-    
+
     <h2 class="login-title">Log in as User</h2>
-    
+
     <form>
-      <app-input 
-        type="email" 
+      <app-input
+        type="email"
         placeholder="Enter email address ..."
         [value]="email"
-        (valueChange)="onEmailChange($event)">
+        (valueChange)="onEmailChange($event)"
+      >
       </app-input>
-      
-      <app-input 
-        type="password" 
+
+      <app-input
+        type="password"
         placeholder="Password"
         [value]="password"
-        (valueChange)="onPasswordChange($event)">
+        (valueChange)="onPasswordChange($event)"
+      >
       </app-input>
-      
+
       <div class="forgot-password">
         <a href="">Forgot password?</a>
       </div>
-      
-      <app-button 
-        type="submit" 
-        text="Log in"
-        (onClick)="onLogin()">
-      </app-button>
-      
+
+      <themed-button type="submit" text="Log in" (onClick)="onLogin()">
+      </themed-button>
+
       <div class="switch-login-type">
         <a (click)="goToAdminLogin()">Log in as Admin</a>
       </div>

@@ -2,11 +2,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../../components/shared/input/input';
-import { ButtonComponent } from '../../../components/shared/button/button';
+import { ThemedButtonComponent } from '../../../components/shared/themed-button/themed-button';
 
 @Component({
   selector: 'app-login-admin',
-  imports: [InputComponent, ButtonComponent],
+  imports: [InputComponent, ThemedButtonComponent],
   templateUrl: './login-admin.html',
   styleUrl: './login-admin.scss',
 })

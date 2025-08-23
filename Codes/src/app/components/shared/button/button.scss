@@ -1,21 +1,12 @@
 // components/shared/button/button.scss
-@use 'sass:color';
-@use '../../../styles/colors' as *;
-@use '../../../styles/radius' as rad;
+@use "sass:color";
+@use "../../../styles/colors" as *;
+@use "../../../styles/radius" as rad;
 
 .custom-btn {
-  background-color: $Btn-color;
-  color: $color-font;
-  width: 100%;
-  padding: 0.85rem;
-  border-radius: rad.$radius-btn;
-  border: none;
-  font-size: 1rem;
-  font-weight: 500;
+  all: unset; // reset everything
   cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: color.adjust($Btn-color, $lightness: -10%);
-  }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

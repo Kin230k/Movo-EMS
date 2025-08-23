@@ -1,7 +1,3 @@
-<!-- components/shared/button/button.html -->
-<button 
-  [type]="type" 
-  class="custom-btn"
-  (click)="onClick.emit()">
-  {{ text }}
+<button [type]="type" class="custom-btn" (click)="onClick.emit()">
+  <ng-content></ng-content>
 </button>

@@ -1,9 +1,9 @@
-// src/app/pages/login-user/login-user.scss
-@use 'sass:color';
-@use '../../styles/colors.scss' as *;
-@use '../../styles/dimensions' as dim;
-@use '../../styles/margin' as mrg;
-@use '../../styles/radius' as rad;
+// src/app/pages/login/login-user.scss
+@use "sass:color";
+@use "../../styles/colors.scss" as *;
+@use "../../styles/dimensions" as dim;
+@use "../../styles/margin" as mrg;
+@use "../../styles/radius" as rad;
 
 .login-container {
   min-height: 100vh;
@@ -14,11 +14,11 @@
 
 .login-form {
   background-color: $Bg-Dark;
-  padding: 5rem; 
+  padding: 5rem;
   border-radius: rad.$radius-form;
   color: $color-font;
   width: 100%;
-  max-width: 26rem; 
+  max-width: 26rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -27,23 +27,20 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 1.5rem;
-  
- 
-  }
-  
-  h1 {
-    color: $Secandary;
-    margin: 0;
-    font-size: 2.2rem;
-    text-align: center;
-    letter-spacing: 1px; 
-    font-weight: bold;
-  }
+}
 
+h1 {
+  color: $Secandary;
+  margin: 0;
+  font-size: 2.2rem;
+  text-align: center;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
 
 .login-title {
   color: rgba($Secandary, 0.9);
-  margin: 0 0 2.5rem 0;  
+  margin: 0 0 2.5rem 0;
   font-size: 1.5rem;
   text-align: center;
   font-weight: 400;
@@ -52,12 +49,12 @@
 .forgot-password {
   text-align: right;
   margin: -0.5rem 0 1.5rem 0;
-  
+
   a {
     color: $Secandary;
     text-decoration: none;
     font-size: 0.9rem;
-    
+
     &:hover {
       text-decoration: underline;
       cursor: pointer;
@@ -68,12 +65,12 @@
 .switch-login-type {
   text-align: center;
   margin: 1.5rem 0 0 0;
-  
+
   a {
     color: $Btn-color;
     text-decoration: none;
     font-size: 0.9rem;
-    
+
     &:hover {
       text-decoration: underline;
       cursor: pointer;

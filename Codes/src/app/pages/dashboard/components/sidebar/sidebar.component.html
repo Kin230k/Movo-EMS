@@ -1,0 +1,44 @@
+<aside class="sidebar-wrap" [class.collapsed]="collapsed">
+  <div class="brand">
+    <app-button
+      type="button"
+      class="menu-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle menu"
+    >
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        stroke="#111"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.33337 6.66663L26.6667 6.66663"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5.33337 15.9999L26.6667 15.9999"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5.33337 25.3333L26.6667 25.3333"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </app-button>
+    <div class="menu-text" *ngIf="!collapsed">Menu</div>
+  </div>
+
+  <ul class="menu-list" *ngIf="!collapsed">
+    <li *ngFor="let item of menu" class="menu-item">
+      <app-button type="button" class="menu-item-btn">{{ item }}</app-button>
+    </li>
+  </ul>
+</aside>

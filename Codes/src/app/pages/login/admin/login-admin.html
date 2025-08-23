@@ -1,31 +1,35 @@
 <!-- components/login/login.html -->
 <div class="login">
-  
   <div class="login-container">
-
     <div class="login-form">
-
-
-
       <h2 class="login-title">Log in as Admin</h2>
 
       <form>
-        <app-input type="email" placeholder="Enter email address ..." [value]="email"
-          (valueChange)="onEmailChange($event)">
+        <app-input
+          type="email"
+          placeholder="Enter email address ..."
+          [value]="email"
+          (valueChange)="onEmailChange($event)"
+        >
         </app-input>
 
-        <app-input type="password" placeholder="Password" [value]="password" (valueChange)="onPasswordChange($event)">
+        <app-input
+          type="password"
+          placeholder="Password"
+          [value]="password"
+          (valueChange)="onPasswordChange($event)"
+        >
         </app-input>
 
         <div class="forgot-password">
           <a class="forgot-password" href="">Forgot password?</a>
         </div>
 
-        <app-button type="submit" text="Log in" (onClick)="onLogin()">
-        </app-button>
+        <themed-button type="submit" text="Log in" (onClick)="onLogin()">
+        </themed-button>
 
         <div class="remember-me">
-          <input type="checkbox">
+          <input type="checkbox" />
           <label>Remember me</label>
         </div>
       </form>

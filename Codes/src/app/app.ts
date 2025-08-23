@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LoginAdmin } from './pages/login/admin/login-admin';
-import { LoginUser } from './pages/login/login-user';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LoginAdmin, LoginUser],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  standalone: true,
+  imports: [RouterOutlet], // <-- only RouterOutlet is needed for routing
+  template: `<router-outlet></router-outlet>`,
 })
 export class App {
   protected title = 'movo-project';
