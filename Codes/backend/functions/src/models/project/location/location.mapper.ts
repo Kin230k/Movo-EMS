@@ -87,9 +87,9 @@ export class LocationMapper extends BaseMapper<Location> {
   private mapRowToEntity = (row: any): Location => {
     return new Location(
       row.name,
-      row.projectid,
-      row.locationid,
-      row.sitemap,
+      row.projectId,
+      row.locationId,
+      row.siteMap,
       row.longitude,
       row.latitude
     );
