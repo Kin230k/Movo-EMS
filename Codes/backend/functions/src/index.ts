@@ -67,6 +67,12 @@ import {
   deleteAttendance,
   getAttendance,
   updateAttendance,
+  createArea,
+  deleteArea,
+  getArea,
+  updateArea,
+  getAreasByLocation,
+  getAllAreas,
 } from './callables/projects/projects.callable';
 
 import { getFunctions } from './callables/getFunctions';
@@ -147,6 +153,15 @@ export {
   // User Schedules
   createUserSchedule,
   updateUserSchedule,
+  
+
+  // Areas
+  createArea,
+  deleteArea,
+  getArea,
+  updateArea,
+  getAreasByLocation,
+  getAllAreas,
 
   // Attendance
   createAttendance,
