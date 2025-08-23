@@ -51,9 +51,9 @@ export async function approveRejectClientHandler(
       client.clientId ?? clientId,
       client.name,
       client.contactEmail,
+      client.company,
       client.contactPhone,
       client.logo,
-      client.company,
       newStatus
     );
   } catch (dbErr: any) {

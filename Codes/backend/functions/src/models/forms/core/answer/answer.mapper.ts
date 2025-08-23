@@ -21,8 +21,8 @@ export class AnswersMapper extends BaseMapper<Answer> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const op = (entity as any).operation as Operation | undefined;
-    const { answerId, submissionId, questionId, answeredAt } = entity as any;
+    const op = entity.operation as Operation | undefined;
+    let { answerId, submissionId, questionId, answeredAt } = entity as any;
 
     if (!submissionId) throw new Error('Submission ID is required');
     if (!questionId) throw new Error('Question ID is required');
@@ -56,19 +56,30 @@ export class AnswersMapper extends BaseMapper<Answer> {
         optionIds, // uuid[] or null
       ]);
     } else {
-      if (!answerId) throw new Error('Answer ID is required for create');
-      await pool.query(`CALL create_answer($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, [
-        currentUserId,
-        answerId,
-        submissionId,
-        questionId,
-        answeredAtISO,
-        null, // answer_type is now inferred, so we pass null
-        textResponse,
-        ratingValue,
-        numericResponse,
-        optionIds, // uuid[] or null
-      ]);
+      // CREATE: do NOT require answerId. DB function will generate it and return it.
+      // Allow callers to optionally pass an answerId (it will be ignored).
+      const result = await pool.query(
+        `SELECT create_answer($1,$2,$3,$4,$5,$6,$7,$8,$9) AS answer_id`,
+        [
+          currentUserId,
+          submissionId,
+          questionId,
+          answeredAtISO,
+          null, // answer_type (inferred by function)
+          textResponse,
+          ratingValue,
+          numericResponse,
+          optionIds,
+        ]
+      );
+
+      const createdId = result.rows?.[0]?.answer_id ?? null;
+      if (!createdId) {
+        throw new Error('Failed to create answer: no id returned from DB');
+      }
+
+      // update the entity instance so callers have the generated id
+      (entity as any).answerId = createdId;
     }
   }
 
@@ -110,26 +121,38 @@ export class AnswersMapper extends BaseMapper<Answer> {
     const questionId = row.questionId;
     const answeredAt = row.answeredAt ? new Date(row.answeredAt) : new Date();
 
+    // helper to attach operation and return
+    const withUpdateOp = (ans: Answer): Answer => {
+      ans.operation = Operation.UPDATE;
+      return ans;
+    };
+
     // infer subtype by which returned subtype columns are present
     // priority: text -> rating -> options (non-empty) -> numeric
     if (row.textResponse != null) {
-      return new TextAnswer(
-        answerId,
-        submissionId,
-        questionId,
-        row.textResponse,
-        answeredAt
+      return withUpdateOp(
+        new TextAnswer(
+          answerId,
+          submissionId,
+          questionId,
+          row.textResponse,
+          answeredAt
+        )
       );
     }
+
     if (row.ratingValue != null) {
-      return new RatingAnswer(
-        answerId,
-        submissionId,
-        questionId,
-        Number(row.ratingValue),
-        answeredAt
+      return withUpdateOp(
+        new RatingAnswer(
+          answerId,
+          submissionId,
+          questionId,
+          Number(row.ratingValue),
+          answeredAt
+        )
       );
     }
+
     if (
       row.optionIds != null &&
       Array.isArray(row.optionIds) &&
@@ -137,22 +160,27 @@ export class AnswersMapper extends BaseMapper<Answer> {
     ) {
       const optionIds: string[] = row.optionIds;
       const optionTexts: any[] = row.optionTexts ?? null;
-      return new OptionsAnswer(
-        answerId,
-        submissionId,
-        questionId,
-        optionIds,
-        optionTexts,
-        answeredAt
+      return withUpdateOp(
+        new OptionsAnswer(
+          answerId,
+          submissionId,
+          questionId,
+          optionIds,
+          optionTexts,
+          answeredAt
+        )
       );
     }
+
     if (row.numericResponse != null) {
-      return new NumericAnswer(
-        answerId,
-        submissionId,
-        questionId,
-        Number(row.numericResponse),
-        answeredAt
+      return withUpdateOp(
+        new NumericAnswer(
+          answerId,
+          submissionId,
+          questionId,
+          Number(row.numericResponse),
+          answeredAt
+        )
       );
     }
 

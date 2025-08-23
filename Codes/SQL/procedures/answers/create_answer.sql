@@ -1,9 +1,8 @@
 -- ============================================
--- PROCEDURE: CREATE_ANSWER
+-- FUNCTION: CREATE_ANSWER (returns created answerId UUID)
 -- ============================================
-CREATE OR REPLACE PROCEDURE create_answer(
+CREATE OR REPLACE FUNCTION create_answer(
     p_current_user_id UUID,
-    p_answer_id UUID,
     p_submission_id UUID,
     p_question_id UUID,
     p_answered_at TIMESTAMP,
@@ -13,20 +12,22 @@ CREATE OR REPLACE PROCEDURE create_answer(
     p_numeric_response NUMERIC,
     p_option_ids UUID[]
 )
+RETURNS UUID
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 DECLARE
     v_type TEXT;
     v_subtypes_count INT;
     v_option_count INT;
+    v_answer_id UUID := gen_random_uuid();
 BEGIN
+    -- permission check (keeps behaviour of previous procedure)
     CALL check_user_permission(p_current_user_id, 'create_answer');
-    
-    IF p_answer_id IS NULL THEN RAISE EXCEPTION 'answerId is required'; END IF;
+
     IF p_submission_id IS NULL THEN RAISE EXCEPTION 'submissionId is required'; END IF;
     IF p_question_id IS NULL THEN RAISE EXCEPTION 'questionId is required'; END IF;
 
-    -- Case-sensitive answerType
+    -- Case-sensitive answerType (if provided)
     IF p_answer_type IS NOT NULL THEN
         v_type := TRIM(p_answer_type);
         IF v_type NOT IN ('text','rating','numeric','options') THEN
@@ -77,21 +78,23 @@ BEGIN
         END IF;
     END IF;
 
-    -- Insert main answer
+    -- Insert main answer with generated v_answer_id
     INSERT INTO ANSWERS(answerId, submissionId, questionId, answeredAt)
-    VALUES (p_answer_id, p_submission_id, p_question_id, COALESCE(p_answered_at, now()));
+    VALUES (v_answer_id, p_submission_id, p_question_id, COALESCE(p_answered_at, now()));
 
-    -- Insert subtype
+    -- Insert subtype row(s)
     IF v_type = 'text' THEN
-        INSERT INTO TEXT_ANSWERS(answerId, response) VALUES (p_answer_id, p_text_response);
+        INSERT INTO TEXT_ANSWERS(answerId, response) VALUES (v_answer_id, p_text_response);
     ELSIF v_type = 'rating' THEN
-        INSERT INTO RATING_ANSWERS(answerId, rating) VALUES (p_answer_id, p_rating);
+        INSERT INTO RATING_ANSWERS(answerId, rating) VALUES (v_answer_id, p_rating);
     ELSIF v_type = 'numeric' THEN
-        INSERT INTO NUMERIC_ANSWERS(answerId, response) VALUES (p_answer_id, p_numeric_response);
+        INSERT INTO NUMERIC_ANSWERS(answerId, response) VALUES (v_answer_id, p_numeric_response);
     ELSE
         INSERT INTO ANSWER_OPTIONS(answerOptionsId, answerId, optionId)
-        SELECT gen_random_uuid(), p_answer_id, unnestVal
+        SELECT gen_random_uuid(), v_answer_id, unnestVal
         FROM unnest(p_option_ids) AS unnestVal;
     END IF;
+
+    RETURN v_answer_id;
 END;
 $$;

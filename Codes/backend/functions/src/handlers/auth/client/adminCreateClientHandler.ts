@@ -77,9 +77,9 @@ export async function adminCreateClientHandler(
       name,
       contactEmail,
       contactPhone,
+      company!,
       userRecord.uid,
       logo,
-      company,
       ClientStatus.Accepted // admin-created clients are active immediately
     );
   } catch (dbErr: any) {

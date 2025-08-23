@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION update_submission_outcome(sub_id UUID)
 RETURNS VOID AS $$
 DECLARE
-  any_failed   BOOLEAN;
-  all_passed   BOOLEAN;
-  any_manual   BOOLEAN;
-  has_answers  BOOLEAN;
-  new_outcome  submission_outcome;
+  any_failed  BOOLEAN;
+  all_passed  BOOLEAN;
+  any_manual  BOOLEAN;
+  has_answers BOOLEAN;
+  new_outcome submission_outcome;
 BEGIN
   SELECT
     COALESCE(BOOL_OR(ar.outcome = 'FAILED'), FALSE),
@@ -26,12 +26,12 @@ BEGIN
   ELSIF any_manual THEN
     new_outcome := 'MANUAL_REVIEW'::submission_outcome;
   ELSE
-    -- defensive fallback
     new_outcome := 'MANUAL_REVIEW'::submission_outcome;
   END IF;
 
   UPDATE submissions
      SET outcome = new_outcome
    WHERE submissionid = sub_id;
+
 END;
 $$ LANGUAGE plpgsql;

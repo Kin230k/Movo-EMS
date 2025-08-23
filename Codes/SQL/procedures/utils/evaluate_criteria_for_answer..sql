@@ -117,6 +117,8 @@ BEGIN
   ON CONFLICT (answerId) DO UPDATE
     SET outcome = EXCLUDED.outcome;
 
+    PERFORM submission_answer_count();
+
   -- recompute submission outcome
   PERFORM update_submission_outcome(
     (SELECT submissionId FROM ANSWERS WHERE answerId = NEW.answerId)
