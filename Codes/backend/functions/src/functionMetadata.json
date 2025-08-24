@@ -392,7 +392,7 @@
       },
       {
         "name": "questions",
-        "type": "{ typeCode: string; questionText: import(\"C:/Users/Laptop Home/Movo-EMS/Codes/backend/functions/src/models/multilingual.type\").Multilingual; interviewId: string; criteria?: import(\"C:/Users/Laptop Home/Movo-EMS/Codes/backend/functions/src/handlers/forms/core/createFormWithQuestionsHandler\").CriteriaInput[] | undefined }[] | null | undefined",
+        "type": "{ typeCode: string; questionText: { en: string; ar: string }; interviewId: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string }[] | undefined }[] | null | undefined",
         "required": false,
         "description": ""
       }
