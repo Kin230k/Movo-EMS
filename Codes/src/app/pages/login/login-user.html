@@ -1,0 +1,44 @@
+<div class="login-container">
+  <div class="login-form">
+    <div class="logo">
+      <div class="logo-svg"></div>
+    </div>
+
+    <h2 class="login-title">{{ 'LOGIN.TITLE' | translate }}</h2>
+
+    <form>
+      <app-input
+        type="email"
+        [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
+        [value]="email"
+        (valueChange)="onEmailChange($event)"
+      >
+      </app-input>
+
+      <app-input
+        type="password"
+        [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
+        [value]="password"
+        (valueChange)="onPasswordChange($event)"
+      >
+      </app-input>
+
+      <div class="forgot-password">
+        <a href="">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+      </div>
+
+      <themed-button
+        type="submit"
+        [text]="'LOGIN.BUTTON' | translate"
+        (onClick)="onLogin()"
+      >
+      </themed-button>
+
+      <div class="switch-login-type">
+        <a (click)="goToAdminLogin()">
+          {{ 'LOGIN.SWITCH_TO_ADMIN' | translate }}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

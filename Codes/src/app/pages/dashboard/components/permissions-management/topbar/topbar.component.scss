@@ -1,0 +1,82 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-block: 2rem;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding-block: 0.5rem;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  font-weight: 800;
+  color: var(--btn-color);
+}
+
+/* small tweak: transform: scale is applied via transform */
+.logo-img {
+  width: 10rem;
+  transform: scale(1.1);
+  display: block;
+  height: auto;
+}
+
+.search {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-btn);
+  border: none;
+  min-width: 28rem;
+  background: #111;
+  color: var(--color-font);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-filter {
+  background: var(--btn-color);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-btn);
+}
+
+.btn-events {
+  background: var(--secondary);
+  color: white;
+  padding: 0.8rem 1.3rem;
+  border-radius: var(--radius-btn);
+}
+
+/* Notification icon button */
+.icon {
+  /* let color define SVG stroke via currentColor */
+  color: var(--color-font); /* white-ish by default */
+  background: var(--btn-color); /* button background */
+  border-radius: var(--radius-btn);
+  padding: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* optional: add a subtle hover background using color-mix for modern CSS */
+  &:hover {
+    background: color-mix(in srgb, var(--btn-color) 90%, black 10%);
+  }
+
+  svg {
+    width: 24px; /* fit inside the button */
+    height: 24px;
+    display: block;
+  }
+}

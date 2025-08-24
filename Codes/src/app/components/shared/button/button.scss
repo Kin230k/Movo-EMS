@@ -1,0 +1,9 @@
+// components/shared/button/button.scss
+
+.custom-btn {
+  all: unset; // reset everything
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

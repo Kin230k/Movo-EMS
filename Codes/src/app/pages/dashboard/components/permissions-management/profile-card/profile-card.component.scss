@@ -1,0 +1,63 @@
+.profile-card {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-dark);
+  color: var(--color-font);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) inset;
+}
+
+.avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--radius-img);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.2)
+  );
+}
+
+.meta {
+}
+
+.meta-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.role {
+  padding: 0.25rem 0.6rem;
+  background: var(--secondary);
+  border-radius: var(--radius-btn);
+  font-size: 0.7rem;
+  color: white;
+}
+
+.meta-body {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.salary {
+  display: inline-block;
+  margin-top: 0.4rem;
+}
+
+.actions {
+  padding: 0.6rem 2.2rem;
+  background-color: var(--btn-color);
+  border-radius: var(--radius-btn);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

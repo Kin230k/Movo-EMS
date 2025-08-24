@@ -1,0 +1,19 @@
+{
+  "LOGIN": {
+    "TITLE": "Log in as User",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "BUTTON": "Log in",
+    "SWITCH_TO_ADMIN": "Log in as Admin"
+  },
+  "LOGIN_ADMIN": {
+    "TITLE": "Log in as Admin",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "BUTTON": "Log in",
+    "REMEMBER_ME": "Remember me",
+    "SWITCH_TO_USER": "Log in as User"
+  }
+}
