@@ -6,7 +6,16 @@ import { Multilingual } from '../../../models/multilingual.type';
 import { LocationService } from '../../../models/project/location/location.service';
 import { authenticateClient } from '../../../utils/authUtils';
 
-export async function createLocationHandler(request: CallableRequest) {
+export interface CreateLocationData {
+  clientId: string;
+  name: Multilingual;
+  projectId: string;
+  siteMap?: string;
+  longitude: number;
+  latitude: number;
+}
+
+export async function createLocationHandler(request: CallableRequest<CreateLocationData>) {
   const issues: FieldIssue[] = [];
 
   const auth = await authenticateClient(request);

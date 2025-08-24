@@ -6,7 +6,12 @@ import { Multilingual } from '../../../models/multilingual.type';
 import { AreaService } from '../../../models/project/area/area.service';
 import { authenticateClient } from '../../../utils/authUtils';
 
-export async function createAreaHandler(request: CallableRequest) {
+interface CreateAreaData {
+  name: Multilingual;
+  locationId: string;
+}
+
+export async function createAreaHandler(request: CallableRequest<CreateAreaData>) {
   const issues: FieldIssue[] = [];
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;

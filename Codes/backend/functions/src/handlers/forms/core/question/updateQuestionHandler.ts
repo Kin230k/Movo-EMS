@@ -5,7 +5,15 @@ import { Multilingual } from '../../../../models/multilingual.type';
 import { parseDbError } from '../../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../../utils/types';
 
-export async function updateQuestionHandler(request: CallableRequest) {
+interface UpdateQuestionData {
+  questionId: string;
+  typeCode: string;
+  questionText: Multilingual;
+  formId: string;
+  interviewId: string;
+}
+
+export async function updateQuestionHandler(request: CallableRequest<UpdateQuestionData>) {
   const issues: FieldIssue[] = [];
 
   // 1) Auth check

@@ -17,7 +17,7 @@ type HandlerResponse =
   | { success: false; issues: FieldIssue[] };
 
 export async function deleteFormHandler(
-  request: CallableRequest
+  request: CallableRequest<DeleteFormRequestData>
 ): Promise<HandlerResponse> {
   const issues: FieldIssue[] = [];
 
