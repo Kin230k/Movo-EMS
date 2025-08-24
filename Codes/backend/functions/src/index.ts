@@ -74,6 +74,15 @@ import {
   getAreasByLocation,
   getAllAreas,
 } from './callables/projects/projects.callable';
+// Import ProjectUserRole callables
+import {
+  createProjectUserRole,
+  updateProjectUserRole,
+  deleteProjectUserRole,
+  getProjectUserRole,
+  getAllProjectUserRoles,
+  getProjectUserRolesByUserAndProject,
+} from './callables/auth/projectUserRole.callable';
 
 import { getFunctions } from './callables/getFunctions';
 
@@ -168,6 +177,14 @@ export {
   deleteAttendance,
   getAttendance,
   updateAttendance,
+   
+  // Project User Roles
+  createProjectUserRole,
+  updateProjectUserRole,
+  deleteProjectUserRole,
+  getProjectUserRole,
+  getAllProjectUserRoles,
+  getProjectUserRolesByUserAndProject,
 
   // Test
   getFunctions,
