@@ -329,6 +329,7 @@ export interface AuthorizeUserProjectAccessSuccess {
   success: true;
   isAdmin: boolean;
   callerAdmin?: any;
+  callerClient?: any;        // added so we can return client objects
   callerUser?: any;
   callerUserProject?: any;
   callerUid: string;
@@ -339,34 +340,33 @@ export type AuthorizeUserProjectAccessResult =
   | { success: false; issues: FieldIssue[] };
 
 /**
- * Worker-first authorization:
+ * Worker-first authorization (WEAK-FIRST):
  * 1) If caller is assigned to the project -> allow
- * 2) Else if caller is the target user -> allow
+ * 2) Else if caller is a client -> allow
  * 3) Else if caller is admin -> allow
  * 4) Otherwise -> deny
+ *
+ * Note: removed the "caller === target user" check per your request.
  */
 export async function authorizeUserProjectAccessWorkerFirst(
   request: CallableRequest,
   targetUserId: string,
   targetProjectId: string
 ): Promise<AuthorizeUserProjectAccessResult> {
-  // 1) Check authentication and set CurrentUser (auth util does this)
+  // 1) Check authentication and set CurrentUser
   const auth = await authenticateCaller(request);
   if (!auth.success) return auth as any; // unauthorized
 
   const { callerUid, callerUuid } = auth;
 
   try {
-    // 2) Try to see if the caller is assigned to the target project (worker-first)
-    //    Expect UserProjectService.getByUserAndProject(userUuid, projectId)
+    // 2) Worker-first: check if caller is assigned to the project (weak privilege)
     const callerUserProject = await ProjectUserRoleService.getProjectUserRolesByUserAndProject(
       callerUuid,
       targetProjectId
     );
 
     if (callerUserProject) {
-      // Caller is a worker assigned to the project — allow
-      // We can include callerUserProject and callerUser for convenience:
       const callerUser = await UserService.getUserById(callerUuid);
       return {
         success: true,
@@ -378,19 +378,19 @@ export async function authorizeUserProjectAccessWorkerFirst(
       };
     }
 
-    // 3) Not assigned as worker — check if caller is the target user (self)
-    if (callerUuid === targetUserId) {
-      const callerUser = await UserService.getUserById(callerUuid);
+    // 3) Check if caller is a client
+    const callerClient = await ClientService.getClientById(callerUuid);
+    if (callerClient) {
       return {
         success: true,
         isAdmin: false,
-        callerUser,
+        callerClient,
         callerUid,
         callerUuid,
       };
     }
 
-    // 4) Fallback to admin: only admins can proceed now
+    // 4) Fallback to admin (strongest)
     const callerAdmin = await AdminService.getAdminById(callerUuid);
     if (callerAdmin) {
       return {
@@ -402,9 +402,9 @@ export async function authorizeUserProjectAccessWorkerFirst(
       };
     }
 
-    // 5) Deny: not worker, not self, not admin
+    // 5) Deny if none of the above
     logger.warn(
-      'authorizeUserProjectAccessWorkerFirst: caller is not worker, not self, not admin',
+      'authorizeUserProjectAccessWorkerFirst: caller is not worker, not client, not admin',
       { callerUuid, targetUserId, targetProjectId }
     );
     return {
@@ -413,14 +413,12 @@ export async function authorizeUserProjectAccessWorkerFirst(
         {
           field: 'auth',
           message:
-            'Forbidden: caller must be assigned to the project, be the target user, or be an admin',
+            'Forbidden: caller must be assigned to the project, be a client, or be an admin',
         },
       ],
     };
-  
   } catch (err: any) {
     logger.error('authorizeUserProjectAccessWorkerFirst: error', err);
     return { success: false, issues: parseDbError(err) };
   }
 }
-
