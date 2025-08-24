@@ -1,9 +1,8 @@
 <div class="dashboard-root">
   <app-sidebar class="dashboard-sidebar"></app-sidebar>
+
   <div class="dashboard-main">
-    <app-topbar></app-topbar>
-    <div class="dashboard-content">
-      <app-card-list [items]="cards"></app-card-list>
-    </div>
+    <!-- child routes render here -->
+    <router-outlet></router-outlet>
   </div>
 </div>

@@ -1,9 +1,3 @@
-@use "sass:color";
-@use "../../../../styles/colors.scss" as *;
-@use "../../../../styles/dimensions" as dim;
-@use "../../../../styles/margin" as mrg;
-@use "../../../../styles/radius" as rad;
-
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -24,7 +18,7 @@
 
 .logo {
   font-weight: 800;
-  color: $Btn-color;
+  color: var(--btn-color);
 }
 
 /* small tweak: transform: scale is applied via transform */
@@ -37,11 +31,11 @@
 
 .search {
   padding: 0.6rem 1rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-btn);
   border: none;
   min-width: 28rem;
   background: #111;
-  color: $color-font;
+  color: var(--color-font);
 }
 
 .right {
@@ -51,36 +45,33 @@
 }
 
 .btn-filter {
-  background: $Btn-color;
+  background: var(--btn-color);
   color: white;
   padding: 0.8rem 1.5rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-btn);
 }
 
 .btn-events {
-  background: $Secandary;
+  background: var(--secondary);
   color: white;
   padding: 0.8rem 1.3rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-btn);
 }
 
 /* Notification icon button */
 .icon {
   /* let color define SVG stroke via currentColor */
-  color: $color-font; /* white-ish by default */
-  background: $Btn-color; /* no white circle unless you want it */
-  border-radius: 1rem;
+  color: var(--color-font); /* white-ish by default */
+  background: var(--btn-color); /* button background */
+  border-radius: var(--radius-btn);
   padding: 0.6rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  /* optional: add a subtle hover background */
+  /* optional: add a subtle hover background using color-mix for modern CSS */
   &:hover {
-    background: color.adjust(
-      $Btn-color,
-      $lightness: -10%
-    ); /* darker hover tint */
+    background: color-mix(in srgb, var(--btn-color) 90%, black 10%);
   }
 
   svg {

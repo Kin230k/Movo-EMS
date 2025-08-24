@@ -3,21 +3,29 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../../components/shared/themed-button/themed-button';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login-admin',
-  imports: [InputComponent, ThemedButtonComponent],
+  standalone: true,
+  imports: [InputComponent, ThemedButtonComponent, TranslateModule],
   templateUrl: './login-admin.html',
-  styleUrl: './login-admin.scss',
+  styleUrls: ['./login-admin.scss'],
 })
 export class LoginAdmin {
   email: string = '';
   password: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translate: TranslateService) {}
+
+  switchLanguage(lang: 'en' | 'ar') {
+    this.translate.use(lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }
 
   onLogin() {
     console.log('Admin login attempted with:', this.email, this.password);
+    // TODO: add real login logic
   }
 
   onEmailChange(value: string) {
@@ -29,6 +37,6 @@ export class LoginAdmin {
   }
 
   goToUserLogin() {
-    this.router.navigate(['/user-login']);
+    this.router.navigate(['/login']);
   }
 }

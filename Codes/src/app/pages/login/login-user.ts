@@ -1,20 +1,27 @@
-// src/app/pages/login-user/login-user.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService } from '../../core/services/language.service'; // <-- centralized service
 
 @Component({
   selector: 'app-login-user',
-  imports: [InputComponent, ThemedButtonComponent],
+  standalone: true,
+  imports: [InputComponent, ThemedButtonComponent, TranslateModule],
   templateUrl: './login-user.html',
-  styleUrl: './login-user.scss',
+  styleUrls: ['./login-user.scss'],
 })
 export class LoginUser {
   email: string = '';
   password: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private langService: LanguageService) {}
+
+  // Optional: switch language from this page
+  switchLanguage(lang: 'en' | 'ar') {
+    this.langService.use(lang);
+  }
 
   onLogin() {
     console.log('User login attempted with:', this.email, this.password);
@@ -29,6 +36,6 @@ export class LoginUser {
   }
 
   goToAdminLogin() {
-    this.router.navigate(['/admin-login']);
+    this.router.navigate(['/login/admin']);
   }
 }

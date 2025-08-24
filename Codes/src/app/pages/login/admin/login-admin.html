@@ -1,13 +1,12 @@
-<!-- components/login/login.html -->
 <div class="login">
   <div class="login-container">
     <div class="login-form">
-      <h2 class="login-title">Log in as Admin</h2>
+      <h2 class="login-title">{{ 'LOGIN_ADMIN.TITLE' | translate }}</h2>
 
       <form>
         <app-input
           type="email"
-          placeholder="Enter email address ..."
+          [placeholder]="'LOGIN_ADMIN.EMAIL_PLACEHOLDER' | translate"
           [value]="email"
           (valueChange)="onEmailChange($event)"
         >
@@ -15,22 +14,34 @@
 
         <app-input
           type="password"
-          placeholder="Password"
+          [placeholder]="'LOGIN_ADMIN.PASSWORD_PLACEHOLDER' | translate"
           [value]="password"
           (valueChange)="onPasswordChange($event)"
         >
         </app-input>
 
         <div class="forgot-password">
-          <a class="forgot-password" href="">Forgot password?</a>
+          <a class="forgot-password" href="">
+            {{ 'LOGIN_ADMIN.FORGOT_PASSWORD' | translate }}
+          </a>
         </div>
 
-        <themed-button type="submit" text="Log in" (onClick)="onLogin()">
+        <themed-button
+          type="submit"
+          [text]="'LOGIN_ADMIN.BUTTON' | translate"
+          (onClick)="onLogin()"
+        >
         </themed-button>
 
         <div class="remember-me">
           <input type="checkbox" />
-          <label>Remember me</label>
+          <label>{{ 'LOGIN_ADMIN.REMEMBER_ME' | translate }}</label>
+        </div>
+
+        <div class="switch-login-type">
+          <a (click)="goToUserLogin()">
+            {{ 'LOGIN_ADMIN.SWITCH_TO_USER' | translate }}
+          </a>
         </div>
       </form>
     </div>

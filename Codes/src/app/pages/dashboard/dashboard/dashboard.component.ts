@@ -1,20 +1,14 @@
+// src/app/dashboard/dashboard.component.ts
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, RouterModule, SidebarComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  standalone: false,
 })
-export class DashboardComponent {
-  // sample array for demo
-  cards = Array.from({ length: 6 }).map((_, i) => ({
-    id: i + 1,
-    name: 'Name',
-    role: 'Supervisor',
-    phone: '0987654321',
-    marital: 'Marred',
-    date: '2024/2/13',
-    salary: '1200$',
-  }));
-}
+export class DashboardComponent {}

@@ -1,4 +1,8 @@
-<aside class="sidebar-wrap" [class.collapsed]="collapsed">
+<aside
+  class="sidebar-wrap"
+  [class.collapsed]="collapsed"
+  [class.mobile]="isMobile"
+>
   <div class="brand">
     <app-button
       type="button"
@@ -6,39 +10,54 @@
       (click)="toggleSidebar()"
       aria-label="Toggle menu"
     >
+      <!-- menu icon -->
       <svg
-        width="32"
-        height="32"
+        width="24"
+        height="24"
         viewBox="0 0 32 32"
-        stroke="#111"
+        stroke="#000"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5.33337 6.66663L26.6667 6.66663"
+          d="M5.333 6.666L26.666 6.666"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
         <path
-          d="M5.33337 15.9999L26.6667 15.9999"
+          d="M5.333 16L26.666 16"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
         <path
-          d="M5.33337 25.3333L26.6667 25.3333"
+          d="M5.333 25.333L26.666 25.333"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
       </svg>
     </app-button>
-    <div class="menu-text" *ngIf="!collapsed">Menu</div>
+
+    <!-- show text only when not collapsed on desktop, or always show brand on mobile -->
+    <div class="menu-text" *ngIf="!collapsed || isMobile">Menu</div>
   </div>
 
-  <ul class="menu-list" *ngIf="!collapsed">
+  <!-- menu list: on desktop it's vertical; on mobile it's horizontal and can expand/collapse -->
+  <ul class="menu-list" [class.open]="!collapsed">
     <li *ngFor="let item of menu" class="menu-item">
-      <app-button type="button" class="menu-item-btn">{{ item }}</app-button>
+      <!-- routerLinkActive toggles .active on the anchor when route matches -->
+      <a
+        class="menu-item-link"
+        [routerLink]="['/dashboard', item.path]"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="onNavigate()"
+      >
+        <app-button type="button" class="menu-item-btn">
+          {{ item.label }}
+        </app-button>
+      </a>
     </li>
   </ul>
 </aside>
