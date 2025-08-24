@@ -1,0 +1,19 @@
+{
+  "LOGIN": {
+    "TITLE": "تسجيل دخول المستخدم",
+    "EMAIL_PLACEHOLDER": "أدخل البريد الإلكتروني ...",
+    "PASSWORD_PLACEHOLDER": "كلمة المرور",
+    "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
+    "BUTTON": "تسجيل الدخول",
+    "SWITCH_TO_ADMIN": "تسجيل دخول كمسؤول"
+  },
+  "LOGIN_ADMIN": {
+    "TITLE": "تسجيل دخول المسؤول",
+    "EMAIL_PLACEHOLDER": "أدخل البريد الإلكتروني ...",
+    "PASSWORD_PLACEHOLDER": "كلمة المرور",
+    "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
+    "BUTTON": "تسجيل الدخول",
+    "REMEMBER_ME": "تذكرني",
+    "SWITCH_TO_USER": "تسجيل دخول المستخدم"
+  }
+}

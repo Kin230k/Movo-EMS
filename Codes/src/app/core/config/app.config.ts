@@ -6,9 +6,16 @@ import {
   withEventReplay,
 } from '@angular/platform-browser';
 
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+
+// Global error handler
 class GlobalErrorHandler implements ErrorHandler {
   handleError(error: unknown): void {
-    // 🔴 Log to console (or send to monitoring service)
     console.error('Global error caught:', error);
   }
 }
@@ -18,5 +25,16 @@ export const appConfig: ApplicationConfig = {
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
+
+    provideHttpClient(withInterceptorsFromDi()),
+
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/assets/i18n/',
+        suffix: '.json',
+      }),
+      fallbackLang: 'en',
+      lang: 'en',
+    }),
   ],
 };
