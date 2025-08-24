@@ -377,12 +377,38 @@
   {
     "name": "createFormWithQuestions",
     "description": "Handler (typed + validated)",
-    "parameters": []
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "questions",
+        "type": "{ typeCode: string; questionText: import(\"C:/Users/Laptop Home/Movo-EMS/Codes/backend/functions/src/models/multilingual.type\").Multilingual; interviewId: string; criteria?: import(\"C:/Users/Laptop Home/Movo-EMS/Codes/backend/functions/src/handlers/forms/core/createFormWithQuestionsHandler\").CriteriaInput[] | undefined }[] | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
   },
   {
     "name": "deleteForm",
     "description": "",
-    "parameters": []
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
   },
   {
     "name": "getForm",
@@ -482,7 +508,38 @@
   {
     "name": "updateQuestion",
     "description": "",
-    "parameters": []
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "typeCode",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "questionText",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
   },
   {
     "name": "createSubmission",
@@ -593,17 +650,49 @@
     ]
   },
   {
-    "name": "createForm",
+    "name": "createProject",
     "description": "",
-    "parameters": []
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startingDate",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "badgeBackground",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "endingDate",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "description",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
   },
   {
-    "name": "deleteForm",
-    "description": "",
-    "parameters": []
-  },
-  {
-    "name": "getForm",
+    "name": "deleteProject",
     "description": "",
     "parameters": [
       {
@@ -615,7 +704,19 @@
     ]
   },
   {
-    "name": "updateForm",
+    "name": "getProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateProject",
     "description": "",
     "parameters": [
       {
@@ -655,5 +756,550 @@
         "description": ""
       }
     ]
+  },
+  {
+    "name": "createLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "siteMap",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "longitude",
+        "type": "number",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "latitude",
+        "type": "number",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "siteMap",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "longitude",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "latitude",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createUserSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateUserSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "timestamp",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "signedWith",
+        "type": "\"QR_CODE\" | \"MANUAL\"",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "signedBy",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "signedWith",
+        "type": "\"QR_CODE\" | \"MANUAL\"",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "timestamp",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "signedBy",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "areaId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAreasByLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllAreas",
+    "description": "",
+    "parameters": []
   }
 ]
