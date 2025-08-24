@@ -1,7 +1,45 @@
-@use "./app/styles/colors" as *;
-@use "./app/styles/dimensions" as *;
-@use "./app/styles/margin" as *;
-@use "./app/styles/radius" as *;
+:root {
+  /* Colors */
+  --bg-dark: #1d1d1b;
+  --secondary: #eb0045; /* corrected spelling from "Secandary" */
+  --secondary-rgb: 235, 0, 69; /* for rgba usage: rgba(var(--secondary-rgb), 0.9) */
+  --btn-color: #7400ff;
+  --btn-color-rgb: 116, 0, 255;
+
+  --color-body: #0e0e2c;
+  --color-text: #333333;
+  --color-font: #f5f5f5;
+  --color-bg-sidebar: #f1f1f1;
+  --color-delete: #243746;
+
+  /* Paddings */
+  --padding-form: 3rem;
+  --padding-input-btn: 1rem 2rem;
+  --padding-checkbox: 1rem;
+  --padding-logo: 1rem 2rem;
+  --padding-card: 2rem;
+  --padding-img: 1rem;
+  --padding-btn: 1rem 2rem;
+  --padding-label: 1rem;
+  --padding-section: 2rem;
+
+  /* Margins */
+  --margin-form: 2rem;
+  --margin-input-btn: 1rem;
+  --margin-center: auto;
+  --margin-main: 32rem;
+
+  /* Layout */
+  --max-width: 24rem;
+
+  /* Radii */
+  --radius-form: 4rem;
+  --radius-input: 1rem;
+  --radius-btn: 1rem;
+  --radius-card: 2rem;
+  --radius-img: 2rem;
+}
+
 /* src/styles.scss (paste this into your global stylesheet) */
 
 /* Font files should live at: src/assets/fonts/ */

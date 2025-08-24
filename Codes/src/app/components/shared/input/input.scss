@@ -1,25 +1,22 @@
 // components/shared/input/input.scss
-@use 'sass:color';
-@use '../../../styles/colors' as *;
-@use '../../../styles/radius' as rad;
 
 .form-group {
   margin-bottom: 1.2rem;
-  
+
   .form-input {
     width: 90%;
     padding: 0.8rem 1.2rem;
-    border-radius: rad.$radius-input;
-    border: 1px solid rgba($color-font, 0.2);
-    color: $Bg-Dark;
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(var(--color-font), 0.2);
+    color: var(--bg-dark);
     font-size: 0.95rem;
-    
+
     &::placeholder {
-      color: rgba($Bg-Dark, 0.5);
+      color: rgba(var(--bg-dark), 0.5);
     }
 
     &:focus {
-      border-color: $Secandary;
+      border-color: var(--secondary);
       outline: none;
     }
   }
