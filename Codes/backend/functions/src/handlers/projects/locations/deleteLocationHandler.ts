@@ -5,7 +5,12 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { LocationService } from '../../../models/project/location/location.service';
 import { authenticateClient } from '../../../utils/authUtils';
 
-export async function deleteLocationHandler(request: CallableRequest) {
+export interface DeleteLocationData {
+  clientId: string;
+  locationId: string;
+}
+
+export async function deleteLocationHandler(request: CallableRequest<DeleteLocationData>) {
   const issues: FieldIssue[] = [];
 
   const auth = await authenticateClient(request);

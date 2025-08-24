@@ -5,7 +5,11 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { AreaService } from '../../../models/project/area/area.service';
 import { authenticateClient } from '../../../utils/authUtils';
 
-export async function deleteAreaHandler(request: CallableRequest) {
+interface DeleteAreaData {
+  areaId: string;
+}
+
+export async function deleteAreaHandler(request: CallableRequest<DeleteAreaData>) {
   const issues: FieldIssue[] = [];
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;

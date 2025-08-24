@@ -53,7 +53,7 @@ function isValidCriteriaOperator(v: unknown): v is CriteriaOperator {
 /**
  * Handler (typed + validated)
  */
-export async function createFormWithQuestionsHandler(request: CallableRequest) {
+export async function createFormWithQuestionsHandler(request: CallableRequest<CreateFormWithQuestionsRequestData>) {
   const issues: FieldIssue[] = [];
 
   // auth
