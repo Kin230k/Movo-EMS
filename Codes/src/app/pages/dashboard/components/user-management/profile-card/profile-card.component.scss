@@ -51,7 +51,7 @@
 
 /* menu item */
 .sidebar-wrap .menu-item {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.7rem;
   display: flex;
 }
 
@@ -64,16 +64,17 @@
 
 /* button within item */
 .sidebar-wrap .menu-item .menu-item-btn {
-  width: 100%;
+  width: 90%;
   border-radius: 0.7rem;
   background-color: var(--bg-dark);
   color: var(--color-font);
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
   font-size: 0.9rem;
-  height: 2.4rem;
+  height: 2.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-inline: 1rem;
   transition: background-color 180ms ease, transform 120ms ease;
   cursor: pointer;
   box-sizing: border-box;
@@ -187,8 +188,7 @@
 /* mobile menu button size/cap */
 .sidebar-wrap.mobile .menu-item .menu-item-btn {
   width: 100%;
-  max-width: calc(100vw - 2rem); /* cap at ~90% of viewport */
-  margin-inline: 1rem;
+  max-width: 90vw; /* cap at ~90% of viewport */
   box-sizing: border-box;
   height: 2.2rem;
   padding-inline: 0.75rem;
@@ -203,18 +203,180 @@
   background-color: var(--secondary);
 }
 
+/* mobile-actions specific styling (actions shown inside the burger menu) */
+.sidebar-wrap .mobile-actions {
+  padding: 0.6rem 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar-wrap .mobile-actions .mobile-actions-inner {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding-inline: 1rem;
+  box-sizing: border-box;
+}
+
+/* make the mobile action buttons visually consistent with profile actions */
+.sidebar-wrap .mobile-actions .actions {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  height: 2.2rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* small cosmetic: remove anchor underline / make anchor full width clickable (global) */
 .menu-item-link {
   text-decoration: none;
   color: inherit;
 }
 
-/* RTL support: mirror rounded corner and adjust padding */
-:host-context(html[dir="rtl"]) .sidebar-wrap,
-.sidebar-wrap.rtl {
-  border-radius: 1rem 0 0 1rem; /* mirror rounded corner */
-  padding-inline-start: 0.9rem;
-  padding-inline-end: 1.5rem;
+/* PROFILE CARD STYLES */
+.profile-card {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-dark);
+  color: var(--color-font);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) inset;
+  margin-top: 1rem;
 }
 
-/* when menu hidden on mobile keep the same hide/open rules (no change needed) */
+.avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--radius-img);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.2)
+  );
+  overflow: hidden;
+}
+
+.avatar .user-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meta-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.role {
+  padding: 0.25rem 0.6rem;
+  background: var(--secondary);
+  border-radius: var(--radius-btn);
+  font-size: 0.7rem;
+  color: white;
+}
+
+.meta-body {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.rate {
+  display: inline-block;
+  margin-top: 0.4rem;
+  background-color: white;
+  color: var(--color-body);
+  border-radius: 0.9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5rem;
+  height: 2rem;
+}
+
+.actions-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.actions-container .actions {
+  padding: 0.6rem 2.2rem;
+  background-color: var(--btn-color);
+  border-radius: var(--radius-btn);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* wrapper for each action so hamburger can be positioned above */
+.actions-container .menu-action-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* stack hamburger above the button */
+  align-items: center;
+  margin-bottom: 1rem; /* optional: space out the actions */
+}
+
+/* the hamburger button (hidden by default on desktop) */
+.actions-container .mobile-hamburger {
+  display: none; /* show only on mobile via .sidebar-wrap.mobile */
+  position: absolute;
+  top: -1.6rem; /* place above the action button */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 20;
+}
+
+/* the hamburger lines */
+.actions-container .mobile-hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  margin: 3px 0;
+  border-radius: 2px;
+  background: var(
+    --color-font
+  ); /* uses existing variable for accessible contrast */
+}
+
+/* Mobile-specific: show hamburger only when sidebar is in mobile mode */
+.sidebar-wrap.mobile .actions-container .mobile-hamburger {
+  display: block;
+}
+
+/* make sure hamburger doesn't overlap action button tap area too aggressively */
+.sidebar-wrap.mobile .actions-container .menu-action-wrapper .actions {
+  margin-top: 2rem; /* give more room under hamburger for mobile action button */
+}
+
+/* make sure button size is consistent */
+.sidebar-wrap.mobile .menu-item .menu-item-btn,
+.sidebar-wrap.mobile .actions-container .actions {
+  max-width: 90vw; /* same cap used elsewhere */
+}
+
+/* optional: reduce visual noise when menu hidden/collapsed on mobile */
+.sidebar-wrap.mobile.collapsed .actions-container .mobile-hamburger {
+  display: none; /* hide when collapsed */
+}

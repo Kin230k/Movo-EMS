@@ -1,1 +1,11 @@
-<p>user-management works!</p>
+<div>
+  <app-topbar></app-topbar>
+
+  <div class="dashboard-content">
+    <app-card-list
+      [items]="cards"
+      [cardComponent]="profileCardComponent"
+      cardInputKey="data"
+    ></app-card-list>
+  </div>
+</div>

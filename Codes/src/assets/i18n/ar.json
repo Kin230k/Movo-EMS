@@ -15,5 +15,47 @@
     "BUTTON": "تسجيل الدخول",
     "REMEMBER_ME": "تذكرني",
     "SWITCH_TO_USER": "تسجيل دخول المستخدم"
+  },
+  "SIDEBAR": {
+    "USER_MANAGEMENT": "إدارة المستخدمين",
+    "PROJECT_MANAGEMENT": "إدارة المشاريع",
+    "FORM_MANAGEMENT": "إدارة النماذج",
+    "CREATE_INTERVIEW_QUESTIONS": "إنشاء أسئلة المقابلة",
+    "LOCATION_MANAGEMENT": "إدارة المواقع",
+    "SEND_EMAILS": "إرسال رسائل البريد",
+    "VIEW_RECORDS": "عرض السجلات",
+    "CLIENT_DATA_MANAGEMENT": "إدارة بيانات العميل",
+    "PERMISSIONS_MANAGEMENT": "إدارة الأذونات",
+    "ATTENDANCE_MANAGEMENT": "إدارة الحضور",
+    "MENU_LABEL": "القائمة"
+  },
+  "ROLES": {
+    "MARSHALL": "مارشال",
+    "SUPERVISOR": "مشرف",
+    "SENIOR_SUPERVISOR": "مشرف أول",
+    "SUPER_ADMIN": "المشرف الأعلى",
+    "MAIN_USER": "المستخدم الرئيسي",
+    "SYSTEM_ADMIN": "مسؤول النظام",
+    "SELECT_ROLE": "اختار الدور"
+  },
+  "USER": {
+    "ACTIONS": {
+      "DISABLE": "الغاء التفعيل ",
+      "EDIT": "تعديل "
+    },
+    "EDIT": "تعديل المستخدم"
+  },
+  "COMMON": {
+    "BUTTONS": {
+      "SAVE": "حفظ",
+      "CANCEL": "إلغاء"
+    },
+    "LABELS": {
+      "ROLE": "الدور",
+      "RATE": "المعدل"
+    },
+    "PLACEHOLDERS": {
+      "RATE": "المعدل"
+    }
   }
 }

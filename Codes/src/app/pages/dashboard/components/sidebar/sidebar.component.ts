@@ -1,42 +1,74 @@
 // src/app/pages/dashboard/components/sidebar/sidebar.component.ts
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { ButtonComponent } from '../../../../components/shared/button/button';
+import { ResponsiveService } from '../../../../core/services/responsive.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService } from '../../../../core/services/language.service';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [CommonModule, RouterModule, ButtonComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, TranslateModule], // <-- added TranslateModule
   standalone: true,
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   collapsed = false; // collapsed = true => compact/hidden menu on desktop; on mobile toggles menu
   isMobile = false;
+  private destroy$ = new Subject<void>();
 
   // explicit mapping label -> path (kebab-case paths used in your routes)
   menu = [
-    { label: 'Project Management', path: 'project-management' },
-    { label: 'Form Management', path: 'form-management' },
-    { label: 'Create Interview Questions', path: 'create-interview-questions' },
-    { label: 'Location Management', path: 'location-management' },
-    { label: 'User Management', path: 'user-management' },
-    { label: 'Send Emails', path: 'send-emails' },
-    { label: 'View Records', path: 'view-records' },
-    { label: 'Client Data Management', path: 'client-data-management' },
-    { label: 'Permissions Management', path: 'permissions-management' },
-    { label: 'Attendance Management', path: 'attendance-management' },
+    { labelKey: 'SIDEBAR.USER_MANAGEMENT', path: 'user-management' },
+    { labelKey: 'SIDEBAR.PROJECT_MANAGEMENT', path: 'project-management' },
+    { labelKey: 'SIDEBAR.FORM_MANAGEMENT', path: 'form-management' },
+    {
+      labelKey: 'SIDEBAR.CREATE_INTERVIEW_QUESTIONS',
+      path: 'create-interview-questions',
+    },
+    { labelKey: 'SIDEBAR.LOCATION_MANAGEMENT', path: 'location-management' },
+    { labelKey: 'SIDEBAR.SEND_EMAILS', path: 'send-emails' },
+    { labelKey: 'SIDEBAR.VIEW_RECORDS', path: 'view-records' },
+    {
+      labelKey: 'SIDEBAR.CLIENT_DATA_MANAGEMENT',
+      path: 'client-data-management',
+    },
+    {
+      labelKey: 'SIDEBAR.PERMISSIONS_MANAGEMENT',
+      path: 'permissions-management',
+    },
+    {
+      labelKey: 'SIDEBAR.ATTENDANCE_MANAGEMENT',
+      path: 'attendance-management',
+    },
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private responsive: ResponsiveService,
+    private langService: LanguageService
+  ) {}
 
   ngOnInit() {
-    this.onResize(); // set initial isMobile
+    // subscribe to global isMobile
+    this.responsive.isMobile$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isMobile) => {
+        this.isMobile = isMobile;
+        // default collapse behavior on entering mobile
+        this.collapsed = isMobile ? true : false;
+      });
+
     // auto-collapse menu on navigation for mobile UX
     this.router.events
-      .pipe(filter((e) => e instanceof NavigationEnd))
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
       .subscribe(() => {
         if (this.isMobile) this.collapsed = true;
       });
@@ -52,16 +84,8 @@ export class SidebarComponent implements OnInit {
     if (this.isMobile) this.collapsed = true;
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    // breakpoint: 768px (change if you prefer)
-    this.isMobile = window.innerWidth <= 768;
-    // on entering mobile view, collapse the menu by default
-    if (this.isMobile) {
-      this.collapsed = true;
-    } else {
-      // on desktop restore expanded state by default
-      this.collapsed = false;
-    }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,0 +1,66 @@
+<article class="profile-card" (click)="$event.stopPropagation()">
+  <div class="avatar" (click)="openModal($event)" title="Open user">
+    <img src="{{ data.picture }}" alt="user image" class="user-image" />
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="name">{{ displayName }}</h3>
+      <span class="role">{{ data.roleKey | translate }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="phone">{{ data.phone }}</p>
+      <p class="email">{{ data.email }}</p>
+      <div class="rate">{{ data.rate }}</div>
+    </div>
+  </div>
+
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <!-- wrapper per action so we can show a hamburger above each button on mobile -->
+    <div class="menu-action-wrapper">
+      <!-- mobile-only hamburger placed above the button -->
+      <button
+        class="mobile-hamburger"
+        type="button"
+        aria-label="Open actions menu"
+        (click)="openMobileMenu($event)"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <app-button class="actions disable" (click)="onDisableUser($event)">
+        {{ "USER.ACTIONS.DISABLE" | translate }}
+      </app-button>
+    </div>
+
+    <div class="menu-action-wrapper">
+      <button
+        class="mobile-hamburger"
+        type="button"
+        aria-label="Open actions menu"
+        (click)="openMobileMenu($event)"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- open modal directly -->
+      <app-button class="actions edit" (click)="openModal($event)">
+        {{ "USER.ACTIONS.EDIT" | translate }}
+      </app-button>
+    </div>
+  </div>
+</article>
+
+<!-- Modal Component -->
+<app-profile-modal
+  *ngIf="modalOpen"
+  [data]="data"
+  (close)="closeModal()"
+  (edit)="handleModalEdit($event)"
+  (disable)="handleModalDisable($event)"
+></app-profile-modal>

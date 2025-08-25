@@ -23,7 +23,7 @@ export const routes: Routes = [
         (m) => m.DashboardComponent
       ),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'permissions-management' },
+      { path: '', pathMatch: 'full', redirectTo: 'user-management' },
 
       // child routes for each feature you listed
       {

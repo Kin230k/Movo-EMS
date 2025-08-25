@@ -11,4 +11,6 @@ import { SidebarComponent } from '../components/sidebar/sidebar.component';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  // layout & responsiveness handled by SCSS — component stays simple
+}

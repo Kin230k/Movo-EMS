@@ -1,0 +1,13 @@
+<section class="card-list">
+  <ng-container *ngFor="let it of items">
+    <!-- If a dynamic card component is provided, render it -->
+    <ng-container *ngIf="cardComponent">
+      <ng-container
+        [ngComponentOutlet]="cardComponent"
+        [ngComponentOutletInputs]="inputsFor(it)"
+      ></ng-container>
+    </ng-container>
+
+    <!-- Fallback to the built-in ProfileCardComponent if no cardComponent was passed -->
+  </ng-container>
+</section>

@@ -15,5 +15,47 @@
     "BUTTON": "Log in",
     "REMEMBER_ME": "Remember me",
     "SWITCH_TO_USER": "Log in as User"
+  },
+  "SIDEBAR": {
+    "USER_MANAGEMENT": "User Management",
+    "PROJECT_MANAGEMENT": "Project Management",
+    "FORM_MANAGEMENT": "Form Management",
+    "CREATE_INTERVIEW_QUESTIONS": "Create Interview Questions",
+    "LOCATION_MANAGEMENT": "Location Management",
+    "SEND_EMAILS": "Send Emails",
+    "VIEW_RECORDS": "View Records",
+    "CLIENT_DATA_MANAGEMENT": "Client Data Management",
+    "PERMISSIONS_MANAGEMENT": "Permissions Management",
+    "ATTENDANCE_MANAGEMENT": "Attendance Management",
+    "MENU_LABEL": "Menu"
+  },
+  "ROLES": {
+    "MARSHALL": "Marshall",
+    "SUPERVISOR": "Supervisor",
+    "SENIOR_SUPERVISOR": "Senior Supervisor",
+    "SUPER_ADMIN": "Super Admin",
+    "MAIN_USER": "Main User",
+    "SYSTEM_ADMIN": "System Admin",
+    "SELECT_ROLE": "Select Role"
+  },
+  "USER": {
+    "ACTIONS": {
+      "DISABLE": "Disable User",
+      "EDIT": "Edit User"
+    },
+    "EDIT": "Edit User"
+  },
+  "COMMON": {
+    "BUTTONS": {
+      "SAVE": "Save",
+      "CANCEL": "Cancel"
+    },
+    "LABELS": {
+      "ROLE": "Role",
+      "RATE": "Rate"
+    },
+    "PLACEHOLDERS": {
+      "RATE": "Rate"
+    }
   }
 }

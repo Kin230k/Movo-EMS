@@ -39,14 +39,14 @@
       </svg>
     </app-button>
 
-    <!-- show text only when not collapsed on desktop, or always show brand on mobile -->
-    <div class="menu-text" *ngIf="!collapsed || isMobile">Menu</div>
+    <!-- use translated menu text -->
+    <div class="menu-text" *ngIf="!collapsed || isMobile">
+      {{ "SIDEBAR.MENU_LABEL" | translate }}
+    </div>
   </div>
 
-  <!-- menu list: on desktop it's vertical; on mobile it's horizontal and can expand/collapse -->
   <ul class="menu-list" [class.open]="!collapsed">
     <li *ngFor="let item of menu" class="menu-item">
-      <!-- routerLinkActive toggles .active on the anchor when route matches -->
       <a
         class="menu-item-link"
         [routerLink]="['/dashboard', item.path]"
@@ -55,7 +55,7 @@
         (click)="onNavigate()"
       >
         <app-button type="button" class="menu-item-btn">
-          {{ item.label }}
+          {{ item.labelKey | translate }}
         </app-button>
       </a>
     </li>

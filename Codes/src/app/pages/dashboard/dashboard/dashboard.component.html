@@ -1,8 +1,12 @@
+<!-- src/app/dashboard/dashboard.component.html -->
 <div class="dashboard-root">
-  <app-sidebar class="dashboard-sidebar"></app-sidebar>
+  <app-sidebar
+    class="dashboard-sidebar"
+    role="navigation"
+    aria-label="Main menu"
+  ></app-sidebar>
 
-  <div class="dashboard-main">
-    <!-- child routes render here -->
+  <div class="dashboard-main" role="main">
     <router-outlet></router-outlet>
   </div>
 </div>
