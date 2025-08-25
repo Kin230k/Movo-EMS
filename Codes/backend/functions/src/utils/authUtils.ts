@@ -350,7 +350,6 @@ export type AuthorizeUserProjectAccessResult =
  */
 export async function authorizeUserProjectAccessWorkerFirst(
   request: CallableRequest,
-  targetUserId: string,
   targetProjectId: string
 ): Promise<AuthorizeUserProjectAccessResult> {
   // 1) Check authentication and set CurrentUser
@@ -405,7 +404,7 @@ export async function authorizeUserProjectAccessWorkerFirst(
     // 5) Deny if none of the above
     logger.warn(
       'authorizeUserProjectAccessWorkerFirst: caller is not worker, not client, not admin',
-      { callerUuid, targetUserId, targetProjectId }
+      { callerUuid, targetProjectId }
     );
     return {
       success: false,
