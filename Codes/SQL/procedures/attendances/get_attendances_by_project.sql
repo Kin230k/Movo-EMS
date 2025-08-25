@@ -15,7 +15,7 @@ SECURITY DEFINER
 AS $$
 BEGIN
   -- ensure caller is authorized (assumes procedure exists and will RAISE if not allowed)
-  CALL check_user_permission(p_auth_user_id, 'get_all_attendances');
+  CALL check_user_permission(p_auth_user_id, 'get_attendances_by_project');
 
   RETURN QUERY
   SELECT

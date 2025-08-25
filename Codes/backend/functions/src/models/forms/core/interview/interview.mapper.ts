@@ -59,6 +59,18 @@ export class InterviewMapper extends BaseMapper<Interview> {
 
     await pool.query('CALL delete_interview($1, $2)', [currentUserId, id]);
   }
+   async getByProjectId(projectId: string): Promise<Interview[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
+
+    const result = await pool.query('SELECT * FROM get_interviews_by_project($1, $2)', [
+      currentUserId,
+      projectId
+    ]);
+    return result.rows.map(this.mapRowToInterview);
+  }
+
 
   private mapRowToInterview = (row: any): Interview => {
     return new Interview(row.projectId, row.interviewId);

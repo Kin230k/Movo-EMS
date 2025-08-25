@@ -24,4 +24,7 @@ export class InterviewService {
   static async deleteInterview(id: string): Promise<void> {
     await interviewMapper.delete(id);
   }
+   static async getInterviewsByProjectId(projectId: string): Promise<Interview[]> {
+    return await interviewMapper.getByProjectId(projectId);
+  }
 }

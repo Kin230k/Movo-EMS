@@ -42,6 +42,12 @@ import {
   deleteSubmission,
   getSubmission,
   updateSubmission,
+  createInterview,
+  updateInterview,
+  getInterview,
+  getInterviewByProject,
+  deleteInterview,
+
 } from './callables/forms/forms.callable';
 
 // Import project-related callables
@@ -191,6 +197,13 @@ export {
   getProjectUserRole,
   getAllProjectUserRoles,
   getProjectUserRolesByUserAndProject,
+
+  // Interview
+  createInterview,
+  updateInterview,
+  deleteInterview,
+  getInterview,
+  getInterviewByProject,
 
   // Test
   getFunctions,
