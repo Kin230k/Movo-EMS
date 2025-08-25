@@ -9,6 +9,7 @@ import { FieldIssue } from './types';
 import { UserService } from '../models/auth/user/user.service';
 import { ClientService } from '../models/project/client/client.service';
 import { isValidEmail, isValidPhone } from './validators';
+import { ProjectUserRoleService } from '../models/auth/project_user_role/project_user_role.service';
 
 /**
  * NOTE: make sure firebase-admin has been initialized somewhere before calling getAuth()
@@ -320,6 +321,103 @@ export async function authorizeClientAccess(
     };
   } catch (err: any) {
     logger.error('authorizeClientAccess: failed to authorize caller', err);
+    return { success: false, issues: parseDbError(err) };
+  }
+  
+}
+export interface AuthorizeUserProjectAccessSuccess {
+  success: true;
+  isAdmin: boolean;
+  callerAdmin?: any;
+  callerClient?: any;        // added so we can return client objects
+  callerUser?: any;
+  callerUserProject?: any;
+  callerUid: string;
+  callerUuid: string;
+}
+export type AuthorizeUserProjectAccessResult =
+  | AuthorizeUserProjectAccessSuccess
+  | { success: false; issues: FieldIssue[] };
+
+/**
+ * Worker-first authorization (WEAK-FIRST):
+ * 1) If caller is assigned to the project -> allow
+ * 2) Else if caller is a client -> allow
+ * 3) Else if caller is admin -> allow
+ * 4) Otherwise -> deny
+ *
+ * Note: removed the "caller === target user" check per your request.
+ */
+export async function authorizeUserProjectAccessWorkerFirst(
+  request: CallableRequest,
+  targetProjectId: string
+): Promise<AuthorizeUserProjectAccessResult> {
+  // 1) Check authentication and set CurrentUser
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth as any; // unauthorized
+
+  const { callerUid, callerUuid } = auth;
+
+  try {
+    // 2) Worker-first: check if caller is assigned to the project (weak privilege)
+    const callerUserProject = await ProjectUserRoleService.getProjectUserRolesByUserAndProject(
+      callerUuid,
+      targetProjectId
+    );
+
+    if (callerUserProject) {
+      const callerUser = await UserService.getUserById(callerUuid);
+      return {
+        success: true,
+        isAdmin: false,
+        callerUser,
+        callerUserProject,
+        callerUid,
+        callerUuid,
+      };
+    }
+
+    // 3) Check if caller is a client
+    const callerClient = await ClientService.getClientById(callerUuid);
+    if (callerClient) {
+      return {
+        success: true,
+        isAdmin: false,
+        callerClient,
+        callerUid,
+        callerUuid,
+      };
+    }
+
+    // 4) Fallback to admin (strongest)
+    const callerAdmin = await AdminService.getAdminById(callerUuid);
+    if (callerAdmin) {
+      return {
+        success: true,
+        isAdmin: true,
+        callerAdmin,
+        callerUid,
+        callerUuid,
+      };
+    }
+
+    // 5) Deny if none of the above
+    logger.warn(
+      'authorizeUserProjectAccessWorkerFirst: caller is not worker, not client, not admin',
+      { callerUuid, targetProjectId }
+    );
+    return {
+      success: false,
+      issues: [
+        {
+          field: 'auth',
+          message:
+            'Forbidden: caller must be assigned to the project, be a client, or be an admin',
+        },
+      ],
+    };
+  } catch (err: any) {
+    logger.error('authorizeUserProjectAccessWorkerFirst: error', err);
     return { success: false, issues: parseDbError(err) };
   }
 }
