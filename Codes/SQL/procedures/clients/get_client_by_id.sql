@@ -5,7 +5,8 @@ RETURNS TABLE (
  logo VARCHAR(512),
  company JSONB,
  contactEmail VARCHAR(255),
- contactPhone VARCHAR(20))
+ contactPhone VARCHAR(20),
+ status client_status)
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 BEGIN
@@ -18,7 +19,8 @@ RETURN QUERY
  c.logo,
  c.company,
  c.contactEmail,
- c.contactPhone
+ c.contactPhone,
+ c.status client_status
  FROM CLIENTS c
  WHERE c.clientId = p_client_id;
 END;

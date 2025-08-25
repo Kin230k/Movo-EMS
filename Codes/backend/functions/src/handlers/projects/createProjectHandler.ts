@@ -6,8 +6,16 @@ import { parseDbError } from '../../utils/dbErrorParser';
 import { Multilingual } from '../../models/multilingual.type';
 import { ProjectService } from '../../models/project/project/project.service';
 import { authenticateClient } from '../../utils/authUtils';
+export interface CreateProjectData {
+  clientId: string;
+  name: Multilingual;
+  startingDate: string; // ISO date string
+  badgeBackground?: string;
+  endingDate?: string;
+  description?: Multilingual | null;
+}
 
-export async function createProjectHandler(request: CallableRequest) {
+export async function createProjectHandler(request: CallableRequest<CreateProjectData>) {
   const issues: FieldIssue[] = [];
 
   const auth = await authenticateClient(request);

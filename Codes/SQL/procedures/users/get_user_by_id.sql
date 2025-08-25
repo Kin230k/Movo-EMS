@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_user_by_id(p_auth_user_id UUID,p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_by_id(p_auth_user_id UUID, p_user_id UUID)
 RETURNS TABLE (
     userId UUID,
     name JSONB,
@@ -12,17 +12,17 @@ RETURNS TABLE (
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_user_by_id');
 
-RETURN QUERY 
+    RETURN QUERY
     SELECT 
         u.userId,
         u.name,
         u.email,
         u.phone,
         u.picture,
-        u.role,
-        u.status,
+        u.role::user_role,     -- cast here
+        u.status::user_status, -- cast here (if needed)
         u.twoFaEnabled
-    FROM USERS u
+    FROM users u
     WHERE u.userId = p_user_id;
 END;
 $$;

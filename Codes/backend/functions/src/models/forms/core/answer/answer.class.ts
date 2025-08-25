@@ -1,8 +1,10 @@
+import { Operation } from '../../../operation.enum';
+
 // models/answer.class.ts
 export type AnswerType = 'text' | 'rating' | 'numeric' | 'options';
 
 export abstract class Answer {
-  operation?: any;
+  operation?: Operation = Operation.CREATE;
 
   constructor(
     public answerId: string,

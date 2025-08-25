@@ -42,6 +42,48 @@ import {
   getSubmission,
   updateSubmission,
 } from './callables/forms/forms.callable';
+
+// Import project-related callables
+import {
+  createProject,
+  deleteProject,
+  getProject,
+  updateProject,
+  createLocation,
+  deleteLocation,
+  getLocation,
+  updateLocation,
+  createUserProject,
+  deleteUserProject,
+  getUserProject,
+  updateUserProject,
+  createSchedule,
+  deleteSchedule,
+  getSchedule,
+  updateSchedule,
+  createUserSchedule,
+  updateUserSchedule,
+  createAttendance,
+  deleteAttendance,
+  getAttendance,
+  updateAttendance,
+  createArea,
+  deleteArea,
+  getArea,
+  updateArea,
+  getAreasByLocation,
+  getAllAreas,
+} from './callables/projects/projects.callable';
+// Import ProjectUserRole callables
+import {
+  createProjectUserRole,
+  updateProjectUserRole,
+  deleteProjectUserRole,
+  getProjectUserRole,
+  getAllProjectUserRoles,
+  getProjectUserRolesByUserAndProject,
+} from './callables/auth/projectUserRole.callable';
+
 import { getFunctions } from './callables/getFunctions';
 
 import './services/firebaseAdmin'; // ensure initializeApp() has run
@@ -93,6 +135,57 @@ export {
   getSubmission,
   updateSubmission,
 
-  //test
+  // Projects
+  createProject,
+  deleteProject,
+  getProject,
+  updateProject,
+
+  // Locations
+  createLocation,
+  deleteLocation,
+  getLocation,
+  updateLocation,
+
+  // User Projects
+  createUserProject,
+  deleteUserProject,
+  getUserProject,
+  updateUserProject,
+
+  // Schedules
+  createSchedule,
+  deleteSchedule,
+  getSchedule,
+  updateSchedule,
+
+  // User Schedules
+  createUserSchedule,
+  updateUserSchedule,
+  
+
+  // Areas
+  createArea,
+  deleteArea,
+  getArea,
+  updateArea,
+  getAreasByLocation,
+  getAllAreas,
+
+  // Attendance
+  createAttendance,
+  deleteAttendance,
+  getAttendance,
+  updateAttendance,
+   
+  // Project User Roles
+  createProjectUserRole,
+  updateProjectUserRole,
+  deleteProjectUserRole,
+  getProjectUserRole,
+  getAllProjectUserRoles,
+  getProjectUserRolesByUserAndProject,
+
+  // Test
   getFunctions,
 };

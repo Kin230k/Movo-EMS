@@ -1,0 +1,1 @@
+CREATE TABLE ENDPOINT(type VARCHAR(50),endpoint_text TEXT);

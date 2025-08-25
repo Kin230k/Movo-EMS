@@ -16,8 +16,8 @@ RETURN QUERY
         u.name,
         u.phone,
         u.picture,
-        u.role,
-        u.status
+        u.role::user_role,
+        u.status::user_status
     FROM USERS u
     WHERE u.email = p_email;
 END;

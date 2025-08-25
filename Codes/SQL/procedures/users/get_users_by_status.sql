@@ -13,7 +13,7 @@ RETURN QUERY
         u.userId,
         u.name,
         u.email,
-        u.role
+        u.role::user_role
     FROM USERS u
     WHERE u.status = p_status;
 END;

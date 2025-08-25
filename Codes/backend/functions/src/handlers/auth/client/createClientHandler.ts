@@ -11,9 +11,8 @@ export interface CreateClientData {
   name: Multilingual;
   contactEmail: string;
   contactPhone: string;
-  firebaseUid: string;
+  company: Multilingual;
   logo?: string;
-  company?: Multilingual | null;
   status?: ClientStatus;
 }
 
@@ -33,7 +32,6 @@ export async function createClientHandler(
     name,
     contactEmail,
     contactPhone,
-    firebaseUid,
     logo,
     company,
     status = ClientStatus.Pending,
@@ -46,8 +44,6 @@ export async function createClientHandler(
     issues.push({ field: 'contactEmail', message: 'Email is required' });
   if (!contactPhone)
     issues.push({ field: 'contactPhone', message: 'Phone is required' });
-  if (!firebaseUid)
-    issues.push({ field: 'firebaseUid', message: 'Firebase UID is required' });
 
   if (issues.length > 0) return { success: false, issues };
 
@@ -56,9 +52,9 @@ export async function createClientHandler(
       name,
       contactEmail,
       contactPhone,
-      firebaseUid,
-      logo,
       company,
+      auth.callerUuid,
+      logo,
       status
     );
   } catch (dbErr: any) {

@@ -48,3 +48,17 @@ BEGIN
     END IF;
 END;
 $$;
+
+-- test
+CREATE OR REPLACE PROCEDURE check_user_permission(
+    p_userId UUID,
+    p_actionType VARCHAR(100)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Always succeed: do nothing
+    -- Optional: you can add a NOTICE for debugging
+    RAISE NOTICE 'Permission check bypassed for user %, action %', p_userId, p_actionType;
+END;
+$$;

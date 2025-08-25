@@ -29,6 +29,14 @@ export class UserProjectService {
     return await userProjectMapper.getAll();
   }
 
+  static async getProjectsByUser(userId: string): Promise<UserProject[]> {
+    return await userProjectMapper.getProjectsByUser(userId);
+  }
+
+  static async getUsersByProject(projectId: string): Promise<UserProject[]> {
+    return await userProjectMapper.getUsersByProject(projectId);
+  }
+
   static async deleteUserProject(id: string): Promise<void> {
     await userProjectMapper.delete(id);
   }

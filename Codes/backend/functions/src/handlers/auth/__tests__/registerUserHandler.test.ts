@@ -1,4 +1,5 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
+import admin from 'firebase-admin';
 import { registerUserHandler, RegisterUserData } from '../registerUserHandler';
 
 import { UserService } from '../../../models/auth/user/user.service';
@@ -27,9 +28,23 @@ const mockSendVerificationEmail = sendVerificationEmailHandler as Mock;
 const mockParseDbError = dbErrorParser.parseDbError as Mock;
 const mockFirebaseUidToUuid = firebaseUtils.firebaseUidToUuid as Mock;
 
+// mock firebase-admin getUser
+const mockGetUser = jest.fn();
+
 describe('registerUserHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // ensure admin.auth().getUser(...) is mocked to return email/phone by default
+    jest.spyOn(admin, 'auth').mockImplementation(() => ({
+      getUser: mockGetUser,
+    } as any));
+
+    mockGetUser.mockResolvedValue({
+      email: 'test@example.com',
+      phoneNumber: '+1234567890',
+    });
+
     mockIsValidEmail.mockReturnValue(true);
     mockIsValidPhone.mockReturnValue(true);
     mockEmailExists.mockResolvedValue(true);
@@ -45,27 +60,34 @@ describe('registerUserHandler', () => {
     } as unknown as CallableRequest<RegisterUserData>;
   }
 
+  // NOTE: RegisterUserData (handler) only includes name, twoFaEnabled, picture (email/phone come from Firebase Auth)
   const validData: RegisterUserData = {
     name: { en: 'Test User', ar: 'تيمبت' },
-    email: 'test@example.com',
-    phone: '+1234567890',
-    role: 'user',
     twoFaEnabled: false,
   };
 
   it('returns issues for missing fields', async () => {
+    // makeReq({}) still includes auth.uid by default, so missing client-side fields are name & twoFaEnabled
     const result = await registerUserHandler(makeReq({}));
     expect(result.success).toBe(false);
-    // 6 required fields: uid, name, twoFaEnabled, email, phone, role
-    expect(result.issues).toHaveLength(6);
+    // Only the client-side required fields: name and twoFaEnabled
+    expect(result.issues).toHaveLength(2);
+    // ensure the two fields are the expected ones
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        { field: 'name', message: 'Name is required' },
+        { field: 'twoFaEnabled', message: '2FA setting required' },
+      ])
+    );
   });
 
   it('returns issues for invalid email format', async () => {
     mockIsValidEmail.mockReturnValue(false);
+    // ensure firebase returns an email (it does by default via mockGetUser)
     const result = await registerUserHandler(makeReq(validData));
     expect(result).toEqual({
       success: false,
-      issues: [{ field: 'email', message: 'Invalid email format' }],
+      issues: [{ field: 'email', message: 'Email from Auth has invalid format' }],
     });
   });
 

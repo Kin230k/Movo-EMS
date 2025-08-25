@@ -11,7 +11,7 @@ BEGIN
 RETURN QUERY 
     SELECT 
         c.criterionId,
-        c.type,
+        c.type:;criteria_operator,
         c.value,
         c.questionId
     FROM CRITERIA c
