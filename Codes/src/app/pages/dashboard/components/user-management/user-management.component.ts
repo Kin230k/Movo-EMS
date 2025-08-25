@@ -16,7 +16,7 @@ export class UserManagementComponent {
   cards = Array.from({ length: 6 }).map((_, i) => ({
     id: i + 1,
     name: { en: 'Name', ar: 'يبتمشتيب' },
-    role: 'Supervisor',
+    role: 'Main User',
     phone: '0987654321',
     email: 'test@gmail.com',
     rate: '1200$',

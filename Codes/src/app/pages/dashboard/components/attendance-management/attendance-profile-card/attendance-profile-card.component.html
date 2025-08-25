@@ -1,0 +1,28 @@
+<article class="profile-card" (click)="$event.stopPropagation()">
+  <div class="avatar" (click)="openModal($event)" title="Open user">
+    <img src="{{ data.picture }}" alt="user image" class="user-image" />
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="name">{{ displayName }}</h3>
+      <span class="role">{{ "ROLES." + getRole() | translate }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="phone">{{ data.phone }}</p>
+      <p class="marital-status">{{ data.maritalStatus }}</p>
+      <p class="date">Date : {{ data.date }}</p>
+      <div class="rate">{{ data.rate }}</div>
+    </div>
+  </div>
+
+  <!-- Actions container -->
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <app-button class="action edit" (click)="openModal($event)">
+      {{ "USER.ACTIONS.EDIT" | translate }}
+    </app-button>
+  </div>
+
+  <!-- Modal Component (conditionally shown based on modalOpen state) -->
+</article>

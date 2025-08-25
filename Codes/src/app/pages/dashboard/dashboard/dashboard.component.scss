@@ -81,8 +81,10 @@
   margin-right: 2rem;
   margin-left: 0;
 }
-.dashboard-main.mobile {
-  margin-left: 0;
-  width: calc(100vw - 4rem);
-  padding-left: 2rem;
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+    width: calc(100vw - 4rem);
+    padding-left: 2rem;
+  }
 }

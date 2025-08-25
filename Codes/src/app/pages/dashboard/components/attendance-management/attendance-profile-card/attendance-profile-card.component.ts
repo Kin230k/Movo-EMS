@@ -4,38 +4,26 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../../../core/services/language.service';
 import { ButtonComponent } from '../../../../../components/shared/button/button';
-import { ProfileModalComponent } from './profile-modal/profile-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-profile-card',
-  templateUrl: './profile-card.component.html',
-  styleUrls: ['./profile-card.component.scss'],
-  imports: [
-    CommonModule,
-    ButtonComponent,
-    ProfileModalComponent,
-    TranslateModule,
-  ],
+  selector: 'app-attendance-profile-card',
+  templateUrl: './attendance-profile-card.component.html',
+  styleUrls: ['./attendance-profile-card.component.scss'],
+  imports: [CommonModule, ButtonComponent, TranslateModule],
   standalone: true,
 })
-export class ProfileCardComponent implements OnInit, OnDestroy {
+export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
   @Input() data: any;
 
   modalOpen = false;
-  isMenuOpen = false; // To toggle the visibility of the menu
   private destroy$ = new Subject<void>();
-
-  @ViewChild('menuWrapper') menuWrapper!: ElementRef;
 
   constructor(
     public language: LanguageService,
@@ -47,7 +35,6 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.cd.markForCheck(); // Trigger change detection
     });
-    this.language.use('ar');
   }
 
   roles: any = {
@@ -74,35 +61,14 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'hidden';
   }
 
-  toggleMenu(evt?: MouseEvent) {
-    evt?.stopPropagation();
-    this.isMenuOpen = !this.isMenuOpen; // Toggle state to show/hide menu
-    this.cd.detectChanges(); // Manually trigger change detection if needed
-  }
-
   closeModal() {
     this.modalOpen = false;
     document.body.style.overflow = '';
   }
 
-  onDisableUser(evt?: MouseEvent) {
-    evt?.stopPropagation();
-    console.log('Disable user', this.data);
-  }
-
-  onEditUser(evt?: MouseEvent) {
-    evt?.stopPropagation();
-    console.log('Edit user', this.data);
-  }
-
   handleModalEdit = (payload: any) => {
     this.data = { ...this.data, ...payload };
     console.log('User updated:', this.data);
-    this.closeModal();
-  };
-
-  handleModalDisable = (payload: any) => {
-    this.onDisableUser();
     this.closeModal();
   };
 
@@ -116,17 +82,5 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
       (this.language.currentLang as string) ||
       (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
     return name[lang] || name['en'] || Object.values(name)[0] || '';
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (
-      this.isMenuOpen &&
-      this.menuWrapper &&
-      !this.menuWrapper.nativeElement.contains(event.target)
-    ) {
-      this.isMenuOpen = false;
-      this.cd.detectChanges();
-    }
   }
 }
