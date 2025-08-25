@@ -7,6 +7,9 @@ import { parseDbError } from '../../utils/dbErrorParser';
 import { FieldIssue } from '../../utils/types';
 import { authenticateClient } from '../../utils/authUtils';
 
+export interface GetProjectUsersData {
+  projectId: string;
+}
 export interface GetProjectUsersResult {
   success: boolean;
   users?: ProjectUser[];
@@ -14,7 +17,7 @@ export interface GetProjectUsersResult {
 }
 
 export async function getProjectUsersHandler(
-  request: CallableRequest
+  request: CallableRequest<GetProjectUsersData>
 ): Promise<GetProjectUsersResult> {
   // Authenticate as client instead of user
   const auth = await authenticateClient(request);
