@@ -5,7 +5,6 @@ import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authorizeUserProjectAccessWorkerFirst } from '../../../utils/authUtils';
 import { AttendanceService } from '../../../models/project/attendance/attendance.service';
-import { LocationService } from '../../../models/project/location/location.service';
 import { AreaService } from '../../../models/project/area/area.service';
 
 export interface CreateAttendanceData {

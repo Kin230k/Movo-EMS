@@ -1,4 +1,4 @@
-import userMapper, { UserMapper } from './user.mapper';
+import userMapper, { UserMapper,ProjectUser  } from './user.mapper';
 import { User } from './user.class';
 import { Multilingual } from '../../multilingual.type';
 import { UserStatus } from './user_status.enum';
@@ -96,4 +96,8 @@ export class UserService {
   static async isUserActive(user: User): Promise<boolean> {
     return user?.getStatus === UserStatus.Active;
   }
+    static async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
+    return await userMapper.getProjectUsers(projectId);
+  }
+
 }

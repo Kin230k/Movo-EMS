@@ -23,6 +23,7 @@ import {
   checkServiceStatus,
   getUserInfo,
   editUserInfo,
+  getProjectUsers,
 } from './callables/auth/auth.callable';
 
 // Import forms callables
@@ -101,6 +102,8 @@ export {
   checkServiceStatus,
   getUserInfo,
   editUserInfo,
+  getProjectUsers,
+  
 
   // Auth admin
   createAdmin,
