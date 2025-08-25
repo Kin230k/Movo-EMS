@@ -9,6 +9,7 @@ import { getUserInfoHandler } from '../../handlers/auth/getUserInfoHandler';
 import { registerUserHandler } from '../../handlers/auth/registerUserHandler';
 import { sendLoginAlertHandler } from '../../handlers/auth/sendLoginAlertHandler';
 import { sendPasswordResetHandler } from '../../handlers/auth/sendPasswordResetHandler';
+import { getProjectUsersHandler } from '../../handlers/auth/getProjectUsersHandler';
 
 export const changeUserEmail = onCall(changeUserEmailHandler);
 
@@ -27,3 +28,5 @@ export const sendLoginAlert = onCall(sendLoginAlertHandler);
 export const sendPasswordReset = onCall(sendPasswordResetHandler);
 
 export const sendVerificationEmail = onCall(sendVerificationEmailHandler);
+
+export const getProjectUsers=onCall(getProjectUsersHandler);

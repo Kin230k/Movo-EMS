@@ -6,6 +6,16 @@ import pool from '../../../utils/pool';
 import { Multilingual } from '../../multilingual.type';
 import { CurrentUser } from '../../../utils/currentUser.class';
 
+export interface ProjectUser {
+  userId: string;
+  name: Multilingual;
+  email: string | null;
+  phone: string | null;
+  picture: string | null;
+  role: string;
+  status: string;
+  hourlyRate: number | null;
+}
 export class UserMapper extends BaseMapper<User> {
   /**
    * Change a user's email
@@ -130,6 +140,18 @@ export class UserMapper extends BaseMapper<User> {
     );
     return result.rows.length ? this.mapRowToUser(result.rows[0]) : null;
   }
+  async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('projectId is required');
+
+    const result = await pool.query('SELECT * FROM get_project_users($1, $2)', [
+      currentUserId,
+      projectId,
+    ]);
+
+    return result.rows.map((row: any) => this.mapRowToProjectUser(row));
+  }
 
   private mapRowToUser = (row: any): User => {
     return new User(
@@ -140,10 +162,27 @@ export class UserMapper extends BaseMapper<User> {
       row.status,
       row.twoFaEnabled,
       row.picture,
-      row.userId
+      row.userId,
     );
   };
+  
+  private mapRowToProjectUser = (row: any): ProjectUser => {
+    return {
+      userId: row.userid,
+      name: row.name,
+      email: row.email ?? null,
+      phone: row.phone ?? null,
+      picture: row.picture ?? null,
+      role: row.role,
+      status: row.status,
+      hourlyRate:
+        row.hourlyrate !== null && row.hourlyrate !== undefined
+          ? parseFloat(row.hourlyrate)
+          : null,
+    };
+  };
 }
+
 
 const userMapper = new UserMapper();
 export default userMapper;
