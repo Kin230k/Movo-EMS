@@ -21,6 +21,12 @@ import { deleteSubmissionHandler } from '../../handlers/forms/submissions/delete
 import { getSubmissionHandler } from '../../handlers/forms/submissions/getSubmissionHandler';
 import { updateSubmissionHandler } from '../../handlers/forms/submissions/updateSubmissionHandler';
 
+// Interview handlers
+import { createInterviewHandler } from '../../handlers/forms/core/interview/createInterviewHandler';
+import { deleteInterviewHandler } from '../../handlers/forms/core/interview/deleteInterviewHandler';
+import { getInterviewsByProjectHandler } from '../../handlers/forms/core/interview/getInterviewsByProjectHandler';
+import { updateInterviewHandler } from '../../handlers/forms/core/interview/updateInterviewHandler';
+import { getInterviewHandler } from '../../handlers/forms/core/interview/getInterviewHandler';
 // Export callable functions
 
 // Form core
@@ -42,3 +48,10 @@ export const createSubmission = onCall(createSubmissionHandler);
 export const deleteSubmission = onCall(deleteSubmissionHandler);
 export const getSubmission = onCall(getSubmissionHandler);
 export const updateSubmission = onCall(updateSubmissionHandler);
+
+//Interview
+export const createInterview=onCall(createInterviewHandler);
+export const updateInterview=onCall(updateInterviewHandler);
+export const getInterview=onCall(getInterviewHandler);
+export const getInterviewByProject=onCall(getInterviewsByProjectHandler);
+export const deleteInterview=onCall(deleteInterviewHandler);
