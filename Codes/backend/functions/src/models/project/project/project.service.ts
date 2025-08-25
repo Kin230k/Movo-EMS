@@ -44,13 +44,35 @@ export class ProjectService {
     );
     await projectMapper.save(entity);
   }
-
+  static async updateProjectAsAdmin(
+    projectId: string,
+    clientId: string,
+    name: Multilingual,
+    startingDate: string,
+    badgeBackground?: string,
+    endingDate?: string,
+    description?: Multilingual | null
+  ): Promise<void> {
+    const entity = new Project(
+      clientId,
+      name,
+      startingDate,
+      projectId,
+      badgeBackground,
+      endingDate,
+      description
+    );
+    await projectMapper.updateAsAdmin(entity);
+  }
   static async getProjectById(id: string): Promise<Project | null> {
     return await projectMapper.getById(id);
   }
 
   static async getAllProjects(): Promise<Project[]> {
     return await projectMapper.getAll();
+  }
+  static async getAllActiveProjects(): Promise<Project[]> {
+    return await projectMapper.getAllActive();
   }
 
   static async deleteProject(id: string): Promise<void> {

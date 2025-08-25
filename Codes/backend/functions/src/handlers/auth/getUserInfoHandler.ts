@@ -5,7 +5,7 @@ import { User } from '../../models/auth/user/user.class';
 import { UserStatus } from '../../models/auth/user/user_status.enum';
 import { parseDbError } from '../../utils/dbErrorParser';
 import { FieldIssue } from '../../utils/types';
-import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
+import { authenticateUser } from '../../utils/authUtils';
 
 export interface GetUserInfoResult {
   success: boolean;
@@ -16,28 +16,13 @@ export interface GetUserInfoResult {
 export async function getUserInfoHandler(
   request: CallableRequest
 ): Promise<GetUserInfoResult> {
-  const issues: FieldIssue[] = [];
-
-  // 1) Validate auth context
-  if (!request.auth || !request.auth.uid) {
-    issues.push({
-      field: 'auth',
-      message: 'Must be signed in to get user info',
-    });
-    return { success: false, issues };
-  }
-
-  // 2) Resolve target UID
-  const targetUserId = firebaseUidToUuid(request.auth.uid);
-  if (!targetUserId) {
-    issues.push({ field: 'uid', message: 'UID is required' });
-    return { success: false, issues };
-  }
+  const auth = await authenticateUser(request);
+  if (!auth.success) return auth;
 
   // 3) Fetch user record
   let user: User | null;
   try {
-    user = await UserService.getUserById(targetUserId);
+    user = await UserService.getUserById(auth.callerUuid);
   } catch (err: any) {
     logger.error('DB fetch failed:', err);
     const dbIssues = parseDbError(err);

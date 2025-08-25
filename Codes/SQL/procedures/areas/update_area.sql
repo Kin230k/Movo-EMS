@@ -1,14 +1,17 @@
-CREATE OR REPLACE PROCEDURE update_area(
-    p_area_id UUID,
-    p_name JSONB,
-    p_location_id UUID
+CREATE OR REPLACE PROCEDURE update_area(p_auth_user_id UUID,
+ p_area_id UUID,
+ p_name JSONB DEFAULT NULL,
+ p_location_id UUID DEFAULT NULL
 )
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    UPDATE AREAS
-    SET 
-        name = p_name,
-        locationId = p_location_id
-    WHERE areaId = p_area_id;
+ CALL check_user_permission(p_auth_user_id, 'update_area');
+
+UPDATE AREAS
+ SET
+ name = COALESCE(p_name, name),
+ locationId = COALESCE(p_location_id, locationId)
+ WHERE areaId = p_area_id;
 END;
 $$;

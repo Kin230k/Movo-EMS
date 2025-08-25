@@ -1,6 +1,6 @@
 CREATE TABLE PROJECTS (
     projectId UUID PRIMARY KEY,
-    clientId UUID NOT NULL REFERENCES CLIENTS(clientId),
+    clientId UUID NOT NULL REFERENCES CLIENTS(clientId) ON DELETE CASCADE ON UPDATE CASCADE,
     name JSONB NOT NULL CHECK (
         name ? 'en' AND 
         name ? 'ar' AND

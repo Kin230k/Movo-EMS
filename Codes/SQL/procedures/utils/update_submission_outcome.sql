@@ -1,33 +1,37 @@
--- 4. Submission outcome updater (priority‐ordered rules)
 CREATE OR REPLACE FUNCTION update_submission_outcome(sub_id UUID)
 RETURNS VOID AS $$
 DECLARE
-    rule       RECORD;
-    all_passed BOOLEAN;
+  any_failed  BOOLEAN;
+  all_passed  BOOLEAN;
+  any_manual  BOOLEAN;
+  has_answers BOOLEAN;
+  new_outcome submission_outcome;
 BEGIN
-    FOR rule IN
-        SELECT ruleId, outcomeOnPass
-          FROM DECISION_RULES
-         ORDER BY priority
-    LOOP
-        SELECT BOOL_AND(cr.passed) INTO all_passed
-          FROM RULE_CRITERIA rc
-          JOIN CRITERIA_RESULTS cr USING (criterionId)
-          JOIN ANSWERS a          ON cr.answerId = a.answerId
-         WHERE rc.ruleId = rule.ruleId
-           AND a.submissionId = sub_id;
+  SELECT
+    COALESCE(BOOL_OR(ar.outcome = 'FAILED'), FALSE),
+    COALESCE(BOOL_AND(ar.outcome = 'PASSED'), FALSE),
+    COALESCE(BOOL_OR(ar.outcome = 'MANUAL'), FALSE),
+    COUNT(*) > 0
+  INTO any_failed, all_passed, any_manual, has_answers
+  FROM answer_results ar
+  JOIN answers a USING (answerid)
+  WHERE a.submissionid = sub_id;
 
-        IF all_passed THEN
-            UPDATE SUBMISSIONS
-               SET outcome = rule.outcomeOnPass
-             WHERE submissionId = sub_id;
-            RETURN;
-        END IF;
-    END LOOP;
+  IF NOT has_answers THEN
+    new_outcome := 'MANUAL_REVIEW'::submission_outcome;
+  ELSIF any_failed THEN
+    new_outcome := 'REJECTED'::submission_outcome;
+  ELSIF all_passed THEN
+    new_outcome := 'ACCEPTED'::submission_outcome;
+  ELSIF any_manual THEN
+    new_outcome := 'MANUAL_REVIEW'::submission_outcome;
+  ELSE
+    new_outcome := 'MANUAL_REVIEW'::submission_outcome;
+  END IF;
 
-    -- fallback if no rule fully passed
-    UPDATE SUBMISSIONS
-       SET outcome = 'MANUAL_REVIEW'
-     WHERE submissionId = sub_id;
+  UPDATE submissions
+     SET outcome = new_outcome
+   WHERE submissionid = sub_id;
+
 END;
 $$ LANGUAGE plpgsql;

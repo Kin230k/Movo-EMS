@@ -6,9 +6,10 @@ RETURNS TABLE (
     startingDate DATE,
     endingDate DATE,
 	description JSONB
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+
+RETURN QUERY 
     SELECT 
         p.projectId,
         p.name,
@@ -17,6 +18,6 @@ BEGIN
         p.endingDate,
 		p.description
     FROM PROJECTS p
-    WHERE CURRENT_DATE BETWEEN p.startingDate AND p.endingDate;
+    WHERE CURRENT_DATE < p.endingDate;
 END;
 $$;

@@ -1,11 +1,14 @@
-CREATE OR REPLACE PROCEDURE update_interview(
-    p_interview_id UUID,
-    p_project_id UUID
+CREATE OR REPLACE PROCEDURE update_interview(p_auth_user_id UUID,
+ p_interview_id UUID,
+ p_project_id UUID DEFAULT NULL
 )
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    UPDATE INTERVIEWS
-    SET projectId = p_project_id
-    WHERE interviewId = p_interview_id;
+ CALL check_user_permission(p_auth_user_id, 'update_interview');
+
+UPDATE INTERVIEWS
+ SET projectId = COALESCE(p_project_id, projectId)
+ WHERE interviewId = p_interview_id;
 END;
 $$;

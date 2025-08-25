@@ -9,5 +9,6 @@ CREATE TABLE CLIENTS (
     logo VARCHAR(512),
     company JSONB NOT NULL,
     contactEmail VARCHAR(255) NOT NULL UNIQUE,
-    contactPhone VARCHAR(20) NOT NULL UNIQUE
+    contactPhone VARCHAR(20) NOT NULL UNIQUE,
+    status client_status NOT NULL DEFAULT 'pending',
 );

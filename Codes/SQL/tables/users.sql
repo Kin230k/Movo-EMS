@@ -6,10 +6,13 @@ CREATE TABLE USERS (
         jsonb_typeof(name->'en') = 'string' AND
         jsonb_typeof(name->'ar') = 'string'
     ),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(255)  UNIQUE,
+    phone VARCHAR(20)  UNIQUE,
     picture VARCHAR(512),
     role userRole NOT NULL,
     status userStatus NOT NULL DEFAULT 'Active',
     twoFaEnabled BOOLEAN NOT NULL DEFAULT FALSE
+     CONSTRAINT chk_email_or_phone CHECK (
+        email IS NOT NULL OR phone IS NOT NULL
+    )
 );

@@ -6,6 +6,7 @@ import { FieldIssue } from '../../utils/types';
 import { isValidPhone } from '../../utils/validators';
 import { UserService } from '../../models/auth/user/user.service';
 import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
+import { authenticateCaller } from '../../utils/authUtils';
 
 export interface ChangePhoneData {
   newPhone: string;
@@ -20,13 +21,8 @@ export async function changeUserPhoneHandler(
 ): Promise<ChangePhoneResult> {
   const issues: FieldIssue[] = [];
 
-  // 1) Must be signed in
-  if (!request.auth) {
-    issues.push({
-      field: 'auth',
-      message: 'Must be signed in to change phone number',
-    });
-  }
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
 
   // 2) Validate newPhone
   const newPhone = request.data?.newPhone;

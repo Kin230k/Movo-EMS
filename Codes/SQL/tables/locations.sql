@@ -6,7 +6,7 @@ CREATE TABLE LOCATIONS (
         jsonb_typeof(name->'en') = 'string' AND
         jsonb_typeof(name->'ar') = 'string'
     ),
-    projectId UUID NOT NULL REFERENCES PROJECTS(projectId),
+    projectId UUID NOT NULL REFERENCES PROJECTS(projectId) ON DELETE CASCADE ON UPDATE CASCADE,
     siteMap VARCHAR(512),
     longitude NUMERIC,
     latitude NUMERIC

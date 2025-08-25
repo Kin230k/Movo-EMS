@@ -28,7 +28,9 @@ export class AreaService {
   static async getAllAreas(): Promise<Area[]> {
     return await areaMapper.getAll();
   }
-
+  static async getAreasByLocation(locationId: string): Promise<Area[]> {
+    return await areaMapper.getByLocation(locationId);
+  }
   static async deleteArea(id: string): Promise<void> {
     await areaMapper.delete(id);
   }

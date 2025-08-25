@@ -4,6 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { LoginAlertData } from '../../utils/types';
 import { sendEmail } from '../../services/emailService';
 import { FieldIssue } from '../../utils/types';
+import { authenticateCaller } from '../../utils/authUtils';
 
 export interface SendLoginAlertResult {
   success: boolean;
@@ -15,12 +16,8 @@ export async function sendLoginAlertHandler(
 ): Promise<SendLoginAlertResult> {
   const issues: FieldIssue[] = [];
 
-  if (!request.auth) {
-    issues.push({
-      field: 'auth',
-      message: 'Must be signed in to send login alert',
-    });
-  }
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
 
   if (issues.length > 0) {
     return { success: false, issues };

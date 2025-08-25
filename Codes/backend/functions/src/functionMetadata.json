@@ -1,0 +1,1305 @@
+[
+  {
+    "name": "createAdmin",
+    "description": "",
+    "parameters": [
+      {
+        "name": "qid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "jobPosition",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAdmin",
+    "description": "Any caller with an admin record may fetch another admin's record.\r\nIf no adminId is provided, the caller's own admin record is returned.",
+    "parameters": [
+      {
+        "name": "adminId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllAdmins",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "updateAdmin",
+    "description": "",
+    "parameters": [
+      {
+        "name": "adminId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "qid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "jobPosition",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "changeUserEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "newEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "changeUserPhone",
+    "description": "",
+    "parameters": [
+      {
+        "name": "newPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "checkServiceStatus",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "editUserInfo",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "picture",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getUserInfo",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "registerUser",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "twoFaEnabled",
+        "type": "boolean",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "picture",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendLoginAlert",
+    "description": "",
+    "parameters": [
+      {
+        "name": "device",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendPasswordReset",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "sendVerificationEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "company",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "logo",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "status",
+        "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "approveRejectClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "approve",
+        "type": "boolean",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllClients",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "firebaseUid",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "logo",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "company",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "status",
+        "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createFormWithQuestions",
+    "description": "Handler (typed + validated)",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "questions",
+        "type": "{ typeCode: string; questionText: { en: string; ar: string }; interviewId: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string }[] | undefined }[] | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "typeCode",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "questionText",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllQuestions",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateQuestion",
+    "description": "",
+    "parameters": [
+      {
+        "name": "questionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "typeCode",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "questionText",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateSubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "Date",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "\"pass\" | \"fail\" | \"manual_review\" | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startingDate",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "badgeBackground",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "endingDate",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "description",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startingDate",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "badgeBackground",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "endingDate",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "description",
+        "type": "{ en: string; ar: string } | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "siteMap",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "longitude",
+        "type": "number",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "latitude",
+        "type": "number",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "siteMap",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "longitude",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "latitude",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateUserProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createUserSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateUserSchedule",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userProjectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "scheduleId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "startTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "endTime",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "timestamp",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "signedWith",
+        "type": "\"QR_CODE\" | \"MANUAL\"",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "signedBy",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateAttendance",
+    "description": "",
+    "parameters": [
+      {
+        "name": "attendanceId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "signedWith",
+        "type": "\"QR_CODE\" | \"MANUAL\"",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "timestamp",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "signedBy",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "areaId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateArea",
+    "description": "",
+    "parameters": [
+      {
+        "name": "areaId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAreasByLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "locationId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllAreas",
+    "description": "",
+    "parameters": []
+  }
+]

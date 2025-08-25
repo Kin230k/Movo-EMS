@@ -41,12 +41,17 @@ export class LocationService {
     );
     await locationMapper.save(entity);
   }
+
   static async getLocationById(id: string): Promise<Location | null> {
     return await locationMapper.getById(id);
   }
 
   static async getAllLocations(): Promise<Location[]> {
     return await locationMapper.getAll();
+  }
+
+  static async getLocationsByProject(projectId: string): Promise<Location[]> {
+    return await locationMapper.getByProject(projectId);
   }
 
   static async deleteLocation(id: string): Promise<void> {

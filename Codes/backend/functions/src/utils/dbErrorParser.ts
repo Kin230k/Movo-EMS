@@ -4,10 +4,45 @@ interface PostgresError {
   code?: string;
   detail?: string;
   message?: string;
+  hint?: string;
 }
 
 export function parseDbError(err: PostgresError): FieldIssue[] {
   const issues: FieldIssue[] = [];
+
+  // Normalize and take only the first line of message to avoid stack traces.
+  const rawMsg = (err?.message ?? '').split('\n')[0].trim();
+
+  // Helper: if the DB error message includes "error:" (common for reraise), return the part after it.
+  const extractFriendly = (s: string) => {
+    const parts = s.split(/error:\s*/i);
+    return parts.length > 1 ? parts.slice(1).join('error:').trim() : s.trim();
+  };
+
+  const friendlyMsg = extractFriendly(rawMsg);
+
+  // Handle PL/pgSQL RAISE EXCEPTION case (P0001) or any message that clearly indicates permission denial.
+  if (err.code === 'P0001' || /You don'?t have permission to/i.test(rawMsg)) {
+    // friendlyMsg will often be like:
+    // "You don't have permission to get user by id | ليس لديك صلاحيات لإجراء غير معروف"
+    // We return that full bilingual string and use a 'permission' field so the client can act on it.
+    issues.push({
+      field: 'permission',
+      message: friendlyMsg || 'You do not have the required permission',
+    });
+
+    // Optionally include hint/detail as an extra internal issue (comment out if undesired)
+    if (err.detail || err.hint) {
+      issues.push({
+        field: 'internal',
+        message: `${err.detail ?? ''}${
+          err.hint ? ' — ' + err.hint : ''
+        }`.trim(),
+      });
+    }
+
+    return issues;
+  }
 
   switch (err.code) {
     case '23505': {

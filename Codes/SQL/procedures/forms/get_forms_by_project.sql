@@ -2,9 +2,11 @@ CREATE OR REPLACE FUNCTION get_forms_by_project(p_project_id UUID)
 RETURNS TABLE (
     formId UUID,
     locationId UUID
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_forms_by_project');
+
+RETURN QUERY 
     SELECT 
         f.formId,
         f.locationId

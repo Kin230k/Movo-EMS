@@ -14,7 +14,7 @@ CREATE TABLE DECISION_RULES (
             jsonb_typeof(description->'ar') = 'string'
         )
     ),
-    formId UUID REFERENCES FORMS(formId),
+    formId UUID REFERENCES FORMS(formId) ON DELETE CASCADE ON UPDATE CASCADE,
     priority INT NOT NULL DEFAULT 0,
     outcomeOnPass submission_outcome,
     outcomeOnFail submission_outcome

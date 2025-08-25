@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_submission_by_id(p_submission_id UUID)
+CREATE OR REPLACE FUNCTION get_submission_by_id(p_auth_user_id UUID,p_submission_id UUID)
 RETURNS TABLE (
     submissionId UUID,
     formId UUID,
@@ -7,16 +7,18 @@ RETURNS TABLE (
     dateSubmitted TIMESTAMP,
     outcome submission_outcome,
     decisionNotes TEXT
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_submission_by_id');
+
+RETURN QUERY 
     SELECT 
         s.submissionId,
         s.formId,
         s.userId,
         s.interviewId,
         s.dateSubmitted,
-        s.outcome,
+        s.outcome::submission_outcome,
         s.decisionNotes
     FROM SUBMISSIONS s
     WHERE s.submissionId = p_submission_id;
