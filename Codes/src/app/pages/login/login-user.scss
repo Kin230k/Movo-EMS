@@ -1,5 +1,5 @@
 .login-container {
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
 
 .login-form {
   background-color: var(--bg-dark);
-  padding: 5rem;
+  padding: 3rem;
   border-radius: var(--radius-form);
   color: var(--color-font);
   width: 100%;
@@ -17,8 +17,9 @@
 
 .logo {
   display: flex;
+  justify-content: center;
+  align-items: center;  
   flex-direction: column;
-  align-items: center;
   margin-bottom: 1.5rem;
 }
 
@@ -32,41 +33,155 @@ h1 {
 }
 
 .login-title {
-  color: rgba(var(--secondary-rgb), 0.9); /* use rgb helper for alpha */
-  margin: 0 0 2.5rem 0;
+  color: rgba(var(--secondary-rgb), 0.9);
+  margin: 0 0 2rem 0;
   font-size: 1.5rem;
   text-align: center;
   font-weight: 400;
 }
 
-.forgot-password {
+.forget-password {
   text-align: right;
   margin: -0.5rem 0 1.5rem 0;
+}
 
-  a {
-    color: var(--secondary);
-    text-decoration: none;
-    font-size: 0.9rem;
+.forget-password a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
 
-    &:hover {
-      text-decoration: underline;
-      cursor: pointer;
-    }
-  }
+.forget-password a:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .switch-login-type {
   text-align: center;
   margin: 1.5rem 0 0 0;
+}
 
-  a {
-    color: var(--btn-color);
-    text-decoration: none;
-    font-size: 0.9rem;
+.switch-login-type a {
+  color: var(--btn-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
 
-    &:hover {
-      text-decoration: underline;
-      cursor: pointer;
-    }
+.switch-login-type a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* التأكد من أن حقول الإدخال تأخذ العرض الكامل */
+app-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* التأكد من أن الأزرار تأخذ العرض الكامل */
+themed-button {
+  display: block;
+  width: 100%;
+}
+
+/* التكيف مع الشاشات المتوسطة (التابلت) */
+@media (max-width: 1024px) {
+  .login-form {
+    padding: 2.5rem;
+    max-width: 24rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .login-title {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+  }
+}
+
+/* التكيف مع الشاشات الصغيرة (الموبايل) */
+@media (max-width: 768px) {
+  .login-form {
+    padding: 2rem;
+    max-width: 22rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .login-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+  
+  .login-form {
+    padding: 1.5rem;
+    margin: 0 0.5rem;
+  }
+  
+  h1 {
+    font-size: 1.6rem;
+  }
+  
+  .login-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .logo {
+    margin-bottom: 1.2rem;
+  }
+  
+  .logo img {
+    max-width: 100px;
+  }
+  
+  .forget-password {
+    margin: -0.5rem 0 1.2rem 0;
+  }
+  
+  .forget-password a {
+    font-size: 0.85rem;
+  }
+  
+  .switch-login-type {
+    margin: 1.2rem 0 0 0;
+  }
+  
+  .switch-login-type a {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-form {
+    padding: 1.2rem;
+  }
+  
+  h1 {
+    font-size: 1.4rem;
+  }
+  
+  .login-title {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .forget-password {
+    margin: -0.3rem 0 1rem 0;
+  }
+  
+  .switch-login-type {
+    margin: 1rem 0 0 0;
   }
 }

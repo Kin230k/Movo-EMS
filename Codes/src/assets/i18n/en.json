@@ -15,5 +15,14 @@
     "BUTTON": "Log in",
     "REMEMBER_ME": "Remember me",
     "SWITCH_TO_USER": "Log in as User"
+  },
+
+  "FORGET_PASSWORD":{
+        "TITLE": "Forget password",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
+        "BUTTON": "Done" ,
+        "LINK_TO_LOGIN":"Back to login" ,
+        "TEXT2":"Enter your email address to start We'll send you a link where you can change your password from it!"
+
   }
 }

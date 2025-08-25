@@ -1,0 +1,37 @@
+<div class="forgot-password-container">
+  <div class="logo">
+<img src="../../../../assets/images/logo.png" alt="">  </div>
+  
+  <div class="forgot-password-form">
+    <h2 class="forgot-password-title" text>{{ 'FORGET_PASSWORD.TITLE' | translate }}
+</h2>
+    
+    <p class="instruction-text">
+{{'FORGET_PASSWORD.TEXT2' | translate}}
+    </p>
+
+    <form (ngSubmit)="onResetPassword()">
+      <app-input
+        type="email"
+        [placeholder]="'FORGET_PASSWORD.EMAIL_PLACEHOLDER' | translate"
+
+        [value]="email"
+        (valueChange)="onEmailChange($event)"
+      >
+      </app-input>
+
+
+      <themed-button
+        type="submit"
+        [text]= "'FORGET_PASSWORD.BUTTON' | translate"
+      >
+      </themed-button>
+
+      <div class="back-to-login">
+        <a (click)="goToLogin()">
+            {{ 'FORGET_PASSWORD.LINK_TO_LOGIN' | translate }}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
