@@ -1,0 +1,6 @@
+<select (change)="onSelect($event)">
+  <option value="">Select Project</option>
+  <option *ngFor="let project of projects" [value]="project.id">
+    {{ project.name }}
+  </option>
+</select>

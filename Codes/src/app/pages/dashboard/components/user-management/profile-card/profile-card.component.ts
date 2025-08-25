@@ -47,7 +47,6 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.cd.markForCheck(); // Trigger change detection
     });
-    this.language.use('ar');
   }
 
   roles: any = {

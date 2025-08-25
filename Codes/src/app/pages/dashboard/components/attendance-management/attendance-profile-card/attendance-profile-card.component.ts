@@ -20,7 +20,17 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
 })
 export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
-  @Input() data: any;
+  @Input() data!: {
+    userId: number;
+    name: {
+      en: string;
+      ar: string;
+    };
+    role: string;
+    picture: string;
+    isPresent: boolean;
+    attendanceTimestamp: Date;
+  };
 
   modalOpen = false;
   private destroy$ = new Subject<void>();
@@ -55,32 +65,24 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  openModal(evt?: MouseEvent) {
-    evt?.stopPropagation();
-    this.modalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeModal() {
-    this.modalOpen = false;
-    document.body.style.overflow = '';
-  }
-
-  handleModalEdit = (payload: any) => {
-    this.data = { ...this.data, ...payload };
-    console.log('User updated:', this.data);
-    this.closeModal();
-  };
-
   get displayName(): string {
     if (!this.data) return '';
     const name = this.data.name;
     if (!name) return '';
     if (typeof name === 'string') return name;
 
-    const lang =
-      (this.language.currentLang as string) ||
+    const lang: 'en' | 'ar' =
+      this.language.currentLang ||
       (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
     return name[lang] || name['en'] || Object.values(name)[0] || '';
+  }
+  get displayDate() {
+    const locale = this.translate.currentLang || 'en';
+    return this.data.attendanceTimestamp.toLocaleString(locale, {
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 }

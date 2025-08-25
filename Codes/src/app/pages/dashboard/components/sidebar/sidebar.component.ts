@@ -24,6 +24,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // explicit mapping label -> path (kebab-case paths used in your routes)
   menu = [
     { labelKey: 'SIDEBAR.USER_MANAGEMENT', path: 'user-management' },
+    {
+      labelKey: 'SIDEBAR.ATTENDANCE_MANAGEMENT',
+      path: 'attendance-management',
+    },
     { labelKey: 'SIDEBAR.PROJECT_MANAGEMENT', path: 'project-management' },
     { labelKey: 'SIDEBAR.FORM_MANAGEMENT', path: 'form-management' },
     {
@@ -40,10 +44,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       labelKey: 'SIDEBAR.PERMISSIONS_MANAGEMENT',
       path: 'permissions-management',
-    },
-    {
-      labelKey: 'SIDEBAR.ATTENDANCE_MANAGEMENT',
-      path: 'attendance-management',
     },
   ];
 

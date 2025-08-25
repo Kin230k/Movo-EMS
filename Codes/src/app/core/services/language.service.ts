@@ -25,6 +25,6 @@ export class LanguageService {
   }
 
   get currentLang() {
-    return this.translate.currentLang;
+    return this.translate.getCurrentLang() as 'en' | 'ar';
   }
 }

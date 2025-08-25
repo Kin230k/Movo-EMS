@@ -40,26 +40,8 @@
 }
 
 .role {
-  padding: 0.25rem 0.6rem;
-  background: var(--secondary);
-  border-radius: var(--radius-btn);
-  font-size: 0.7rem;
-  color: white;
-}
-
-.meta-body {
+  background: white;
   margin-top: 0.4rem;
-  font-size: 0.9rem;
-}
-
-.meta-body p {
-  margin: 0;
-}
-
-.rate {
-  display: inline-block;
-  margin-top: 0.4rem;
-  background-color: white;
   color: var(--color-body);
   border-radius: 0.9rem;
   display: flex;
@@ -69,14 +51,29 @@
   height: 2rem;
 }
 
+.meta-body {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
 .actions-container {
   display: flex;
   gap: 1rem;
   position: relative;
 }
 
-.action.edit {
-  background: purple; /* Adjust to match the purple in the image */
-  color: white;
-  border-radius: 9999px; /* Pill shape */
+.prestion {
+  border-radius: 2.5rem;
+  background-color: var(--color-delete);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  width: 6.5rem;
+  height: 2.5rem;
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+.prestion.active {
+  background-color: var(--secondary);
 }
