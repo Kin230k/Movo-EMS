@@ -63,10 +63,26 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
   const currentUserId = CurrentUser.uuid;
   if (!currentUserId) throw new Error('Current user UUID is not set');
   if (!userId) throw new Error('User ID is required');
+  
+  
 
   const result: QueryResult = await pool.query(
     'SELECT * FROM get_attendance_by_user($1, $2)',
     [currentUserId, userId]
+  );
+
+
+  return result.rows.map(this.mapRowToEntity);
+}
+// Add to attendance.mapper.ts
+async getByProject(projectId: string): Promise<Attendance[]> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  if (!projectId) throw new Error('Project ID is required');
+
+  const result: QueryResult = await pool.query(
+    'SELECT * FROM get_attendances_by_project($1, $2)',
+    [currentUserId, projectId]
   );
 
   return result.rows.map(this.mapRowToEntity);

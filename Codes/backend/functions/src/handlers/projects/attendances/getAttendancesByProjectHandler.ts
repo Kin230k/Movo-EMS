@@ -6,43 +6,36 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { authorizeUserProjectAccessWorkerFirst } from '../../../utils/authUtils';
 import { AttendanceService } from '../../../models/project/attendance/attendance.service';
 
-export interface GetAttendancesByUserData {
-  userId: string;
-  projectId: string; // Add projectId to the interface
+export interface GetAttendancesByProjectData {
+  projectId: string;
 }
-export interface GetAttendancesByUserResult {
+
+export interface GetAttendancesByProjectResult {
   success: boolean;
   data?: any[];
   issues?: FieldIssue[];
 }
 
-export async function getAttendancesByUserHandler(
-  request: CallableRequest<GetAttendancesByUserData>
-): Promise<GetAttendancesByUserResult> {
+export async function getAttendancesByProjectHandler(
+  request: CallableRequest<GetAttendancesByProjectData>
+): Promise<GetAttendancesByProjectResult> {
   const issues: FieldIssue[] = [];
-  const { userId, projectId } = request.data || {};
+  const { projectId } = request.data || {};
 
-  if (!userId) issues.push({ field: 'userId', message: 'userId is required' });
   if (!projectId) issues.push({ field: 'projectId', message: 'projectId is required' });
 
   if (issues.length > 0) return { success: false, issues };
 
   try {
-    // Authorize user access to the project
     const auth = await authorizeUserProjectAccessWorkerFirst(request, projectId);
     if (!auth.success) {
       return { success: false, issues: auth.issues };
     }
 
-    const attendances = await AttendanceService.getAttendancesByUser(userId);
-    
-    // Filter attendances to only include those from the authorized project
-    
-    
-    
+    const attendances = await AttendanceService.getAttendancesByProject(projectId);
     return { success: true, data: attendances };
   } catch (dbErr: any) {
-    logger.error('Get attendances by user failed:', dbErr);
+    logger.error('Get attendances by project failed:', dbErr);
     return { success: false, issues: parseDbError(dbErr) };
   }
 }

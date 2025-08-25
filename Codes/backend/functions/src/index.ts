@@ -67,6 +67,7 @@ import {
   deleteAttendance,
   getAttendance,
   updateAttendance,
+  getAttendancesByProject,
   createArea,
   deleteArea,
   getArea,
@@ -177,6 +178,8 @@ export {
   deleteAttendance,
   getAttendance,
   updateAttendance,
+  getAttendancesByProject,
+  
    
   // Project User Roles
   createProjectUserRole,

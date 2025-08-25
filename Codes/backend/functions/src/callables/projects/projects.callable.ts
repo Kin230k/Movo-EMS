@@ -32,6 +32,7 @@ import { updateUserProjectWithScheduleHandler } from '../../handlers/projects/us
 // --- Attendance Handlers ---
 import { createAttendanceHandler } from '../../handlers/projects/attendances/createAttendanceHandler';
 import { deleteAttendanceHandler } from '../../handlers/projects/attendances/deleteAttendanceHandler';
+import { getAttendancesByProjectHandler } from '../../handlers/projects/attendances/getAttendancesByProjectHandler';
 import { getAttendanceByIdHandler } from '../../handlers/projects/attendances/getAttendanceByIdHandler';
 import { updateAttendanceHandler } from '../../handlers/projects/attendances/updateAttendanceHandler';
 
@@ -76,6 +77,7 @@ export const createAttendance = onCall(createAttendanceHandler);
 export const deleteAttendance = onCall(deleteAttendanceHandler);
 export const getAttendance = onCall(getAttendanceByIdHandler);
 export const updateAttendance = onCall(updateAttendanceHandler);
+export const getAttendancesByProject=onCall(getAttendancesByProjectHandler);
 
 
 

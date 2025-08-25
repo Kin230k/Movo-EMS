@@ -61,4 +61,8 @@ export class AttendanceService {
   return await attendanceMapper.getByUser(userId);
 }
 
+static async getAttendancesByProject(projectId: string): Promise<Attendance[]> {
+  return await attendanceMapper.getByProject(projectId);
+}
+
 }

@@ -3,8 +3,10 @@ import * as logger from 'firebase-functions/logger';
 
 import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
-import { authenticateCaller } from '../../../utils/authUtils';
+import { authorizeUserProjectAccessWorkerFirst } from '../../../utils/authUtils';
 import { AttendanceService } from '../../../models/project/attendance/attendance.service';
+import { LocationService } from '../../../models/project/location/location.service';
+import { AreaService } from '../../../models/project/area/area.service';
 
 export interface CreateAttendanceData {
   timestamp?: string | null;
@@ -12,6 +14,7 @@ export interface CreateAttendanceData {
   signedBy: string;
   userId: string;
   areaId: string;
+   
 }
 
 export interface CreateAttendanceResult {
@@ -23,17 +26,14 @@ export async function createAttendanceHandler(
   request: CallableRequest<CreateAttendanceData>
 ): Promise<CreateAttendanceResult> {
   const issues: FieldIssue[] = [];
-  const auth = await authenticateCaller(request);
-  if (!auth.success) return auth;
-
-  const { timestamp = null, signedWith, signedBy, userId, areaId } = request.data || {};
+  const data = request.data || {};
+  const { timestamp = null, signedWith, signedBy, userId, areaId } = data;
 
   // presence validation (no UUID format checks per your request)
   if (!signedWith) issues.push({ field: 'signedWith', message: 'signedWith is required' });
   if (!signedBy) issues.push({ field: 'signedBy', message: 'signedBy is required' });
   if (!userId) issues.push({ field: 'userId', message: 'userId is required' });
   if (!areaId) issues.push({ field: 'areaId', message: 'areaId is required' });
-
   // timestamp parse check (optional)
   if (timestamp !== null && timestamp !== undefined) {
     if (isNaN(Date.parse(String(timestamp)))) {
@@ -55,6 +55,26 @@ export async function createAttendanceHandler(
   }
 
   if (issues.length > 0) return { success: false, issues };
+
+ try {
+    const area = await AreaService.getAreaById(areaId);
+    if (!area) {
+      return { success: false, issues: [{ field: 'areaId', message: 'Area not found' }] };
+    }
+
+    const location = await area.location();
+    if (!location) {
+      return { success: false, issues: [{ field: 'areaId', message: 'Area has no valid location' }] };
+    }
+    const auth = await authorizeUserProjectAccessWorkerFirst( request,location.projectId);
+    if (!auth.success) {
+      // normalize the failure to our CreateAttendanceResult shape
+      return { success: false, issues: auth.issues };
+    }
+  } catch (err: any) {
+    logger.error('createAttendanceHandler: authorization failure', err);
+    return { success: false, issues: parseDbError(err) };
+  }
 
   try {
     await AttendanceService.createAttendance(
