@@ -71,6 +71,8 @@ export async function authenticateAdmin(
   request: CallableRequest
 ): Promise<AuthenticateResult> {
   const callerUid = request.auth?.uid;
+  const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
+
   if (!callerUid) {
     logger.warn('authenticateAdmin: unauthenticated request');
     return {
@@ -86,6 +88,14 @@ export async function authenticateAdmin(
 
   const callerUuid = firebaseUidToUuid(callerUid);
   CurrentUser.setUuid(callerUuid);
+
+  // Skip admin check if running in Firebase emulator
+  if (isEmulator) {
+    logger.info('authenticateAdmin: skipping admin check in emulator mode', {
+      callerUuid,
+    });
+    return { success: true, callerUid, callerUuid, callerAdmin: null };
+  }
 
   try {
     const callerAdmin = await AdminService.getAdminById(callerUuid);
@@ -110,7 +120,6 @@ export async function authenticateAdmin(
     return { success: false, issues: parseDbError(err) };
   }
 }
-
 export async function authenticateClient(
   request: CallableRequest
 ): Promise<AuthenticateResult> {
