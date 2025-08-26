@@ -9,7 +9,7 @@ RETURNS TABLE (
     phone VARCHAR(20),
     picture VARCHAR(512),
     role userRole,
-    status userStatus
+    status userStatus,
     hourlyRate NUMERIC(10,2)
 )
 LANGUAGE plpgsql
@@ -28,7 +28,7 @@ BEGIN
         u.phone,
         u.picture,
         u.role,
-        u.status
+        u.status,
         r.hourlyRate
 
     FROM USERS u

@@ -1,5 +1,5 @@
 import { Attendance } from './attendance.class';
-import attendanceMapper from './attendance.mapper';
+import attendanceMapper,{UserAttendance} from './attendance.mapper';
 
 
 export class AttendanceService {
@@ -63,6 +63,9 @@ export class AttendanceService {
 
 static async getAttendancesByProject(projectId: string): Promise<Attendance[]> {
   return await attendanceMapper.getByProject(projectId);
+}
+static async getUsersAttendanceByProject(projectId: string): Promise<UserAttendance[]> {
+  return await attendanceMapper.getUserAttendancesByProject(projectId);
 }
 
 }
