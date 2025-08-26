@@ -9,8 +9,8 @@ import { InputComponent } from '../../../components/shared/input/input';
   selector: 'app-forget-password',
   standalone: true,
   imports: [InputComponent, ThemedButtonComponent, TranslateModule],
-  templateUrl: './forger-passwor.component.html',
-  styleUrls: ['./forger-passwor.component.scss'],
+  templateUrl: './forget-password.component.html',
+  styleUrls: ['./forget-password.component.scss'],
 })
 export class ForgetPasswordComponent {
   email: string = '';
