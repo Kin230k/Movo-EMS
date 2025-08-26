@@ -11,10 +11,9 @@ BEGIN
 RETURN QUERY 
     SELECT 
         c.criterionId,
-        c.type:;criteria_operator,
+        c.type::criteria_operator,
         c.value,
         c.questionId
     FROM CRITERIA c
     WHERE c.criterionId = p_criterion_id;
 END;
-$$;

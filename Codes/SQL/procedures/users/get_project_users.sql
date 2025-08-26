@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION get_project_users(
     p_auth_user_id UUID,
     p_project_id UUID
@@ -8,8 +9,8 @@ RETURNS TABLE (
     email VARCHAR(255),
     phone VARCHAR(20),
     picture VARCHAR(512),
-    role userRole,
-    status userStatus,
+    role user_role,
+    status user_status,
     hourlyRate NUMERIC(10,2)
 )
 LANGUAGE plpgsql
@@ -27,7 +28,7 @@ BEGIN
         u.email,
         u.phone,
         u.picture,
-        u.role,
+        u.role ,
         u.status,
         r.hourlyRate
 

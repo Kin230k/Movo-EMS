@@ -7,6 +7,7 @@ DECLARE
   acount        INT;
   cur_outcome   TEXT;
   payload       JSON;
+  wrapped_payload JSON;
   endpoint_text TEXT;
 BEGIN
   -- get endpoint for current env
