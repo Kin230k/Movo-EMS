@@ -214,6 +214,18 @@
     ]
   },
   {
+    "name": "getProjectUsers",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createClient",
     "description": "",
     "parameters": [
@@ -351,6 +363,107 @@
       {
         "name": "status",
         "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createProjectUserRole",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "roleId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateProjectUserRole",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectUserRoleId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "roleId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteProjectUserRole",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectUserRoleId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getProjectUserRole",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectUserRoleId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllProjectUserRoles",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getProjectUserRolesByUserAndProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string | null | undefined",
         "required": false,
         "description": ""
       }
@@ -650,6 +763,72 @@
     ]
   },
   {
+    "name": "createInterview",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateInterview",
+    "description": "",
+    "parameters": [
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getInterview",
+    "description": "",
+    "parameters": [
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getInterviewByProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "deleteInterview",
+    "description": "",
+    "parameters": [
+      {
+        "name": "interviewId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createProject",
     "description": "",
     "parameters": [
@@ -753,6 +932,18 @@
         "name": "description",
         "type": "{ en: string; ar: string } | null | undefined",
         "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getProjectByClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "clientId",
+        "type": "string",
+        "required": true,
         "description": ""
       }
     ]
@@ -1215,6 +1406,30 @@
         "name": "areaId",
         "type": "string | null | undefined",
         "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAttendancesByProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getUserAttendancesByProject",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
         "description": ""
       }
     ]
