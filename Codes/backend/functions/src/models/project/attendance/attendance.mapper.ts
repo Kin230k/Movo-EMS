@@ -4,7 +4,22 @@ import { Attendance } from './attendance.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
 import { CurrentUser } from '../../../utils/currentUser.class';
+import { Multilingual } from '../../multilingual.type';
 
+export enum enAttendanceStatus {
+  present = 'present',
+  absent = 'absent'
+}
+
+export interface UserAttendance {
+  userId?: string;
+  name: Multilingual;
+  role: string;
+  userStatus: string;
+  picture: string | undefined;
+  attendanceTimestamp: string;
+  attendanceStatus: enAttendanceStatus;
+}
 export class AttendanceMapper extends BaseMapper<Attendance> {
   async save(entity: Attendance): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -87,6 +102,20 @@ async getByProject(projectId: string): Promise<Attendance[]> {
 
   return result.rows.map(this.mapRowToEntity);
 }
+  async getUserAttendancesByProject(projectId: string): Promise<UserAttendance[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_user_attendances_by_project($1, $2)',
+      [currentUserId, projectId]
+    );
+
+    return result.rows.map(this.mapRowToUserAttendance);
+  }
+
+
 
   private mapRowToEntity = (row: any): Attendance => {
     return new Attendance(
@@ -98,7 +127,19 @@ async getByProject(projectId: string): Promise<Attendance[]> {
       row.attendanceId
     );
   };
+   private mapRowToUserAttendance = (row: any): UserAttendance => {
+    return {
+      userId: row.userId,
+      name: row.name,
+      role: row.role,
+      userStatus: row.userStatus,
+      picture: row.picture,
+      attendanceTimestamp: row.attendanceTimestamp,
+      attendanceStatus: row.attendanceStatus as enAttendanceStatus
+    };
+  };
 }
+
 
 const attendanceMapper = new AttendanceMapper();
 export default attendanceMapper;

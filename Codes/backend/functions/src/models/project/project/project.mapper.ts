@@ -105,6 +105,17 @@ export class ProjectMapper extends BaseMapper<Project> {
     const result = await pool.query('SELECT * FROM get_active_projects()');
     return result.rows.map(this.mapRowToEntity);
   }
+  async getByClient(clientId: string): Promise<Project[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!clientId) throw new Error('Client ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_project_by_client($1, $2)',
+      [currentUserId, clientId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
