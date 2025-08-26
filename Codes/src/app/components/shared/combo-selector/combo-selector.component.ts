@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-combo-selector',
   templateUrl: './combo-selector.component.html',
-  styleUrls: [], // Remove the SCSS reference
+  styleUrl: './combo-selector.component.scss', // Remove the SCSS reference
   imports: [CommonModule, FormsModule],
   standalone: true,
 })

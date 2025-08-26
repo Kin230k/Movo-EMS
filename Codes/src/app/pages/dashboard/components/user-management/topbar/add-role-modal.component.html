@@ -1,0 +1,52 @@
+<div class="overlay" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>Add Role</h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <label class="label">Email</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="name@example.com"
+        [disabled]="checking || checkSucceeded"
+      />
+
+      <div class="actions">
+        <button
+          class="verify-btn"
+          (click)="onVerifyEmail()"
+          [disabled]="checking || checkSucceeded"
+        >
+          {{
+            checking
+              ? "Checking…"
+              : checkSucceeded
+              ? "Verified"
+              : "Verify Email"
+          }}
+        </button>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <!-- Show dropdown only if check succeeded -->
+      <div *ngIf="checkSucceeded" class="project-select">
+        <label class="label">Select Project</label>
+        <app-combo-selector
+          [projects]="projects"
+          (projectSelected)="onProjectSelected($event)"
+        ></app-combo-selector>
+
+        <div class="assign-actions">
+          <button class="assign-btn" (click)="assignRole()">Assign Role</button>
+          <button class="cancel-btn" (click)="onClose()">Cancel</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

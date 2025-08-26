@@ -12,7 +12,11 @@ import {
 } from '@angular/common/http';
 import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-
+import {
+  provideTanStackQuery,
+  QueryClient,
+  withDevtools,
+} from '@tanstack/angular-query-experimental';
 // Global error handler
 class GlobalErrorHandler implements ErrorHandler {
   handleError(error: unknown): void {
@@ -27,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
 
     provideHttpClient(withInterceptorsFromDi()),
-
+    provideTanStackQuery(new QueryClient(), withDevtools()),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: '/assets/i18n/',

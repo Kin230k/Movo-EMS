@@ -3,7 +3,28 @@
   (projectSelected)="onProjectSelected($event)"
 ></app-topbar>
 
-<app-card-list
-  [items]="users"
-  [cardComponent]="profileCardComponent"
-></app-card-list>
+<!-- show error -->
+<div *ngIf="error" class="error" role="alert">
+  Error loading users: {{ error?.message || error || "Unknown" }}
+</div>
+
+<!-- show skeleton placeholders when loading -->
+<div *ngIf="isLoading" class="card-list-skeleton">
+  <app-card-list-skeletion></app-card-list-skeletion>
+</div>
+
+<!-- show empty state if finished and no users -->
+<div
+  *ngIf="!isLoading && isFinished && users && users.length === 0"
+  class="empty-state"
+>
+  No users found for this project.
+</div>
+
+<!-- show real list when loaded -->
+<div *ngIf="!isLoading && users && users.length > 0">
+  <app-card-list
+    [items]="users"
+    [cardComponent]="profileCardComponent"
+  ></app-card-list>
+</div>

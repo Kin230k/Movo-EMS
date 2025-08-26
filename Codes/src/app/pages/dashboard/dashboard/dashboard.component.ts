@@ -1,7 +1,7 @@
-// src/app/dashboard/dashboard.component.ts
+// src/app/pages/dashboard/dashboard/dashboard.component.ts
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 
 @Component({
@@ -11,6 +11,4 @@ import { SidebarComponent } from '../components/sidebar/sidebar.component';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent {
-  // layout & responsiveness handled by SCSS — component stays simple
-}
+export class DashboardComponent {}

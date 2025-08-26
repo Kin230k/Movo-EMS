@@ -1,0 +1,15 @@
+.card-list-skeleton {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.error {
+  color: var(--color-danger);
+  margin: 1rem 0;
+}
+
+.empty-state {
+  color: var(--color-muted);
+  margin: 1rem 0;
+}
