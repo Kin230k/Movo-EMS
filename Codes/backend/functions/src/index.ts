@@ -55,6 +55,7 @@ import {
   createProject,
   deleteProject,
   getProject,
+  getProjectByClient,
   updateProject,
   createLocation,
   deleteLocation,
@@ -75,6 +76,7 @@ import {
   getAttendance,
   updateAttendance,
   getAttendancesByProject,
+  getUserAttendancesByProject,
   createArea,
   deleteArea,
   getArea,
@@ -150,6 +152,7 @@ export {
   deleteProject,
   getProject,
   updateProject,
+  getProjectByClient,
 
   // Locations
   createLocation,
@@ -188,6 +191,7 @@ export {
   getAttendance,
   updateAttendance,
   getAttendancesByProject,
+  getUserAttendancesByProject,
   
    
   // Project User Roles

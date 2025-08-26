@@ -6,7 +6,7 @@ import { createProjectHandler } from '../../handlers/projects/createProjectHandl
 import { deleteProjectHandler } from '../../handlers/projects/deleteProjectHandler';
 import { getProjectByIdHandler } from '../../handlers/projects/getProjectByIdHandler';
 import { updateProjectHandler } from '../../handlers/projects/updateProjectHandler';
-
+import { getProjectByClientHandler } from '../../handlers/projects/getProjectsByClientHandler';
 // --- Location Handlers ---
 import { createLocationHandler } from '../../handlers/projects/locations/createLocationHandler';
 import { deleteLocationHandler } from '../../handlers/projects/locations/deleteLocationHandler';
@@ -35,7 +35,7 @@ import { deleteAttendanceHandler } from '../../handlers/projects/attendances/del
 import { getAttendancesByProjectHandler } from '../../handlers/projects/attendances/getAttendancesByProjectHandler';
 import { getAttendanceByIdHandler } from '../../handlers/projects/attendances/getAttendanceByIdHandler';
 import { updateAttendanceHandler } from '../../handlers/projects/attendances/updateAttendanceHandler';
-
+import { getUserAttendancesByProjectHandler } from '../../handlers/projects/attendances/getUsersAttendanceByProjectHandler';
 // --- Area Handlers ---
 import { createAreaHandler } from '../../handlers/projects/areas/createAreaHandler';
 import { deleteAreaHandler } from '../../handlers/projects/areas/deleteAreaHandler';
@@ -49,6 +49,7 @@ export const createProject = onCall(createProjectHandler);
 export const deleteProject = onCall(deleteProjectHandler);
 export const getProject = onCall(getProjectByIdHandler);
 export const updateProject = onCall(updateProjectHandler);
+export const getProjectByClient=onCall(getProjectByClientHandler);
 
 // --- Location Callables ---
 export const createLocation = onCall(createLocationHandler);
@@ -78,7 +79,7 @@ export const deleteAttendance = onCall(deleteAttendanceHandler);
 export const getAttendance = onCall(getAttendanceByIdHandler);
 export const updateAttendance = onCall(updateAttendanceHandler);
 export const getAttendancesByProject=onCall(getAttendancesByProjectHandler);
-
+export const getUserAttendancesByProject=onCall(getUserAttendancesByProjectHandler);
 
 
 // --- Area Callables ---
