@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { CardListComponent } from '../../../../components/shared/card-list/card-list.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { ProfileCardComponent } from './profile-card/profile-card.component';
-import { SkeletonProfileCardComponent } from '../../../../components/shared/skeleton-profile-card/skeleton-profile-card.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-management',
@@ -14,15 +14,16 @@ import { CardListSkeletionComponent } from '../../../../components/shared/card-l
     CardListComponent,
     TopbarComponent,
     CardListSkeletionComponent,
+    TranslateModule,
   ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
 export class UserManagementComponent {
   projects = [
-    { id: 1, name: 'Project A' },
-    { id: 2, name: 'Project B' },
-    { id: 3, name: 'Project C' },
+    { id: 1, name: { en: 'Project A', ar: 'المشروع A' } },
+    { id: 2, name: { en: 'Project B', ar: 'المشروع B' } },
+    { id: 3, name: { en: 'Project C', ar: 'المشروع C' } },
   ];
 
   private mockUsers: { [key: number]: any[] } = {

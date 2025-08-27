@@ -3,14 +3,10 @@
     class="combo-selector"
     [projects]="projects"
     (projectSelected)="projectSelected.emit($event)"
-    [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT' | translate"  
   ></app-combo-selector>
 
   <!-- open the Add Role modal -->
-  <themed-button
-    text="{{ 'ROLES.ADD_ROLE' | translate }}"
-    (click)="openAddRole()"
-  ></themed-button>
+  <themed-button text="Add Role" (click)="openAddRole()"></themed-button>
 </div>
 
 <!-- Add Role modal -->

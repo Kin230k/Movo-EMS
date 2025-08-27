@@ -26,6 +26,7 @@ import { rolesLable } from '../../../../../../shared/types/roles';
   styleUrls: ['./profile-modal.component.scss'],
 })
 export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
+  // create a new form group for the project
   @Input() data: any;
   @Output() close = new EventEmitter<void>();
   @Output() edit = new EventEmitter<any>();
@@ -63,17 +64,27 @@ export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
 
   buildForm() {
     this.form = this.fb.group({
-      userId: [null],
-      role: ['', Validators.required],
-      rate: ['', Validators.required],
+      projectId: ['', Validators.required],
+      nameAr: ['', Validators.required],
+      nameEn: ['', Validators.required],
+      startingDate: ['', Validators.required],
+      endingDate: ['', Validators.required],
+      descriptionAr: ['', Validators.required],
+      descriptionEn: ['', Validators.required],
+      badgeBackground: ['', Validators.required],
     });
   }
 
   patchForm(data: any) {
     this.form.patchValue({
-      userId: data?.userId ?? null,
-      role: data?.role ?? '',
-      rate: data?.rate ?? '',
+      projectId: data?.projectId ?? '',
+      nameAr: data?.name.ar ?? '',
+      nameEn: data?.name.en ?? '',
+      startingDate: data?.startingDate ?? '',
+      endingDate: data?.endingDate ?? '',
+      descriptionAr: data?.description.ar ?? '',
+      descriptionEn: data?.description.en ?? '',
+      badgeBackground: data?.badgeBackground ?? '',
     });
   }
 

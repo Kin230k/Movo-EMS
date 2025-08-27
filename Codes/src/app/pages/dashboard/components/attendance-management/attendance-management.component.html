@@ -3,7 +3,22 @@
   (projectSelected)="onProjectSelected($event)"
 ></app-topbar>
 
-<app-card-list
-  [items]="users"
-  [cardComponent]="attendanceCardComponent"
-></app-card-list>
+<div *ngIf="isLoading" class="card-list-skeleton">
+  <app-card-list-skeletion></app-card-list-skeletion>
+</div>
+
+<!-- show empty state if finished and no users -->
+<div
+  *ngIf="!isLoading && isFinished && users && users.length === 0"
+  class="empty-state"
+>
+  {{ 'ATTENDANCE_MANAGEMENT.NO_USERS_FOUND' | translate }}
+</div>
+
+<!-- show real list when loaded -->
+<div *ngIf="!isLoading && users && users.length > 0">
+  <app-card-list
+    [items]="users"
+    [cardComponent]="attendanceCardComponent"
+  ></app-card-list>
+</div>

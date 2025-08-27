@@ -4,22 +4,21 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 import { AddRoleModalComponent } from './add-role-modal.component'; // adjust path as needed
 import { rolesDropDown } from '../../../../../shared/types/roles';
-import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss'],
-  imports: [  
+  imports: [
     CommonModule,
     ComboSelectorComponent,
     ThemedButtonComponent,
     AddRoleModalComponent,
-    TranslateModule,
   ],
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: { en: string; ar: string } }[] = [];
+  @Input() projects: { id: number; name: string }[] = [];
   @Output() projectSelected = new EventEmitter<number>();
 
   showAddRole = false;
@@ -30,7 +29,8 @@ export class TopbarComponent {
     this.showAddRole = true;
   }
 
-  onModalClose() {
+  onModalClose(closeReason?: any) {
+    // closeReason can be used if needed
     this.showAddRole = false;
   }
 

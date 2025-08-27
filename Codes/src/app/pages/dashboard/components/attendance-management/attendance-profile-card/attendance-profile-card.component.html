@@ -1,5 +1,5 @@
 <article class="profile-card" (click)="$event.stopPropagation()">
-  <div class="avatar" title="Open user">
+  <div class="avatar" title="{{ 'ATTENDANCE_MANAGEMENT.OPEN_USER' | translate }}">
     <img src="{{ data.picture }}" alt="user image" class="user-image" />
   </div>
 
@@ -9,10 +9,14 @@
     </div>
 
     <div class="meta-body">
-      <p class="prestion {{ data.isPresent && 'active' }}">prestion</p>
-      <p class="prestion {{ !data.isPresent && 'active' }}">abscense</p>
+          <p class="prestion {{ data.isPresent && 'active' }}">
+            {{ 'ATTENDANCE_MANAGEMENT.PRESENT' | translate }}
+          </p>
+      <p class="prestion {{ !data.isPresent && 'active' }}">
+        {{ 'ATTENDANCE_MANAGEMENT.ABSENCE' | translate }}
+      </p>
       <p class="date">
-        Date :
+        {{ 'ATTENDANCE_MANAGEMENT.DATE' | translate }} :
         {{ displayDate }}
       </p>
       <div class="role">{{ "ROLES." + getRole() | translate }}</div>

@@ -20,7 +20,7 @@
     "USER_MANAGEMENT": "User Management",
     "PROJECT_MANAGEMENT": "Project Management",
     "FORM_MANAGEMENT": "Form Management",
-    "CREATE_INTERVIEW_QUESTIONS": "Create Interview Questions",
+    "CREATE_FORM_QUESTIONS": "Create Form Questions",
     "LOCATION_MANAGEMENT": "Location Management",
     "SEND_EMAILS": "Send Emails",
     "VIEW_RECORDS": "View Records",
@@ -36,12 +36,40 @@
     "SUPER_ADMIN": "Super Admin",
     "MAIN_USER": "Main User",
     "SYSTEM_ADMIN": "System Admin",
-    "SELECT_ROLE": "Select Role"
+    "SELECT_ROLE": "Select Role",
+    "ADD_ROLE": "Add Role"
+  },
+  "ATTENDANCE_MANAGEMENT": {
+    "PRESENT": "Present",
+    "ABSENCE": "Absence",
+    "DATE": "Date",
+    "OPEN_USER": "Open User",
+    "NO_USERS_FOUND": "No users found for this project.",
+    "SELECT_PROJECT": "Select Project"
+  },
+  "USER_MANGEMENT": {
+    "NO_PROJECTS_FOUND": "No projects found.",
+    "ERROR_LOADING_PROJECTS": "Error loading projects."
+  },
+  "PROJECT_MANAGEMENT": {
+    "NO_PROJECTS_FOUND": "No projects found.",
+    "ERROR_LOADING_PROJECTS": "Error loading projects.",
+    "STARTING_DATE": "Starting Date",
+    "ENDING_DATE": "Ending Date",
+    "DESCRIPTION": "Description",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "NAME_AR": "Name (Arabic)",
+    "NAME_EN": "Name (English)",
+    "BADGE_BACKGROUND": "Badge Background",
+    "DESCRIPTION_AR": "Description (Arabic)",
+    "DESCRIPTION_EN": "Description (English)"
   },
   "USER": {
     "ACTIONS": {
       "DISABLE": "Disable User",
-      "EDIT": "Edit User"
+      "EDIT": "Edit User",
+      "OPEN_USER": "Open User"
     },
     "EDIT": "Edit User"
   },
@@ -57,5 +85,61 @@
     "PLACEHOLDERS": {
       "RATE": "Rate"
     }
+  },
+  "ADD_ROLE_MODAL": {
+    "TITLE": "Add Role",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "name@example.com",
+    "VERIFY_EMAIL_BTN": "Verify Email",
+    "CHECKING_BTN": "Checking…",
+    "VERIFIED_BTN": "Verified",
+    "SELECT_PROJECT_LABEL": "Select Project",
+    "SELECT_ROLE_LABEL": "Select Role",
+    "CHOOSE_ROLE_OPTION": "-- choose role --",
+    "ASSIGN_ROLE_BTN": "Assign Role",
+    "CANCEL_BTN": "Cancel",
+    "ERRORS": {
+      "EMAIL_REQUIRED": "Please enter an email.",
+      "VERIFICATION_FAILED": "Email verification failed (mock).",
+      "PROJECT_REQUIRED": "Please select a project.",
+      "ROLE_REQUIRED": "Please select a role."
+    }
+  },
+  "CREATE_FORM_QUESTIONS": {
+    "TITLE": "Create Interview Questions",
+    "PROJECT_NAME": "Project Name",
+    "CLIENT_NAME": "Client Name",
+    "QUESTION_TYPE": "Question Type",
+    "QUESTION_TEXT": "Question Text",
+    "FAILED_CRITERIA": "Failed Criteria",
+    "PASS_CRITERIA": "Pass Criteria",
+    "ADD_QUESTION": "Add Question",
+    "DELETE": "Delete",
+    "ADD_FAILED_CRITERIA": "Add Failed Criteria",
+    "ADD_PASS_CRITERIA": "Add Pass Criteria",
+    "PREVIEW": "Preview",
+    "SAVE_ALL_QUESTIONS": "Save All Questions",
+    "QUESTION": "Question",
+    "CRITERIA": "Criteria",
+    "VALUE": "Value",
+    "VALUE_TO": "Value To",
+    "DESCRIPTION": "Description",
+    "OPTION_LABEL": "Option Label",
+    "ADD_OPTION": "Add Option",
+    "NO_QUESTIONS": "No questions yet. Click 'Add Question' to get started.",
+    "FAILED_CRITERIA_TITLE": "Failed Criteria",
+    "PASS_CRITERIA_TITLE": "Pass Criteria",
+    "FORM_NAME": "Survey Name",
+    "LANGUAGE": "Language",
+    "CONDITION": "Condition",
+    "SHORT_ANSWER_INPUT": "Short Answer Input",
+    "ENTER_SHORT_ANSWER": "Enter your short answer here...",
+    "LONG_ANSWER_INPUT": "Long Answer Input",
+    "ENTER_LONG_ANSWER": "Enter your detailed answer here...",
+    "RATING_INPUT": "Rating Input",
+    "ENTER_RATING": "Enter rating (1-10)",
+    "MULTIPLE_CHOICE_OPTIONS": "Multiple Choice Options",
+    "RADIO_OPTIONS": "Radio Button Options",
+    "SELECT_TYPE_FIRST": "Please select a question type first to see the input options."
   }
 }

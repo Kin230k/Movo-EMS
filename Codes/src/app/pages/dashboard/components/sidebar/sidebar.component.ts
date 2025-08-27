@@ -31,8 +31,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { labelKey: 'SIDEBAR.PROJECT_MANAGEMENT', path: 'project-management' },
     { labelKey: 'SIDEBAR.FORM_MANAGEMENT', path: 'form-management' },
     {
-      labelKey: 'SIDEBAR.CREATE_INTERVIEW_QUESTIONS',
-      path: 'create-interview-questions',
+      labelKey: 'SIDEBAR.CREATE_FORM_QUESTIONS',
+      path: 'create-form-questions',
     },
     { labelKey: 'SIDEBAR.LOCATION_MANAGEMENT', path: 'location-management' },
     { labelKey: 'SIDEBAR.SEND_EMAILS', path: 'send-emails' },

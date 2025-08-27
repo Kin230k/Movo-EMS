@@ -8,15 +8,15 @@ import {
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../../../core/services/language.service';
-import { ButtonComponent } from '../../../../../components/shared/button/button';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { rolesBinding } from '../../../../../shared/types/roles';
 
 @Component({
   selector: 'app-attendance-profile-card',
   templateUrl: './attendance-profile-card.component.html',
   styleUrls: ['./attendance-profile-card.component.scss'],
-  imports: [CommonModule, ButtonComponent, TranslateModule],
+  imports: [CommonModule, TranslateModule],
   standalone: true,
 })
 export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
@@ -47,14 +47,7 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
     });
   }
 
-  roles: any = {
-    Marshall: 'MARSHALL',
-    Supervisor: 'SUPERVISOR',
-    'Senior Supervisor': 'SENIOR_SUPERVISOR',
-    'Super Admin': 'SUPER_ADMIN',
-    'Main User': 'MAIN_USER',
-    'System Admin': 'SYSTEM_ADMIN',
-  };
+  roles: any = rolesBinding;
 
   getRole() {
     return this.roles[this.data.role];

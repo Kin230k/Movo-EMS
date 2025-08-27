@@ -1,1 +1,25 @@
-<p>project-management works!</p>
+<!-- show error -->
+<div *ngIf="error" class="error" role="alert">
+  {{ 'PROJECT_MANAGEMENT.ERROR_LOADING_PROJECTS' | translate }}
+</div>
+
+<!-- show skeleton placeholders when loading -->
+<div *ngIf="isLoading" class="card-list-skeleton">
+  <app-card-list-skeletion></app-card-list-skeletion>
+</div>
+
+<!-- show empty state if finished and no users -->
+<div
+  *ngIf="!isLoading && isFinished && mockProjects && mockProjects.length === 0"
+  class="empty-state"
+>
+  {{ 'PROJECT_MANAGEMENT.NO_PROJECTS_FOUND' | translate }}
+</div>
+
+<!-- show real list when loaded -->
+<div *ngIf="!isLoading && mockProjects && mockProjects.length > 0">
+  <app-card-list
+    [items]="mockProjects"
+    [cardComponent]="profileCardComponent"
+  ></app-card-list>
+</div>

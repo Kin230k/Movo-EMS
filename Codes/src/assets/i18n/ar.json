@@ -20,7 +20,7 @@
     "USER_MANAGEMENT": "إدارة المستخدمين",
     "PROJECT_MANAGEMENT": "إدارة المشاريع",
     "FORM_MANAGEMENT": "إدارة النماذج",
-    "CREATE_INTERVIEW_QUESTIONS": "إنشاء أسئلة المقابلة",
+    "CREATE_FORM_QUESTIONS": "إنشاء أسئلة ",
     "LOCATION_MANAGEMENT": "إدارة المواقع",
     "SEND_EMAILS": "إرسال رسائل البريد",
     "VIEW_RECORDS": "عرض السجلات",
@@ -36,12 +36,40 @@
     "SUPER_ADMIN": "المشرف الأعلى",
     "MAIN_USER": "المستخدم الرئيسي",
     "SYSTEM_ADMIN": "مسؤول النظام",
-    "SELECT_ROLE": "اختار الدور"
+    "SELECT_ROLE": "اختار الدور",
+    "ADD_ROLE": "إضافة الدور",
+    "OPEN_USER": "فتح المستخدم"
+  },
+  "ATTENDANCE_MANAGEMENT": {
+    "PRESENT": "حضور",
+    "ABSENCE": "غياب",
+    "DATE": "التاريخ",
+    "SELECT_PROJECT": "اختر المشروع",
+    "NO_USERS_FOUND": "لا يوجد مستخدمين لهذا المشروع."
+  },
+  "USER_MANGEMENT": {
+    "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
+    "ERROR_LOADING_PROJECTS": "خطأ في تحميل المشاريع."
+  },
+  "PROJECT_MANAGEMENT": {
+    "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
+    "ERROR_LOADING_PROJECTS": "خطأ في تحميل المشاريع.",
+    "STARTING_DATE": "تاريخ البدء",
+    "ENDING_DATE": "تاريخ الانتهاء",
+    "DESCRIPTION": "الوصف",
+    "SAVE": "حفظ",
+    "CANCEL": "إلغاء",
+    "NAME_AR": "الاسم (عربي)",
+    "NAME_EN": "الاسم (انجليزي)",
+    "BADGE_BACKGROUND": "لون البادئة",
+    "DESCRIPTION_AR": "الوصف (عربي)",
+    "DESCRIPTION_EN": "الوصف (انجليزي)"
   },
   "USER": {
     "ACTIONS": {
       "DISABLE": "الغاء التفعيل ",
-      "EDIT": "تعديل "
+      "EDIT": "تعديل ",
+      "OPEN_USER": "فتح المستخدم    "
     },
     "EDIT": "تعديل المستخدم"
   },
@@ -57,5 +85,61 @@
     "PLACEHOLDERS": {
       "RATE": "المعدل"
     }
+  },
+  "ADD_ROLE_MODAL": {
+    "TITLE": "إضافة دور",
+    "EMAIL_LABEL": "البريد الإلكتروني",
+    "EMAIL_PLACEHOLDER": "name@example.com",
+    "VERIFY_EMAIL_BTN": "التحقق من البريد الإلكتروني",
+    "CHECKING_BTN": "جار التحقق...",
+    "VERIFIED_BTN": "تم التحقق",
+    "SELECT_PROJECT_LABEL": "اختر المشروع",
+    "SELECT_ROLE_LABEL": "اختر الدور",
+    "CHOOSE_ROLE_OPTION": "-- اختر دور --",
+    "ASSIGN_ROLE_BTN": "تعيين الدور",
+    "CANCEL_BTN": "إلغاء",
+    "ERRORS": {
+      "EMAIL_REQUIRED": "يرجى إدخال البريد الإلكتروني.",
+      "VERIFICATION_FAILED": "فشل التحقق من البريد الإلكتروني (محاكاة).",
+      "PROJECT_REQUIRED": "يرجى اختيار مشروع.",
+      "ROLE_REQUIRED": "يرجى اختيار دور."
+    }
+  },
+  "CREATE_FORM_QUESTIONS": {
+    "TITLE": "إنشاء أسئلة المقابلة",
+    "PROJECT_NAME": "اسم المشروع",
+    "CLIENT_NAME": "اسم العميل",
+    "QUESTION_TYPE": "نوع السؤال",
+    "QUESTION_TEXT": "نص السؤال",
+    "FAILED_CRITERIA": "معايير الفشل",
+    "PASS_CRITERIA": "معايير النجاح",
+    "ADD_QUESTION": "إضافة سؤال",
+    "DELETE": "حذف",
+    "ADD_FAILED_CRITERIA": "إضافة معايير الفشل",
+    "ADD_PASS_CRITERIA": "إضافة معايير النجاح",
+    "PREVIEW": "معاينة",
+    "SAVE_ALL_QUESTIONS": "حفظ جميع الأسئلة",
+    "QUESTION": "السؤال",
+    "CRITERIA": "المعايير",
+    "VALUE": "القيمة",
+    "VALUE_TO": "القيمة إلى",
+    "DESCRIPTION": "الوصف",
+    "OPTION_LABEL": "تسمية الخيار",
+    "ADD_OPTION": "إضافة خيار",
+    "NO_QUESTIONS": "لا يوجد أسئلة بعد. اضغط على 'إضافة سؤال' للبدء.",
+    "FAILED_CRITERIA_TITLE": "معايير الفشل",
+    "PASS_CRITERIA_TITLE": "معايير النجاح",
+    "FORM_NAME": "اسم الاستبيان",
+    "LANGUAGE": "اللغة",
+    "CONDITION": "الشرط",
+    "SHORT_ANSWER_INPUT": "إدخال إجابة قصيرة",
+    "ENTER_SHORT_ANSWER": "أدخل إجابتك القصيرة هنا...",
+    "LONG_ANSWER_INPUT": "إدخال إجابة طويلة",
+    "ENTER_LONG_ANSWER": "أدخل إجابتك التفصيلية هنا...",
+    "RATING_INPUT": "إدخال التقييم",
+    "ENTER_RATING": "أدخل التقييم (1-10)",
+    "MULTIPLE_CHOICE_OPTIONS": "خيارات متعددة الاختيار",
+    "RADIO_OPTIONS": "خيارات أزرار الراديو",
+    "SELECT_TYPE_FIRST": "يرجى اختيار نوع السؤال أولاً لرؤية خيارات الإدخال."
   }
 }

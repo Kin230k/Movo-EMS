@@ -1,6 +1,6 @@
 <select (change)="onSelect($event)">
-  <option value="">Select Project</option>
+  <option value="">{{ placeholder | translate }}</option>
   <option *ngFor="let project of projects" [value]="project.id">
-    {{ project.name }}
+    {{ project.name[currentLang] }}
   </option>
 </select>

@@ -5,7 +5,7 @@
 
 <!-- show error -->
 <div *ngIf="error" class="error" role="alert">
-  Error loading users: {{ error?.message || error || "Unknown" }}
+  {{ 'USER_MANGEMENT.ERROR_LOADING_PROJECTS' | translate }}
 </div>
 
 <!-- show skeleton placeholders when loading -->
@@ -18,7 +18,7 @@
   *ngIf="!isLoading && isFinished && users && users.length === 0"
   class="empty-state"
 >
-  No users found for this project.
+  {{ 'USER_MANGEMENT.NO_PROJECTS_FOUND' | translate }}
 </div>
 
 <!-- show real list when loaded -->

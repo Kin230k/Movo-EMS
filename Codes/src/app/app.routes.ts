@@ -41,11 +41,11 @@ export const routes: Routes = [
           ).then((m) => m.FormManagementComponent),
       },
       {
-        path: 'create-interview-questions',
+        path: 'create-form-questions',
         loadComponent: () =>
           import(
-            './pages/dashboard/components/create-interview-questions/create-interview-questions.component'
-          ).then((m) => m.CreateInterviewQuestionsComponent),
+            './pages/dashboard/components/create-form-questions/create-form-questions.component'
+          ).then((m) => m.CreateFormQuestionsComponent),
       },
       {
         path: 'location-management',

@@ -2,21 +2,20 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
-// Import TranslateModule and TranslateService
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 
 @Component({
   selector: 'app-add-role-modal',
   templateUrl: './add-role-modal.component.html',
   styleUrls: ['./add-role-modal.component.scss'],
-  // Add TranslateModule to imports for the pipe to work in the template
-  imports: [CommonModule, FormsModule, ComboSelectorComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, ComboSelectorComponent],
   standalone: true,
 })
 export class AddRoleModalComponent {
-  @Input() projects: { id: number; name: { en: string; ar: string } }[] = [];
-  @Input() roles: { id: string; name: { en: string; ar: string } }[] = [];
+  @Input() projects: { id: number; name: string }[] = [];
+  @Input() roles: { id: string; name: string }[] = []; // new input for roles
   @Output() close = new EventEmitter<void>();
+  // Emit object containing selected project and role
   @Output() assigned = new EventEmitter<{
     projectId: number;
     roleId: string;
@@ -27,10 +26,7 @@ export class AddRoleModalComponent {
   checkSucceeded = false;
   errorMessage = '';
   selectedProjectId: number | null = null;
-  selectedRoleId: string | null = null;
-
-  // Inject TranslateService in the constructor
-  constructor(private translate: TranslateService) {}
+  selectedRoleId: string | null = null; // new
 
   // Mock async check — returns Promise<boolean>
   async checkEmailAsync(email: string): Promise<boolean> {
@@ -47,10 +43,7 @@ export class AddRoleModalComponent {
 
   async onVerifyEmail() {
     if (!this.email) {
-      // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.EMAIL_REQUIRED'
-      );
+      this.errorMessage = 'Please enter an email.';
       return;
     }
     this.errorMessage = '';
@@ -59,10 +52,7 @@ export class AddRoleModalComponent {
       this.checkSucceeded = true;
     } else {
       this.checkSucceeded = false;
-      // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.VERIFICATION_FAILED'
-      );
+      this.errorMessage = 'Email verification failed (mock).';
     }
   }
 
@@ -79,17 +69,11 @@ export class AddRoleModalComponent {
 
   assignRole() {
     if (this.selectedProjectId == null) {
-      // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.PROJECT_REQUIRED'
-      );
+      this.errorMessage = 'Please select a project.';
       return;
     }
     if (this.selectedRoleId == null) {
-      // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.ROLE_REQUIRED'
-      );
+      this.errorMessage = 'Please select a role.';
       return;
     }
     this.assigned.emit({

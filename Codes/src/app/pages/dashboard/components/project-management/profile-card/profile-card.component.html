@@ -4,19 +4,19 @@
     (click)="openModal($event)"
     title="{{ 'USER.ACTIONS.OPEN_USER' | translate }}"
   >
-    <img src="{{ data.picture }}" alt="user image" class="user-image" />
+
   </div>
 
   <div class="meta">
     <div class="meta-top">
       <h3 class="name">{{ displayName }}</h3>
-      <span class="role">{{ "ROLES." + getRole() | translate }}</span>
+      <span class="role">{{ displayClientName }}</span>
     </div>
 
     <div class="meta-body">
-      <p class="phone">{{ data.phone }}</p>
-      <p class="email">{{ data.email }}</p>
-      <div class="rate">{{ data.rate }}</div>
+      <p class="starting-date">{{ 'PROJECT_MANAGEMENT.STARTING_DATE' | translate }}: {{ data.startingDate | date:'dd/MM/yyyy' }}</p>
+      <p class="ending-date">{{ 'PROJECT_MANAGEMENT.ENDING_DATE' | translate }}: {{ data.endingDate | date:'dd/MM/yyyy' }}</p>
+      <div class="description">{{ 'PROJECT_MANAGEMENT.DESCRIPTION' | translate }}: {{ displayDescription }}</div>
     </div>
   </div>
 
@@ -47,10 +47,7 @@
 
       <!-- Buttons that will show/hide based on menu state -->
       <div class="actions {{ isMenuOpen ? 'open' : '' }}">
-        <app-button class="action disable" (click)="onDisableUser($event)">
-          {{ "USER.ACTIONS.DISABLE" | translate }}
-        </app-button>
-        <hr />
+      
         <app-button class="action edit" (click)="openModal($event)">
           {{ "USER.ACTIONS.EDIT" | translate }}
         </app-button>
