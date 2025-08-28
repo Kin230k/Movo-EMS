@@ -1,6 +1,5 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import { FormService } from '../../../models/forms/core/form/form.service';
 import { QuestionService } from '../../../models/forms/core/question/question.service';
 import { CriteriaService } from '../../../models/forms/rules/criteria/criteria.service';
 import { Multilingual } from '../../../models/multilingual.type';
@@ -8,195 +7,182 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
 import { CriteriaOperator } from '../../../models/criteria_operator.enum';
 import { authenticateClient } from '../../../utils/authUtils';
+import { OptionService } from '../../../models/forms/core/option/option.service';
 
-/**
- * Runtime shapes for input (exported so other modules/tests can use them)
- */
+
 export interface CriteriaInput {
   type: CriteriaOperator;
   value: string;
+  effect: "PASS" | "FAIL";
+}
+
+export interface OptionInput {
+  optionText: Multilingual;
+  isCorrect: boolean;
 }
 
 export interface QuestionInput {
-  typeCode: string;
+  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE';
   questionText: Multilingual;
   interviewId: string;
   criteria?: CriteriaInput[];
+  options?: OptionInput[];
 }
 
-export interface CreateFormWithQuestionsRequestData {
-  projectId?: string | null;
-  locationId?: string | null;
-  questions?: QuestionInput[] | null;
+export interface CreateQuestionsRequestData {
+  formId: string;
+  questions: QuestionInput[];
 }
 
-/**
- * Simple runtime validators (keeps the handler defensive)
- */
 const MAX_ID_LENGTH = 256;
 
 function isNonEmptyString(v: unknown): v is string {
-  return (
-    typeof v === 'string' && v.trim().length > 0 && v.length <= MAX_ID_LENGTH
-  );
+  return typeof v === 'string' && v.trim().length > 0 && v.length <= MAX_ID_LENGTH;
 }
 
 function isMultilingual(v: unknown): v is Multilingual {
-  return typeof v === 'object' && v !== null; // you can tighten this if Multilingual has known keys
+  return typeof v === 'object' && v !== null;
 }
 
 function isValidCriteriaOperator(v: unknown): v is CriteriaOperator {
-  // Works for numeric or string enums
   return Object.values(CriteriaOperator).includes(v as any);
 }
 
-/**
- * Handler (typed + validated)
- */
-export async function createFormWithQuestionsHandler(
-  request: CallableRequest<CreateFormWithQuestionsRequestData>
+export async function createQuestionsHandler(
+  request: CallableRequest<CreateQuestionsRequestData>
 ) {
   const issues: FieldIssue[] = [];
-
-  // auth
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;
 
-  // cast and defend
-  const data = (request.data ?? {}) as CreateFormWithQuestionsRequestData;
-
-  const projectId = isNonEmptyString(data.projectId)
-    ? data.projectId.trim()
-    : null;
-  const locationId = isNonEmptyString(data.locationId)
-    ? data.locationId.trim()
-    : null;
-  const questions = Array.isArray(data.questions)
-    ? (data.questions as QuestionInput[])
-    : null;
-
-  if (!projectId) {
-    issues.push({
-      field: 'projectId',
-      message: 'projectId is required and must be a non-empty string',
-    });
-  }
-  if (!locationId) {
-    issues.push({
-      field: 'locationId',
-      message: 'locationId is required and must be a non-empty string',
-    });
-  }
-  if (!questions || questions.length === 0) {
-    issues.push({
-      field: 'questions',
-      message: 'At least one question is required',
-    });
+  const data = request.data;
+  if (!data) {
+    return { success: false, issues: [{ field: 'data', message: 'Request data is missing' }] };
   }
 
-  // validate each question minimally
-  if (questions && questions.length > 0) {
+  if (!isNonEmptyString(data.formId)) {
+    issues.push({ field: 'formId', message: 'formId is required and must be a non-empty string' });
+  }
+
+   const questions = data.questions;
+  if (!Array.isArray(questions) || questions.length === 0) {
+    issues.push({ field: 'questions', message: 'At least one question is required' });
+  } else {
+    // Add this validation for question types
+    const validTypeCodes = ['OPEN_ENDED', 'SHORT_ANSWER', 'NUMBER', 'RATE', 'DROPDOWN', 'RADIO', 'MULTIPLE_CHOICE'];
+
     questions.forEach((q, idx) => {
       if (!isNonEmptyString(q.typeCode)) {
-        issues.push({
-          field: `questions[${idx}].typeCode`,
-          message: 'typeCode must be a non-empty string',
+        issues.push({ field: `questions[${idx}].typeCode`, message: 'typeCode must be a non-empty string' });
+      } else if (!validTypeCodes.includes(q.typeCode)) {
+        issues.push({ 
+          field: `questions[${idx}].typeCode`, 
+          message: `typeCode must be one of: ${validTypeCodes.join(', ')}` 
         });
       }
+      
       if (!isMultilingual(q.questionText)) {
-        issues.push({
-          field: `questions[${idx}].questionText`,
-          message: 'questionText must be a Multilingual object',
-        });
+        issues.push({ field: `questions[${idx}].questionText`, message: 'questionText must be a Multilingual object' });
       }
+      
       if (!isNonEmptyString(q.interviewId)) {
-        issues.push({
-          field: `questions[${idx}].interviewId`,
-          message: 'interviewId must be a non-empty string',
+        issues.push({ field: `questions[${idx}].interviewId`, message: 'interviewId must be a non-empty string' });
+      }
+      
+      // Only validate options for OPTION type questions
+      if (q.typeCode === 'MULTIPLE_CHOICE') {
+        if (!Array.isArray(q.options) || q.options.length === 0) {
+          issues.push({ field: `questions[${idx}].options`, message: 'Options are required for OPTION type questions' });
+        } else {
+          q.options.forEach((o, oidx) => {
+            if (!isMultilingual(o.optionText)) {
+              issues.push({ field: `questions[${idx}].options[${oidx}].optionText`, message: 'optionText must be a Multilingual object' });
+            }
+            if (typeof o.isCorrect !== 'boolean') {
+              issues.push({ field: `questions[${idx}].options[${oidx}].isCorrect`, message: 'isCorrect must be a boolean' });
+            }
+          });
+        }
+      } else if (q.options && q.options.length > 0) {
+        // Warn if options are provided for non-OPTION questions
+        issues.push({ 
+          field: `questions[${idx}].options`, 
+          message: 'Options should only be provided for OPTION type questions' 
         });
       }
+      
+      // Validate criteria
       if (q.criteria) {
         if (!Array.isArray(q.criteria)) {
-          issues.push({
-            field: `questions[${idx}].criteria`,
-            message: 'criteria must be an array',
-          });
+          issues.push({ field: `questions[${idx}].criteria`, message: 'criteria must be an array' });
         } else {
           q.criteria.forEach((c, cidx) => {
             if (!isValidCriteriaOperator(c.type)) {
-              issues.push({
-                field: `questions[${idx}].criteria[${cidx}].type`,
-                message: 'criteria.type is invalid',
-              });
+              issues.push({ field: `questions[${idx}].criteria[${cidx}].type`, message: 'criteria.type is invalid' });
             }
             if (!isNonEmptyString(c.value)) {
-              issues.push({
-                field: `questions[${idx}].criteria[${cidx}].value`,
-                message: 'criteria.value must be a non-empty string',
-              });
+              issues.push({ field: `questions[${idx}].criteria[${cidx}].value`, message: 'criteria.value must be a non-empty string' });
+            }
+            if (!['PASS', 'FAIL'].includes(c.effect)) {
+              issues.push({ field: `questions[${idx}].criteria[${cidx}].effect`, message: 'effect must be either "PASS" or "FAIL"' });
             }
           });
         }
       }
-    });
-  }
+    }); // This closing bracket was missing
+  } 
 
   if (issues.length > 0) {
-    logger.warn('Validation failed for createFormWithQuestionsHandler input', {
-      issues,
-    });
+    logger.warn('Validation failed', { issues });
     return { success: false, issues };
   }
 
   try {
-    // 3) Create the form
-    const formEntity = await FormService.createForm(projectId!, locationId!);
-    const formId = (formEntity as any)?.formId;
-    if (!isNonEmptyString(formId)) {
-      throw new Error('Form creation did not return formId');
-    }
-
-    // 4) Create questions and criteria
     for (const q of questions!) {
+      
       const questionEntity = await QuestionService.createQuestion(
         q.typeCode,
         q.questionText,
-        formId,
+        data.formId,
         q.interviewId
       );
+     
 
       const questionId = (questionEntity as any)?.questionId;
       if (!isNonEmptyString(questionId)) {
-        throw new Error('Question creation did not return questionId');
+        throw new Error('Question creation did not return a valid questionId');
       }
 
+      // Handle options only for OPTION type questions
+      if (q.typeCode === 'MULTIPLE_CHOICE' && Array.isArray(q.options)) {
+        for (let i = 0; i < q.options.length; i++) {
+          const o = q.options[i];
+           await OptionService.createOption(
+            o.optionText,
+            questionId,
+            o.isCorrect,
+            i // Use index as displayOrder
+          );
+          
+    
+      }
+    }
+      // Handle criteria
       if (Array.isArray(q.criteria) && q.criteria.length > 0) {
         for (const c of q.criteria) {
-          await CriteriaService.createCriterion(c.type, c.value, questionId);
+          await CriteriaService.createCriterion(c.type, c.value, questionId, c.effect);
+          
         }
       }
     }
 
-    logger.info('Form with questions created', {
-      projectId,
-      locationId,
-      formId,
-    });
-    return { success: true, formId };
+    return { success: true };
   } catch (err: any) {
-    logger.error('Form with questions creation failed', { err });
+    logger.error('Creation failed', { err });
     const parsed = parseDbError(err);
-    const responseIssues: FieldIssue[] =
-      Array.isArray(parsed) && parsed.length > 0
-        ? parsed
-        : [
-            {
-              field: 'server',
-              message:
-                'An unexpected error occurred while creating the form with questions',
-            },
-          ];
-
+    const responseIssues: FieldIssue[] = Array.isArray(parsed) && parsed.length > 0 ? parsed : [
+      { field: 'server', message: 'An unexpected error occurred' },
+    ];
     return { success: false, issues: responseIssues };
   }
 }

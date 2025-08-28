@@ -16,6 +16,8 @@ export class Area {
  
   async location(): Promise<Location | null> {
     if (!this.locationId) return null;
+    
     return await LocationService.getLocationById(this.locationId);
+   
   }
 }

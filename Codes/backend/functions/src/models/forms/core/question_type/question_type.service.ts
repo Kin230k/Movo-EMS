@@ -25,4 +25,7 @@ export class QuestionTypeService {
   static async deleteQuestionType(id: string): Promise<void> {
     await questionTypeMapper.delete(id);
   }
+  static async getValidTypeCodes(): Promise<string[]> {
+  return await questionTypeMapper.getValidTypeCodes();
+}
 }

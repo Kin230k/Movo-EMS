@@ -9,7 +9,7 @@ CREATE TABLE PROJECTS (
     ),
     badgeBackground VARCHAR(512),
     startingDate DATE NOT NULL DEFAULT CURRENT_DATE,
-    endingDate DATE,
+    endingDate DATE NOT NULL,
     description JSONB CHECK (
         description IS NULL OR (
             description ? 'en' AND 

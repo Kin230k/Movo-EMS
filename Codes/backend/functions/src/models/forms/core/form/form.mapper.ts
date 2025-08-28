@@ -8,14 +8,12 @@ import { CurrentUser } from '../../../../utils/currentUser.class';
 export class FormMapper extends BaseMapper<Form> {
   async save(entity: Form): Promise<void> {
     const currentUserId = CurrentUser.uuid;
+      
     if (!currentUserId) throw new Error('Current user UUID is not set');
-
+    
+    
     const op = entity.operation;
     const { formId, projectId, locationId } = entity;
-
-    if (!projectId) throw new Error('Project ID is required');
-    if (!locationId) throw new Error('Location ID is required');
-
     if (op === Operation.UPDATE) {
       if (!formId) throw new Error('Form ID is required for update');
       await pool.query('CALL update_form($1, $2, $3, $4)', [
@@ -30,6 +28,7 @@ export class FormMapper extends BaseMapper<Form> {
         projectId,
         locationId,
       ]);
+      
     }
   }
 
@@ -64,7 +63,7 @@ export class FormMapper extends BaseMapper<Form> {
   }
 
   private mapRowToForm = (row: any): Form => {
-    return new Form(row.projectId, row.locationId, row.formId);
+    return new Form(row.projectid, row.locationid, row.formid);
   };
 }
 

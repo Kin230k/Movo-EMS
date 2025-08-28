@@ -44,15 +44,20 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       );
     } else {
       // CREATE: call the DB function that RETURNS TABLE(...) and read the returned row
+      console.log(     currentUserId,
+          formId,
+          userId,
+          interviewId,
+          dateSubmitted,
+          decisionNotes,)
       const result: QueryResult = await pool.query(
-        `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6, $7)`,
+        `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6)`,
         [
           currentUserId,
           formId,
           userId,
           interviewId,
           dateSubmitted,
-          outcome,
           decisionNotes,
         ]
       );
@@ -124,16 +129,30 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
     await pool.query('CALL delete_submission($1, $2)', [currentUserId, id]);
   }
+    async getManualByFormId(formId: string): Promise<Submission[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!formId) throw new Error('Form ID is required');
+    
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_manual_submission_by_form_id($1, $2)',
+      [currentUserId, formId]
+    );
+
+    return result.rows.map(this.mapRowToSubmission);
+  }
+
 
   private mapRowToSubmission = (row: any): Submission => {
     return new Submission(
       row.formId ?? row.formid ?? row.form_id,
       row.userId ?? row.userid ?? row.user_id,
       row.interviewId ?? row.interviewid ?? row.interview_id,
-      row.dateSubmitted ?? row.datesubmitted ?? row.date_submitted,
-      Operation.UPDATE, // returned objects are update-ready
-      row.outcome ?? row.outcome,
+      row.datesubmitted ?? row.datesubmitted ?? row.date_submitted,
+       // returned objects are update-ready
+     
       row.decisionNotes ?? row.decisionnotes ?? row.decision_notes,
+       row.outcome ?? row.outcome,
       row.submissionId ?? row.submissionid ?? row.submission_id
     );
   };

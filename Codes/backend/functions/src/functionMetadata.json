@@ -343,12 +343,6 @@
         "description": ""
       },
       {
-        "name": "firebaseUid",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "logo",
         "type": "string | undefined",
         "required": false,
@@ -363,6 +357,48 @@
       {
         "name": "status",
         "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "adminCreateClient",
+    "description": "",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "{ en: string; ar: string }",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactEmail",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "contactPhone",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "logo",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "company",
+        "type": "{ en: string; ar: string } | null | undefined",
         "required": false,
         "description": ""
       }
@@ -475,38 +511,32 @@
     "parameters": [
       {
         "name": "projectId",
-        "type": "string | null | undefined",
+        "type": "string | undefined",
         "required": false,
         "description": ""
       },
       {
         "name": "locationId",
-        "type": "string | null | undefined",
+        "type": "string | undefined",
         "required": false,
         "description": ""
       }
     ]
   },
   {
-    "name": "createFormWithQuestions",
-    "description": "Handler (typed + validated)",
+    "name": "createQuestions",
+    "description": "",
     "parameters": [
       {
-        "name": "projectId",
-        "type": "string | null | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "locationId",
-        "type": "string | null | undefined",
-        "required": false,
+        "name": "formId",
+        "type": "string",
+        "required": true,
         "description": ""
       },
       {
         "name": "questions",
-        "type": "{ typeCode: string; questionText: { en: string; ar: string }; interviewId: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string }[] | undefined }[] | null | undefined",
-        "required": false,
+        "type": "{ typeCode: \"OPEN_ENDED\" | \"SHORT_ANSWER\" | \"NUMBER\" | \"RATE\" | \"DROPDOWN\" | \"RADIO\" | \"MULTIPLE_CHOICE\"; questionText: { en: string; ar: string }; interviewId: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string; effect: \"PASS\" | \"FAIL\" }[] | undefined; options?: { optionText: { en: string; ar: string }; isCorrect: boolean }[] | undefined }[]",
+        "required": true,
         "description": ""
       }
     ]
@@ -565,7 +595,7 @@
     "parameters": [
       {
         "name": "typeCode",
-        "type": "string",
+        "type": "\"OPEN_ENDED\" | \"SHORT_ANSWER\" | \"NUMBER\" | \"RATE\" | \"DROPDOWN\" | \"RADIO\" | \"MULTIPLE_CHOICE\"",
         "required": true,
         "description": ""
       },
@@ -630,7 +660,7 @@
       },
       {
         "name": "typeCode",
-        "type": "string",
+        "type": "\"OPEN_ENDED\" | \"SHORT_ANSWER\" | \"NUMBER\" | \"RATE\" | \"DROPDOWN\" | \"RADIO\" | \"MULTIPLE_CHOICE\"",
         "required": true,
         "description": ""
       },
@@ -672,12 +702,6 @@
       },
       {
         "name": "dateSubmitted",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "outcome",
         "type": "string | undefined",
         "required": false,
         "description": ""
@@ -763,6 +787,24 @@
     ]
   },
   {
+    "name": "getManualByFormId",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createInterview",
     "description": "",
     "parameters": [
@@ -833,12 +875,6 @@
     "description": "",
     "parameters": [
       {
-        "name": "clientId",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "name",
         "type": "{ en: string; ar: string }",
         "required": true,
@@ -858,8 +894,8 @@
       },
       {
         "name": "endingDate",
-        "type": "string | undefined",
-        "required": false,
+        "type": "string",
+        "required": true,
         "description": ""
       },
       {
@@ -949,15 +985,19 @@
     ]
   },
   {
+    "name": "getAllProjects",
+    "description": "",
+    "parameters": []
+  },
+  {
+    "name": "getAllActiveProjects",
+    "description": "",
+    "parameters": []
+  },
+  {
     "name": "createLocation",
     "description": "",
     "parameters": [
-      {
-        "name": "clientId",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
       {
         "name": "name",
         "type": "{ en: string; ar: string }",
@@ -1024,12 +1064,6 @@
     "name": "updateLocation",
     "description": "",
     "parameters": [
-      {
-        "name": "clientId",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
       {
         "name": "locationId",
         "type": "string",
@@ -1320,13 +1354,7 @@
       },
       {
         "name": "signedWith",
-        "type": "\"QR_CODE\" | \"MANUAL\"",
-        "required": true,
-        "description": ""
-      },
-      {
-        "name": "signedBy",
-        "type": "string",
+        "type": "\"BARCODE\" | \"MANUAL\"",
         "required": true,
         "description": ""
       },
@@ -1379,19 +1407,7 @@
         "description": ""
       },
       {
-        "name": "signedWith",
-        "type": "\"QR_CODE\" | \"MANUAL\"",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "timestamp",
-        "type": "string | null | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "signedBy",
         "type": "string | null | undefined",
         "required": false,
         "description": ""

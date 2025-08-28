@@ -18,7 +18,7 @@ BEGIN
 
  INSERT INTO SCHEDULES (
  scheduleId,
- date,
+ createdAt,
  startTime,
  endTime,
  projectId,

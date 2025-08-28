@@ -1,28 +1,28 @@
 import questionMapper from './question.mapper';
 import { Question } from './question.class';
 import { Multilingual } from '../../../multilingual.type';
-import { Operation } from '../../../operation.enum';
+
 
 export class QuestionService {
-  static async createQuestion(
-    typeCode: string,
-    questionText: Multilingual,
-    formId: string,
-    interviewId: string
-  ): Promise<void> {
-    const entity = new Question(
-      typeCode,
-      questionText,
-      formId,
-      interviewId,
-      Operation.CREATE
-    );
-    await questionMapper.save(entity);
-  }
+static async createQuestion(
+  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
+  questionText: Multilingual,
+  formId: string,
+  interviewId: string
+): Promise<Question> {
+  const entity = new Question(
+    typeCode,
+    questionText,
+    formId,
+    interviewId
+  );
+  await questionMapper.save(entity);
+  return entity;
+}
 
   static async updateQuestion(
     questionId: string,
-    typeCode: string,
+    typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
     questionText: Multilingual,
     formId: string,
     interviewId: string
@@ -32,7 +32,6 @@ export class QuestionService {
       questionText,
       formId,
       interviewId,
-      Operation.UPDATE,
       questionId
     );
     await questionMapper.save(entity);
@@ -52,4 +51,5 @@ export class QuestionService {
   static async deleteQuestion(id: string): Promise<void> {
     await questionMapper.delete(id);
   }
+  
 }

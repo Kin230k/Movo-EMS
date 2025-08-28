@@ -3,7 +3,6 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { AnswerService } from '../../../models/forms/core/answer/answer.service';
-import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
 import { scheduleReminder } from '../../../reminders/submissionReminder';
@@ -41,7 +40,7 @@ export async function createSubmissionWithAnswerHandler(
     formId,
     interviewId,
     dateSubmitted,
-    outcome,
+    
     decisionNotes,
     questionId,
     answeredAt,
@@ -106,7 +105,6 @@ export async function createSubmissionWithAnswerHandler(
       auth.callerUuid,
       interviewId!,
       new Date(dateSubmitted || Date.now()),
-      outcome as SubmissionOutcome | undefined,
       decisionNotes
     );
 

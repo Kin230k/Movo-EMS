@@ -8,6 +8,7 @@ import { deleteClientHandler } from '../../handlers/auth/client/deleteClientHand
 import { getAllClientsHandler } from '../../handlers/auth/client/getAllClientsHandler';
 import { getClientByIdHandler } from '../../handlers/auth/client/getClientByIdHandler';
 import { updateClientHandler } from '../../handlers/auth/client/updateClientHandler';
+import { adminCreateClientHandler } from '../../handlers/auth/client/adminCreateClientHandler';
 
 // Client core
 export const createClient = onCall(createClientHandler);
@@ -16,3 +17,4 @@ export const deleteClient = onCall(deleteClientHandler);
 export const getAllClients = onCall(getAllClientsHandler);
 export const getClient = onCall(getClientByIdHandler);
 export const updateClient = onCall(updateClientHandler);
+export const adminCreateClient=onCall(adminCreateClientHandler);

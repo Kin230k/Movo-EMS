@@ -6,7 +6,7 @@ import { parseDbError } from '../../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../../utils/types';
 import { authenticateUser } from '../../../../utils/authUtils';
 interface CreateQuestionRequestData {
-  typeCode: string;
+  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE';
   questionText: Multilingual;
   formId: string;
   interviewId: string;

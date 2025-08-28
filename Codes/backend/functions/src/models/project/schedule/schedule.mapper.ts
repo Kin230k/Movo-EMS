@@ -12,7 +12,7 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
     const op = entity.operation;
     const { scheduleId, createdAt, startTime, endTime, projectId, locationId } =
-      entity;
+      entity; 
 
     // Validation
     if (op === Operation.CREATE) {
@@ -34,6 +34,7 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
         locationId,
       ]);
     } else {
+    
       await pool.query('CALL create_schedule($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         createdAt,
@@ -77,12 +78,12 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
   private mapRowToEntity = (row: any): Schedule => {
     return new Schedule(
-      row.startTime,
-      row.endTime,
-      row.projectId,
-      row.locationId,
-      row.createdAt,
-      row.scheduleId
+      row.starttime,
+      row.endtime,
+      row.projectid,
+      row.locationid,
+      row.createdat,
+      row.scheduleid
     );
   };
 }

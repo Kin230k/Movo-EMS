@@ -8,9 +8,7 @@ import { AreaService } from '../../../models/project/area/area.service';
 
 export interface UpdateAttendanceData {
   attendanceId: string;
-  signedWith: 'QR_CODE' | 'MANUAL';
   timestamp?: string | null;
-  signedBy?: string | null;
   userId?: string | null;
   areaId?: string | null;
 }
@@ -24,27 +22,19 @@ export async function updateAttendanceHandler(
   request: CallableRequest<UpdateAttendanceData>
 ): Promise<UpdateAttendanceResult> {
   const issues: FieldIssue[] = [];
-  const { attendanceId, timestamp, signedWith, signedBy, userId, areaId } =
+  const { attendanceId, timestamp, userId, areaId } =
     request.data || {};
 
   // Presence validation
   if (!attendanceId) issues.push({ field: 'attendanceId', message: 'attendanceId is required' });
   if (!areaId) issues.push({ field: 'areaId', message: 'areaId is required' });
+  
 
   // Timestamp parse if provided
   if (timestamp !== null && timestamp !== undefined && isNaN(Date.parse(String(timestamp)))) {
     issues.push({ field: 'timestamp', message: 'timestamp must be a valid date/time if provided' });
   }
 
-  // Business rules only when enough data provided
-  if (signedWith !== null && signedBy !== null && userId !== null) {
-    if (signedWith === 'QR_CODE' && signedBy !== userId) {
-      issues.push({ field: 'signedWith', message: 'QR_CODE sign-in must have signedBy = userId' });
-    }
-    if (signedWith === 'MANUAL' && signedBy === userId) {
-      issues.push({ field: 'signedWith', message: 'MANUAL sign-in must have signedBy <> userId' });
-    }
-  }
 
   if (issues.length > 0) return { success: false, issues };
 
@@ -59,6 +49,11 @@ export async function updateAttendanceHandler(
     if (!location) {
       return { success: false, issues: [{ field: 'areaId', message: 'Area has no valid location' }] };
     }
+    const attendance=await AttendanceService.getAttendanceById(attendanceId);
+    if(!attendance)
+    {
+      return {success:false, issues: [{field:"attendance",message:"No Attendance Found with that Id"}]};
+    }
     
     const auth = await authorizeUserProjectAccessWorkerFirst(request, location.projectId);
     if (!auth.success) {
@@ -69,8 +64,8 @@ export async function updateAttendanceHandler(
     await AttendanceService.updateAttendance(
       attendanceId,
       timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
-      signedWith!,
-      signedBy!,
+      attendance.signedWith!,
+      attendance.signedBy!,
       userId!,
       areaId!
     );

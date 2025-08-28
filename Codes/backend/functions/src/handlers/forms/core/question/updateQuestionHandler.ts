@@ -7,7 +7,7 @@ import { FieldIssue } from '../../../../utils/types';
 
 interface UpdateQuestionData {
   questionId: string;
-  typeCode: string;
+  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE' ;
   questionText: Multilingual;
   formId: string;
   interviewId: string;

@@ -12,6 +12,7 @@ import {
   getAllClients,
   getClient,
   updateClient,
+  adminCreateClient
 } from './callables/auth/client.callable';
 import {
   sendPasswordReset,
@@ -29,7 +30,7 @@ import {
 // Import forms callables
 import {
   createForm,
-  createFormWithQuestions,
+  createQuestions,
   deleteForm,
   getForm,
   updateForm,
@@ -41,6 +42,7 @@ import {
   createSubmission,
   deleteSubmission,
   getSubmission,
+  getManualByFormId,
   updateSubmission,
   createInterview,
   updateInterview,
@@ -56,6 +58,8 @@ import {
   deleteProject,
   getProject,
   getProjectByClient,
+  getAllProjects,
+  getAllActiveProjects,
   updateProject,
   createLocation,
   deleteLocation,
@@ -126,10 +130,11 @@ export {
   getAllClients,
   getClient,
   updateClient,
+  adminCreateClient,
 
   // Forms - core
   createForm,
-  createFormWithQuestions,
+  createQuestions,
   deleteForm,
   getForm,
   updateForm,
@@ -146,6 +151,8 @@ export {
   deleteSubmission,
   getSubmission,
   updateSubmission,
+  getManualByFormId,
+  
 
   // Projects
   createProject,
@@ -153,6 +160,8 @@ export {
   getProject,
   updateProject,
   getProjectByClient,
+  getAllProjects,
+  getAllActiveProjects,
 
   // Locations
   createLocation,

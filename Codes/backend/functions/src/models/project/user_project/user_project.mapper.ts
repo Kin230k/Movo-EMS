@@ -81,7 +81,7 @@ export class UserProjectMapper extends BaseMapper<UserProject> {
   }
 
   private mapRowToEntity = (row: any): UserProject => {
-    return new UserProject(row.userId, row.projectId, row.userProjectId);
+    return new UserProject(row.userid, row.projectid, row.userprojectid);
   };
 }
 

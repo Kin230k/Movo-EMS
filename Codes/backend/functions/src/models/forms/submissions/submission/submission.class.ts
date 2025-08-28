@@ -5,12 +5,12 @@ export class Submission {
   constructor(
     public formId: string,
     public userId: string,
-    public interviewId: string,
+    public interviewId: string | undefined,
     public dateSubmitted: Date,
-    public op:Operation,
-    public outcome?: SubmissionOutcome,
     public decisionNotes?: string,
-    public submissionId?: string
+     public outcome?: SubmissionOutcome,
+    public submissionId?: string,
+   
   ) {}
 
   get operation(): Operation {

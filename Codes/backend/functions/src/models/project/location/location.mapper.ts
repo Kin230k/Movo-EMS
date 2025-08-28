@@ -36,6 +36,9 @@ export class LocationMapper extends BaseMapper<Location> {
         'SELECT * FROM create_location($1, $2, $3, $4, $5, $6)',
         [currentUserId, name, projectId, siteMap, longitude, latitude]
       );
+      
+      
+      
 
       if (rows.length === 0) throw new Error('Failed to create location');
       entity.locationId = rows[0].locationId;
@@ -43,13 +46,11 @@ export class LocationMapper extends BaseMapper<Location> {
   }
 
   async getById(id: string): Promise<Location | null> {
-    const currentUserId = CurrentUser.uuid;
-    if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!id) throw new Error('Location ID is required');
 
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_location_by_id($1, $2)',
-      [currentUserId, id]
+      'SELECT * FROM get_location_by_id($1)',
+      [id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
@@ -87,9 +88,9 @@ export class LocationMapper extends BaseMapper<Location> {
   private mapRowToEntity = (row: any): Location => {
     return new Location(
       row.name,
-      row.projectId,
-      row.locationId,
-      row.siteMap,
+      row.projectid,
+      row.locationid,
+      row.sitemap,
       row.longitude,
       row.latitude
     );

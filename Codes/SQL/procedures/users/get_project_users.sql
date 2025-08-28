@@ -28,12 +28,13 @@ BEGIN
         u.email,
         u.phone,
         u.picture,
-        u.role ,
-        u.status,
+        u.role::user_role ,
+        u.status::user_status,
         r.hourlyRate
 
     FROM USERS u
-    INNER JOIN PROJECT_USER_ROLES pur ON u.userId = pur.userId INNER JOIN rates r on r.userId=u.userId and r.projectId=p_project_id
+    INNER JOIN PROJECT_USER_ROLES pur ON u.userId = pur.userId 
+    INNER JOIN rates r on r.userId=u.userId 
     WHERE pur.projectId = p_project_id;
 END;
 $$;

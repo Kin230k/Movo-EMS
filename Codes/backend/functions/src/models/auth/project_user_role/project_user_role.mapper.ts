@@ -76,10 +76,10 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
 
   private mapRowToEntity = (row: any): ProjectUserRole => {
     return new ProjectUserRole(
-      row.userId,
-      row.projectId,
-      row.roleId,
-      row.projectUserRoleId
+      row.userid,
+      row.projectid,
+      row.roleid,
+      row.projectuserroleid
     );
   };
   

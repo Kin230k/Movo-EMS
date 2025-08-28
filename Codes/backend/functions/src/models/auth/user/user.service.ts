@@ -75,7 +75,7 @@ export class UserService {
     name: Multilingual,
     picture?: string
   ) {
-    UserMapper.editUserInfo(userId, name, picture);
+   return await UserMapper.editUserInfo(userId, name, picture);
   }
 
   static async getUserById(userId: string): Promise<User | null> {

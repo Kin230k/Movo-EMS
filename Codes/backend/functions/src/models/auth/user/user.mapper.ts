@@ -5,7 +5,6 @@ import { User } from './user.class';
 import pool from '../../../utils/pool';
 import { Multilingual } from '../../multilingual.type';
 import { CurrentUser } from '../../../utils/currentUser.class';
-
 export interface ProjectUser {
   userId: string;
   name: Multilingual;
@@ -56,7 +55,6 @@ export class UserMapper extends BaseMapper<User> {
     if (!uid) throw new Error('User ID is required for update');
     if (!name || Object.keys(name).length === 0)
       throw new Error('Name is required for update');
-
     return pool.query('CALL edit_user_info($1, $2, $3, $4)', [
       currentUserId,
       uid,
@@ -144,11 +142,12 @@ export class UserMapper extends BaseMapper<User> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!projectId) throw new Error('projectId is required');
-
+    
     const result = await pool.query('SELECT * FROM get_project_users($1, $2)', [
       currentUserId,
       projectId,
     ]);
+    
 
     return result.rows.map((row: any) => this.mapRowToProjectUser(row));
   }

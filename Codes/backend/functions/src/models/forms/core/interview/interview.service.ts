@@ -1,15 +1,15 @@
 import interviewMapper from './interview.mapper';
 import { Interview } from './interview.class';
-import { Operation } from '../../../operation.enum';
+
 
 export class InterviewService {
   static async createInterview(projectId: string): Promise<void> {
-    const entity = new Interview(projectId,Operation.CREATE);
+    const entity = new Interview(projectId);
     await interviewMapper.save(entity);
   }
 
   static async updateInterview(interviewId: string, projectId: string): Promise<void> {
-    const entity = new Interview(projectId,Operation.UPDATE, interviewId);
+    const entity = new Interview(projectId, interviewId);
     await interviewMapper.save(entity);
   }
 

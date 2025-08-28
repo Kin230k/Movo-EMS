@@ -2,8 +2,8 @@ CREATE OR REPLACE PROCEDURE create_admin(p_auth_user_id UUID,
 p_adminId UUID,
  p_name JSONB,
  p_qid VARCHAR(20),
- p_date_of_birth DATE,
- p_job_position VARCHAR(100)
+ p_date_of_birth DATE DEFAULT NULL,
+ p_job_position VARCHAR(100) DEFAULT NULL
 )
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$

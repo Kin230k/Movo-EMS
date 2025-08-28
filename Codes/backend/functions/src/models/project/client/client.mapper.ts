@@ -27,7 +27,7 @@ export class ClientMapper extends BaseMapper<Client> {
 
     if (op === Operation.UPDATE) {
       if (!clientId) throw new Error('Client ID is required for update');
-      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6, $7)', [
+      await pool.query('CALL update_client($1, $2, $3, $4, $5, $6, $7,$8)', [
         currentUserId,
         clientId,
         name,
@@ -86,9 +86,9 @@ export class ClientMapper extends BaseMapper<Client> {
       row.name,
       row.contactemail,
       row.contactphone,
-      row.clientId,
-      row.logo,
       row.company,
+      row.clientid,
+      row.logo,
       row.status as ClientStatus
     );
     client.operation = Operation.UPDATE;

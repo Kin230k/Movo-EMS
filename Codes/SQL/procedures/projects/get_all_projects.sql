@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION get_all_projects(p_auth_user_id UUID)
 RETURNS TABLE (
     projectId UUID,
+    clientId UUID,
     name JSONB,
     badgeBackground VARCHAR(512),
     startingDate DATE,
@@ -13,6 +14,7 @@ BEGIN
 RETURN QUERY 
     SELECT 
         p.projectId,
+        p.clientId,
         p.name,
         p.badgeBackground,
         p.startingDate,

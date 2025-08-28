@@ -48,13 +48,11 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
   }
 
   async getById(id: string): Promise<Attendance | null> {
-    const currentUserId = CurrentUser.uuid;
-    if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!id) throw new Error('Attendance ID is required');
 
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_attendance_by_id($1, $2)',
-      [currentUserId, id]
+      'SELECT * FROM get_attendance_by_id($1)',
+      [id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
@@ -119,12 +117,12 @@ async getByProject(projectId: string): Promise<Attendance[]> {
 
   private mapRowToEntity = (row: any): Attendance => {
     return new Attendance(
-      row.attendanceTimestamp,
-      row.signedWith,
-      row.signedBy,
-      row.userId,
-      row.areaId,
-      row.attendanceId
+      row.attendancetimestamp,
+      row.signedwith,
+      row.signedby,
+      row.userid,
+      row.areaid,
+      row.attendanceid
     );
   };
    private mapRowToUserAttendance = (row: any): UserAttendance => {

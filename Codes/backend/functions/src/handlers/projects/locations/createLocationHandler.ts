@@ -7,7 +7,6 @@ import { LocationService } from '../../../models/project/location/location.servi
 import { authenticateClient } from '../../../utils/authUtils';
 
 export interface CreateLocationData {
-  clientId: string;
   name: Multilingual;
   projectId: string;
   siteMap?: string;
@@ -21,9 +20,9 @@ export async function createLocationHandler(request: CallableRequest<CreateLocat
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;
 
-  const { clientId, name, projectId, siteMap, longitude, latitude } = request.data || {};
+  const { name, projectId, siteMap, longitude, latitude } = request.data || {};
 
-  if (!clientId || !name || !projectId || longitude == null || latitude == null) {
+  if ( !name || !projectId || longitude == null || latitude == null) {
     issues.push({
       field: 'input',
       message: 'Missing required fields: clientId, name, projectId, longitude, latitude',

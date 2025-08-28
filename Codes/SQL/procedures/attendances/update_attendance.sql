@@ -14,7 +14,7 @@ BEGIN
 UPDATE ATTENDANCES
  SET
  attendanceTimestamp = COALESCE(p_timestamp, attendanceTimestamp),
- signedWith = COALESCE(p_signed_with, signedWith),
+ signedWith = COALESCE(p_signed_with::varchar(20), signedWith),
  signedBy = COALESCE(p_signed_by, signedBy),
  userId = COALESCE(p_user_id, userId),
  areaId = COALESCE(p_area_id, areaId)

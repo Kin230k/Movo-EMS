@@ -368,12 +368,13 @@ export async function authorizeUserProjectAccessWorkerFirst(
   const { callerUid, callerUuid } = auth;
 
   try {
+    
     // 2) Worker-first: check if caller is assigned to the project (weak privilege)
     const callerUserProject = await ProjectUserRoleService.getProjectUserRolesByUserAndProject(
       callerUuid,
       targetProjectId
     );
-
+   
     if (callerUserProject) {
       const callerUser = await UserService.getUserById(callerUuid);
       return {

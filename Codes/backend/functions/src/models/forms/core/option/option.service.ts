@@ -1,7 +1,6 @@
 import optionMapper from './option.mapper';
 import { Option } from './option.class';
 import { Multilingual } from '../../../multilingual.type';
-import { Operation } from '../../../operation.enum';
 
 export class OptionService {
   static async createOption(
@@ -10,7 +9,7 @@ export class OptionService {
     isCorrect: boolean,
     displayOrder: number
   ): Promise<void> {
-    const entity = new Option(optionText, questionId, isCorrect, displayOrder,Operation.CREATE);
+    const entity = new Option(optionText, questionId, isCorrect, displayOrder);
     await optionMapper.save(entity);
   }
 
@@ -21,7 +20,7 @@ export class OptionService {
     isCorrect: boolean,
     displayOrder: number
   ): Promise<void> {
-    const entity = new Option(optionText, questionId, isCorrect, displayOrder,Operation.UPDATE, optionId);
+    const entity = new Option(optionText, questionId, isCorrect, displayOrder, optionId);
     await optionMapper.save(entity);
   }
 

@@ -9,8 +9,8 @@ CREATE TABLE USERS (
     email VARCHAR(255)  UNIQUE,
     phone VARCHAR(20)  UNIQUE,
     picture VARCHAR(512),
-    role userRole NOT NULL,
-    status userStatus NOT NULL DEFAULT 'Active',
+    role user_role NOT NULL,
+    status user_status NOT NULL DEFAULT 'Active',
     twoFaEnabled BOOLEAN NOT NULL DEFAULT FALSE
      CONSTRAINT chk_email_or_phone CHECK (
         email IS NOT NULL OR phone IS NOT NULL

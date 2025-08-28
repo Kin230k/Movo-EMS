@@ -28,16 +28,20 @@ export class QuestionMapper extends BaseMapper<Question> {
         formId,
         interviewId,
       ]);
-    } else {
-      await pool.query('CALL create_question($1, $2, $3, $4, $5)', [
+    } const result: QueryResult = await pool.query(
+      'SELECT create_question($1, $2, $3, $4, $5) as question_id',
+      [
         currentUserId,
         typeCode,
         questionText,
         formId,
         interviewId,
-      ]);
-    }
+      ]
+    );
+    // Set the questionId on the entity object
+    entity.questionId = result.rows[0].question_id;
   }
+
 
   async getById(id: string): Promise<Question | null> {
     const currentUserId = CurrentUser.uuid;
@@ -81,11 +85,11 @@ export class QuestionMapper extends BaseMapper<Question> {
 
   private mapRowToQuestion = (row: any): Question => {
     return new Question(
-      row.typeCode,
-      row.questionText,
-      row.formId,
-      row.interviewId,
-      row.questionId
+      row.typecode,
+      row.questiontext,
+      row.formid,
+      row.interviewid,
+      row.questionid
     );
   };
 }
