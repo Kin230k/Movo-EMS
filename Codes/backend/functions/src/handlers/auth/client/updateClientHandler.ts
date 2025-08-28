@@ -12,7 +12,6 @@ export interface UpdateClientData {
   name: Multilingual;
   contactEmail: string;
   contactPhone: string;
-  firebaseUid: string;
   logo?: string;
   company?: Multilingual | null;
   status?: ClientStatus;
@@ -32,7 +31,6 @@ export async function updateClientHandler(
     name,
     contactEmail,
     contactPhone,
-    firebaseUid,
     logo,
     company,
     status = ClientStatus.Pending,
@@ -47,17 +45,25 @@ export async function updateClientHandler(
     issues.push({ field: 'contactEmail', message: 'Email is required' });
   if (!contactPhone)
     issues.push({ field: 'contactPhone', message: 'Phone is required' });
-  if (!firebaseUid)
-    issues.push({ field: 'firebaseUid', message: 'Firebase UID is required' });
+
 
   if (issues.length > 0) return { success: false, issues };
-
+  
+  
   // authorize caller: admin can update any client, client can update only their own
   const authz = await authorizeClientAccess(request, clientId);
   if (!authz.success) {
+    
     // authorizeClientAccess returns { success: false, issues } on failure
     return authz;
   }
+  console.log(     clientId,
+      name,
+      contactEmail,
+      company!,
+      contactPhone,
+      logo,
+      status)
 
   try {
     await ClientService.updateClient(

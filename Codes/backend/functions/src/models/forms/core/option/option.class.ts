@@ -7,7 +7,6 @@ export class Option {
     public questionId: string,
     public isCorrect: boolean,
     public displayOrder: number,
-    public op :Operation,
     public optionId?: string
   ) {}
 

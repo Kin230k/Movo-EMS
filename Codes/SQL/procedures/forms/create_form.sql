@@ -1,6 +1,7 @@
-CREATE OR REPLACE PROCEDURE create_form(p_auth_user_id UUID,
- p_project_id UUID,
- p_location_id UUID
+CREATE OR REPLACE PROCEDURE create_form(
+p_auth_user_id UUID,
+ p_project_id UUID DEFAULT NULL,
+ p_location_id UUID DEFAULT NULL
 )
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$

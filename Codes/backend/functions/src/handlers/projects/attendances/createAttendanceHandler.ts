@@ -9,8 +9,7 @@ import { AreaService } from '../../../models/project/area/area.service';
 
 export interface CreateAttendanceData {
   timestamp?: string | null;
-  signedWith: 'QR_CODE' | 'MANUAL';
-  signedBy: string;
+  signedWith: 'BARCODE' | 'MANUAL';
   userId: string;
   areaId: string;
    
@@ -26,11 +25,10 @@ export async function createAttendanceHandler(
 ): Promise<CreateAttendanceResult> {
   const issues: FieldIssue[] = [];
   const data = request.data || {};
-  const { timestamp = null, signedWith, signedBy, userId, areaId } = data;
+  const { timestamp = null, signedWith,  userId, areaId } = data;
 
   // presence validation (no UUID format checks per your request)
   if (!signedWith) issues.push({ field: 'signedWith', message: 'signedWith is required' });
-  if (!signedBy) issues.push({ field: 'signedBy', message: 'signedBy is required' });
   if (!userId) issues.push({ field: 'userId', message: 'userId is required' });
   if (!areaId) issues.push({ field: 'areaId', message: 'areaId is required' });
   // timestamp parse check (optional)
@@ -43,33 +41,29 @@ export async function createAttendanceHandler(
     }
   }
 
-  // business rules
-  if (signedBy && userId) {
-    if (signedWith === 'QR_CODE' && signedBy !== userId) {
-      issues.push({ field: 'signedWith', message: 'QR_CODE sign-in must have signedBy = userId' });
-    }
-    if (signedWith === 'MANUAL' && signedBy === userId) {
-      issues.push({ field: 'signedWith', message: 'MANUAL sign-in must have signedBy <> userId' });
-    }
-  }
+
 
   if (issues.length > 0) return { success: false, issues };
-
+let auth
  try {
-    const area = await AreaService.getAreaById(areaId);
+      const area = await AreaService.getAreaById(areaId);
     if (!area) {
       return { success: false, issues: [{ field: 'areaId', message: 'Area not found' }] };
     }
+    
 
     const location = await area.location();
     if (!location) {
       return { success: false, issues: [{ field: 'areaId', message: 'Area has no valid location' }] };
     }
-    const auth = await authorizeUserProjectAccessWorkerFirst( request,location.projectId);
+    
+
+     auth = await authorizeUserProjectAccessWorkerFirst( request,location.projectId);
     if (!auth.success) {
       // normalize the failure to our CreateAttendanceResult shape
       return { success: false, issues: auth.issues };
     }
+    
   } catch (err: any) {
     logger.error('createAttendanceHandler: authorization failure', err);
     return { success: false, issues: parseDbError(err) };
@@ -79,7 +73,7 @@ export async function createAttendanceHandler(
     await AttendanceService.createAttendance(
       timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
       signedWith,
-      signedBy,
+      auth.callerUuid,
       userId,
       areaId
     );

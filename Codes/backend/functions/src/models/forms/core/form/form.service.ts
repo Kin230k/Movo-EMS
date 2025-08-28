@@ -1,6 +1,6 @@
 import formMapper from './form.mapper';
 import { Form } from './form.class';
-import { Operation } from '../../../operation.enum';
+
 
 export class FormService {
   constructor() {}
@@ -9,7 +9,7 @@ export class FormService {
     projectId: string | null,
     locationId: string | null
   ): Promise<void> {
-    const entity = new Form(projectId, locationId, Operation.CREATE);
+    const entity = new Form(projectId, locationId);
     await formMapper.save(entity);
   }
 
@@ -18,7 +18,7 @@ export class FormService {
     projectId: string | null,
     locationId: string | null
   ): Promise<void> {
-    const entity = new Form(projectId, locationId, Operation.UPDATE, formId);
+    const entity = new Form(projectId, locationId, formId);
     await formMapper.save(entity);
   }
 

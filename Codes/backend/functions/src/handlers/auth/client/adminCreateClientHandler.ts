@@ -9,6 +9,7 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
 
 import { authenticateAdmin } from '../../../utils/authUtils';
+import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 
 export interface AdminCreateClientData {
   name: Multilingual;
@@ -72,13 +73,14 @@ export async function adminCreateClientHandler(
   }
 
   // create client in DB; cleanup Firebase user on failure
+
   try {
     await ClientService.createClient(
       name,
       contactEmail,
       contactPhone,
       company!,
-      userRecord.uid,
+      firebaseUidToUuid(userRecord.uid),
       logo,
       ClientStatus.Accepted // admin-created clients are active immediately
     );

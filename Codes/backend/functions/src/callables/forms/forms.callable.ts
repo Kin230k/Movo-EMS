@@ -3,7 +3,7 @@ import { onCall } from 'firebase-functions/v2/https';
 
 // Form core handlers
 import { createFormHandler } from '../../handlers/forms/core/createFormHandler';
-import { createFormWithQuestionsHandler } from '../../handlers/forms/core/createFormWithQuestionsHandler';
+import { createQuestionsHandler } from '../../handlers/forms/core/createFormWithQuestionsHandler';
 import { deleteFormHandler } from '../../handlers/forms/core/deleteFormHandler';
 import { getFormHandler } from '../../handlers/forms/core/getFormHandler';
 import { updateFormHandler } from '../../handlers/forms/core/updateFormHandler';
@@ -20,6 +20,7 @@ import { createSubmissionHandler } from '../../handlers/forms/submissions/create
 import { deleteSubmissionHandler } from '../../handlers/forms/submissions/deleteSubmissionHandler';
 import { getSubmissionHandler } from '../../handlers/forms/submissions/getSubmissionHandler';
 import { updateSubmissionHandler } from '../../handlers/forms/submissions/updateSubmissionHandler';
+import { getManualSubmissionsByFormIdHandler } from '../../handlers/forms/submissions/getManualSubmissionsByFormHandler';
 
 // Interview handlers
 import { createInterviewHandler } from '../../handlers/forms/core/interview/createInterviewHandler';
@@ -31,7 +32,7 @@ import { getInterviewHandler } from '../../handlers/forms/core/interview/getInte
 
 // Form core
 export const createForm = onCall(createFormHandler);
-export const createFormWithQuestions = onCall(createFormWithQuestionsHandler);
+export const createQuestions = onCall(createQuestionsHandler);
 export const deleteForm = onCall(deleteFormHandler);
 export const getForm = onCall(getFormHandler);
 export const updateForm = onCall(updateFormHandler);
@@ -48,7 +49,7 @@ export const createSubmission = onCall(createSubmissionHandler);
 export const deleteSubmission = onCall(deleteSubmissionHandler);
 export const getSubmission = onCall(getSubmissionHandler);
 export const updateSubmission = onCall(updateSubmissionHandler);
-
+export const getManualByFormId=onCall(getManualSubmissionsByFormIdHandler)
 //Interview
 export const createInterview=onCall(createInterviewHandler);
 export const updateInterview=onCall(updateInterviewHandler);

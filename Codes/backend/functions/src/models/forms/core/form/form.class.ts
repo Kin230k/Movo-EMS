@@ -4,7 +4,6 @@ export class Form {
   constructor(
     public projectId: string | null,
     public locationId: string | null,
-    public op:Operation,
     public formId?: string
   ) {}
 

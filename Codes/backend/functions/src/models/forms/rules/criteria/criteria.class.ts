@@ -4,7 +4,7 @@ export class Criteria {
   constructor(
     public type: any,
     public questionId: string,
-    public op :Operation,
+    public criterion_effect :"PASS"|"FAIL",
     public criterionId?: string,
     public value?: string
   ) {}

@@ -7,11 +7,10 @@ import { Multilingual } from '../../models/multilingual.type';
 import { ProjectService } from '../../models/project/project/project.service';
 import { authenticateClient } from '../../utils/authUtils';
 export interface CreateProjectData {
-  clientId: string;
   name: Multilingual;
   startingDate: string; // ISO date string
   badgeBackground?: string;
-  endingDate?: string;
+  endingDate: string;
   description?: Multilingual | null;
 }
 
@@ -22,14 +21,13 @@ export async function createProjectHandler(request: CallableRequest<CreateProjec
   if (!auth.success) return auth;
 
   const {
-    clientId,
     name,
     startingDate,
     badgeBackground,
     endingDate,
     description,
   } = request.data || {};
-  if (!clientId || !name || !startingDate) {
+  if ( !name || !startingDate) {
     issues.push({
       field: 'input',
       message: 'Missing required fields: clientId, name, startingDate',
@@ -39,7 +37,7 @@ export async function createProjectHandler(request: CallableRequest<CreateProjec
 
   try {
     await ProjectService.createProject(
-      clientId,
+      auth.callerUuid,
       name as Multilingual,
       startingDate,
       badgeBackground,

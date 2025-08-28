@@ -8,7 +8,7 @@ export class AttendanceService {
   // CREATE
   static async createAttendance(
     attendanceTimestamp: string,
-    signedWith: 'QR_CODE' | 'MANUAL',
+    signedWith: 'BARCODE' | 'MANUAL',
     signedBy: string,
     userId: string,
     areaId: string
@@ -27,7 +27,7 @@ export class AttendanceService {
   static async updateAttendance(
     attendanceId: string,
     attendanceTimestamp: string,
-    signedWith: 'QR_CODE' | 'MANUAL',
+    signedWith: 'BARCODE' | 'MANUAL',
     signedBy: string,
     userId: string,
     areaId: string

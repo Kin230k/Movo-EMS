@@ -62,6 +62,16 @@ export class QuestionTypeMapper extends BaseMapper<QuestionType> {
 
     await pool.query('CALL delete_question_type($1, $2)', [currentUserId, id]);
   }
+  async getValidTypeCodes(): Promise<string[]> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+
+  const result = await pool.query(
+    'SELECT typeCode FROM QUESTION_TYPES',
+    
+  );
+  return result.rows.map(row => row.typecode);
+}
 
   private mapRowToQuestionType = (row: any): QuestionType => {
     return new QuestionType(row.description, row.typeCode);

@@ -43,6 +43,8 @@ import { getAreaByIdHandler } from '../../handlers/projects/areas/getAreaByIdHan
 import { updateAreaHandler } from '../../handlers/projects/areas/updateAreaHandler';
 import { getAreasByLocationHandler } from '../../handlers/projects/areas/getAreasByLocationHandler';
 import { getAllAreasHandler } from '../../handlers/projects/areas/getAllAreasHandler';
+import { getAllProjectsHandler } from '../../handlers/projects/getAllProjectsHandler';
+import { getAllActiveProjectsHandler } from '../../handlers/projects/getAllActiveProjectsHandler';
 
 // --- Project Callables ---
 export const createProject = onCall(createProjectHandler);
@@ -50,7 +52,8 @@ export const deleteProject = onCall(deleteProjectHandler);
 export const getProject = onCall(getProjectByIdHandler);
 export const updateProject = onCall(updateProjectHandler);
 export const getProjectByClient=onCall(getProjectByClientHandler);
-
+export const getAllProjects=onCall(getAllProjectsHandler)
+export const getAllActiveProjects=onCall(getAllActiveProjectsHandler)
 // --- Location Callables ---
 export const createLocation = onCall(createLocationHandler);
 export const deleteLocation = onCall(deleteLocationHandler);

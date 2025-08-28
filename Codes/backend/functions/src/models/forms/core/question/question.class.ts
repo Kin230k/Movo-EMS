@@ -3,11 +3,10 @@ import { Multilingual } from '../../../multilingual.type';
 
 export class Question {
   constructor(
-    public typeCode: string,
+    public typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
     public questionText: Multilingual,
     public formId: string,
     public interviewId: string,
-    public op :Operation,
     public questionId?: string
   ) {}
 

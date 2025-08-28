@@ -23,6 +23,12 @@ export class AdminMapper extends BaseMapper<Admin> {
         jobPosition,
       ]);
     } else {
+      console.log( currentUserId,
+        adminId,
+        name,
+        qid,
+        dateOfBirth,
+        jobPosition,)
       await pool.query('CALL create_admin($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         adminId,
@@ -42,9 +48,10 @@ export class AdminMapper extends BaseMapper<Admin> {
       'SELECT * FROM get_admin_by_id($1, $2)',
       [currentUserId, id]
     );
-    const admin = this.mapRowToEntity(result.rows[0]);
-    admin.operation = Operation.UPDATE;
-    return result.rows.length ? admin : null;
+    let admin :Admin | undefined
+     if(result.rows.length) {  admin =this.mapRowToEntity(result.rows[0]);
+    admin.operation = Operation.UPDATE;}
+    return admin ? admin : null;
   }
 
   async getAll(): Promise<Admin[]> {

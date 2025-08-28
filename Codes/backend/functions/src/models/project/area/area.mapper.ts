@@ -34,13 +34,11 @@ export class AreaMapper extends BaseMapper<Area> {
   }
 
   async getById(id: string): Promise<Area | null> {
-    const currentUserId = CurrentUser.uuid;
-    if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!id) throw new Error('Area ID is required');
 
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_area_by_id($1, $2)',
-      [currentUserId, id]
+      'SELECT * FROM get_area_by_id($1)',
+      [id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
@@ -74,7 +72,7 @@ export class AreaMapper extends BaseMapper<Area> {
   }
 
   private mapRowToEntity = (row: any): Area => {
-    return new Area(row.name, row.locationId, row.areaId);
+    return new Area(row.name, row.locationid, row.areaid);
   };
 }
 

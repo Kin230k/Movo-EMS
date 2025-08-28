@@ -20,7 +20,7 @@ RETURN QUERY
  c.company,
  c.contactEmail,
  c.contactPhone,
- c.status client_status
+ c.status::client_status
  FROM CLIENTS c
  WHERE c.clientId = p_client_id;
 END;

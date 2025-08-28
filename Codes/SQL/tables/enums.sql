@@ -22,3 +22,13 @@ CREATE TYPE client_status AS ENUM (
     'accepted',
     'rejected'
 );
+CREATE TYPE question_types AS ENUM
+(
+'OPEN_ENDED',
+'SHORT_ANSWER',
+'NUMBER',
+'RATE',
+'DROPDOWN',
+'RADIO',
+'MULTIPLE_CHOICE'
+)

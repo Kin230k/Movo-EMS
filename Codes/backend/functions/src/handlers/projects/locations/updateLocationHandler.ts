@@ -7,7 +7,7 @@ import { LocationService } from '../../../models/project/location/location.servi
 import { authenticateClient } from '../../../utils/authUtils';
 
 export interface UpdateLocationData {
-  clientId: string;
+  
   locationId: string;
   name: Multilingual;
   projectId: string;
@@ -22,9 +22,9 @@ export async function updateLocationHandler(request: CallableRequest<UpdateLocat
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;
 
-  const { clientId, locationId, name, projectId, siteMap, longitude, latitude } = request.data || {};
+  const {  locationId, name, projectId, siteMap, longitude, latitude } = request.data || {};
 
-  if (!clientId || !locationId || !name || !projectId) {
+  if ( !locationId || !name || !projectId) {
     issues.push({
       field: 'input',
       message: 'Missing required fields: clientId, locationId, name, projectId',

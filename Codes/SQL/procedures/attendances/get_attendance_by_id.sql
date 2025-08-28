@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_attendance_by_id(p_auth_user_id UUID,p_attendance_id UUID)
+CREATE OR REPLACE FUNCTION get_attendance_by_id(p_attendance_id UUID)
 RETURNS TABLE (
  attendanceId UUID,
  attendanceTimestamp TIMESTAMP,
@@ -10,7 +10,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 BEGIN
- CALL check_user_permission(p_auth_user_id, 'get_attendance_by_id');
+
 
 RETURN QUERY
  SELECT

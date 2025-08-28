@@ -1,15 +1,16 @@
 import criteriaMapper from './criteria.mapper';
 import { Criteria } from './criteria.class';
 import { CriteriaOperator } from '../../../criteria_operator.enum';
-import { Operation } from '../../../operation.enum';
+
 
 export class CriteriaService {
   static async createCriterion(
     type: CriteriaOperator,
     value: string,
     questionId: string
+    ,effect :"PASS"|"FAIL"
   ): Promise<void> {
-    const entity = new Criteria(type, value, Operation.CREATE, questionId);
+    const entity = new Criteria(type,questionId ,effect,undefined,value);
     await criteriaMapper.save(entity);
   }
 
@@ -18,13 +19,14 @@ export class CriteriaService {
     type: CriteriaOperator,
     value: string,
     questionId: string
+    ,effect :"PASS"|"FAIL"
   ): Promise<void> {
     const entity = new Criteria(
       type,
-      value,
-      Operation.UPDATE,
       questionId,
+      effect,
       criterionId
+      ,value
     );
     await criteriaMapper.save(entity);
   }

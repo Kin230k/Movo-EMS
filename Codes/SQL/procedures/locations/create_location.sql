@@ -1,4 +1,5 @@
 CREATE OR REPLACE FUNCTION create_location(
+ p_auth_user_id UUID,
  p_name JSONB,
  p_project_id UUID,
  p_site_map VARCHAR(512),
@@ -6,10 +7,10 @@ CREATE OR REPLACE FUNCTION create_location(
  p_latitude NUMERIC
 )
 RETURNS TABLE (
- locationId UUID,
+ locationid UUID,
  name JSONB,
- projectId UUID,
- siteMap VARCHAR(512),
+ projectid UUID,
+ sitemap VARCHAR(512),
  longitude NUMERIC,
  latitude NUMERIC
 )
@@ -26,8 +27,8 @@ IF p_longitude < -180 OR p_longitude > 180 THEN
  END IF;
 
  RETURN QUERY
- INSERT INTO LOCATIONS (locationId, name, projectId, siteMap, longitude, latitude)
+ INSERT INTO locations (locationid, name, projectid, sitemap, longitude, latitude)
  VALUES (gen_random_uuid(), p_name, p_project_id, p_site_map, p_longitude, p_latitude)
- RETURNING locationId, name, projectId, siteMap, longitude, latitude;
+ RETURNING locations.locationid, locations.name, locations.projectid, locations.sitemap, locations.longitude, locations.latitude;
 END;
 $$;

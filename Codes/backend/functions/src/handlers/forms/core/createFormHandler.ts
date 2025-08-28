@@ -11,8 +11,8 @@ import { authenticateClient } from '../../../utils/authUtils';
  * but validation below ensures they become non-empty strings.
  */
 export interface CreateFormRequestData {
-  projectId?: string | null;
-  locationId?: string | null;
+  projectId?: string ;
+  locationId?: string ;
 }
 
 export async function createFormHandler(
@@ -31,18 +31,13 @@ export async function createFormHandler(
     typeof data.projectId === 'string' ? data.projectId.trim() : null;
   const locationId =
     typeof data.locationId === 'string' ? data.locationId.trim() : null;
-
-  if (!projectId) {
-    issues.push({
-      field: 'projectId',
-      message: 'projectId is required and must be a non-empty string',
-    });
-  }
-  if (!locationId) {
-    issues.push({
-      field: 'locationId',
-      message: 'locationId is required and must be a non-empty string',
-    });
+    if ((locationId && projectId) || (!locationId && !projectId)) {
+        issues.push({
+          field: 'projectId locationId',
+          message: 'projectId or loctionId only one of them needed',
+        });
+        
+      
   }
   if (issues.length > 0) {
     logger.warn('Validation failed for createFormHandler input', { issues });

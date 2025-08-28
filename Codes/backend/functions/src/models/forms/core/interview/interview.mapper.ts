@@ -39,6 +39,7 @@ export class InterviewMapper extends BaseMapper<Interview> {
       'SELECT * FROM get_interview_by_id($1, $2)',
       [currentUserId, id]
     );
+    console.log(result);
     return result.rows.length ? this.mapRowToInterview(result.rows[0]) : null;
   }
 
@@ -73,7 +74,7 @@ export class InterviewMapper extends BaseMapper<Interview> {
 
 
   private mapRowToInterview = (row: any): Interview => {
-    return new Interview(row.projectId, row.interviewId);
+    return new Interview(row.projectid, row.interviewid);
   };
 }
 

@@ -4,14 +4,13 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
 import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
-import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
+
 export interface CreateSubmissionRequestData {
   formId?: string;
   interviewId?: string;
   dateSubmitted?: string;
-  outcome?: string;
   decisionNotes?: string;
 }
 export async function createSubmissionHandler(
@@ -23,13 +22,13 @@ export async function createSubmissionHandler(
   if (!auth.success) return auth;
 
   // 2) Extract and validate input
-  const { formId, interviewId, dateSubmitted, outcome, decisionNotes } =
+  const { formId, interviewId, dateSubmitted, decisionNotes } =
     request.data || {};
-
-  if (!formId || !interviewId || !dateSubmitted) {
+  
+  if (!formId ||  !dateSubmitted) {
     issues.push({
       field: 'input',
-      message: 'Missing required fields: formId, interviewId, dateSubmitted',
+      message: 'Missing required fields: formId,  dateSubmitted',
     });
     return { success: false, issues };
   }
@@ -48,7 +47,6 @@ export async function createSubmissionHandler(
       userId,
       interviewId,
       new Date(dateSubmitted),
-      outcome as SubmissionOutcome | undefined,
       decisionNotes
     );
     return { success: true };
