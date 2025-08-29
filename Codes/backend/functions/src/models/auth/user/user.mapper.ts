@@ -136,6 +136,7 @@ export class UserMapper extends BaseMapper<User> {
       'SELECT * FROM get_user_by_email($1, $2)',
       [currentUserId, email]
     );
+    
     return result.rows.length ? this.mapRowToUser(result.rows[0]) : null;
   }
   async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
@@ -159,9 +160,10 @@ export class UserMapper extends BaseMapper<User> {
       row.phone,
       row.role,
       row.status,
-      row.twoFaEnabled,
+      row.twofaenabled,
       row.picture,
-      row.userId,
+      row.Operation,
+      row.userid,
     );
   };
   

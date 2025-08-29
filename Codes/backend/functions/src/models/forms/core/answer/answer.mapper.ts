@@ -114,52 +114,82 @@ export class AnswersMapper extends BaseMapper<Answer> {
 
     await pool.query('CALL delete_answer($1, $2)', [currentUserId, id]);
   }
-
-  private mapRowToAnswer = (row: any): Answer => {
-    const answerId = row.answerId;
-    const submissionId = row.submissionId;
-    const questionId = row.questionId;
-    const answeredAt = row.answeredAt ? new Date(row.answeredAt) : new Date();
-
-    // helper to attach operation and return
+    async getManualAnswersBySubmissionId(submissionId:string): Promise<Answer[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if(!submissionId) throw new Error('Submission ID is Required');
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_manual_answers_by_submission($1,$2)',
+      [currentUserId,submissionId]
+    );
+    return result.rows.map(this.mapRowToAnswer);
+  }
+    async getAnswersBySubmissionId(submissionId:string): Promise<Answer[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if(!submissionId) throw new Error('Submission ID is Required');
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_answers_by_submission_id($1,$2)',
+      [currentUserId,submissionId]
+    );
+    console.log(result)
+    return result.rows.map(this.mapRowToAnswer);
+  }
+ 
+private mapRowToAnswer = (row: any): Answer => {
+    const answerId = row.answerid;
+    const submissionId = row.submissionid;
+    const questionId = row.questionid;
+    const answeredAt = row.answeredat ? new Date(row.answeredat) : new Date();
+    console.log(row);
     const withUpdateOp = (ans: Answer): Answer => {
       ans.operation = Operation.UPDATE;
       return ans;
     };
 
-    // infer subtype by which returned subtype columns are present
-    // priority: text -> rating -> options (non-empty) -> numeric
-    if (row.textResponse != null) {
+    // Check for text response first
+    if (row.textresponse !== null && row.textresponse !== undefined) {
       return withUpdateOp(
         new TextAnswer(
           answerId,
           submissionId,
           questionId,
-          row.textResponse,
+          row.textresponse,
           answeredAt
         )
       );
     }
-
-    if (row.ratingValue != null) {
+    
+    // Check for rating value
+    if (row.ratingvalue !== null && row.ratingvalue !== undefined) {
       return withUpdateOp(
         new RatingAnswer(
           answerId,
           submissionId,
           questionId,
-          Number(row.ratingValue),
+          Number(row.ratingvalue),
           answeredAt
         )
       );
     }
 
-    if (
-      row.optionIds != null &&
-      Array.isArray(row.optionIds) &&
-      row.optionIds.length > 0
-    ) {
-      const optionIds: string[] = row.optionIds;
-      const optionTexts: any[] = row.optionTexts ?? null;
+    // Check for numeric response
+    if (row.numericresponse !== null && row.numericresponse !== undefined) {
+      return withUpdateOp(
+        new NumericAnswer(
+          answerId,
+          submissionId,
+          questionId,
+          Number(row.numericresponse),
+          answeredAt
+        )
+      );
+    }
+
+    // Check for options - use array length instead of null check
+    if (row.optionids !== null && row.optionids !== undefined && row.optionids.length > 0) {
+      const optionIds: string[] = row.optionids || [];
+      const optionTexts: any[] = row.optiontexts || [];
       return withUpdateOp(
         new OptionsAnswer(
           answerId,
@@ -172,21 +202,8 @@ export class AnswersMapper extends BaseMapper<Answer> {
       );
     }
 
-    if (row.numericResponse != null) {
-      return withUpdateOp(
-        new NumericAnswer(
-          answerId,
-          submissionId,
-          questionId,
-          Number(row.numericResponse),
-          answeredAt
-        )
-      );
-    }
-
-    // Fallback: if nothing present, throw so you notice incomplete rows
     throw new Error(`Unable to infer answer subtype for answerId=${answerId}`);
-  };
+};
 }
 
 const answersMapper = new AnswersMapper();

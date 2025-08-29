@@ -7,77 +7,138 @@ DECLARE
   raw_text        TEXT;
   raw_numeric     NUMERIC;
   eval_result     BOOLEAN;
-  crit_effect     criterion_effect;
   answer_outcome  answer_result_outcome := 'MANUAL';
   found_match     BOOLEAN := FALSE;
+  sub_id          UUID;
+
+  -- option-specific vars
+  opt_correct     BOOLEAN;
+  all_correct     BOOLEAN;
+  selected_count  INT;
 BEGIN
   -- Lookup the questionId for this answer
   SELECT questionId
     INTO answer_qid
-    FROM ANSWERS
+    FROM answers
    WHERE answerId = NEW.answerId;
 
   -- Fetch the question type
   SELECT typeCode
     INTO question_type
-    FROM QUESTIONS
+    FROM questions
    WHERE questionId = answer_qid;
 
-  -- Loop through all criteria for this question
+  ----------------------------------------------------------------
+  -- Handle option-based question types (no criteria rows exist)
+  ----------------------------------------------------------------
+  IF question_type IN ('DROPDOWN','RADIO','MULTIPLE_CHOICE') THEN
+
+    -- remove any previous per-criterion rows for this answer (optional)
+    DELETE FROM criteria_results WHERE answerId = NEW.answerId;
+
+
+    IF question_type IN ('DROPDOWN','RADIO') THEN
+      -- single selected option -> check its isCorrect flag
+      SELECT o.isCorrect
+        INTO opt_correct
+      FROM answer_options ao
+      JOIN options o USING (optionId)
+      WHERE ao.answerId = NEW.answerId
+      LIMIT 1;
+
+      IF opt_correct THEN
+        answer_outcome := 'PASSED';
+      ELSE
+        answer_outcome := 'FAILED';
+      END IF;
+
+    ELSE
+      -- MULTIPLE_CHOICE: require all selected options to be correct
+DECLARE
+  total_correct_count INT;
+
+  -- Get the total number of correct options for this question
+  SELECT COUNT(*) INTO total_correct_count
+  FROM options
+  WHERE questionId = answer_qid AND isCorrect = TRUE;
+
+  -- Get the number of selected options and whether they're all correct
+  SELECT bool_and(o.isCorrect) AS all_correct, count(*) AS selected_count
+    INTO all_correct, selected_count
+  FROM answer_options ao
+  JOIN options o USING (optionId)
+  WHERE ao.answerId = NEW.answerId;
+
+  -- Compare selected count with total correct count
+  IF selected_count = total_correct_count AND all_correct THEN
+    answer_outcome := 'PASSED';
+  ELSE
+    answer_outcome := 'FAILED';
+  END IF;
+    END IF;
+
+    -- upsert combined answer-level result (no per-criterion rows exist)
+    INSERT INTO answer_results(answerId, outcome)
+      VALUES (NEW.answerId, answer_outcome)
+    ON CONFLICT (answerId) DO UPDATE
+      SET outcome = EXCLUDED.outcome;
+
+    -- assign submissionId & recompute counts/outcome
+    SELECT submissionId INTO sub_id
+      FROM answers
+     WHERE answerId = NEW.answerId;
+
+    PERFORM submission_answer_count(sub_id);
+    PERFORM update_submission_outcome(sub_id);
+
+    RETURN NEW;
+  END IF;
+
+  ----------------------------------------------------------------
+  -- Non-option questions: evaluate using criteria table (original logic)
+  ----------------------------------------------------------------
   FOR criterion IN
-    SELECT * FROM CRITERIA WHERE questionId = answer_qid
+    SELECT * FROM criteria WHERE questionId = answer_qid
   LOOP
     -- extract raw answer & evaluate
     CASE question_type
       WHEN 'OPEN_ENDED','SHORT_ANSWER' THEN
         SELECT response INTO raw_text
-          FROM TEXT_ANSWERS WHERE answerId = NEW.answerId;
+          FROM text_answers WHERE answerId = NEW.answerId;
+
+        -- CAST criterion.type to the enum here
         eval_result := evaluate_text_criteria(
-                         criterion.type, criterion.value, raw_text
+                         criterion.type::criteria_operator,
+                         criterion.value,
+                         raw_text
                        );
 
       WHEN 'NUMBER' THEN
         SELECT response INTO raw_numeric
-          FROM NUMERIC_ANSWERS WHERE answerId = NEW.answerId;
+          FROM numeric_answers WHERE answerId = NEW.answerId;
+
         eval_result := evaluate_numeric_criteria(
-                         criterion.type, criterion.value, raw_numeric
+                         criterion.type::criteria_operator,
+                         criterion.value,
+                         raw_numeric
                        );
 
       WHEN 'RATE' THEN
         SELECT rating::NUMERIC INTO raw_numeric
-          FROM RATING_ANSWERS WHERE answerId = NEW.answerId;
+          FROM rating_answers WHERE answerId = NEW.answerId;
+
         eval_result := evaluate_numeric_criteria(
-                         criterion.type, criterion.value, raw_numeric
-                       );
-
-      WHEN 'DROPDOWN','RADIO' THEN
-        SELECT o.optionText->>current_setting('app.locale',true)
-          INTO raw_text
-        FROM ANSWER_OPTIONS ao
-        JOIN OPTIONS o USING (optionId)
-        WHERE ao.answerId = NEW.answerId
-        LIMIT 1;
-        eval_result := evaluate_text_criteria(
-                         criterion.type, criterion.value, raw_text
-                       );
-
-      WHEN 'MULTIPLE_CHOICE' THEN
-        SELECT STRING_AGG(
-                 o.optionText->>current_setting('app.locale',true), ','
-               ) INTO raw_text
-        FROM ANSWER_OPTIONS ao
-        JOIN OPTIONS o USING (optionId)
-        WHERE ao.answerId = NEW.answerId;
-        eval_result := evaluate_text_criteria(
-                         criterion.type, criterion.value, raw_text
+                         criterion.type::criteria_operator,
+                         criterion.value,
+                         raw_numeric
                        );
 
       ELSE
         eval_result := NULL;
     END CASE;
 
-    -- insert per-criterion result, casting each branch to the enum
-    INSERT INTO CRITERIA_RESULTS (
+    -- insert per-criterion result
+    INSERT INTO criteria_results (
       criterionResultId,
       answerId,
       criterionId,
@@ -111,18 +172,20 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- upsert combined answer‐level result (already enum, no cast needed)
-  INSERT INTO ANSWER_RESULTS(answerId, outcome)
+  -- upsert combined answer‐level result
+  INSERT INTO answer_results(answerId, outcome)
     VALUES (NEW.answerId, answer_outcome)
   ON CONFLICT (answerId) DO UPDATE
     SET outcome = EXCLUDED.outcome;
+   
+  -- assign submissionId
+  SELECT submissionId INTO sub_id 
+    FROM answers 
+   WHERE answerId = NEW.answerId;
 
-    PERFORM submission_answer_count();
-
-  -- recompute submission outcome
-  PERFORM update_submission_outcome(
-    (SELECT submissionId FROM ANSWERS WHERE answerId = NEW.answerId)
-  );
+  -- recompute counts and outcomes
+  PERFORM submission_answer_count(sub_id);
+  PERFORM update_submission_outcome(sub_id);
 
   RETURN NEW;
 END;

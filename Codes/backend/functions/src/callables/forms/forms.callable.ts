@@ -21,13 +21,18 @@ import { deleteSubmissionHandler } from '../../handlers/forms/submissions/delete
 import { getSubmissionHandler } from '../../handlers/forms/submissions/getSubmissionHandler';
 import { updateSubmissionHandler } from '../../handlers/forms/submissions/updateSubmissionHandler';
 import { getManualSubmissionsByFormIdHandler } from '../../handlers/forms/submissions/getManualSubmissionsByFormHandler';
-
+import { createSubmissionWithAnswerHandler } from '../../handlers/forms/submissions/createSubmissionWithAnswerHandler';
+import { getManualAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getManualAnswersBySubmissionHandler';
+import { getSubmissionsByFormHandler } from '../../handlers/forms/submissions/getSubmissionsByFormHandler';
+import { getAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getAnswersBySubmissionHandler';
+import { updateSubmissionStatusForManualHandler } from '../../handlers/forms/submissions/updateSubmissionStatusForManualHandler';
 // Interview handlers
 import { createInterviewHandler } from '../../handlers/forms/core/interview/createInterviewHandler';
 import { deleteInterviewHandler } from '../../handlers/forms/core/interview/deleteInterviewHandler';
 import { getInterviewsByProjectHandler } from '../../handlers/forms/core/interview/getInterviewsByProjectHandler';
 import { updateInterviewHandler } from '../../handlers/forms/core/interview/updateInterviewHandler';
 import { getInterviewHandler } from '../../handlers/forms/core/interview/getInterviewHandler';
+
 // Export callable functions
 
 // Form core
@@ -49,7 +54,12 @@ export const createSubmission = onCall(createSubmissionHandler);
 export const deleteSubmission = onCall(deleteSubmissionHandler);
 export const getSubmission = onCall(getSubmissionHandler);
 export const updateSubmission = onCall(updateSubmissionHandler);
-export const getManualByFormId=onCall(getManualSubmissionsByFormIdHandler)
+export const getManualByFormId=onCall(getManualSubmissionsByFormIdHandler);
+export const createSubmissionWithAnswer=onCall(createSubmissionWithAnswerHandler);
+export const getManualAnswersBySubmissionId=onCall(getManualAnswersBySubmissionIdHandler);
+export const getSubmissionsByForm=onCall(getSubmissionsByFormHandler);
+export const getAnswersBySubmissionId=onCall(getAnswersBySubmissionIdHandler);
+export const updateSubmissionStatusForManual=onCall(updateSubmissionStatusForManualHandler);
 //Interview
 export const createInterview=onCall(createInterviewHandler);
 export const updateInterview=onCall(updateInterviewHandler);

@@ -3,8 +3,11 @@ import { BaseMapper } from '../../base-mapper';
 import { Project } from './project.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
+import { Multilingual } from '../../multilingual.type';
 import { CurrentUser } from '../../../utils/currentUser.class';
-
+export interface ProjectWithClient extends Omit<Project, 'operation'> {
+  clientName: Multilingual;
+}
 export class ProjectMapper extends BaseMapper<Project> {
   async save(entity: Project): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -100,10 +103,19 @@ export class ProjectMapper extends BaseMapper<Project> {
     ]);
     return result.rows.map(this.mapRowToEntity);
   }
+  async getAllProjectWithClientName():Promise<ProjectWithClient[]>
+  {
+       const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
 
-  async getAllActive(): Promise<Project[]> {
+    const result = await pool.query('SELECT * FROM get_all_projects($1)', [
+      currentUserId,
+    ]);
+    return result.rows.map(this.mapRowToEntityWithClient);
+  }
+  async getAllActive(): Promise<ProjectWithClient[]> {
     const result = await pool.query('SELECT * FROM get_active_projects()');
-    return result.rows.map(this.mapRowToEntity);
+    return result.rows.map(this.mapRowToEntityWithClient);
   }
   async getByClient(clientId: string): Promise<Project[]> {
     const currentUserId = CurrentUser.uuid;
@@ -125,6 +137,7 @@ export class ProjectMapper extends BaseMapper<Project> {
     await pool.query('CALL delete_project($1, $2)', [currentUserId, id]);
   }
 
+  
   private mapRowToEntity = (row: any): Project => {
     return new Project(
       row.clientid,
@@ -136,7 +149,20 @@ export class ProjectMapper extends BaseMapper<Project> {
       row.description
     );
   };
+  
+    private mapRowToEntityWithClient = (row: any): ProjectWithClient => {
+    const project = this.mapRowToEntity(row);
+    return {
+      
+      ...project,
+      clientName: row.clientname
+      
+    }};
+  
 }
+
+  
+
 
 const projectMapper = new ProjectMapper();
 export default projectMapper;

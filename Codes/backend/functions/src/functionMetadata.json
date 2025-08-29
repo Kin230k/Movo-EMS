@@ -226,6 +226,18 @@
     ]
   },
   {
+    "name": "getUserInfoByEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createClient",
     "description": "",
     "parameters": [
@@ -792,6 +804,162 @@
     "parameters": [
       {
         "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createSubmissionWithAnswer",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "questionId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "answeredAt",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "answerType",
+        "type": "\"text\" | \"rating\" | \"numeric\" | \"options\" | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "textResponse",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "rating",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "numericResponse",
+        "type": "number | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "optionIds",
+        "type": "string[] | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getManualAnswersBySubmissionId",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSubmissionsByForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAnswersBySubmissionId",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "updateSubmissionStatusForManual",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "outcome",
         "type": "string",
         "required": true,
         "description": ""

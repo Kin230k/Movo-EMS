@@ -141,6 +141,33 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
     return result.rows.map(this.mapRowToSubmission);
   }
+      async getSubmissionsByFormId(formId: string): Promise<Submission[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!formId) throw new Error('Form ID is required');
+    
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_submissions_by_form_id($1, $2)',
+      [currentUserId, formId]
+    );
+
+    return result.rows.map(this.mapRowToSubmission);
+  }
+  async updateSubmissionStatusForManual(
+  submissionId: string, 
+  outcome: string
+): Promise<void> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  if (!submissionId) throw new Error('Submission ID is required');
+  if (!outcome) throw new Error('Outcome is required');
+
+  await pool.query(
+    'CALL update_submission_status($1, $2, $3)',
+    [currentUserId, submissionId, outcome]
+  );
+}
+  
 
 
   private mapRowToSubmission = (row: any): Submission => {

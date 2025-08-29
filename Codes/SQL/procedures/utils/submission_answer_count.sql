@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION submission_answer_count(p_submissionid UUID)
-RETURNS VOID AS $$
+RETURNS VOID AS $$          
 BEGIN
   UPDATE submissions
   SET answer_count = COALESCE(answer_count, 0) + 1
