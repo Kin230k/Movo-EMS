@@ -1,14 +1,13 @@
 import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { QuestionService } from '../../../../models/forms/core/question/question.service';
-import { Multilingual } from '../../../../models/multilingual.type';
 import { parseDbError } from '../../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../../utils/types';
 
 interface UpdateQuestionData {
   questionId: string;
-  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE' ;
-  questionText: Multilingual;
+  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE';
+  questionText: string;  // Changed from Multilingual to string
   formId: string;
   interviewId: string;
 }
@@ -38,7 +37,7 @@ export async function updateQuestionHandler(request: CallableRequest<UpdateQuest
     await QuestionService.updateQuestion(
       questionId,
       typeCode,
-      questionText as Multilingual,
+      questionText,  // Now passes string directly
       formId,
       interviewId
     );

@@ -26,7 +26,7 @@ export class OptionMapper extends BaseMapper<Option> {
       await pool.query('CALL update_option($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         optionId,
-        optionText,
+        optionText,  // Now passes string directly
         questionId,
         isCorrect,
         displayOrder,
@@ -34,12 +34,11 @@ export class OptionMapper extends BaseMapper<Option> {
     } else {
       await pool.query('CALL create_option($1, $2, $3, $4, $5)', [
         currentUserId,
-        optionText,
+        optionText,  // Now passes string directly
         questionId,
         isCorrect,
         displayOrder,
       ]);
-      
     }
   }
 
@@ -75,11 +74,11 @@ export class OptionMapper extends BaseMapper<Option> {
 
   private mapRowToOption = (row: any): Option => {
     return new Option(
-      row.optionText,
-      row.questionId,
-      row.isCorrect,
-      row.displayOrder,
-      row.optionId
+      row.optiontext,  // Now receives string directly
+      row.questionid,
+      row.iscorrect,
+      row.displayorder,
+      row.optionid
     );
   };
 }

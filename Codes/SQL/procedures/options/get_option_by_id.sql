@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_option_by_id(p_auth_user_id UUID,p_option_id UUID)
 RETURNS TABLE (
     optionId UUID,
-    optionText JSONB,
+    optionText TEXT,  -- Changed from JSONB to TEXT
     questionId UUID,
     isCorrect BOOLEAN,
     displayOrder INT
@@ -12,7 +12,7 @@ BEGIN
 RETURN QUERY 
     SELECT 
         o.optionId,
-        o.optionText,
+        o.optionText,  -- Now returns TEXT
         o.questionId,
         o.isCorrect,
         o.displayOrder

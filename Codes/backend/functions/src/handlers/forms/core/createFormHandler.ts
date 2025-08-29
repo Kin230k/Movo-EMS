@@ -11,8 +11,10 @@ import { authenticateClient } from '../../../utils/authUtils';
  * but validation below ensures they become non-empty strings.
  */
 export interface CreateFormRequestData {
-  projectId?: string ;
-  locationId?: string ;
+  projectId?: string;
+  locationId?: string;
+  formLanguage?: string;
+  formTitle?: string;
 }
 
 export async function createFormHandler(
@@ -23,33 +25,45 @@ export async function createFormHandler(
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;
 
-  // cast request.data to our interface for safer access
   const data = request.data;
 
-  // 2) Extract input (defensive checks)
-  const projectId =
-    typeof data.projectId === 'string' ? data.projectId.trim() : null;
-  const locationId =
-    typeof data.locationId === 'string' ? data.locationId.trim() : null;
-    if ((locationId && projectId) || (!locationId && !projectId)) {
-        issues.push({
-          field: 'projectId locationId',
-          message: 'projectId or loctionId only one of them needed',
-        });
-        
-      
+  const projectId = typeof data.projectId === 'string' ? data.projectId.trim() : null;
+  const locationId = typeof data.locationId === 'string' ? data.locationId.trim() : null;
+  const formLanguage = typeof data.formLanguage === 'string' ? data.formLanguage.trim() : '';
+  const formTitle = typeof data.formTitle === 'string' ? data.formTitle.trim() : '';
+
+  // Validation
+  if ((locationId && projectId) || (!locationId && !projectId)) {
+    issues.push({
+      field: 'projectId locationId',
+      message: 'projectId or locationId only one of them needed',
+    });
   }
+
+  if (!formLanguage) {
+    issues.push({
+      field: 'formLanguage',
+      message: 'Form language is required',
+    });
+  }
+
+  if (!formTitle) {
+    issues.push({
+      field: 'formTitle',
+      message: 'Form title is required',
+    });
+  }
+
   if (issues.length > 0) {
     logger.warn('Validation failed for createFormHandler input', { issues });
     return { success: false, issues };
   }
 
-  // 3) Call service
   try {
-    await FormService.createForm(projectId, locationId);
+    await FormService.createForm(projectId, locationId, formLanguage, formTitle);
     return { success: true };
   } catch (err: any) {
-    logger.error('Form creation failed', { err, projectId, locationId });
+    logger.error('Form creation failed', { err, projectId, locationId, formLanguage, formTitle });
 
     const parsed = parseDbError(err);
     const responseIssues: FieldIssue[] =

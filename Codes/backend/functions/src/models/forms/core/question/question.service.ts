@@ -1,35 +1,33 @@
 import questionMapper from './question.mapper';
 import { Question } from './question.class';
-import { Multilingual } from '../../../multilingual.type';
-
 
 export class QuestionService {
-static async createQuestion(
-  typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
-  questionText: Multilingual,
-  formId: string,
-  interviewId: string
-): Promise<Question> {
-  const entity = new Question(
-    typeCode,
-    questionText,
-    formId,
-    interviewId
-  );
-  await questionMapper.save(entity);
-  return entity;
-}
+  static async createQuestion(
+    typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
+    questionText: string,  // Changed from Multilingual to string
+    formId: string,
+    interviewId: string
+  ): Promise<Question> {
+    const entity = new Question(
+      typeCode,
+      questionText,  // Now passes string directly
+      formId,
+      interviewId
+    );
+    await questionMapper.save(entity);
+    return entity;
+  }
 
   static async updateQuestion(
     questionId: string,
     typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
-    questionText: Multilingual,
+    questionText: string,  // Changed from Multilingual to string
     formId: string,
     interviewId: string
   ): Promise<void> {
     const entity = new Question(
       typeCode,
-      questionText,
+      questionText,  // Now passes string directly
       formId,
       interviewId,
       questionId
@@ -44,6 +42,7 @@ static async createQuestion(
   static async getAllQuestions(): Promise<Question[]> {
     return await questionMapper.getAll();
   }
+  
   static async getAllQuestionsByFormId(formId: string): Promise<Question[]> {
     return await questionMapper.getAllByFormId(formId);
   }
@@ -51,5 +50,4 @@ static async createQuestion(
   static async deleteQuestion(id: string): Promise<void> {
     await questionMapper.delete(id);
   }
-  
 }

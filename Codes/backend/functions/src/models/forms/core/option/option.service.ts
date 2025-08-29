@@ -1,10 +1,9 @@
 import optionMapper from './option.mapper';
 import { Option } from './option.class';
-import { Multilingual } from '../../../multilingual.type';
 
 export class OptionService {
   static async createOption(
-    optionText: Multilingual,
+    optionText: string,  // Changed from Multilingual to string
     questionId: string,
     isCorrect: boolean,
     displayOrder: number
@@ -15,7 +14,7 @@ export class OptionService {
 
   static async updateOption(
     optionId: string,
-    optionText: Multilingual,
+    optionText: string,  // Changed from Multilingual to string
     questionId: string,
     isCorrect: boolean,
     displayOrder: number
