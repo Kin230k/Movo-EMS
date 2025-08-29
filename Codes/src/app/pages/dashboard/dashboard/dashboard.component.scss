@@ -54,8 +54,8 @@
     display: inline-block;
     margin-top: 0.6rem;
     padding: 0.35rem 0.6rem;
-    background: #fff;
-    color: #000;
+    background: var(--white);
+    color: var(--color-dark-text);
     border-radius: 0.6rem;
   }
 }

@@ -51,7 +51,6 @@
         class="menu-item-link"
         [routerLink]="['/dashboard', item.path]"
         routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
         (click)="onNavigate()"
       >
         <app-button type="button" class="menu-item-btn">

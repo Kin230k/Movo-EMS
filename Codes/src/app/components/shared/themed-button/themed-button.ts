@@ -12,5 +12,6 @@ import { CommonModule } from '@angular/common';
 export class ThemedButtonComponent {
   @Input() type: string = 'button';
   @Input() text: string = '';
+  @Input() disabled: boolean = false;
   @Output() onClick = new EventEmitter<void>();
 }

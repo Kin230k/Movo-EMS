@@ -2,7 +2,7 @@
 .sidebar-wrap {
   background: var(--color-bg-sidebar);
   padding: 1.5rem;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03) inset;
+  box-shadow: 0 0 0 1px var(--shadow-sidebar) inset;
   border-radius: 0 1rem 1rem 0;
   height: 92vh;
   top: 0;
@@ -68,7 +68,7 @@
   border-radius: 0.7rem;
   background-color: var(--bg-dark);
   color: var(--color-font);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 0 var(--shadow-menu);
   font-size: 0.9rem;
   height: 2.4rem;
   display: flex;

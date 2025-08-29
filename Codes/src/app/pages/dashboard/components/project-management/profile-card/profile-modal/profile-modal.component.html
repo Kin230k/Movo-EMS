@@ -18,47 +18,59 @@
         <h2 class="modal-title">{{ "USER.EDIT" | translate }}</h2>
       </header>
 
-
       <div class="fields">
         <label class="field">
-          <span class="label">{{ "PROJECT_MANAGEMENT.NAME_AR" | translate }}</span>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.NAME_AR" | translate
+          }}</span>
           <input type="text" formControlName="nameAr" />
         </label>
 
         <label class="field">
-          <span class="label">{{ "PROJECT_MANAGEMENT.NAME_EN" | translate }}</span>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.NAME_EN" | translate
+          }}</span>
           <input type="text" formControlName="nameEn" />
         </label>
-<!-- 
+        <!-- 
           <label class="field">
             <span class="label">{{ "PROJECT_MANAGEMENT.BADGE_BACKGROUND" | translate }}</span>
             <input type="color" formControlName="badgeBackground" />
           </label> -->
 
         <label class="field">
-          <span class="label">{{ "PROJECT_MANAGEMENT.STARTING_DATE" | translate }}</span>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.STARTING_DATE" | translate
+          }}</span>
           <input type="date" formControlName="startingDate" />
         </label>
 
         <label class="field">
-          <span class="label">{{ "PROJECT_MANAGEMENT.ENDING_DATE" | translate }}</span>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.ENDING_DATE" | translate
+          }}</span>
           <input type="date" formControlName="endingDate" />
         </label>
 
         <label class="field description">
-          <span class="label">{{ "PROJECT_MANAGEMENT.DESCRIPTION_AR" | translate }}</span>
-          <textarea formControlName="descriptionAr" ></textarea>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.DESCRIPTION_AR" | translate
+          }}</span>
+          <textarea formControlName="descriptionAr"></textarea>
         </label>
 
         <label class="field description">
-          <span class="label">{{ "PROJECT_MANAGEMENT.DESCRIPTION_EN" | translate }}</span>
-          <textarea formControlName="descriptionEn" ></textarea>
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.DESCRIPTION_EN" | translate
+          }}</span>
+          <textarea formControlName="descriptionEn"></textarea>
         </label>
-
-   
       </div>
 
       <div class="actions">
+        <button type="button" class="btn neutral" (click)="onClose($event)">
+          {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
+        </button>
         <button
           type="button"
           class="btn primary"
@@ -66,10 +78,6 @@
           [disabled]="form.invalid || !dataLoaded"
         >
           {{ "PROJECT_MANAGEMENT.SAVE" | translate }}
-        </button>
-
-        <button type="button" class="btn neutral" (click)="onClose($event)">
-          {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
         </button>
       </div>
     </div>

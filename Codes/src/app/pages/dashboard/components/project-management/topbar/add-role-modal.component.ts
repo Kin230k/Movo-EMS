@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
-import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 
 @Component({
   selector: 'app-add-role-modal',
@@ -12,12 +11,12 @@ import { ThemedButtonComponent } from '../../../../../components/shared/themed-b
   standalone: true,
 })
 export class AddRoleModalComponent {
-  @Input() projects: { id: number; name: string }[] = [];
-  @Input() roles: { id: string; name: string }[] = []; // new input for roles
+  @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
+  @Input() roles: { id: string; name: { en: string; ar: string } }[] = []; // new input for roles
   @Output() close = new EventEmitter<void>();
   // Emit object containing selected project and role
   @Output() assigned = new EventEmitter<{
-    projectId: number;
+    projectId: string;
     roleId: string;
   }>();
 
@@ -25,7 +24,7 @@ export class AddRoleModalComponent {
   checking = false;
   checkSucceeded = false;
   errorMessage = '';
-  selectedProjectId: number | null = null;
+  selectedProjectId: string | null = null;
   selectedRoleId: string | null = null; // new
 
   // Mock async check — returns Promise<boolean>
@@ -56,7 +55,7 @@ export class AddRoleModalComponent {
     }
   }
 
-  onProjectSelected(projectId: number) {
+  onProjectSelected(projectId: string) {
     this.selectedProjectId = projectId;
     this.errorMessage = '';
   }

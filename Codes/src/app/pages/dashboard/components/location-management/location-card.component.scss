@@ -1,0 +1,111 @@
+.location-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-dark);
+  color: var(--color-font);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 var(--shadow-inset) inset;
+}
+
+.icon {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--radius-img);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(147, 51, 234, 0.2)
+  );
+}
+
+.meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.project {
+  padding: 0.25rem 0.6rem;
+  background: var(--primary);
+  border-radius: var(--radius-btn);
+  font-size: 0.7rem;
+  color: var(--white);
+}
+
+.meta-body {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+
+  .mono {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--color-font-secondary);
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.update-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: var(--radius-btn);
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+}
+
+.update-btn {
+  color: var(--primary);
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.delete-btn {
+  color: var(--error);
+
+  &:hover {
+    background: rgba(var(--error-rgb), 0.1);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}

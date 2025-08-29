@@ -20,14 +20,91 @@
     "USER_MANAGEMENT": "User Management",
     "PROJECT_MANAGEMENT": "Project Management",
     "FORM_MANAGEMENT": "Form Management",
-    "CREATE_FORM_QUESTIONS": "Create Form Questions",
+    "CREATE_FORM_QUESTIONS": "Form Questions",
     "LOCATION_MANAGEMENT": "Location Management",
-    "SEND_EMAILS": "Send Emails",
-    "VIEW_RECORDS": "View Records",
+    "SEND_EMAILS": "Email Management",
+    "VIEW_SUBMISSIONS": "View Submissions",
     "CLIENT_DATA_MANAGEMENT": "Client Data Management",
     "PERMISSIONS_MANAGEMENT": "Permissions Management",
     "ATTENDANCE_MANAGEMENT": "Attendance Management",
     "MENU_LABEL": "Menu"
+  },
+  "LOCATION_MANAGEMENT": {
+    "ADD_LOCATION": "Add Location",
+    "UPDATE_LOCATION": "Update",
+    "DELETE_LOCATION": "Delete",
+    "LATITUDE": "Latitude",
+    "LONGITUDE": "Longitude",
+    "TITLE": "Locations",
+    "COORDS": "Coordinates",
+    "USE_MY_LOCATION": "Use my location",
+    "CONFIRM_LOCATION": "Confirm location",
+    "NAME_AR": "Location Name (Arabic)",
+    "NAME_EN": "Location Name (English)"
+  },
+  "EMAILS": {
+    "TITLE": "Email Management",
+    "SELECT_FORM_DESCRIPTION": "Select a form ",
+    "SELECT_FORM": "Select Form",
+    "SELECTED_FORM": "Selected Form",
+    "FORM_ID": "Form ID",
+    "FORM_NAME": "Form Name",
+    "EMAIL": "Email",
+    "EMAIL_ID": "Email ID",
+    "EMAIL_TEMPLATE": "Template",
+    "SUBJECT": "Subject",
+    "CREATED": "Created",
+    "OPEN_EMAIL": "Open Email",
+    "EDIT_EMAIL": "Edit",
+    "DUPLICATE_EMAIL": "Duplicate",
+    "DELETE_EMAIL": "Delete",
+    "EMAILS_FOR_FORM": "Emails for Form",
+    "ALL_EMAILS": "All Emails",
+    "NO_EMAILS_FOR_FORM": "No emails found for this form."
+  },
+  "CLIENT_DATA_MANAGEMENT": {
+    "TITLE": "Client Data Management",
+    "ADD_CLIENT": "Add Client",
+    "CLIENT_NAME": "Client Name",
+    "ENTER_CLIENT_NAME": "Enter client name",
+    "EMAIL": "Email",
+    "PHONE": "Phone",
+    "PASSWORD": "Password",
+    "LOGO_URL": "Logo URL",
+    "COMPANY": "Company",
+    "ERRORS": {
+      "NAME_REQUIRED": "Please enter client name in both languages.",
+      "EMAIL_REQUIRED": "Please enter a valid email address.",
+      "PHONE_REQUIRED": "Please enter a phone number.",
+      "PASSWORD_REQUIRED": "Please enter a password."
+    }
+  },
+  "PERMISSIONS_MANAGEMENT": {
+    "TITLE": "Permissions Management"
+  },
+  "VIEW_SUBMISSIONS": {
+    "SELECT_FORM_TO_VIEW_SUBMISSIONS": "Select a form to view submissions",
+    "LOADING_SUBMISSIONS": "Loading submissions...",
+    "SELECT_FORM_DESCRIPTION": "Select a form ",
+    "SELECT_FORM": "Select Form",
+    "SELECTED_FORM": "Selected Form",
+    "TITLE": "View Submissions",
+    "SUBMISSION_ID": "Submission ID",
+    "FORM_TITLE": "Form Title",
+    "USER_ID": "User ID",
+    "INTERVIEW_ID": "Interview ID",
+    "DATE_SUBMITTED": "Date Submitted",
+    "SUBMISSIONS_FOR_FORM": "Submissions for Form",
+    "NO_SUBMISSIONS_FOR_FORM": "No submissions found for this form.",
+    "DECISION_NOTES": "Decision Notes",
+    "UPDATE_STATUS": "Update Status",
+    "STATUS": "Status",
+    "ACCEPTED": "Accepted",
+    "REJECTED": "Rejected",
+    "MANUAL_REVIEW": "Manual Review"
+  },
+  "WELCOME": {
+    "TITLE": "Welcome to EMS Dashboard"
   },
   "ROLES": {
     "MARSHALL": "Marshall",
@@ -40,6 +117,7 @@
     "ADD_ROLE": "Add Role"
   },
   "ATTENDANCE_MANAGEMENT": {
+    "TITLE": "Attendance Management",
     "PRESENT": "Present",
     "ABSENCE": "Absence",
     "DATE": "Date",
@@ -48,10 +126,12 @@
     "SELECT_PROJECT": "Select Project"
   },
   "USER_MANGEMENT": {
+    "TITLE": "User Management",
     "NO_PROJECTS_FOUND": "No projects found.",
     "ERROR_LOADING_PROJECTS": "Error loading projects."
   },
   "PROJECT_MANAGEMENT": {
+    "TITLE": "Project Management",
     "NO_PROJECTS_FOUND": "No projects found.",
     "ERROR_LOADING_PROJECTS": "Error loading projects.",
     "STARTING_DATE": "Starting Date",
@@ -63,7 +143,11 @@
     "NAME_EN": "Name (English)",
     "BADGE_BACKGROUND": "Badge Background",
     "DESCRIPTION_AR": "Description (Arabic)",
-    "DESCRIPTION_EN": "Description (English)"
+    "DESCRIPTION_EN": "Description (English)",
+    "PLACEHOLDER": "Select Project",
+    "ADD_ROLE": "Add Role",
+    "ADD_PROJECT": "Add Project",
+    "CREATE": "Create"
   },
   "USER": {
     "ACTIONS": {
@@ -76,14 +160,24 @@
   "COMMON": {
     "BUTTONS": {
       "SAVE": "Save",
-      "CANCEL": "Cancel"
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "CANCEL": "Cancel",
+      "CREATE": "Create",
+      "UPDATE": "Update"
     },
     "LABELS": {
       "ROLE": "Role",
-      "RATE": "Rate"
+      "RATE": "Rate",
+      "NAME_AR": "Location Name (Arabic)",
+      "NAME_EN": "Location Name (English)"
     },
     "PLACEHOLDERS": {
       "RATE": "Rate"
+    },
+    "STATUS": {
+      "PRESENT": "Present",
+      "ABSENT": "Absent"
     }
   },
   "ADD_ROLE_MODAL": {
@@ -118,6 +212,7 @@
     "ADD_FAILED_CRITERIA": "Add Failed Criteria",
     "ADD_PASS_CRITERIA": "Add Pass Criteria",
     "PREVIEW": "Preview",
+    "SAVE_DRAFT": "Save Draft",
     "SAVE_ALL_QUESTIONS": "Save All Questions",
     "QUESTION": "Question",
     "CRITERIA": "Criteria",
@@ -140,6 +235,63 @@
     "ENTER_RATING": "Enter rating (1-10)",
     "MULTIPLE_CHOICE_OPTIONS": "Multiple Choice Options",
     "RADIO_OPTIONS": "Radio Button Options",
-    "SELECT_TYPE_FIRST": "Please select a question type first to see the input options."
+    "SELECT_TYPE_FIRST": "Please select a question type first to see the input options.",
+    "SELECT_ALL_DROPDOWNS": "Please select a project, form, and language to start creating questions.",
+    "LOADING_QUESTIONS": "Loading questions...",
+    "ERROR_LOADING": "Error Loading Questions",
+    "RETRY": "Retry",
+    "MODAL": {
+      "ADD_QUESTIONS_TITLE": "Add Questions",
+      "EDIT_QUESTION_TITLE": "Edit Question",
+      "TEXT_LABEL": "Text",
+      "DESCRIPTION_LABEL": "Description",
+      "TYPE_LABEL": "Type",
+      "OPTIONS_LABEL": "Options",
+      "ADD_OPTION": "Add Option",
+      "REMOVE_OPTION": "Remove",
+      "REMOVE_QUESTION": "Remove Question",
+      "ADD_ANOTHER": "Add Another",
+      "CANCEL": "Cancel",
+      "SAVE": "Save",
+      "OPTION_PLACEHOLDER": "Option",
+      "VALUE_PLACEHOLDER": "Value",
+      "VALUE_TO_PLACEHOLDER": "To",
+      "CONDITION_PLACEHOLDER": "Select Condition",
+      "FAILED_CRITERIA_TITLE": "Failed Criteria",
+      "PASS_CRITERIA_TITLE": "Pass Criteria",
+      "ADD_FAILED": "Add Failed",
+      "ADD_PASS": "Add Pass",
+      "DELETE": "Delete"
+    }
+  },
+  "FORM_MANAGEMENT": {
+    "FORM": "Form",
+    "TITLE": "Form Management",
+    "SELECT_PROJECT": "Select Project",
+    "SELECT_PROJECT_DESCRIPTION": "Select a project ",
+    "SELECT_LOCATION": "Select Location",
+    "CREATE_FORM": "Create Form",
+    "FORM_IS_RELATED_TO": "Form is related to",
+    "PROJECT": "Project",
+    "LOCATION": "Location",
+    "SELECT_LOCATION_TO_CREATE_LOCATION_BASED_FORM": "Please select a location in the top bar to create a location-based form.",
+    "SELECTED_LOCATION": "Selected Location",
+    "FORM_NAME": "Form Name",
+    "ENTER_FORM_NAME": "Enter form name",
+    "FORM_DETAILS": "Form Details",
+    "FORM_TYPE": "Form Type",
+    "LOCATION_BASED_FORM": "Location-based Form",
+    "PROJECT_BASED_FORM": "Project-based Form",
+    "ADD_NEW_FORM": "Add New Form",
+    "CANCEL": "Cancel",
+    "PLEASE_SELECT_A_LOCATION": "Please select a location",
+    "PLEASE_SELECT_A_PROJECT": "Please select a project",
+    "EDIT_FORM": "Edit Form",
+    "DELETE_FORM": "Delete Form",
+    "LOCATION_BASED_FORM_TITLE": "Location-based Form",
+    "PROJECT_BASED_FORM_TITLE": "Project-based Form",
+    "FORM_ID": "Form ID",
+    "CREATED": "Created At",
+    "UPDATED_AT": "Updated At"
   }
 }

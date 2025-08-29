@@ -1,0 +1,37 @@
+.project-management-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+  }
+}
+
+.card-list-container {
+  margin-top: 4rem;
+}
+
+@media (max-width: 768px) {
+  .project-management-container {
+    padding: 1rem;
+  }
+
+  .header-section {
+    margin-bottom: 1.5rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .card-list-container {
+    margin-top: 2rem;
+  }
+}

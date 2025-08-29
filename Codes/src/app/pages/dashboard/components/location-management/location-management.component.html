@@ -1,1 +1,37 @@
-<p>location-management works!</p>
+<section class="location-management">
+  <h1 class="title">
+    {{ "LOCATION_MANAGEMENT.TITLE" | translate : { default: "Locations" } }}
+  </h1>
+
+  <header class="header">
+    <themed-button
+      (click)="openAddModal()"
+      [text]="'LOCATION_MANAGEMENT.ADD_LOCATION' | translate"
+    >
+    </themed-button>
+  </header>
+
+  <div class="card-list">
+    <app-location-card
+      *ngFor="let loc of locations"
+      [data]="loc"
+      (deleteLocation)="handleDeleteLocation($event)"
+      (updateLocation)="handleUpdateLocation($event)"
+    ></app-location-card>
+  </div>
+</section>
+
+<app-add-location-modal
+  *ngIf="isAddModalOpen"
+  [projects]="projects"
+  (close)="closeAddModal()"
+  (create)="handleCreateLocation($event)"
+></app-add-location-modal>
+
+<app-update-location-modal
+  *ngIf="isUpdateModalOpen"
+  [locationData]="selectedLocation"
+  [projects]="projects"
+  (close)="closeUpdateModal()"
+  (update)="handleLocationUpdate($event)"
+></app-update-location-modal>

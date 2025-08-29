@@ -71,7 +71,16 @@ export class AttendanceManagementComponent {
     return this._isFinished;
   }
   // Add this line so the template binding exists at runtime:
-  async onProjectSelected(projectId: number) {
+  async onProjectSelected(projectId: number | null) {
+    if (projectId === null) {
+      // Handle deselection - clear users list
+      this.users = [];
+      this._isFinished = true;
+      this._isLoading = false;
+      this._error = null;
+      return;
+    }
+
     this._isLoading = true;
     this._error = null;
     this._isFinished = false;

@@ -1,0 +1,41 @@
+<article class="email-card" (click)="$event.stopPropagation()">
+  <div
+    class="email-icon"
+    (click)="openModal($event)"
+    title="{{ 'EMAILS.OPEN_EMAIL' | translate }}"
+  >
+    <svg
+      width="48"
+      height="48"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path
+        d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+      />
+    </svg>
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="email-title">{{ emailTitle }}</h3>
+      <span class="email-badge">{{ "EMAILS.EMAIL_TEMPLATE" | translate }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="email-subject">
+        <strong>{{ "EMAILS.SUBJECT" | translate }}:</strong>
+        {{ displayTitle }}
+      </p>
+      <p class="email-preview">{{ displayBody }}</p>
+      <p class="email-id">
+        {{ "EMAILS.EMAIL_ID" | translate }}: {{ data?.emailId }}
+      </p>
+      <div class="created-date" *ngIf="data?.createdAt">
+        {{ "EMAILS.CREATED" | translate }}:
+        {{ data?.createdAt | date : "short" }}
+      </div>
+    </div>
+  </div>
+</article>

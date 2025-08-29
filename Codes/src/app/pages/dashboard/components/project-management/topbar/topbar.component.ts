@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
-import { AddRoleModalComponent } from './add-role-modal.component'; // adjust path as needed
-import { rolesDropDown } from '../../../../../shared/types/roles';
+import { AddProjectModalComponent } from './add-project-modal.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-topbar',
@@ -11,43 +10,31 @@ import { rolesDropDown } from '../../../../../shared/types/roles';
   styleUrls: ['./topbar.component.scss'],
   imports: [
     CommonModule,
-    ComboSelectorComponent,
     ThemedButtonComponent,
-    AddRoleModalComponent,
+    AddProjectModalComponent,
+    TranslateModule,
   ],
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: string }[] = [];
-  @Output() projectSelected = new EventEmitter<number>();
+  @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
+  @Output() projectCreated = new EventEmitter<any>();
 
-  showAddRole = false;
+  showAddProject = false;
 
-  roles = rolesDropDown;
-
-  openAddRole() {
-    this.showAddRole = true;
+  openAddProject() {
+    this.showAddProject = true;
   }
 
   onModalClose(closeReason?: any) {
     // closeReason can be used if needed
-    this.showAddRole = false;
+    this.showAddProject = false;
   }
 
-  onProjectAssigned(projectId: number) {
-    // The modal emitted a project assignment (e.g., after mock async succeeded and user selected)
-    this.projectSelected.emit(projectId);
-    this.showAddRole = false;
-  }
-  onAssigned(payload: { projectId: number; roleId: string }) {
-    // handle role assignment; for now re-emit projectSelected and log role
-    this.projectSelected.emit(payload.projectId);
-    console.log(
-      'Assigned role:',
-      payload.roleId,
-      'to project:',
-      payload.projectId
-    );
-    this.showAddRole = false;
+  onProjectCreated(projectData: any) {
+    // Handle project creation
+    this.projectCreated.emit(projectData);
+    console.log('New project created:', projectData);
+    this.showAddProject = false;
   }
 }

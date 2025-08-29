@@ -1,0 +1,49 @@
+<div class="api-question-list">
+  <div
+    class="api-question-card"
+    *ngFor="let q of questions.controls; let i = index; trackBy: trackById"
+    [formGroup]="q"
+  >
+    <div class="api-question-card__header">
+      <h4>{{ q.get("text")?.value }}</h4>
+      <div class="actions">
+        <themed-button
+          type="button"
+          class="btn btn--secondary"
+          (click)="onEdit(i)"
+          [text]="'COMMON.BUTTONS.EDIT' | translate"
+        >
+        </themed-button>
+        <themed-button
+          type="button"
+          class="btn btn--dark"
+          (click)="onDelete(i)"
+          [text]="'COMMON.BUTTONS.DELETE' | translate"
+        >
+        </themed-button>
+      </div>
+    </div>
+    <div class="api-question-card__meta">
+      <span
+        >{{ "CREATE_FORM_QUESTIONS.QUESTION_TYPE" | translate }}:
+        {{ q.get("type")?.value }}</span
+      >
+      <span *ngIf="q.get('description')?.value">
+        — {{ q.get("description")?.value }}</span
+      >
+    </div>
+    <div
+      class="api-question-card__options"
+      *ngIf="(q.get('options')?.value || []).length > 0"
+    >
+      <ul>
+        <li *ngFor="let o of q.get('options')?.value">
+          {{ o.optionText }}
+          <strong *ngIf="o.isCorrect"
+            >({{ "CREATE_FORM_QUESTIONS.OPTION_LABEL" | translate }})</strong
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

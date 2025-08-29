@@ -1,0 +1,65 @@
+<div class="emails-container">
+  <div class="header-section">
+    <h1>{{ "EMAILS.TITLE" | translate }}</h1>
+  </div>
+
+  <div class="form-selector-section">
+    <app-combo-selector
+      [projects]="formsForSelector"
+      [selectedValue]="selectedFormId"
+      placeholder="{{ 'EMAILS.SELECT_FORM' | translate }}"
+      (projectSelected)="onFormSelected($event)"
+    >
+    </app-combo-selector>
+  </div>
+
+  <!-- Show selected form info -->
+  <!-- <div class="selected-form-info" *ngIf="selectedFormId">
+    <h3>{{ "EMAILS.SELECTED_FORM" | translate }}</h3>
+    <p>
+      <strong>{{ "EMAILS.FORM_ID" | translate }}:</strong>
+      {{ selectedFormId }}
+    </p>
+    <p>
+      <strong>{{ "EMAILS.FORM_NAME" | translate }}:</strong>
+      {{ getFormTitle(selectedFormId) }}
+    </p>
+  </div> -->
+
+  <!-- Email cards section -->
+  <div class="emails-section" *ngIf="filteredEmails.length > 0 || isLoading">
+    <h3 *ngIf="selectedFormId && !isLoading">
+      {{ "EMAILS.EMAILS_FOR_FORM" | translate }}:
+      {{ getFormTitle(selectedFormId) }}
+    </h3>
+    <h3 *ngIf="!selectedFormId && !isLoading">
+      {{ "EMAILS.ALL_EMAILS" | translate }}
+    </h3>
+    <h3 *ngIf="isLoading">{{ "EMAILS.LOADING_EMAILS" | translate }}</h3>
+
+    <div class="emails-grid">
+      <!-- Show skeleton cards during loading -->
+      <ng-container *ngIf="isLoading">
+        <app-skeleton-form-card *ngFor="let i of [1, 2, 3]">
+        </app-skeleton-form-card>
+      </ng-container>
+
+      <!-- Show actual email cards when not loading -->
+      <ng-container *ngIf="!isLoading">
+        <app-email-card
+          *ngFor="let email of filteredEmails"
+          [data]="getEmailData(email)"
+        >
+        </app-email-card>
+      </ng-container>
+
+      <!-- No emails message -->
+      <div
+        class="no-emails"
+        *ngIf="filteredEmails.length === 0 && selectedFormId"
+      >
+        <p>{{ "EMAILS.NO_EMAILS_FOR_FORM" | translate }}</p>
+      </div>
+    </div>
+  </div>
+</div>

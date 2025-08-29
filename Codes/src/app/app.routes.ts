@@ -44,8 +44,8 @@ export const routes: Routes = [
         path: 'create-form-questions',
         loadComponent: () =>
           import(
-            './pages/dashboard/components/create-form-questions/create-form-questions.component'
-          ).then((m) => m.CreateFormQuestionsComponent),
+            './pages/dashboard/components/form-questions/form-questions.component'
+          ).then((m) => m.FormQuestionsComponent),
       },
       {
         path: 'location-management',
@@ -64,16 +64,16 @@ export const routes: Routes = [
       {
         path: 'send-emails',
         loadComponent: () =>
-          import(
-            './pages/dashboard/components/send-emails/send-emails.component'
-          ).then((m) => m.SendEmailsComponent),
+          import('./pages/dashboard/components/emails/emails.component').then(
+            (m) => m.EmailsComponent
+          ),
       },
       {
-        path: 'view-records',
+        path: 'view-submissions',
         loadComponent: () =>
           import(
-            './pages/dashboard/components/view-records/view-records.component'
-          ).then((m) => m.ViewRecordsComponent),
+            './pages/dashboard/components/view-submissions/view-submissions.component'
+          ).then((m) => m.ViewSubmissionsComponent),
       },
       {
         path: 'client-data-management',

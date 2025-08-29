@@ -1,19 +1,14 @@
 <div class="container">
-  <app-combo-selector
-    class="combo-selector"
-    [projects]="projects"
-    (projectSelected)="projectSelected.emit($event)"
-  ></app-combo-selector>
-
-  <!-- open the Add Role modal -->
-  <themed-button text="Add Role" (click)="openAddRole()"></themed-button>
+  <!-- open the Add Project modal -->
+  <themed-button
+    text="{{ 'PROJECT_MANAGEMENT.ADD_PROJECT' | translate }}"
+    (click)="openAddProject()"
+  ></themed-button>
 </div>
 
-<!-- Add Role modal -->
-<app-add-role-modal
-  *ngIf="showAddRole"
-  [projects]="projects"
-  [roles]="roles"
+<!-- Add Project modal -->
+<app-add-project-modal
+  *ngIf="showAddProject"
   (close)="onModalClose()"
-  (assigned)="onAssigned($event)"
-></app-add-role-modal>
+  (create)="onProjectCreated($event)"
+></app-add-project-modal>

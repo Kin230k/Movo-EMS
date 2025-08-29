@@ -1,30 +1,36 @@
-<app-topbar
-  [projects]="projects"
-  (projectSelected)="onProjectSelected($event)"
-></app-topbar>
+<div class="user-management-container">
+  <div class="header-section">
+    <h1>{{ "USER_MANGEMENT.TITLE" | translate }}</h1>
+  </div>
 
-<!-- show error -->
-<div *ngIf="error" class="error" role="alert">
-  {{ 'USER_MANGEMENT.ERROR_LOADING_PROJECTS' | translate }}
-</div>
+  <app-topbar
+    [projects]="projects"
+    (projectSelected)="onProjectSelected($event)"
+  ></app-topbar>
 
-<!-- show skeleton placeholders when loading -->
-<div *ngIf="isLoading" class="card-list-skeleton">
-  <app-card-list-skeletion></app-card-list-skeletion>
-</div>
+  <!-- show error -->
+  <div *ngIf="error" class="error" role="alert">
+    {{ "USER_MANGEMENT.ERROR_LOADING_PROJECTS" | translate }}
+  </div>
 
-<!-- show empty state if finished and no users -->
-<div
-  *ngIf="!isLoading && isFinished && users && users.length === 0"
-  class="empty-state"
->
-  {{ 'USER_MANGEMENT.NO_PROJECTS_FOUND' | translate }}
-</div>
+  <!-- show skeleton placeholders when loading -->
+  <div *ngIf="isLoading" class="card-list-skeleton">
+    <app-card-list-skeletion></app-card-list-skeletion>
+  </div>
 
-<!-- show real list when loaded -->
-<div *ngIf="!isLoading && users && users.length > 0">
-  <app-card-list
-    [items]="users"
-    [cardComponent]="profileCardComponent"
-  ></app-card-list>
+  <!-- show empty state if finished and no users -->
+  <div
+    *ngIf="!isLoading && isFinished && users && users.length === 0"
+    class="empty-state"
+  >
+    {{ "USER_MANGEMENT.NO_PROJECTS_FOUND" | translate }}
+  </div>
+
+  <!-- show real list when loaded -->
+  <div *ngIf="!isLoading && users && users.length > 0">
+    <app-card-list
+      [items]="users"
+      [cardComponent]="profileCardComponent"
+    ></app-card-list>
+  </div>
 </div>

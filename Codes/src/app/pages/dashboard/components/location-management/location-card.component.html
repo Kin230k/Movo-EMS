@@ -1,0 +1,40 @@
+<article class="location-card">
+  <div class="icon"></div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <div class="title-section">
+        <h3 class="name">{{ displayName }}</h3>
+        <span class="project" *ngIf="displayProjectName">{{
+          displayProjectName
+        }}</span>
+      </div>
+    </div>
+
+    <div class="meta-body">
+      <p class="coords" *ngIf="data?.latitude && data?.longitude">
+        {{ "LOCATION_MANAGEMENT.COORDS" | translate : { default: "Coords" } }}:
+        {{ data.latitude }}, {{ data.longitude }}
+      </p>
+      <p class="id">
+        ID: <span class="mono">{{ data?.locationId }}</span>
+      </p>
+    </div>
+  </div>
+  <div class="action-buttons">
+    <themed-button
+      class="update-btn"
+      (click)="onUpdate()"
+      title="Update Location"
+      [text]="'LOCATION_MANAGEMENT.UPDATE_LOCATION' | translate"
+    >
+    </themed-button>
+    <themed-button
+      class="delete-btn"
+      (click)="onDelete()"
+      title="Delete Location"
+      [text]="'LOCATION_MANAGEMENT.DELETE_LOCATION' | translate"
+    >
+    </themed-button>
+  </div>
+</article>

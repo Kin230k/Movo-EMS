@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  color: var(--white);
+}
+
+.dropdowns-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.add-form-btn {
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}

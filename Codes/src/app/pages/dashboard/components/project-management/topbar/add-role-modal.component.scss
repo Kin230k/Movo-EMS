@@ -2,7 +2,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(var(--bg-dark-rbg), 0.6);
+  background: rgba(var(--bg-dark-rbg), var(--backdrop-opacity));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,12 +12,12 @@
 /* modal card */
 .modal {
   background: var(--bg-dark);
-  color: white;
+  color: var(--white);
   border-radius: 12px;
   max-width: 20rem;
   width: 94%;
   padding: 1.25rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 30px var(--shadow-modal);
 }
 
 /* header */
@@ -35,7 +35,7 @@
 
 .close-btn {
   background: transparent;
-  color: white;
+  color: var(--white);
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
@@ -50,14 +50,14 @@
 
 .label {
   font-size: 0.9rem;
-  color: white;
+  color: var(--white);
   margin-bottom: 0.25rem;
 }
 
 input[type="email"] {
   padding: 0.65rem 0.75rem;
   border-radius: var(--radius-input);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-light-gray);
   font-size: 0.95rem;
   width: 100%;
   box-sizing: border-box;
@@ -72,7 +72,7 @@ input[type="email"] {
 
 .verify-btn {
   background: var(--secondary);
-  color: white;
+  color: var(--white);
   border: none;
   padding: 0.55rem 0.9rem;
   border-radius: var(--radius-btn);
@@ -98,7 +98,7 @@ input[type="email"] {
 
 .assign-btn {
   background: var(--secondary);
-  color: #fff;
+  color: var(--white);
   border: none;
   padding: 0.5rem 0.9rem;
   border-radius: var(--radius-btn);
@@ -107,7 +107,7 @@ input[type="email"] {
 
 .cancel-btn {
   background: transparent;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-medium-gray);
   padding: 0.5rem 0.9rem;
   border-radius: var(--radius-btn);
   cursor: pointer;
@@ -116,7 +116,7 @@ input[type="email"] {
   width: 100%;
   padding: 0.6rem 0.8rem;
   border-radius: var(--radius-input);
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-light-gray);
   font-size: 0.95rem;
   box-sizing: border-box;
 }

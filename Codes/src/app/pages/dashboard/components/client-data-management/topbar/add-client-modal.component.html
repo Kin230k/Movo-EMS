@@ -1,0 +1,109 @@
+<div class="overlay" *ngIf="true" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ "CLIENT_DATA_MANAGEMENT.ADD_CLIENT" | translate }}</h3>
+      <button
+        class="close"
+        [attr.aria-label]="'COMMON.BUTTONS.CANCEL' | translate"
+        (click)="onClose()"
+      >
+        ✕
+      </button>
+    </header>
+    <section class="modal-body">
+      <div class="fields">
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.CLIENT_NAME" | translate }} (EN)</label
+          >
+          <input
+            class="text-input"
+            [(ngModel)]="nameEn"
+            type="text"
+            placeholder="{{
+              'CLIENT_DATA_MANAGEMENT.ENTER_CLIENT_NAME' | translate
+            }}"
+          />
+        </div>
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.CLIENT_NAME" | translate }} (AR)</label
+          >
+          <input
+            class="text-input"
+            [(ngModel)]="nameAr"
+            type="text"
+            placeholder="{{
+              'CLIENT_DATA_MANAGEMENT.ENTER_CLIENT_NAME' | translate
+            }}"
+          />
+        </div>
+
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.EMAIL" | translate
+          }}</label>
+          <input
+            class="text-input"
+            [(ngModel)]="contactEmail"
+            type="email"
+            placeholder="name@example.com"
+          />
+        </div>
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.PHONE" | translate
+          }}</label>
+          <input
+            class="text-input"
+            [(ngModel)]="contactPhone"
+            type="text"
+            placeholder="05xxxxxxxx"
+          />
+        </div>
+
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.PASSWORD" | translate
+          }}</label>
+          <input class="text-input" [(ngModel)]="password" type="password" />
+        </div>
+
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.LOGO_URL" | translate
+          }}</label>
+          <input
+            class="text-input"
+            [(ngModel)]="logo"
+            type="text"
+            placeholder="https://..."
+          />
+        </div>
+
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.COMPANY" | translate }} (EN)</label
+          >
+          <input class="text-input" [(ngModel)]="companyEn" type="text" />
+        </div>
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.COMPANY" | translate }} (AR)</label
+          >
+          <input class="text-input" [(ngModel)]="companyAr" type="text" />
+        </div>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </section>
+    <footer class="modal-footer">
+      <button type="button" class="secondary-btn" (click)="onClose()">
+        {{ "COMMON.BUTTONS.CANCEL" | translate }}
+      </button>
+      <button type="button" class="primary-btn" (click)="onSave()">
+        {{ "COMMON.BUTTONS.CREATE" | translate }}
+      </button>
+    </footer>
+  </div>
+</div>

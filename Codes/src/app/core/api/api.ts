@@ -128,7 +128,6 @@ export interface UpdateClientPayload {
   name: Multilingual;
   contactEmail: string;
   contactPhone: string;
-  firebaseUid: string;
   logo?: string;
   company?: Multilingual | null;
   status?: 'accepted' | 'rejected' | 'pending';

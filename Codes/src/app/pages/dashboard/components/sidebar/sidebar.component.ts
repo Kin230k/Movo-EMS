@@ -1,13 +1,12 @@
 // src/app/pages/dashboard/components/sidebar/sidebar.component.ts
+import { Subject } from 'rxjs';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
 import { ButtonComponent } from '../../../../components/shared/button/button';
 import { ResponsiveService } from '../../../../core/services/responsive.service';
-import { TranslateModule } from '@ngx-translate/core';
-import { LanguageService } from '../../../../core/services/language.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -36,22 +35,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     { labelKey: 'SIDEBAR.LOCATION_MANAGEMENT', path: 'location-management' },
     { labelKey: 'SIDEBAR.SEND_EMAILS', path: 'send-emails' },
-    { labelKey: 'SIDEBAR.VIEW_RECORDS', path: 'view-records' },
+    { labelKey: 'SIDEBAR.VIEW_SUBMISSIONS', path: 'view-submissions' },
     {
       labelKey: 'SIDEBAR.CLIENT_DATA_MANAGEMENT',
       path: 'client-data-management',
     },
-    {
-      labelKey: 'SIDEBAR.PERMISSIONS_MANAGEMENT',
-      path: 'permissions-management',
-    },
+    // {
+    //   labelKey: 'SIDEBAR.PERMISSIONS_MANAGEMENT',
+    //   path: 'permissions-management',
+    // },
   ];
 
-  constructor(
-    private router: Router,
-    private responsive: ResponsiveService,
-    private langService: LanguageService
-  ) {}
+  constructor(private router: Router, private responsive: ResponsiveService) {}
 
   ngOnInit() {
     // subscribe to global isMobile

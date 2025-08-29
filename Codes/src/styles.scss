@@ -3,16 +3,52 @@
   --bg-dark: #1d1d1b;
   --bg-dark-rbg: 29, 29, 27;
   --secondary: #eb0045; /* corrected spelling from "Secandary" */
-  --secondary-rgb: 235, 0, 69; /* for rgba usage: rgba(var(--secondary-rgb), 0.9) */
+  --secondary-rgb: 235, 0, 69;
+  --accent: #7400ff;
+  --accent-rgb: 116, 0, 255;
   --btn-color: #7400ff;
   --btn-color-rgb: 116, 0, 255;
+  --btn-hover-color: #5a00cc;
+
+  --success: #22c55e;
+  --success-rgb: 34, 197, 94;
+  --error: #ef4444;
+  --error-rgb: 239, 68, 68;
 
   --color-body: #0e0e2c;
   --color-text: #333333;
   --color-font: #f5f5f5;
+  --color-font-secondary: #a3a3a3;
   --color-bg-sidebar: #f1f1f1;
   --color-delete: #243746;
+  --white: #ffffff;
 
+  /* Additional commonly used colors */
+  --color-dark-text: #111; /* for dark text on light backgrounds */
+  --color-light-gray: #ddd; /* light gray borders */
+  --color-medium-gray: #ccc; /* medium gray borders */
+  --color-placeholder: #8a8a8a; /* placeholder text color */
+  --color-dark-neutral: #2b2f3a; /* dark neutral background */
+
+  /* RGB versions for rgba() usage */
+  --color-font-rgb: 245, 245, 245;
+  --white-rgb: 255, 255, 255;
+  --color-dark-text-rgb: 17, 17, 17;
+
+  /* Shadow and backdrop colors */
+  --shadow-dark: 0, 0, 0;
+  --backdrop-opacity: 0.6;
+  --shadow-inset: rgba(0, 0, 0, 0.25);
+  --shadow-inset-hover: rgba(0, 0, 0, 0.25);
+  --shadow-elevation: rgba(0, 0, 0, 0.3);
+  --shadow-modal: rgba(0, 0, 0, 0.4);
+  --shadow-modal-large: rgba(0, 0, 0, 0.55);
+  --shadow-input: rgba(0, 0, 0, 0.14);
+  --shadow-button: rgba(0, 0, 0, 0.35);
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-sidebar: rgba(0, 0, 0, 0.03);
+  --shadow-menu: rgba(0, 0, 0, 0.06);
+  --shadow-login: rgba(0, 0, 0, 0.15);
   /* Paddings */
   --padding-form: 3rem;
   --padding-input-btn: 1rem 2rem;

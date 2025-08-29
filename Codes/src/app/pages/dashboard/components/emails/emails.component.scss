@@ -1,0 +1,72 @@
+.emails-container {
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: var(--color-body);
+    margin: 0;
+  }
+}
+
+.form-selector-section {
+  display: flex;
+  margin-bottom: 2rem;
+}
+
+.selected-form-info {
+  background: var(--bg-dark);
+  padding: 2rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) inset;
+
+  h3 {
+    font-size: 1.5rem;
+    color: var(--color-font);
+    margin: 0 0 1rem 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--color-font-secondary);
+    margin: 0.5rem 0;
+
+    strong {
+      color: var(--primary);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .emails-container {
+    padding: 1rem;
+  }
+
+  .header-section {
+    margin-bottom: 1.5rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .form-selector-section {
+    app-combo-selector {
+      min-width: 100%;
+    }
+  }
+}

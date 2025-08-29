@@ -1,7 +1,9 @@
 <!-- components/shared/button/button.html -->
-<button 
-  [type]="type" 
+<button
+  [type]="type"
   class="custom-btn"
-  (click)="onClick.emit()">
+  [disabled]="disabled"
+  (click)="onClick.emit()"
+>
   {{ text }}
 </button>
