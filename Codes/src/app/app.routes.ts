@@ -19,7 +19,7 @@ export const routes: Routes = [
 {
   path: 'forget-password',
   loadComponent: () =>
-    import('./pages/login/forger-passwor/forger-passwor.component').then(
+    import('./pages/login/forget-password/forget-password.component').then(
       (m) => m.ForgetPasswordComponent
     ),
 },
@@ -110,4 +110,3 @@ export const routes: Routes = [
   // fallback
   { path: '**', redirectTo: 'login' },
 ];
-

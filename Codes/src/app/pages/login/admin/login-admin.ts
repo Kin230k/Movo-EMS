@@ -40,6 +40,6 @@ export class LoginAdmin {
     this.router.navigate(['/login']);
   }
   goToForgetPassword() {
-  this.router.navigate(['/forget-password']);
-}
+    this.router.navigate(['/forget-password']);
+  }
 }

@@ -38,8 +38,8 @@ export class LoginUser {
   goToAdminLogin() {
     this.router.navigate(['/login/admin']);
   }
-  
-goToForgetPassword() {
-  this.router.navigate(['/forget-password']);
-}
+
+  goToForgetPassword() {
+    this.router.navigate(['/forget-password']);
+  }
 }

@@ -1,7 +1,7 @@
 <div class="login">
-   <div class="logo">
-        <img src="../../../assets/images/logo.png" alt="">
-      </div>
+  <div class="logo">
+    <img src="../../../assets/images/logo.png" alt="" />
+  </div>
   <div class="login-container">
     <div class="login-form">
       <h2 class="login-title">{{ 'LOGIN_ADMIN.TITLE' | translate }}</h2>
@@ -23,9 +23,11 @@
         >
         </app-input>
 
-           <div class="forget-password">
-        <a (click)="goToForgetPassword()" >{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
-      </div>
+        <div class="forget-password">
+          <a (click)="goToForgetPassword()"
+            >{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a
+          >
+        </div>
 
         <themed-button
           type="submit"

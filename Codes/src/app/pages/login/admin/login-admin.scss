@@ -16,7 +16,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
 .forget-password a {
   color: var(--secondary);
   text-decoration: none;
@@ -27,8 +26,6 @@
   text-decoration: underline;
   cursor: pointer;
 }
-
-
 
 .logo {
   display: flex;
@@ -125,17 +122,17 @@
   background-color: color-mix(in srgb, var(--btn-color) 90%, black 10%);
 }
 
-// شاشات متوسطة 
+// شاشات متوسطة
 @media (max-width: 1024px) {
   .login-form {
     padding: 2.5rem;
     max-width: 24rem;
   }
-  
+
   .logo h1 {
     font-size: 2rem;
   }
-  
+
   .login-title {
     font-size: 1.4rem;
     margin-bottom: 2rem;
@@ -148,16 +145,16 @@
     padding: 2rem;
     max-width: 22rem;
   }
-  
+
   .logo h1 {
     font-size: 1.8rem;
   }
-  
+
   .login-title {
     font-size: 1.3rem;
     margin-bottom: 1.8rem;
   }
-  
+
   .form-group input {
     padding: 0.75rem 1rem;
   }
@@ -167,50 +164,50 @@
   .login-container {
     padding: 0.5rem;
   }
-  
+
   .login-form {
     padding: 1.5rem;
     margin: 0 0.5rem;
   }
-  
+
   .logo {
     margin-bottom: 1.2rem;
   }
-  
+
   .logo h1 {
     font-size: 1.6rem;
   }
-  
+
   .login-title {
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .form-group {
     margin-bottom: 1rem;
   }
-  
+
   .form-group input {
     padding: 0.7rem 0.9rem;
     font-size: 0.9rem;
   }
-  
+
   .forgot-password {
     margin: -0.5rem 0 1.2rem 0;
   }
-  
+
   .forgot-password a {
     font-size: 0.85rem;
   }
-  
+
   .switch-login-type {
     margin: 1.2rem 0 0 0;
   }
-  
+
   .switch-login-type a {
     font-size: 0.85rem;
   }
-  
+
   .login-btn {
     padding: 0.75rem;
     font-size: 0.95rem;
@@ -221,29 +218,29 @@
   .login-form {
     padding: 1.2rem;
   }
-  
+
   .logo h1 {
     font-size: 1.4rem;
   }
-  
+
   .login-title {
     font-size: 1.1rem;
     margin-bottom: 1.2rem;
   }
-  
+
   .form-group input {
     padding: 0.6rem 0.8rem;
     font-size: 0.85rem;
   }
-  
+
   .forgot-password {
     margin: -0.3rem 0 1rem 0;
   }
-  
+
   .switch-login-type {
     margin: 1rem 0 0 0;
   }
-  
+
   .login-btn {
     padding: 0.7rem;
     font-size: 0.9rem;
