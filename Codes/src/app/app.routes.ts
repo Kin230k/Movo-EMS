@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  // login routes (example — keep yours)
+  // login routes
   {
     path: 'login',
     loadComponent: () =>
@@ -15,6 +15,14 @@ export const routes: Routes = [
       import('./pages/login/admin/login-admin').then((m) => m.LoginAdmin),
   },
 
+  // forgot password route
+{
+  path: 'forget-password',
+  loadComponent: () =>
+    import('./pages/login/forget-password/forget-password.component').then(
+      (m) => m.ForgetPasswordComponent
+    ),
+},
   // dashboard (parent)
   {
     path: 'dashboard',
@@ -25,7 +33,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'permissions-management' },
 
-      // child routes for each feature you listed
+      // child routes for each feature
       {
         path: 'project-management',
         loadComponent: () =>
