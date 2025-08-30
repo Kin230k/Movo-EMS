@@ -7,7 +7,7 @@ import { ProjectService } from '../project/project.service';
 export class Location {
   constructor(
     public name: Multilingual,
-    public projectId: string,
+    public projectId: string|undefined,
     public locationId?: string,
     public siteMap?: string,
     public longitude?: number,

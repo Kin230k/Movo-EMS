@@ -1,5 +1,6 @@
 // submissionReminder.ts
 import * as admin from 'firebase-admin';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 
 if (!admin.apps.length) admin.initializeApp();
@@ -28,9 +29,7 @@ export async function scheduleReminder(
   const reminders = admin.firestore().collection(REMINDERS_COLLECTION);
   const docRef = reminders.doc(submissionId);
 
-  const runAt = admin.firestore.Timestamp.fromMillis(
-    Date.now() + delaySeconds * 1000
-  );
+ const runAt = Timestamp.fromMillis(Date.now() + Math.round(delaySeconds * 1000));
 
   try {
     const docSnap = await docRef.get();
@@ -58,7 +57,7 @@ export async function scheduleReminder(
         runAt,
         status: 'pending', // pending | processing | sent | retry | failed
         attempts: 0,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt:FieldValue.serverTimestamp(),
         lastError: null,
         emailPayload: emailPayload || null, // store template inputs here
       },

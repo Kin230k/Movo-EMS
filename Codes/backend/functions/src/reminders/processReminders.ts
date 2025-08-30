@@ -8,6 +8,7 @@ import { logger } from 'firebase-functions';
 // Example: if sendSubmissionEmail.ts is in the same src folder use './sendSubmissionEmail'
 import { EmailPayload } from './submissionReminder'; // if you stored payload shape there
 import { sendSubmissionEmail } from '../utils/sendSubmissionEmail';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 // NOTE: don't call admin.initializeApp() here if services/firebaseAdmin already runs it from index.ts
 
@@ -60,14 +61,14 @@ async function processReminderDoc(
       const status = data.status;
       if (status === 'processing' || status === 'sent') return null;
 
-      const runAt: admin.firestore.Timestamp = data.runAt;
+      const runAt: Timestamp = data.runAt;
       if (runAt.toMillis() > Date.now()) return null;
 
       const newAttempts = (data.attempts || 0) + 1;
       tx.update(docRef, {
         status: 'processing',
         attempts: newAttempts,
-        lastClaimedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastClaimedAt: FieldValue.serverTimestamp(),
       });
       return { ...data, attempts: newAttempts };
     });

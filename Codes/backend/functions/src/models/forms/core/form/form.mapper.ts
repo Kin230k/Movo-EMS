@@ -11,24 +11,27 @@ export class FormMapper extends BaseMapper<Form> {
       
     if (!currentUserId) throw new Error('Current user UUID is not set');
     
-    
     const op = entity.operation;
-    const { formId, projectId, locationId } = entity;
+    const { formId, projectId, locationId, formLanguage, formTitle } = entity;
+    
     if (op === Operation.UPDATE) {
       if (!formId) throw new Error('Form ID is required for update');
-      await pool.query('CALL update_form($1, $2, $3, $4)', [
+      await pool.query('CALL update_form($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         formId,
         projectId,
         locationId,
+        formLanguage,
+        formTitle,
       ]);
     } else {
-      await pool.query('CALL create_form($1, $2, $3)', [
+      await pool.query('CALL create_form($1, $2, $3, $4, $5)', [
         currentUserId,
         projectId,
         locationId,
+        formLanguage,
+        formTitle,
       ]);
-      
     }
   }
 
@@ -63,7 +66,13 @@ export class FormMapper extends BaseMapper<Form> {
   }
 
   private mapRowToForm = (row: any): Form => {
-    return new Form(row.projectid, row.locationid, row.formid);
+    return new Form(
+      row.projectid,
+      row.locationid,
+      row.form_language,
+      row.form_title,
+      row.formid
+    );
   };
 }
 

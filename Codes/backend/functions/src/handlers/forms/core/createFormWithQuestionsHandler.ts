@@ -17,13 +17,13 @@ export interface CriteriaInput {
 }
 
 export interface OptionInput {
-  optionText: Multilingual;
+  optionText: string;
   isCorrect: boolean;
 }
 
 export interface QuestionInput {
   typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE';
-  questionText: Multilingual;
+  questionText: string;
   interviewId: string;
   criteria?: CriteriaInput[];
   options?: OptionInput[];
@@ -81,8 +81,8 @@ export async function createQuestionsHandler(
         });
       }
       
-      if (!isMultilingual(q.questionText)) {
-        issues.push({ field: `questions[${idx}].questionText`, message: 'questionText must be a Multilingual object' });
+      if (!isNonEmptyString(q.questionText)) {
+        issues.push({ field: `questions[${idx}].questionText`, message: 'questionText must be a non-empty string' });
       }
       
       if (!isNonEmptyString(q.interviewId)) {

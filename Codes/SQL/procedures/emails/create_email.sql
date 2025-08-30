@@ -1,6 +1,6 @@
 CREATE OR REPLACE PROCEDURE create_email(p_auth_user_id UUID,
- p_title JSONB,
- p_body JSONB,
+ p_title TEXT,  -- Changed from JSONB to TEXT
+ p_body TEXT,   -- Changed from JSONB to TEXT
  p_form_id UUID
 )
 LANGUAGE plpgsql SECURITY DEFINER
@@ -15,8 +15,8 @@ INSERT INTO EMAILS (
  formId
  ) VALUES (
  gen_random_uuid(),
- p_title,
- p_body,
+ p_title,  -- Now accepts TEXT
+ p_body,   -- Now accepts TEXT
  p_form_id
  );
 END;

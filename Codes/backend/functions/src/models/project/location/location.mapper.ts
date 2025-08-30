@@ -16,7 +16,6 @@ export class LocationMapper extends BaseMapper<Location> {
 
     // Validation
     if (!name) throw new Error('Location name is required');
-    if (!projectId) throw new Error('Project ID is required');
     if (longitude == null || latitude == null)
       throw new Error('Longitude and latitude are required');
 
@@ -32,6 +31,7 @@ export class LocationMapper extends BaseMapper<Location> {
         latitude,
       ]);
     } else {
+    if (!projectId) throw new Error('Project ID is required');
       const { rows } = await pool.query(
         'SELECT * FROM create_location($1, $2, $3, $4, $5, $6)',
         [currentUserId, name, projectId, siteMap, longitude, latitude]

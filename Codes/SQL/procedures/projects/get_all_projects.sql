@@ -6,7 +6,8 @@ RETURNS TABLE (
     badgeBackground VARCHAR(512),
     startingDate DATE,
     endingDate DATE,
-    description JSONB
+    description JSONB,
+    clientName JSONB  -- Add client name
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_all_projects');
@@ -19,7 +20,9 @@ RETURN QUERY
         p.badgeBackground,
         p.startingDate,
         p.endingDate,
-        p.description
-    FROM PROJECTS p;
+        p.description,
+        c.name  -- Join with CLIENTS table
+    FROM PROJECTS p
+    LEFT JOIN CLIENTS c ON p.clientId = c.clientId;
 END;
 $$;

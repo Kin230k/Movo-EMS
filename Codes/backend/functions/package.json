@@ -9,7 +9,7 @@
     "test": "jest",
     "deploy": "npx firebase deploy --only functions",
     "logs": "npx firebase functions:log",
-    "dev": "concurrently \"npm run watch\" \"cross-env FUNCTIONS_EMULATOR=true firebase emulators:start --only functions,auth\"",
+  "dev": "concurrently \"npm run watch\" \"cross-env FUNCTIONS_EMULATOR=true firebase emulators:start --only functions,auth,firestore\"",
     "generate:metadata": "ts-node  scripts/generateMetadata.ts"
   },
   "engines": {

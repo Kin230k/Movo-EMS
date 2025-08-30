@@ -10,7 +10,7 @@ export interface UpdateLocationData {
   
   locationId: string;
   name: Multilingual;
-  projectId: string;
+  projectId?: string;
   siteMap?: string;
   longitude?: number;
   latitude?: number;
@@ -24,10 +24,10 @@ export async function updateLocationHandler(request: CallableRequest<UpdateLocat
 
   const {  locationId, name, projectId, siteMap, longitude, latitude } = request.data || {};
 
-  if ( !locationId || !name || !projectId) {
+  if ( !locationId || !name ) {
     issues.push({
       field: 'input',
-      message: 'Missing required fields: clientId, locationId, name, projectId',
+      message: 'Missing required fields: clientId, locationId, name',
     });
     return { success: false, issues };
   }

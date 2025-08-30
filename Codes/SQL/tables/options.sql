@@ -1,6 +1,6 @@
 CREATE TABLE OPTIONS (
     optionId UUID PRIMARY KEY,
-    optionText JSONB ,
+    optionText TEXT ,
     questionId UUID NOT NULL REFERENCES QUESTIONS(questionId) ON DELETE CASCADE ON UPDATE CASCADE,
     isCorrect BOOLEAN NOT NULL DEFAULT FALSE,
     displayOrder INT DEFAULT 0

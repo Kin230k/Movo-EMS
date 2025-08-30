@@ -12,3 +12,4 @@ CREATE TABLE submissions (
   answer_count INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT submissions_user_form_unique UNIQUE (userId, formId)
 );
+  

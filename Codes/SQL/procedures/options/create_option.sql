@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE create_option(p_auth_user_id UUID,
- p_option_text JSONB,
+ p_option_text TEXT,  -- Changed from JSONB to TEXT
  p_question_id UUID,
  p_is_correct BOOLEAN,
  p_display_order INT
@@ -17,7 +17,7 @@ INSERT INTO OPTIONS (
  displayOrder
  ) VALUES (
  gen_random_uuid(),
- p_option_text,
+ p_option_text,  -- Now accepts TEXT
  p_question_id,
  p_is_correct,
  p_display_order

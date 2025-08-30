@@ -8,7 +8,7 @@ export async function getAllProjectsHandler(request: CallableRequest) {
   const auth = await authenticateAdmin(request);
   if (!auth.success) return auth;
   try {
-    const projects = await ProjectService.getAllProjects();
+    const projects = await ProjectService.getAllProjectsWithClientName();
     return { success: true, projects };
   } catch (err: any) {
     logger.error('Fetching all projects failed', err);

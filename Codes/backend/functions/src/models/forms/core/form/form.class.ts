@@ -4,6 +4,8 @@ export class Form {
   constructor(
     public projectId: string | null,
     public locationId: string | null,
+    public formLanguage: string,
+    public formTitle: string,
     public formId?: string
   ) {}
 

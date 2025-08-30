@@ -112,6 +112,12 @@ export class AnswerService {
   ): Promise<Answer[]> {
     return await answersMapper.getBySubmissionId(submissionId);
   }
+    static async getManualAnswersBySubmissionId(
+    submissionId: string
+  ): Promise<Answer[]> {
+    return await answersMapper.getManualAnswersBySubmissionId(submissionId);
+  }
+
 
   /**
    * Get all answers

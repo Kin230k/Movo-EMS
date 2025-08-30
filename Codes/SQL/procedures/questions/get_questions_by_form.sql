@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION get_questions_by_form(p_auth_user_id UUID,p_form_id U
 RETURNS TABLE (
     questionId UUID,
     typeCode VARCHAR(30),
-    questionText JSONB
+    questionText TEXT  -- Changed from JSONB to TEXT
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     CALL check_user_permission(p_auth_user_id, 'get_questions_by_form');
@@ -11,7 +11,7 @@ RETURN QUERY
     SELECT 
         q.questionId,
         q.typeCode,
-        q.questionText
+        q.questionText  -- Now returns TEXT
     FROM QUESTIONS q
     WHERE q.formId = p_form_id;
 END;

@@ -63,6 +63,16 @@ export class SubmissionService {
   static async getAllSubmissions(): Promise<Submission[]> {
     return await submissionMapper.getAll();
   }
+  static async updateSubmissionStatusForManual(
+  submissionId: string,
+  outcome: string
+): Promise<void> {
+  await submissionMapper.updateSubmissionStatusForManual(submissionId, outcome);
+}
+static async getSubmissionsByForm(formId:string): Promise<Submission[]> {
+    return await submissionMapper.getSubmissionsByFormId(formId);
+  }
+
 
   static async deleteSubmission(id: string): Promise<void> {
     await submissionMapper.delete(id);

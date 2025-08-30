@@ -26,7 +26,7 @@ export class LocationService {
   static async updateLocation(
     locationId: string,
     name: Multilingual,
-    projectId: string,
+    projectId: string|undefined,
     siteMap?: string,
     longitude?: number,
     latitude?: number

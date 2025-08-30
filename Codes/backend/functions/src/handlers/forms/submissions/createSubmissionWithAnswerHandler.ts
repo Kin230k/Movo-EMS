@@ -118,7 +118,9 @@ export async function createSubmissionWithAnswerHandler(
           questionId!,
           textResponse!,
           answeredAt ? new Date(answeredAt) : new Date()
+          
         );
+        console.log(answerId);
         break;
       case 'rating':
         answerId = await AnswerService.createRatingAnswer(
@@ -156,7 +158,6 @@ export async function createSubmissionWithAnswerHandler(
       submissionId,
       answerId,
     });
-
     return {
       success: true,
       submissionId,

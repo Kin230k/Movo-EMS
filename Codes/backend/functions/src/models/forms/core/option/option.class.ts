@@ -1,9 +1,8 @@
 import { Operation } from '../../../operation.enum';
-import { Multilingual } from '../../../multilingual.type';
 
 export class Option {
   constructor(
-    public optionText: Multilingual,
+    public optionText: string,  // Changed from Multilingual to string
     public questionId: string,
     public isCorrect: boolean,
     public displayOrder: number,

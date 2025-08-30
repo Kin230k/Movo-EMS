@@ -1,4 +1,4 @@
-import projectMapper from './project.mapper';
+import projectMapper, { ProjectWithClient } from './project.mapper';
 import { Project } from './project.class';
 import { Multilingual } from '../../multilingual.type';
 export class ProjectService {
@@ -75,9 +75,14 @@ export class ProjectService {
     return await projectMapper.getAll();
   }
   
-  static async getAllActiveProjects(): Promise<Project[]> {
+  static async getAllActiveProjects(): Promise<ProjectWithClient[]> {
     return await projectMapper.getAllActive();
   }
+   
+  static async getAllProjectsWithClientName(): Promise<ProjectWithClient[]> {
+    return await projectMapper.getAllProjectWithClientName();
+  }
+
 
   static async deleteProject(id: string): Promise<void> {
     await projectMapper.delete(id);

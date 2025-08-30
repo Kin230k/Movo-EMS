@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION create_question(
     p_auth_user_id UUID,
     p_type_code VARCHAR(30),
-    p_question_text JSONB,
+    p_question_text TEXT,  -- Changed from JSONB to TEXT
     p_form_id UUID,
     p_interview_id UUID
 )
@@ -24,7 +24,7 @@ BEGIN
     ) VALUES (
         gen_random_uuid(),
         p_type_code,
-        p_question_text,
+        p_question_text,  -- Now accepts TEXT
         p_form_id,
         p_interview_id
     )

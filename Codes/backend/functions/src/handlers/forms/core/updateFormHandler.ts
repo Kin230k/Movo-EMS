@@ -8,6 +8,8 @@ export interface UpdateFormRequestData {
   formId?: string | null;
   projectId?: string | null;
   locationId?: string | null;
+  formLanguage?: string | null;
+  formTitle?: string | null;
 }
 
 export async function updateFormHandler(
@@ -15,17 +17,11 @@ export async function updateFormHandler(
 ) {
   const issues: FieldIssue[] = [];
 
-  
-   const auth = await authenticateClient(request);
-    if (!auth.success) return auth;
+  const auth = await authenticateClient(request);
+  if (!auth.success) return auth;
 
-  if (!request.auth?.uid) {
-    issues.push({ field: 'auth', message: 'Must be signed in' });
-    return { success: false, issues };
-  }
+  const { formId, projectId, locationId, formLanguage, formTitle } = request.data || {};
 
-  const { formId, projectId, locationId } = request.data || {};
-  
   // Validate Form ID
   if (!formId) {
     issues.push({ field: 'formId', message: 'Form ID is required' });
@@ -47,16 +43,32 @@ export async function updateFormHandler(
     });
   }
 
+  // Validate form language and title
+  if (!formLanguage) {
+    issues.push({
+      field: 'formLanguage',
+      message: 'Form language is required',
+    });
+  }
+
+  if (!formTitle) {
+    issues.push({
+      field: 'formTitle',
+      message: 'Form title is required',
+    });
+  }
+
   if (issues.length > 0) {
     return { success: false, issues };
   }
 
   try {
-    // Pass null for the unused field
     await FormService.updateForm(
       formId!,
       hasProject ? projectId! : null,
-      hasLocation ? locationId! : null
+      hasLocation ? locationId! : null,
+      formLanguage!,
+      formTitle!
     );
     return { success: true };
   } catch (err: any) {
