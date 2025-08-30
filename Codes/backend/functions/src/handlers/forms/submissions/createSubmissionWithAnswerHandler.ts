@@ -5,7 +5,6 @@ import { SubmissionService } from '../../../models/forms/submissions/submission/
 import { AnswerService } from '../../../models/forms/core/answer/answer.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
-import { scheduleReminder } from '../../../reminders/submissionReminder';
 import { UserService } from '../../../models/auth/user/user.service';
 
 export interface CreateSubmissionWithAnswerRequestData {
@@ -151,8 +150,8 @@ export async function createSubmissionWithAnswerHandler(
         throw new Error('Invalid answer type');
     }
     const user = await UserService.getUserById(auth.callerUuid);
-    // 6. Schedule reminder email after 10 minutes
-    await scheduleReminder(submissionId, auth.callerUuid, user?.email!);
+    // 6.create recored emails_to_send
+    
 
     logger.info('Submission with answer created successfully', {
       submissionId,

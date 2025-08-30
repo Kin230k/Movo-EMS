@@ -58,7 +58,7 @@ let auth
     }
     
 
-     auth = await authorizeUserProjectAccessWorkerFirst( request,location.projectId);
+     auth = await authorizeUserProjectAccessWorkerFirst( request,location.projectId!);
     if (!auth.success) {
       // normalize the failure to our CreateAttendanceResult shape
       return { success: false, issues: auth.issues };

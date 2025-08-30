@@ -92,6 +92,13 @@ export class AnswerService {
     await answersMapper.save(answer);
     return (answer as any).answerId as string;
   }
+  // Add this method to the AnswerService class in answer.service.ts
+ static async createAnswers(
+  submissionId: string,
+  answers: any[]
+): Promise<string[]> {
+  return await answersMapper.createAnswers(submissionId, answers);
+}
 
   /**
    * Update an existing answer

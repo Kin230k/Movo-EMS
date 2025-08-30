@@ -36,4 +36,12 @@ export class FormService {
   static async deleteForm(id: string): Promise<void> {
     await formMapper.delete(id);
   }
+    static async getFormsByLocation(locationId: string): Promise<Form[]> {
+    return await formMapper.getFormsByLocation(locationId);
+  }
+
+  static async getFormsByProject(projectId: string): Promise<Form[]> {
+    return await formMapper.getFormsByProject(projectId);
+  }
+
 }

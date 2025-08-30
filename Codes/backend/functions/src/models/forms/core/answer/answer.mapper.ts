@@ -135,6 +135,27 @@ export class AnswersMapper extends BaseMapper<Answer> {
     console.log(result)
     return result.rows.map(this.mapRowToAnswer);
   }
+  // Add this method to the AnswersMapper class in answer.mapper.ts
+async createAnswers(
+  submissionId: string,
+  answers: any[]
+): Promise<string[]> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  if (!submissionId) throw new Error('Submission ID is required');
+  if (!answers || !Array.isArray(answers)) {
+    throw new Error('Answers must be an array');
+  }
+
+  const answersJsonb = JSON.stringify(answers);
+  
+  const result = await pool.query(
+    'SELECT create_answers($1, $2, $3::jsonb) AS answer_ids',
+    [currentUserId, submissionId, answersJsonb]
+  );
+
+  return result.rows[0].answer_ids;
+}
  
 private mapRowToAnswer = (row: any): Answer => {
     const answerId = row.answerid;

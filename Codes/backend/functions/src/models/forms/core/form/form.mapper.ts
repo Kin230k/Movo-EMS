@@ -4,6 +4,29 @@ import { Form } from './form.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../../utils/pool';
 import { CurrentUser } from '../../../../utils/currentUser.class';
+import { Question } from '../question/question.class';
+// types/forms.ts (or inside form.class.ts)
+
+
+
+export interface OptionDTO {
+  optionId: string;
+  optionText: string;
+}
+
+export interface QuestionDTO {
+  questionId: string;
+  typeCode: Question['typeCode'];
+  questionText: string;
+  options: OptionDTO[]; // empty array when no options
+}
+
+export interface FormWithQuestions {
+  formId: string;
+  formTitle: string;
+  formLanguage: string;
+  questions: QuestionDTO[]; // empty array when no questions
+}
 
 export class FormMapper extends BaseMapper<Form> {
   async save(entity: Form): Promise<void> {
@@ -63,6 +86,30 @@ export class FormMapper extends BaseMapper<Form> {
     if (!id) throw new Error('Form ID is required');
 
     await pool.query('CALL delete_form($1, $2)', [currentUserId, id]);
+  }
+    async getFormsByLocation(locationId: string): Promise<Form[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!locationId) throw new Error('Location ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_forms_by_location($1, $2)',
+      [currentUserId, locationId]
+    );
+
+    return result.rows.map(this.mapRowToForm);
+  }
+    async getFormsByProject(projectId: string): Promise<Form[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_forms_by_project($1, $2)',
+      [currentUserId, projectId]
+    );
+
+    return result.rows.map(this.mapRowToForm);
   }
 
   private mapRowToForm = (row: any): Form => {
