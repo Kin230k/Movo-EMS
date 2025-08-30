@@ -7,7 +7,7 @@ import { logger } from 'firebase-functions';
 // Put the correct relative path to your sendSubmissionEmail function.
 // Example: if sendSubmissionEmail.ts is in the same src folder use './sendSubmissionEmail'
 import { EmailPayload } from './submissionReminder'; // if you stored payload shape there
-import { sendSubmissionEmail } from '../utils/sendSubmissionEmail';
+
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 // NOTE: don't call admin.initializeApp() here if services/firebaseAdmin already runs it from index.ts

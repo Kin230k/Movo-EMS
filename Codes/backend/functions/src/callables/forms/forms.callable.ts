@@ -22,6 +22,7 @@ import { getSubmissionHandler } from '../../handlers/forms/submissions/getSubmis
 import { updateSubmissionHandler } from '../../handlers/forms/submissions/updateSubmissionHandler';
 import { getManualSubmissionsByFormIdHandler } from '../../handlers/forms/submissions/getManualSubmissionsByFormHandler';
 import { createSubmissionWithAnswerHandler } from '../../handlers/forms/submissions/createSubmissionWithAnswerHandler';
+import { createSubmissionWithAnswersHandler } from '../../handlers/forms/submissions/createSubmissionWithAnswersHandler';
 import { getManualAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getManualAnswersBySubmissionHandler';
 import { getSubmissionsByFormHandler } from '../../handlers/forms/submissions/getSubmissionsByFormHandler';
 import { getAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getAnswersBySubmissionHandler';
@@ -54,15 +55,24 @@ export const createSubmission = onCall(createSubmissionHandler);
 export const deleteSubmission = onCall(deleteSubmissionHandler);
 export const getSubmission = onCall(getSubmissionHandler);
 export const updateSubmission = onCall(updateSubmissionHandler);
-export const getManualByFormId=onCall(getManualSubmissionsByFormIdHandler);
-export const createSubmissionWithAnswer=onCall(createSubmissionWithAnswerHandler);
-export const getManualAnswersBySubmissionId=onCall(getManualAnswersBySubmissionIdHandler);
-export const getSubmissionsByForm=onCall(getSubmissionsByFormHandler);
-export const getAnswersBySubmissionId=onCall(getAnswersBySubmissionIdHandler);
-export const updateSubmissionStatusForManual=onCall(updateSubmissionStatusForManualHandler);
+export const getManualByFormId = onCall(getManualSubmissionsByFormIdHandler);
+export const createSubmissionWithAnswer = onCall(
+  createSubmissionWithAnswerHandler
+);
+export const createSubmissionWithAnswers = onCall(
+  createSubmissionWithAnswersHandler
+);
+export const getManualAnswersBySubmissionId = onCall(
+  getManualAnswersBySubmissionIdHandler
+);
+export const getSubmissionsByForm = onCall(getSubmissionsByFormHandler);
+export const getAnswersBySubmissionId = onCall(getAnswersBySubmissionIdHandler);
+export const updateSubmissionStatusForManual = onCall(
+  updateSubmissionStatusForManualHandler
+);
 //Interview
-export const createInterview=onCall(createInterviewHandler);
-export const updateInterview=onCall(updateInterviewHandler);
-export const getInterview=onCall(getInterviewHandler);
-export const getInterviewByProject=onCall(getInterviewsByProjectHandler);
-export const deleteInterview=onCall(deleteInterviewHandler);
+export const createInterview = onCall(createInterviewHandler);
+export const updateInterview = onCall(updateInterviewHandler);
+export const getInterview = onCall(getInterviewHandler);
+export const getInterviewByProject = onCall(getInterviewsByProjectHandler);
+export const deleteInterview = onCall(deleteInterviewHandler);

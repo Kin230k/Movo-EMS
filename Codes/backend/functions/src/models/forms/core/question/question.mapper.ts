@@ -15,8 +15,6 @@ export class QuestionMapper extends BaseMapper<Question> {
 
     if (!typeCode) throw new Error('Question type code is required');
     if (!questionText) throw new Error('Question text is required');
-    if (!formId) throw new Error('Form ID is required');
-    if (!interviewId) throw new Error('Interview ID is required');
 
     if (op === Operation.UPDATE) {
       if (!questionId) throw new Error('Question ID is required for update');
@@ -24,7 +22,7 @@ export class QuestionMapper extends BaseMapper<Question> {
         currentUserId,
         questionId,
         typeCode,
-        questionText,  // Now passes string directly
+        questionText, // Now passes string directly
         formId,
         interviewId,
       ]);
@@ -34,7 +32,7 @@ export class QuestionMapper extends BaseMapper<Question> {
         [
           currentUserId,
           typeCode,
-          questionText,  // Now passes string directly
+          questionText, // Now passes string directly
           formId,
           interviewId,
         ]
@@ -65,7 +63,7 @@ export class QuestionMapper extends BaseMapper<Question> {
     ]);
     return result.rows.map(this.mapRowToQuestion);
   }
-  
+
   async getAllByFormId(formId: string): Promise<Question[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
@@ -88,7 +86,7 @@ export class QuestionMapper extends BaseMapper<Question> {
   private mapRowToQuestion = (row: any): Question => {
     return new Question(
       row.typecode,
-      row.questiontext,  // Now receives string directly
+      row.questiontext, // Now receives string directly
       row.formid,
       row.interviewid,
       row.questionid

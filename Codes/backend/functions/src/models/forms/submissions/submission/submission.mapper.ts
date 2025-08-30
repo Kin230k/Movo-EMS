@@ -21,9 +21,7 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       decisionNotes,
     } = entity;
 
-    if (!formId) throw new Error('Form ID is required');
     if (!userId) throw new Error('User ID is required');
-    if (!interviewId) throw new Error('Interview ID is required');
     if (!dateSubmitted) throw new Error('Date Submitted is required');
 
     if (op === Operation.UPDATE) {
@@ -44,12 +42,14 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       );
     } else {
       // CREATE: call the DB function that RETURNS TABLE(...) and read the returned row
-      console.log(     currentUserId,
-          formId,
-          userId,
-          interviewId,
-          dateSubmitted,
-          decisionNotes,)
+      console.log(
+        currentUserId,
+        formId,
+        userId,
+        interviewId,
+        dateSubmitted,
+        decisionNotes
+      );
       const result: QueryResult = await pool.query(
         `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6)`,
         [
@@ -129,11 +129,11 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
     await pool.query('CALL delete_submission($1, $2)', [currentUserId, id]);
   }
-    async getManualByFormId(formId: string): Promise<Submission[]> {
+  async getManualByFormId(formId: string): Promise<Submission[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!formId) throw new Error('Form ID is required');
-    
+
     const result: QueryResult = await pool.query(
       'SELECT * FROM get_manual_submission_by_form_id($1, $2)',
       [currentUserId, formId]
@@ -141,11 +141,11 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
     return result.rows.map(this.mapRowToSubmission);
   }
-      async getSubmissionsByFormId(formId: string): Promise<Submission[]> {
+  async getSubmissionsByFormId(formId: string): Promise<Submission[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!formId) throw new Error('Form ID is required');
-    
+
     const result: QueryResult = await pool.query(
       'SELECT * FROM get_submissions_by_form_id($1, $2)',
       [currentUserId, formId]
@@ -154,21 +154,20 @@ export class SubmissionMapper extends BaseMapper<Submission> {
     return result.rows.map(this.mapRowToSubmission);
   }
   async updateSubmissionStatusForManual(
-  submissionId: string, 
-  outcome: string
-): Promise<void> {
-  const currentUserId = CurrentUser.uuid;
-  if (!currentUserId) throw new Error('Current user UUID is not set');
-  if (!submissionId) throw new Error('Submission ID is required');
-  if (!outcome) throw new Error('Outcome is required');
+    submissionId: string,
+    outcome: string
+  ): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!submissionId) throw new Error('Submission ID is required');
+    if (!outcome) throw new Error('Outcome is required');
 
-  await pool.query(
-    'CALL update_submission_status($1, $2, $3)',
-    [currentUserId, submissionId, outcome]
-  );
-}
-  
-
+    await pool.query('CALL update_submission_status($1, $2, $3)', [
+      currentUserId,
+      submissionId,
+      outcome,
+    ]);
+  }
 
   private mapRowToSubmission = (row: any): Submission => {
     return new Submission(
@@ -176,10 +175,10 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       row.userId ?? row.userid ?? row.user_id,
       row.interviewId ?? row.interviewid ?? row.interview_id,
       row.datesubmitted ?? row.datesubmitted ?? row.date_submitted,
-       // returned objects are update-ready
-     
+      // returned objects are update-ready
+
       row.decisionNotes ?? row.decisionnotes ?? row.decision_notes,
-       row.outcome ?? row.outcome,
+      row.outcome ?? row.outcome,
       row.submissionId ?? row.submissionid ?? row.submission_id
     );
   };

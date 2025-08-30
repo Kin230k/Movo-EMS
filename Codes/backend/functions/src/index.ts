@@ -12,7 +12,7 @@ import {
   getAllClients,
   getClient,
   updateClient,
-  adminCreateClient
+  adminCreateClient,
 } from './callables/auth/client.callable';
 import {
   sendPasswordReset,
@@ -45,6 +45,7 @@ import {
   getSubmission,
   getManualByFormId,
   createSubmissionWithAnswer,
+  createSubmissionWithAnswers,
   getAnswersBySubmissionId,
   getManualAnswersBySubmissionId,
   getSubmissionsByForm,
@@ -55,7 +56,6 @@ import {
   getInterview,
   getInterviewByProject,
   deleteInterview,
-
 } from './callables/forms/forms.callable';
 
 // Import project-related callables
@@ -107,6 +107,7 @@ import {
 import { getFunctions } from './callables/getFunctions';
 
 import './services/firebaseAdmin'; // ensure initializeApp() has run
+import { sendEmail } from './callables/sendEmail.callable';
 
 // Export all callables
 export {
@@ -122,7 +123,6 @@ export {
   editUserInfo,
   getProjectUsers,
   getUserInfoByEmail,
-  
 
   // Auth admin
   createAdmin,
@@ -160,12 +160,11 @@ export {
   updateSubmission,
   getManualByFormId,
   createSubmissionWithAnswer,
+  createSubmissionWithAnswers,
   getAnswersBySubmissionId,
   getSubmissionsByForm,
   getManualAnswersBySubmissionId,
   updateSubmissionStatusForManual,
-  
-  
 
   // Projects
   createProject,
@@ -197,7 +196,6 @@ export {
   // User Schedules
   createUserSchedule,
   updateUserSchedule,
-  
 
   // Areas
   createArea,
@@ -214,8 +212,7 @@ export {
   updateAttendance,
   getAttendancesByProject,
   getUserAttendancesByProject,
-  
-   
+
   // Project User Roles
   createProjectUserRole,
   updateProjectUserRole,
@@ -230,6 +227,9 @@ export {
   deleteInterview,
   getInterview,
   getInterviewByProject,
+
+  // Email
+  sendEmail,
 
   // Test
   getFunctions,

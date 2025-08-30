@@ -17,7 +17,7 @@ DECLARE
     v_option_count INT;
     v_answer_ids UUID[] := ARRAY[]::UUID[];
 BEGIN
-    PERFORM check_user_permission(p_current_user_id, 'create_answers');
+    CALL check_user_permission(p_current_user_id, 'create_answers');
 
     IF p_submission_id IS NULL THEN
         RAISE EXCEPTION 'submissionId is required';

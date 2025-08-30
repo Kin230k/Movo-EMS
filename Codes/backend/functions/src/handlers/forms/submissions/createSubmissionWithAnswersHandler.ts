@@ -5,7 +5,8 @@ import { SubmissionService } from '../../../models/forms/submissions/submission/
 import { AnswerService } from '../../../models/forms/core/answer/answer.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
-
+import { sendSubmissionEmail } from '../../../utils/sendSubmissionEmail';
+import { UserService } from '../../../models/auth/user/user.service';
 export interface CreateSubmissionWithAnswersRequestData {
   // Submission fields
   formId?: string;
@@ -42,23 +43,22 @@ export async function createSubmissionWithAnswersHandler(
     dateSubmitted,
     decisionNotes,
     answers,
+    outcome,
   } = request.data || {};
-
-  // Validate required fields
-  if (!formId) {
-    issues.push({ field: 'formId', message: 'Form ID is required' });
-  }
-  if (!interviewId) {
-    issues.push({ field: 'interviewId', message: 'Interview ID is required' });
-  }
 
   // Validate answers array
   if (!answers || !Array.isArray(answers) || answers.length === 0) {
-    issues.push({ field: 'answers', message: 'Answers array is required and must not be empty' });
+    issues.push({
+      field: 'answers',
+      message: 'Answers array is required and must not be empty',
+    });
   } else {
     answers.forEach((answer, index) => {
       if (!answer.questionId) {
-        issues.push({ field: `answers[${index}].questionId`, message: 'Question ID is required' });
+        issues.push({
+          field: `answers[${index}].questionId`,
+          message: 'Question ID is required',
+        });
       }
 
       // Validate answer type and corresponding data
@@ -67,17 +67,27 @@ export async function createSubmissionWithAnswersHandler(
           field: `answers[${index}].textResponse`,
           message: 'Text response is required for text answers',
         });
-      } else if (answer.answerType === 'rating' && (answer.rating === undefined || answer.rating === null)) {
+      } else if (
+        answer.answerType === 'rating' &&
+        (answer.rating === undefined || answer.rating === null)
+      ) {
         issues.push({
           field: `answers[${index}].rating`,
           message: 'Rating is required for rating answers',
         });
-      } else if (answer.answerType === 'numeric' && (answer.numericResponse === undefined || answer.numericResponse === null)) {
+      } else if (
+        answer.answerType === 'numeric' &&
+        (answer.numericResponse === undefined ||
+          answer.numericResponse === null)
+      ) {
         issues.push({
           field: `answers[${index}].numericResponse`,
           message: 'Numeric response is required for numeric answers',
         });
-      } else if (answer.answerType === 'options' && (!answer.optionIds || answer.optionIds.length === 0)) {
+      } else if (
+        answer.answerType === 'options' &&
+        (!answer.optionIds || answer.optionIds.length === 0)
+      ) {
         issues.push({
           field: `answers[${index}].optionIds`,
           message: 'Option IDs are required for options answers',
@@ -88,7 +98,8 @@ export async function createSubmissionWithAnswersHandler(
       if (!answer.answerType) {
         if (answer.textResponse !== undefined) answer.answerType = 'text';
         else if (answer.rating !== undefined) answer.answerType = 'rating';
-        else if (answer.numericResponse !== undefined) answer.answerType = 'numeric';
+        else if (answer.numericResponse !== undefined)
+          answer.answerType = 'numeric';
         else if (answer.optionIds !== undefined) answer.answerType = 'options';
         else {
           issues.push({
@@ -121,7 +132,44 @@ export async function createSubmissionWithAnswersHandler(
       submissionId,
       answerIds,
     });
+    if (interviewId) {
+      await SubmissionService.updateSubmissionStatusForManual(
+        submissionId,
+        outcome!
+      );
+    }
+    try {
+      // 5. Gather email data
+      const user = await UserService.getUserById(auth.callerUuid);
+      const to = user?.email ?? '';
+      const displayName =
+        (user?.name as any)?.en ?? (user?.name as any)?.ar ?? 'User';
 
+      // Read latest submission to get computed outcome and decision notes
+      const latestSubmission = await SubmissionService.getSubmissionById(
+        submissionId
+      );
+      const status = (latestSubmission?.outcome as any) ?? 'MANUAL_REVIEW';
+      const details = latestSubmission?.decisionNotes ?? undefined;
+
+      // Optional links (set if you have a frontend route)
+      const actionLink = formId ? undefined : undefined;
+      const confirmLink = status === 'PASSED' ? undefined : undefined;
+
+      if (to) {
+        await sendSubmissionEmail(
+          to,
+          displayName,
+          status,
+          details,
+          actionLink,
+          confirmLink
+        );
+      }
+    } catch (err: any) {
+      logger.error('Error sending email', err);
+      return { success: false, issues: parseDbError(err) };
+    }
     return {
       success: true,
       submissionId,

@@ -1,5 +1,29 @@
 [
   {
+    "name": "sendEmail",
+    "description": "",
+    "parameters": [
+      {
+        "name": "email",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "subject",
+        "type": "string",
+        "required": true,
+        "description": ""
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createAdmin",
     "description": "",
     "parameters": [
@@ -532,6 +556,18 @@
         "type": "string | undefined",
         "required": false,
         "description": ""
+      },
+      {
+        "name": "formLanguage",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "formTitle",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
       }
     ]
   },
@@ -540,14 +576,20 @@
     "description": "",
     "parameters": [
       {
+        "name": "interviewId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
         "name": "formId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
         "name": "questions",
-        "type": "{ typeCode: \"OPEN_ENDED\" | \"SHORT_ANSWER\" | \"NUMBER\" | \"RATE\" | \"DROPDOWN\" | \"RADIO\" | \"MULTIPLE_CHOICE\"; questionText: { en: string; ar: string }; interviewId: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string; effect: \"PASS\" | \"FAIL\" }[] | undefined; options?: { optionText: { en: string; ar: string }; isCorrect: boolean }[] | undefined }[]",
+        "type": "{ typeCode: \"OPEN_ENDED\" | \"SHORT_ANSWER\" | \"NUMBER\" | \"RATE\" | \"DROPDOWN\" | \"RADIO\" | \"MULTIPLE_CHOICE\"; questionText: string; criteria?: { type: \"equals\" | \"greater_than\" | \"less_than\" | \"contains\" | \"between\" | \"not_equals\" | \"greater_than_or_equal\" | \"less_than_or_equal\"; value: string; effect: \"PASS\" | \"FAIL\" }[] | undefined; options?: { optionText: string; isCorrect: boolean }[] | undefined }[]",
         "required": true,
         "description": ""
       }
@@ -598,6 +640,18 @@
         "type": "string | null | undefined",
         "required": false,
         "description": ""
+      },
+      {
+        "name": "formLanguage",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "formTitle",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
       }
     ]
   },
@@ -613,7 +667,7 @@
       },
       {
         "name": "questionText",
-        "type": "{ en: string; ar: string }",
+        "type": "string",
         "required": true,
         "description": ""
       },
@@ -678,7 +732,7 @@
       },
       {
         "name": "questionText",
-        "type": "{ en: string; ar: string }",
+        "type": "string",
         "required": true,
         "description": ""
       },
@@ -890,6 +944,48 @@
         "name": "optionIds",
         "type": "string[] | undefined",
         "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "createSubmissionWithAnswers",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "interviewId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "dateSubmitted",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "outcome",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "answers",
+        "type": "{ questionId?: string | undefined; answeredAt?: string | undefined; answerType?: \"text\" | \"rating\" | \"numeric\" | \"options\" | undefined; textResponse?: string | undefined; rating?: number | undefined; numericResponse?: number | undefined; optionIds?: string[] | undefined }[]",
+        "required": true,
         "description": ""
       }
     ]
@@ -1246,8 +1342,8 @@
       },
       {
         "name": "projectId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {

@@ -10,6 +10,10 @@ CREATE TABLE submissions (
   outcome submission_outcome DEFAULT 'MANUAL_REVIEW'::submission_outcome,
   decisionNotes TEXT,
   answer_count INTEGER NOT NULL DEFAULT 0,
+  correct_answer_count INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT submissions_user_form_unique UNIQUE (userId, formId)
+  
 );
+
+
   

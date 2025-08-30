@@ -2,14 +2,14 @@ import submissionMapper from './submission.mapper';
 import { Submission } from './submission.class';
 import { SubmissionOutcome } from '../../../submission_outcome.enum';
 
-
 export class SubmissionService {
   static async createSubmission(
     formId: string,
     userId: string,
-    interviewId: string |undefined,
+    interviewId: string | undefined,
     dateSubmitted: Date,
-    decisionNotes?: string
+    decisionNotes?: string,
+    outcome?: string
   ): Promise<string> {
     // <- now returns the generated submissionId
     const entity = new Submission(
@@ -17,7 +17,8 @@ export class SubmissionService {
       userId,
       interviewId,
       dateSubmitted,
-      decisionNotes
+      decisionNotes,
+      outcome as SubmissionOutcome
     );
 
     await submissionMapper.save(entity);
@@ -55,24 +56,28 @@ export class SubmissionService {
   static async getSubmissionById(id: string): Promise<Submission | null> {
     return await submissionMapper.getById(id);
   }
-    static async getManualSubmissionsByFormId(formId: string): Promise<Submission[]> {
+  static async getManualSubmissionsByFormId(
+    formId: string
+  ): Promise<Submission[]> {
     return await submissionMapper.getManualByFormId(formId);
   }
-
 
   static async getAllSubmissions(): Promise<Submission[]> {
     return await submissionMapper.getAll();
   }
   static async updateSubmissionStatusForManual(
-  submissionId: string,
-  outcome: string
-): Promise<void> {
-  await submissionMapper.updateSubmissionStatusForManual(submissionId, outcome);
-}
-static async getSubmissionsByForm(formId:string): Promise<Submission[]> {
-    return await submissionMapper.getSubmissionsByFormId(formId);
+    submissionId: string,
+    outcome: string
+  ): Promise<void> {
+    await submissionMapper.updateSubmissionStatusForManual(
+      submissionId,
+      outcome
+    );
   }
 
+  static async getSubmissionsByForm(formId: string): Promise<Submission[]> {
+    return await submissionMapper.getSubmissionsByFormId(formId);
+  }
 
   static async deleteSubmission(id: string): Promise<void> {
     await submissionMapper.delete(id);

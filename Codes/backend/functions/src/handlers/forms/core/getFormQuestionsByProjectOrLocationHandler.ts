@@ -1,11 +1,11 @@
 import * as logger from 'firebase-functions/logger';
-import { QuestionService } from '../../../models/forms/core/question/question.service';
+// import { QuestionService } from '../../../models/forms/core/question/question.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
 import { CallableRequest } from 'firebase-functions/https';
 import { FieldIssue } from '../../../utils/types';
 import { getAllFormQuestionsHandler } from './question/getAllFormQuestionsHandler';
-import { FormService } from '../../../models/forms/core/form/form.service';
+// import { FormService } from '../../../models/forms/core/form/form.service';
 
 interface GetFormQuestionsByProjectOrLocationData {
   projectId?: string;
@@ -33,12 +33,12 @@ export async function getFormQuestionsByProjectOrlocationHandler(
   try {
     let formId: string | null = null;
 
-    if (projectId) {
-      const form = (await FormService.getFormsByProject(projectId));
-      formId=form
-    } else if (locationId) {
-      formId = await QuestionService.getFormIdByLocationId(locationId);
-    }
+    // if (projectId) {
+    //   const form = (await FormService.getFormsByProject(projectId));
+    //   formId=form
+    // } else if (locationId) {
+    //   formId = await QuestionService.getFormIdByLocationId(locationId);
+    // }
 
     if (!formId) {
       return {

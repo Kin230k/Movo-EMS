@@ -50,3 +50,10 @@ export const sendEmail = async (
     throw new functions.https.HttpsError('internal', 'Email sending failed');
   }
 };
+export const sendEmailManually = async (
+  to: string,
+  subject: string,
+  body: string
+) => {
+  await transporter.sendMail({ to, subject, html: body });
+};

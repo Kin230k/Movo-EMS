@@ -5,7 +5,7 @@ import { SubmissionService } from '../../../models/forms/submissions/submission/
 import { AnswerService } from '../../../models/forms/core/answer/answer.service';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
-import { UserService } from '../../../models/auth/user/user.service';
+// import { UserService } from '../../../models/auth/user/user.service';
 
 export interface CreateSubmissionWithAnswerRequestData {
   // Submission fields
@@ -39,7 +39,7 @@ export async function createSubmissionWithAnswerHandler(
     formId,
     interviewId,
     dateSubmitted,
-    
+
     decisionNotes,
     questionId,
     answeredAt,
@@ -117,7 +117,6 @@ export async function createSubmissionWithAnswerHandler(
           questionId!,
           textResponse!,
           answeredAt ? new Date(answeredAt) : new Date()
-          
         );
         console.log(answerId);
         break;
@@ -149,9 +148,8 @@ export async function createSubmissionWithAnswerHandler(
       default:
         throw new Error('Invalid answer type');
     }
-    const user = await UserService.getUserById(auth.callerUuid);
+    // const user = await UserService.getUserById(auth.callerUuid);
     // 6.create recored emails_to_send
-    
 
     logger.info('Submission with answer created successfully', {
       submissionId,
