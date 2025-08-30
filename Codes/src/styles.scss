@@ -203,3 +203,17 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Generic form helpers using theme variables */
+.btn {
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.q-label {
+  color: var(--color-font);
+}
+.q-input {
+  transition: outline-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}

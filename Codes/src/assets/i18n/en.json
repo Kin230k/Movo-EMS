@@ -40,7 +40,9 @@
     "USE_MY_LOCATION": "Use my location",
     "CONFIRM_LOCATION": "Confirm location",
     "NAME_AR": "Location Name (Arabic)",
-    "NAME_EN": "Location Name (English)"
+    "NAME_EN": "Location Name (English)",
+    "SELECT_PROJECT": "Select Project",
+    "PROJECT": "Project"
   },
   "EMAILS": {
     "TITLE": "Email Management",

@@ -71,14 +71,80 @@
 
         <div class="field">
           <label class="label">{{
-            "CLIENT_DATA_MANAGEMENT.LOGO_URL" | translate
+            "CLIENT_DATA_MANAGEMENT.LOGO" | translate
           }}</label>
-          <input
-            class="text-input"
-            [(ngModel)]="logo"
-            type="text"
-            placeholder="https://..."
-          />
+
+          <!-- Image Upload Section -->
+          <div class="image-upload-container">
+            <!-- Current Logo Preview -->
+            <div class="image-preview" *ngIf="logo || previewUrl">
+              <img
+                [src]="previewUrl || logo"
+                alt="Client logo preview"
+                class="preview-image"
+              />
+              <button
+                type="button"
+                class="remove-image-btn"
+                (click)="removeImage()"
+                [attr.aria-label]="'COMMON.BUTTONS.REMOVE' | translate"
+              >
+                ✕
+              </button>
+            </div>
+
+            <!-- File Input and Upload Controls -->
+            <div class="upload-controls" *ngIf="!logo && !previewUrl">
+              <input
+                type="file"
+                id="client-logo-input"
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                style="display: none"
+              />
+              <button
+                type="button"
+                class="upload-btn"
+                (click)="fileInput.click()"
+                [disabled]="isUploading"
+                [class.uploading]="isUploading"
+                [class.error]="hasUploadError"
+              >
+                {{ "CLIENT_DATA_MANAGEMENT.CHOOSE_IMAGE" | translate }}
+              </button>
+            </div>
+
+            <!-- Upload Progress -->
+            <div class="upload-progress" *ngIf="isUploading">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="uploadProgress"
+                ></div>
+              </div>
+              <span class="progress-text">{{ uploadProgress }}%</span>
+            </div>
+
+            <!-- Upload Button -->
+            <button
+              type="button"
+              class="upload-action-btn"
+              (click)="uploadImage()"
+              [disabled]="!selectedFile || isUploading"
+              *ngIf="selectedFile && !isUploading"
+            >
+              {{ "CLIENT_DATA_MANAGEMENT.UPLOAD_IMAGE" | translate }}
+            </button>
+
+            <!-- Uploading State -->
+            <div class="upload-loading-state" *ngIf="isUploading">
+              <div class="upload-spinner"></div>
+              <span class="upload-loading-text">
+                {{ "CLIENT_DATA_MANAGEMENT.UPLOADING" | translate }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div class="field">

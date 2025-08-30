@@ -40,7 +40,9 @@
     "NAME_AR": "اسم الموقع (عربي)",
     "NAME_EN": "اسم الموقع (انجليزي)",
     "USE_MY_LOCATION": "استخدم موقعي",
-    "CONFIRM_LOCATION": "تأكيد الموقع"
+    "CONFIRM_LOCATION": "تأكيد الموقع",
+    "SELECT_PROJECT": "اختر المشروع",
+    "PROJECT": "المشروع"
   },
   "EMAILS": {
     "TITLE": "إدارة البريد الإلكتروني",

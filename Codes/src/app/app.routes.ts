@@ -96,9 +96,23 @@ export const routes: Routes = [
             './pages/dashboard/components/attendance-management/attendance-management.component'
           ).then((m) => m.AttendanceManagementComponent),
       },
+      // {
+      //   path: 'form/:formId',
+      //   loadComponent: () =>
+      //     import('../app/pages/form/form-page.component').then(
+      //       (m) => m.FormPageComponent
+      //     ),
+      // },
     ],
   },
 
   // fallback
+  {
+    path: 'form/:formId',
+    loadComponent: () =>
+      import('./pages/form/form-page.component').then(
+        (m) => m.FormPageComponent
+      ),
+  },
   { path: '**', redirectTo: 'login' },
 ];

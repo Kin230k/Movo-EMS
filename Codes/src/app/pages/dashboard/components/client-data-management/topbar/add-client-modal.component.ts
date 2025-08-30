@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ImageUploadService } from '../../../../../core/services/image-upload.service';
 
 @Component({
   selector: 'app-add-client-modal',
@@ -32,7 +33,17 @@ export class AddClientModalComponent {
 
   errorMessage = '';
 
-  constructor(private translate: TranslateService) {}
+  // Image upload properties
+  selectedFile: File | null = null;
+  isUploading = false;
+  uploadProgress = 0;
+  previewUrl: string | null = null;
+  hasUploadError = false;
+
+  constructor(
+    private translate: TranslateService,
+    private imageUploadService: ImageUploadService
+  ) {}
 
   onClose() {
     this.close.emit();
@@ -75,5 +86,117 @@ export class AddClientModalComponent {
           ? { en: this.companyEn.trim(), ar: this.companyAr.trim() }
           : null,
     });
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Clear previous errors
+    this.errorMessage = '';
+    this.hasUploadError = false;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.errorMessage = this.translate.instant(
+        'CLIENT_DATA_MANAGEMENT.ERRORS.INVALID_FILE_TYPE'
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      this.errorMessage = this.translate.instant(
+        'CLIENT_DATA_MANAGEMENT.ERRORS.FILE_TOO_LARGE'
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+      return;
+    }
+
+    this.selectedFile = file;
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.previewUrl = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      this.errorMessage = this.translate.instant(
+        'CLIENT_DATA_MANAGEMENT.ERRORS.FILE_READ_ERROR'
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+    };
+    reader.readAsDataURL(file);
+    this.uploadImage();
+  }
+
+  private clearFileSelection() {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    // Reset file input
+    const fileInput = document.querySelector(
+      '#client-logo-input'
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  async uploadImage() {
+    if (!this.selectedFile) return;
+    console.log(this.selectedFile);
+
+    this.isUploading = true;
+    this.uploadProgress = 0;
+
+    try {
+      const upload$ = this.imageUploadService.uploadFile(
+        this.selectedFile,
+        `clients/${Date.now()}_${this.selectedFile.name}`
+      );
+
+      upload$.subscribe({
+        next: (progress) => {
+          this.uploadProgress = progress.progress;
+          if (progress.downloadURL) {
+            this.logo = progress.downloadURL;
+            this.isUploading = false;
+            this.selectedFile = null;
+          }
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          this.errorMessage = this.translate.instant(
+            'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+          );
+          this.hasUploadError = true;
+          this.isUploading = false;
+          this.uploadProgress = 0;
+        },
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      this.errorMessage = this.translate.instant(
+        'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+      );
+      this.hasUploadError = true;
+      this.isUploading = false;
+    }
+  }
+
+  removeImage() {
+    this.logo = undefined;
+    this.previewUrl = null;
+    this.selectedFile = null;
+    this.uploadProgress = 0;
+    this.isUploading = false;
+    this.hasUploadError = false;
+    this.errorMessage = '';
   }
 }
