@@ -1,4 +1,4 @@
-import userMapper, { UserMapper,ProjectUser  } from './user.mapper';
+import userMapper, { UserMapper, ProjectUser } from './user.mapper';
 import { User } from './user.class';
 import { Multilingual } from '../../multilingual.type';
 import { UserStatus } from './user_status.enum';
@@ -75,7 +75,7 @@ export class UserService {
     name: Multilingual,
     picture?: string
   ) {
-   return await UserMapper.editUserInfo(userId, name, picture);
+    return await UserMapper.editUserInfo(userId, name, picture);
   }
 
   static async getUserById(userId: string): Promise<User | null> {
@@ -84,6 +84,10 @@ export class UserService {
 
   static async getUserByEmail(email: string): Promise<User | null> {
     return await userMapper.getByEmail(email);
+  }
+
+  static async getUserRoleById(userId: string): Promise<string | null> {
+    return await userMapper.getUserRoleById(userId);
   }
 
   static async getAllUsers(): Promise<User[]> {
@@ -96,8 +100,7 @@ export class UserService {
   static async isUserActive(user: User): Promise<boolean> {
     return user?.getStatus === UserStatus.Active;
   }
-    static async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
+  static async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
     return await userMapper.getProjectUsers(projectId);
   }
-
 }

@@ -3,7 +3,7 @@ import { onCall } from 'firebase-functions/v2/https';
 
 // Form core handlers
 import { createFormHandler } from '../../handlers/forms/core/createFormHandler';
-import { createQuestionsHandler } from '../../handlers/forms/core/createFormWithQuestionsHandler';
+import { createQuestionsHandler } from '../../handlers/forms/core/createQuestionsHandler';
 import { deleteFormHandler } from '../../handlers/forms/core/deleteFormHandler';
 import { getFormHandler } from '../../handlers/forms/core/getFormHandler';
 import { updateFormHandler } from '../../handlers/forms/core/updateFormHandler';

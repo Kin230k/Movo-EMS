@@ -22,7 +22,8 @@ export async function getAttendanceByIdHandler(
   const issues: FieldIssue[] = [];
   const { attendanceId } = request.data || {};
 
-  if (!attendanceId) issues.push({ field: 'attendanceId', message: 'attendanceId is required' });
+  if (!attendanceId)
+    issues.push({ field: 'attendanceId', message: 'attendanceId is required' });
 
   if (issues.length > 0) return { success: false, issues };
 
@@ -30,21 +31,33 @@ export async function getAttendanceByIdHandler(
     // Fetch attendance to determine its project for authorization
     const attendance = await AttendanceService.getAttendanceById(attendanceId);
     if (!attendance) {
-      return { success: false, issues: [{ field: 'attendanceId', message: 'Attendance not found' }] };
+      return {
+        success: false,
+        issues: [{ field: 'attendanceId', message: 'Attendance not found' }],
+      };
     }
-    
+
     const area = await AreaService.getAreaById(attendance.areaId);
     if (!area) {
-      return { success: false, issues: [{ field: 'areaId', message: 'Area not found' }] };
+      return {
+        success: false,
+        issues: [{ field: 'areaId', message: 'Area not found' }],
+      };
     }
-    
+
     const location = await area.location();
     if (!location) {
-      return { success: false, issues: [{ field: 'areaId', message: 'Area has no valid location' }] };
+      return {
+        success: false,
+        issues: [{ field: 'areaId', message: 'Area has no valid location' }],
+      };
     }
-    
+
     // Authorize user access to the project
-    const auth = await authorizeUserProjectAccessWorkerFirst(request, location.projectId);
+    const auth = await authorizeUserProjectAccessWorkerFirst(
+      request,
+      location.projectId!
+    );
     if (!auth.success) {
       return { success: false, issues: auth.issues };
     }

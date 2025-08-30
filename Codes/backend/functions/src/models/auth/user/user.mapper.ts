@@ -136,19 +136,32 @@ export class UserMapper extends BaseMapper<User> {
       'SELECT * FROM get_user_by_email($1, $2)',
       [currentUserId, email]
     );
-    
+
     return result.rows.length ? this.mapRowToUser(result.rows[0]) : null;
+  }
+  async getUserRoleById(userId: string): Promise<string | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!userId) throw new Error('User ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_user_role_by_id($1, $2)',
+      [currentUserId, userId]
+    );
+
+    if (!result.rows.length) return null;
+    const row = result.rows[0] as any;
+    return row.role as string;
   }
   async getProjectUsers(projectId: string): Promise<ProjectUser[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!projectId) throw new Error('projectId is required');
-    
+
     const result = await pool.query('SELECT * FROM get_project_users($1, $2)', [
       currentUserId,
       projectId,
     ]);
-    
 
     return result.rows.map((row: any) => this.mapRowToProjectUser(row));
   }
@@ -163,10 +176,10 @@ export class UserMapper extends BaseMapper<User> {
       row.twofaenabled,
       row.picture,
       row.Operation,
-      row.userid,
+      row.userid
     );
   };
-  
+
   private mapRowToProjectUser = (row: any): ProjectUser => {
     return {
       userId: row.userid,
@@ -183,7 +196,6 @@ export class UserMapper extends BaseMapper<User> {
     };
   };
 }
-
 
 const userMapper = new UserMapper();
 export default userMapper;
