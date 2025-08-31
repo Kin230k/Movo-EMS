@@ -65,13 +65,15 @@ export class SubmissionService {
   static async getAllSubmissions(): Promise<Submission[]> {
     return await submissionMapper.getAll();
   }
-  static async updateSubmissionStatusForManual(
+  static async updateSubmissionStatus(
     submissionId: string,
-    outcome: string
+    outcome: string,
+    decisionNotes?: string
   ): Promise<void> {
-    await submissionMapper.updateSubmissionStatusForManual(
+    await submissionMapper.updateSubmissionStatus(
       submissionId,
-      outcome
+      outcome,
+      decisionNotes
     );
   }
 

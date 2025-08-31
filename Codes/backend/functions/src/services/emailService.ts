@@ -34,7 +34,7 @@ export const sendEmail = async (
   const template = EMAIL_TEMPLATES[templateKey];
   if (!template) throw new Error(`Template ${templateKey} not found`);
 
-  const { subject, text, html } = template(...templateData);
+  const { subject, text, html } =await template(...templateData);
 
   try {
     await transporter.sendMail({

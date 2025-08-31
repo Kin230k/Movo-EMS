@@ -1,5 +1,5 @@
-import { sendEmail } from '../services/emailService';
-import { EmailTemplateKey } from './types';
+import { sendEmailManually } from '../services/emailService'; // Adjust path if necessary
+import { submissionResult } from './emailTemplates'; // Import the named function
 
 export async function sendSubmissionEmail(
   to: string,
@@ -7,16 +7,24 @@ export async function sendSubmissionEmail(
   status: 'PASSED' | 'REJECTED' | 'MANUAL_REVIEW',
   details?: string,
   actionLink?: string,
-  confirmLink?: string
-): Promise<void> {
+  confirmLink?: string,
+  userId?: string
+): Promise<string> {
   try {
-    await sendEmail(to, 'SUBMISSION_RESULT' as EmailTemplateKey, [
+    // Call submissionResult to generate email content
+    const { subject, html } = await submissionResult(
       displayName,
       status,
       details,
       actionLink,
       confirmLink,
-    ]);
+      userId
+    );
+
+    // Use sendEmailManually to send the email with the generated content
+    await sendEmailManually(to, subject, html);
+    return html;
+    
   } catch (error) {
     console.error('Failed to send submission email:', error);
     throw error;

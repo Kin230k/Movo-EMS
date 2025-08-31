@@ -1,4 +1,5 @@
 import { EmailTemplate } from './types';
+import QRCode from 'qrcode';
 
 export const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
   VERIFICATION: (displayName: string, link: string) => ({
@@ -30,27 +31,52 @@ export const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
     text: `Hi ${displayName},\n\n${message}`,
     html: `<p>Hi ${displayName},</p><p>${message}</p>`,
   }),
-  SUBMISSION_RESULT: (
+    
+
+};
+
+export async function submissionResult(
   displayName: string,
   status: 'PASSED' | 'REJECTED' | 'MANUAL_REVIEW',
   details?: string,
   actionLink?: string,
   confirmLink?: string
-) => {
+  ,userId?: string
+)  {
   let subject = '';
   let text = '';
   let html = '';
 
   switch (status) {
-    case 'PASSED':
-      subject = '🎉 Your Submission Has Been Approved';
-      text = `Hi ${displayName},\n\nCongratulations! Your submission has been approved.${details ? `\n\nDetails: ${details}` : ''}${confirmLink ? `\n\nPlease confirm your acceptance by clicking: ${confirmLink}` : '\n\nNo further action is required at this time.'}\n\nThank you for your contribution!`;
-      html = `<p>Hi ${displayName},</p>
-              <p><strong>Congratulations! Your submission has been approved.</strong></p>
-              ${details ? `<p>Details: ${details}</p>` : ''}
-              ${confirmLink ? `<p>Please confirm your acceptance by clicking: <a href="${confirmLink}">Confirm Acceptance</a></p>` : '<p>No further action is required at this time.</p>'}
-              <p>Thank you for your contribution!</p>`;
-      break;
+      case 'PASSED': {
+        let additionalHtml = '';
+        if (userId) {
+          const qrDataUrl = await QRCode.toDataURL(userId);
+          const qrImage = `<img src="${qrDataUrl}" alt="Attendance Barcode" style="width: 200px; height: 200px;" />`;
+          additionalHtml = `<p>Congratulations! Scan this barcode to create attendance:</p>${qrImage}`;
+        }
+
+        subject = '🎉 Your Submission Has Been Approved';
+        text = `Hi ${displayName},\n\nCongratulations! Your submission has been approved.${
+          details ? `\n\nDetails: ${details}` : ''
+        }${
+          confirmLink
+            ? `\n\nPlease confirm your acceptance by clicking: ${confirmLink}`
+            : '\n\nNo further action is required at this time.'
+        }\n\nThank you for your contribution!`;
+
+        html = `<p>Hi ${displayName},</p>
+                <p><strong>Congratulations! Your submission has been approved.</strong></p>
+                ${details ? `<p>Details: ${details}</p>` : ''}
+                ${
+                  confirmLink
+                    ? `<p>Please confirm your acceptance by clicking: <a href="${confirmLink}">Confirm Acceptance</a></p>`
+                    : '<p>No further action is required at this time.</p>'
+                }
+                ${additionalHtml}
+                <p>Thank you for your contribution!</p>`;
+        break;
+      }
 
     case 'REJECTED':
       subject = 'Submission Status Update';
@@ -73,6 +99,4 @@ export const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
   }
 
   return { subject, text, html };
-},
-
-};
+} 

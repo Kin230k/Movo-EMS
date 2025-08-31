@@ -7,6 +7,7 @@ import { parseDbError } from '../../../utils/dbErrorParser';
 import { authenticateUser } from '../../../utils/authUtils';
 import { sendSubmissionEmail } from '../../../utils/sendSubmissionEmail';
 import { UserService } from '../../../models/auth/user/user.service';
+import { EmailService } from '../../../models/forms/core/email/email.service';
 export interface CreateSubmissionWithAnswersRequestData {
   // Submission fields
   formId?: string;
@@ -133,7 +134,7 @@ export async function createSubmissionWithAnswersHandler(
       answerIds,
     });
     if (interviewId) {
-      await SubmissionService.updateSubmissionStatusForManual(
+      await SubmissionService.updateSubmissionStatus(
         submissionId,
         outcome!
       );
@@ -157,19 +158,31 @@ export async function createSubmissionWithAnswersHandler(
       const confirmLink = status === 'PASSED' ? undefined : undefined;
 
       if (to) {
-        await sendSubmissionEmail(
+       const html= await sendSubmissionEmail(
           to,
           displayName,
           status,
           details,
           actionLink,
-          confirmLink
+          confirmLink,
+          auth.callerUuid
         );
+        try
+        {
+         await EmailService.createEmail(to,html!,formId!)
+        }
+        catch(err:any)
+        {
+          logger.error('Email Cannot be Created to Database', err);
+          return { success: false, issues: parseDbError(err) };
+        }
+        
       }
     } catch (err: any) {
       logger.error('Error sending email', err);
       return { success: false, issues: parseDbError(err) };
     }
+   
     return {
       success: true,
       submissionId,

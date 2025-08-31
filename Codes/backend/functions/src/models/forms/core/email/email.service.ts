@@ -1,26 +1,25 @@
 import emailMapper from './email.mapper';
 import { Email } from './email.class';
-import { Operation } from '../../../operation.enum';
 
 export class EmailService {
   constructor() {}
 
   static async createEmail(
-    title: any,
-    body: any,
+    title: string,
+    body: string,
     formId: string
   ): Promise<void> {
-    const entity = new Email(title, body, formId, Operation.CREATE);
+    const entity = new Email(title, body, formId);
     await emailMapper.save(entity);
   }
 
   static async updateEmail(
     emailId: string,
-    title: any,
-    body: any,
+    title: string,
+    body: string,
     formId: string
   ): Promise<void> {
-    const entity = new Email(title, body, formId, Operation.UPDATE, emailId);
+    const entity = new Email(title, body, formId, emailId);
     await emailMapper.save(entity);
   }
 
