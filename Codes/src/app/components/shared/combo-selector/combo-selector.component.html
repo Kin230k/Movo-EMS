@@ -1,7 +1,7 @@
 <select
   #selectElement
-  (change)="onSelect($event)"
-  [value]="getSelectedValue()"
+  [(ngModel)]="selectedValue"
+  (ngModelChange)="onModelChange($event)"
   [class.error-border]="hasError"
 >
   <option value="">{{ placeholder | translate }}</option>

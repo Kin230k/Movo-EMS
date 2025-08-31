@@ -31,7 +31,12 @@
     "MENU_LABEL": "القائمة"
   },
   "LOCATION_MANAGEMENT": {
+    "LOCATION": "الموقع",
+  "ZONE_NAME": "اسم المنطقة",
+    "TAB_LOCATIONS": "المواقع",
+    "TAB_ZONES": "المناطق",
     "ADD_LOCATION": "إضافة موقع",
+    "ADD_ZONE": "إضافة منطقة",
     "UPDATE_LOCATION": "تحديث ",
     "DELETE_LOCATION": "حذف ",
     "LATITUDE": "العرض",
@@ -43,7 +48,12 @@
     "USE_MY_LOCATION": "استخدم موقعي",
     "CONFIRM_LOCATION": "تأكيد الموقع",
     "SELECT_PROJECT": "اختر المشروع",
-    "PROJECT": "المشروع"
+    "PROJECT": "المشروع",
+    "NO_ZONES_FOUND_FOR_LOCATION": "لا يوجد مناطق لهذا الموقع.",
+    "CHOOSE_LOCATION_TO_VIEW_ZONES": "اختر موقع لعرض المناطق",
+    "DELETE_ZONE_TITLE": "حذف المنطقة",
+    "DELETE_ZONE_MESSAGE": "هل أنت متأكد من حذف هذه المنطقة؟",
+    "SELECT_LOCATION": "اختر الموقع"
   },
   "EMAILS": {
     "TITLE": "إدارة البريد الإلكتروني",

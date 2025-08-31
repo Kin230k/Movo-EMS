@@ -31,7 +31,13 @@
     "MENU_LABEL": "Menu"
   },
   "LOCATION_MANAGEMENT": {
+    "TAB_LOCATIONS": "Locations",
+    "TAB_ZONES": "Zones",
+    "LOCATION": "Location",
+    "ZONE_NAME": "Zone Name",
+    "SELECT_LOCATION": "Select Location",
     "ADD_LOCATION": "Add Location",
+    "ADD_ZONE": "Add Zone",
     "UPDATE_LOCATION": "Update",
     "DELETE_LOCATION": "Delete",
     "LATITUDE": "Latitude",

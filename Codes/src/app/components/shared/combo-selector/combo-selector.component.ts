@@ -26,6 +26,16 @@ export class ComboSelectorComponent implements AfterViewInit, OnChanges {
   @Input() selectedValue: any = '';
   @Input() hasError: boolean = false;
   @Output() projectSelected = new EventEmitter<any | null>();
+
+  // Getter and setter for ngModel two-way binding
+  get value(): any {
+    return this.selectedValue;
+  }
+
+  set value(val: any) {
+    this.selectedValue = val;
+    this.onModelChange(val);
+  }
   @Input() placeholder: string = '';
   @ViewChild('selectElement', { static: false })
   selectElement!: ElementRef<HTMLSelectElement>;
@@ -36,50 +46,39 @@ export class ComboSelectorComponent implements AfterViewInit, OnChanges {
     return this.translate.currentLang;
   }
 
-  onSelect(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    const value = target.value;
+  onModelChange(value: any) {
     if (value) {
-      // Try to convert to number if the original value was a number
-      const selectedProject = this.projects.find((p) => p.id == value);
-      this.projectSelected.emit(selectedProject ? selectedProject.id : value);
+      // Find the selected project using strict equality
+      const selectedProject = this.projects.find(
+        (p) => String(p.id) === String(value)
+      );
+      const emitValue = selectedProject ? selectedProject.id : value;
+      this.projectSelected.emit(emitValue);
     } else {
       // Emit null when placeholder (empty value) is selected
       this.projectSelected.emit(null);
     }
   }
 
+  onSelect(event: Event) {
+    // Keep this for backward compatibility, but ngModel should handle most cases
+    const target = event.target as HTMLSelectElement;
+    const value = target.value;
+    this.onModelChange(value);
+  }
+
   ngOnChanges(changes: SimpleChanges) {
-    // React to changes in selectedValue input
-    if (changes['selectedValue'] && this.selectElement) {
-      setTimeout(() => {
-        if (this.selectElement) {
-          const newValue = this.getSelectedValue();
-          this.selectElement.nativeElement.value = newValue;
-        }
-      }, 0);
-    }
+    // ngModel will handle the value binding automatically
+    // No need for manual value setting
   }
 
   ngAfterViewInit() {
-    // Force re-evaluation of selected value after view is initialized
-    // This helps ensure the correct option is selected when component loads
-
-    setTimeout(() => {
-      if (this.selectElement) {
-        const currentValue = this.getSelectedValue();
-        this.selectElement.nativeElement.value = currentValue;
-
-        // If the value is empty, ensure placeholder is shown
-        if (currentValue === '') {
-          this.selectElement.nativeElement.value = '';
-        }
-      }
-    }, 0);
+    // ngModel will handle the initial value binding
+    // No need for manual value setting
   }
 
   // Helper method to compare values (handles string vs number comparison)
-  getSelectedValue(): any {
+  getSelectedValue(): string {
     // Explicitly return empty string for null, undefined, or empty values
     if (
       this.selectedValue === null ||
@@ -91,6 +90,7 @@ export class ComboSelectorComponent implements AfterViewInit, OnChanges {
       return '';
     }
 
-    return this.selectedValue;
+    // Ensure we return a string value for the select element
+    return String(this.selectedValue);
   }
 }
