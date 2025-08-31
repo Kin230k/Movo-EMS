@@ -2,7 +2,6 @@ import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { QuestionService } from '../../../models/forms/core/question/question.service';
 import { CriteriaService } from '../../../models/forms/rules/criteria/criteria.service';
-import { Multilingual } from '../../../models/multilingual.type';
 import { parseDbError } from '../../../utils/dbErrorParser';
 import { FieldIssue } from '../../../utils/types';
 import { CriteriaOperator } from '../../../models/criteria_operator.enum';
@@ -48,9 +47,6 @@ function isNonEmptyString(v: unknown): v is string {
   );
 }
 
-function isMultilingual(v: unknown): v is Multilingual {
-  return typeof v === 'object' && v !== null;
-}
 
 function isValidCriteriaOperator(v: unknown): v is CriteriaOperator {
   return Object.values(CriteriaOperator).includes(v as any);
@@ -118,12 +114,6 @@ export async function createQuestionsHandler(
           });
         } else {
           q.options.forEach((o, oidx) => {
-            if (!isMultilingual(o.optionText)) {
-              issues.push({
-                field: `questions[${idx}].options[${oidx}].optionText`,
-                message: 'optionText must be a Multilingual object',
-              });
-            }
             if (typeof o.isCorrect !== 'boolean') {
               issues.push({
                 field: `questions[${idx}].options[${oidx}].isCorrect`,

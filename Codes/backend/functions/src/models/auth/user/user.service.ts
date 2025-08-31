@@ -81,6 +81,9 @@ export class UserService {
   static async getUserById(userId: string): Promise<User | null> {
     return await userMapper.getById(userId);
   }
+  static async getUsersSalary(year?: number, month?: number): Promise<number> {
+    return await userMapper.getUsersSalary(year, month);
+  }
 
   static async getUserByEmail(email: string): Promise<User | null> {
     return await userMapper.getByEmail(email);

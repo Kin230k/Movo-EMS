@@ -162,10 +162,29 @@ export class UserMapper extends BaseMapper<User> {
       currentUserId,
       projectId,
     ]);
+    
 
     return result.rows.map((row: any) => this.mapRowToProjectUser(row));
   }
-
+  async getUsersSalary(year?: number, month?: number): Promise<number> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    
+    
+    // Default to current month/year if not provided
+    const currentDate = new Date();
+    const calculationYear = year || currentDate.getFullYear();
+    const calculationMonth = month || currentDate.getMonth() + 1;
+    
+    const result: QueryResult = await pool.query(
+      'SELECT calculate_monthly_salary($1, $2) AS salary',
+      [calculationYear, calculationMonth]
+    );
+    
+    if (!result.rows.length) throw new Error('Failed to calculate salary');
+    
+    return parseInt(result.rows[0].salary);
+  }
   private mapRowToUser = (row: any): User => {
     return new User(
       row.name,

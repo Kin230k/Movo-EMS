@@ -53,6 +53,17 @@ export class OptionMapper extends BaseMapper<Option> {
     );
     return result.rows.length ? this.mapRowToOption(result.rows[0]) : null;
   }
+    async getByQuestion(questionId: string): Promise<Option[] | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!questionId) throw new Error('Question ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_options_by_question($1, $2)',
+      [currentUserId, questionId]
+    );
+   return result.rows.map(this.mapRowToOption);
+  }
 
   async getAll(): Promise<Option[]> {
     const currentUserId = CurrentUser.uuid;

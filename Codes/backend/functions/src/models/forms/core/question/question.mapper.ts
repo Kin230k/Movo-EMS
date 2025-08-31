@@ -67,7 +67,7 @@ export class QuestionMapper extends BaseMapper<Question> {
   async getAllByFormId(formId: string): Promise<Question[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-
+   console.log(formId);
     const result = await pool.query(
       'SELECT * FROM get_questions_by_form($1, $2)',
       [currentUserId, formId]

@@ -26,6 +26,9 @@ export class OptionService {
   static async getOptionById(id: string): Promise<Option | null> {
     return await optionMapper.getById(id);
   }
+  static async  getOptionsByQuestion(questionId: string): Promise<Option[] | null> {
+    return await optionMapper.getByQuestion(questionId);
+  }
 
   static async getAllOptions(): Promise<Option[]> {
     return await optionMapper.getAll();
