@@ -1,7 +1,22 @@
-<div class="container">
+<div class="container topbar-grid">
   <app-combo-selector
     [projects]="projects"
     (projectSelected)="projectSelected.emit($event)"
     [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT' | translate"
   ></app-combo-selector>
+  <themed-button
+    class="primary-btn add-btn"
+    (click)="openCreateModal()"
+    text="{{ 'ATTENDANCE_MANAGEMENT.ADD_ATTENDANCE' | translate }}"
+  >
+  </themed-button>
+
+  <!-- Create attendance modal -->
+  <app-create-attendance-modal
+    *ngIf="showCreateModal"
+    [users]="mockUsers"
+    [areas]="mockAreas"
+    (close)="closeCreateModal()"
+    (create)="handleCreateAttendance($event)"
+  ></app-create-attendance-modal>
 </div>

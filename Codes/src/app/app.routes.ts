@@ -41,11 +41,18 @@ export const routes: Routes = [
           ).then((m) => m.FormManagementComponent),
       },
       {
-        path: 'create-form-questions',
+        path: 'create-questions',
         loadComponent: () =>
           import(
             './pages/dashboard/components/form-questions/form-questions.component'
           ).then((m) => m.FormQuestionsComponent),
+      },
+      {
+        path: 'interview',
+        loadComponent: () =>
+          import(
+            './pages/dashboard/components/interview/interview.component'
+          ).then((m) => m.InterviewerFormPageComponent),
       },
       {
         path: 'location-management',
@@ -96,13 +103,6 @@ export const routes: Routes = [
             './pages/dashboard/components/attendance-management/attendance-management.component'
           ).then((m) => m.AttendanceManagementComponent),
       },
-      // {
-      //   path: 'form/:formId',
-      //   loadComponent: () =>
-      //     import('../app/pages/form/form-page.component').then(
-      //       (m) => m.FormPageComponent
-      //     ),
-      // },
     ],
   },
 
@@ -112,6 +112,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/form/form-page.component').then(
         (m) => m.FormPageComponent
+      ),
+  },
+  {
+    path: 'interviews/:interviewId',
+    loadComponent: () =>
+      import('./pages/interview/interview-questions-page.component').then(
+        (m) => m.InterviewQuestionsPageComponent
       ),
   },
   { path: '**', redirectTo: 'login' },

@@ -17,6 +17,52 @@
     </svg>
   </div>
 
+  <!-- Actions container with hamburger menu -->
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <div class="menu-action-wrapper" #menuWrapper>
+      <button
+        class="mobile-hamburger"
+        type="button"
+        aria-label="Open actions menu"
+        (click)="toggleMenu($event)"
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 6h18M3 12h18M3 18h18"
+            stroke="#000"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <!-- Buttons that will show/hide based on menu state -->
+      <div class="actions {{ isMenuOpen ? 'open' : '' }}">
+        <app-button class="action send" (click)="onSendEmail($event)">
+          {{ "EMAILS.SEND_EMAIL" | translate }}
+        </app-button>
+        <hr />
+        <app-button class="action edit" (click)="onEditEmail($event)">
+          {{ "EMAILS.EDIT_EMAIL" | translate }}
+        </app-button>
+        <hr />
+        <app-button class="action duplicate" (click)="onDuplicateEmail($event)">
+          {{ "EMAILS.DUPLICATE_EMAIL" | translate }}
+        </app-button>
+        <hr />
+        <app-button class="action delete" (click)="onDeleteEmail($event)">
+          {{ "EMAILS.DELETE_EMAIL" | translate }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+
   <div class="meta">
     <div class="meta-top">
       <h3 class="email-title">{{ emailTitle }}</h3>

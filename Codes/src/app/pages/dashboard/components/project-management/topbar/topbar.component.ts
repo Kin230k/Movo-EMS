@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 import { AddProjectModalComponent } from './add-project-modal.component';
+import { AddScheduleModalComponent } from './add-schedule-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -12,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     ThemedButtonComponent,
     AddProjectModalComponent,
+    AddScheduleModalComponent,
     TranslateModule,
   ],
   standalone: true,
@@ -19,11 +21,17 @@ import { TranslateModule } from '@ngx-translate/core';
 export class TopbarComponent {
   @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
   @Output() projectCreated = new EventEmitter<any>();
+  @Output() scheduleCreated = new EventEmitter<any>();
 
   showAddProject = false;
+  showAddSchedule = false;
 
   openAddProject() {
     this.showAddProject = true;
+  }
+
+  openAddSchedule() {
+    this.showAddSchedule = true;
   }
 
   onModalClose(closeReason?: any) {
@@ -31,10 +39,21 @@ export class TopbarComponent {
     this.showAddProject = false;
   }
 
+  onScheduleModalClose(closeReason?: any) {
+    this.showAddSchedule = false;
+  }
+
   onProjectCreated(projectData: any) {
     // Handle project creation
     this.projectCreated.emit(projectData);
     console.log('New project created:', projectData);
     this.showAddProject = false;
+  }
+
+  onScheduleCreated(scheduleData: any) {
+    // Handle schedule creation
+    this.scheduleCreated.emit(scheduleData);
+    console.log('New schedule created:', scheduleData);
+    this.showAddSchedule = false;
   }
 }

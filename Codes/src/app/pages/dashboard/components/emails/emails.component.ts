@@ -1,12 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { EmailCardComponent } from './email-card.component';
-import { SkeletonFormCardComponent } from '../../../../components/shared/skeleton-form-card/skeleton-form-card.component';
-import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { SkeletonFormCardComponent } from '../../../../components/shared/skeleton-form-card/skeleton-form-card.component';
 import { delay } from 'rxjs/operators';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 export interface Form {
   id: string;
@@ -17,15 +21,18 @@ export interface Form {
   selector: 'app-emails',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     ComboSelectorComponent,
     TranslateModule,
-    EmailCardComponent,
     SkeletonFormCardComponent,
   ],
   templateUrl: './emails.component.html',
   styleUrl: './emails.component.scss',
 })
-export class EmailsComponent {
+export class EmailsComponent implements OnInit {
+  // Tab management (two tabs only: Send and History)
+  activeTab: 'compose' | 'history' = 'compose';
+
   // Mock forms data - in real app this would come from an API
   forms: Form[] = [
     { id: '1', title: 'Customer Feedback Form' },
@@ -66,10 +73,33 @@ export class EmailsComponent {
     },
   ];
 
+  // Email history data (loaded per selected form)
+  emailHistory: Array<{
+    id: string;
+    subject: string;
+    sentAt: Date;
+    body: string;
+  }> = [];
+
+  isHistoryLoading = false;
+
   selectedFormId: string | undefined = undefined;
   isLoading = false;
 
-  constructor(private http: HttpClient) {}
+  // Compose form
+  composeForm!: FormGroup;
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.initializeComposeForm({
+      recipientType: 'users',
+      customRecipients: '',
+      templateId: '',
+      subject: '',
+      body: '',
+    });
+  }
 
   onFormSelected(formId: string | undefined) {
     this.selectedFormId = formId;
@@ -131,6 +161,26 @@ export class EmailsComponent {
     ];
   }
 
+  // Mock history API call (future: wire to Angular Query)
+  private loadEmailHistoryForForm(formId: string): Observable<any[]> {
+    this.isHistoryLoading = true;
+    const history = [
+      {
+        id: `${formId}-h1`,
+        subject: `Welcome for form ${formId}`,
+        sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        body: 'Welcome for form 1',
+      },
+      {
+        id: `${formId}-h2`,
+        subject: `Reminder for form ${formId}`,
+        sentAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        body: 'Reminder for form 2',
+      },
+    ];
+    return of(history).pipe(delay(1500));
+  }
+
   private resetEmails() {
     this.emails = [
       {
@@ -179,5 +229,148 @@ export class EmailsComponent {
     this.isLoading = false;
     // Fallback to mock data
     this.emails = this.getMockEmailsForForm(this.selectedFormId || '1');
+  }
+
+  // Tab management
+  setActiveTab(tab: 'compose' | 'history') {
+    this.activeTab = tab;
+  }
+
+  // Compose form methods
+  initializeComposeForm(initialValue: any) {
+    this.composeForm = this.fb.group({
+      email: [
+        initialValue?.email || '',
+        [Validators.required, Validators.email],
+      ], // <-- ADDED
+      formId: [initialValue?.formId || null],
+      recipientType: [
+        initialValue?.recipientType || 'users',
+        Validators.required,
+      ],
+      customRecipients: [initialValue?.customRecipients || ''],
+      templateId: [initialValue?.templateId || ''],
+      subject: [initialValue?.subject || '', Validators.required],
+      body: [initialValue?.body || '', Validators.required],
+    });
+  }
+
+  onRecipientTypeChange() {
+    // Reset form fields when recipient type changes
+    this.composeForm.patchValue({
+      customRecipients: '',
+      templateId: '',
+    });
+  }
+
+  onTemplateSelected(templateId: string) {
+    if (templateId) {
+      const template = this.emails.find((email) => email.id === templateId);
+      if (template) {
+        // Patch the template id so the form control exists and UI updates
+        this.composeForm.patchValue({
+          templateId: templateId,
+          subject: template.title,
+          body: template.body,
+        });
+
+        // If you want validations to run/update immediately:
+        this.composeForm.get('subject')?.updateValueAndValidity();
+        this.composeForm.get('body')?.updateValueAndValidity();
+      }
+    }
+  }
+
+  sendEmail() {
+    if (this.composeForm.valid) {
+      const formData = this.composeForm.value;
+
+      // Mock email sending
+      const newHistoryItem = {
+        id: Date.now().toString(),
+        subject: formData.subject,
+        sentAt: new Date(),
+        body: formData.body,
+      };
+
+      this.emailHistory.unshift(newHistoryItem);
+
+      // Reset form and switch to history tab
+      this.resetComposeForm();
+      this.setActiveTab('history');
+
+      // Show success message (you could use a toast service here)
+      alert('Email sent successfully!');
+    }
+  }
+
+  getRecipientCount(formData: any): number {
+    switch (formData.recipientType) {
+      case 'users':
+        return 50; // Mock: all users
+      case 'form':
+        return 25; // Mock: form recipients
+      case 'custom':
+        return formData.customRecipients.split(',').length;
+      default:
+        return 0;
+    }
+  }
+
+  resetComposeForm() {
+    this.composeForm.reset({
+      recipientType: 'users',
+      customRecipients: '',
+      templateId: '',
+      subject: '',
+      body: '',
+    });
+  }
+
+  openComposeModal() {
+    this.setActiveTab('compose');
+  }
+
+  // Email card actions
+  onEditEmail(emailData: any) {
+    console.log('Edit email:', emailData);
+    // Navigate to edit modal or page
+  }
+
+  onDuplicateEmail(emailData: any) {
+    console.log('Duplicate email:', emailData);
+    // Create duplicate template
+  }
+
+  onDeleteEmail(emailData: any) {
+    console.log('Delete email:', emailData);
+    // Show delete confirmation
+  }
+
+  onSendEmail(emailData: any) {
+    console.log('Send email template:', emailData);
+    // Pre-populate compose form with template data
+    this.setActiveTab('compose');
+    this.onTemplateSelected(emailData.emailId);
+  }
+
+  // History methods
+  onHistoryFormSelected(formId: string | undefined) {
+    this.selectedFormId = formId;
+    this.emailHistory = [];
+    if (!formId) {
+      this.isHistoryLoading = false;
+      return;
+    }
+    this.loadEmailHistoryForForm(formId).subscribe({
+      next: (items) => {
+        this.emailHistory = items as any;
+        this.isHistoryLoading = false;
+      },
+      error: () => {
+        this.emailHistory = [];
+        this.isHistoryLoading = false;
+      },
+    });
   }
 }

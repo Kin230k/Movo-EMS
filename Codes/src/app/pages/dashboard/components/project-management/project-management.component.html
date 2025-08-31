@@ -3,39 +3,166 @@
     <h1>{{ "PROJECT_MANAGEMENT.TITLE" | translate }}</h1>
   </div>
 
-  <app-topbar
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'projects'"
+      (click)="setActiveTab('projects')"
+    >
+      {{ "PROJECT_MANAGEMENT.PROJECTS_TAB" | translate }}
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'schedules'"
+      (click)="setActiveTab('schedules')"
+    >
+      {{ "PROJECT_MANAGEMENT.SCHEDULES_TAB" | translate }}
+    </button>
+  </div>
+
+  <!-- Projects Tab Content -->
+  <div *ngIf="activeTab === 'projects'" class="tab-content">
+    <app-topbar
+      [projects]="transformedProjects"
+      (projectCreated)="onProjectCreated($event)"
+      (scheduleCreated)="onScheduleCreated($event)"
+    ></app-topbar>
+
+    <!-- show error -->
+    <div *ngIf="error" class="error" role="alert">
+      {{ "PROJECT_MANAGEMENT.ERROR_LOADING_PROJECTS" | translate }}
+    </div>
+
+    <!-- show skeleton placeholders when loading -->
+    <div *ngIf="isLoading" class="card-list-skeleton">
+      <app-card-list-skeletion></app-card-list-skeletion>
+    </div>
+
+    <!-- show empty state if finished and no users -->
+    <div
+      *ngIf="
+        !isLoading && isFinished && mockProjects && mockProjects.length === 0
+      "
+      class="empty-state"
+    >
+      {{ "PROJECT_MANAGEMENT.NO_PROJECTS_FOUND" | translate }}
+    </div>
+
+    <!-- show real list when loaded -->
+    <div
+      class="card-list-container"
+      *ngIf="!isLoading && mockProjects && mockProjects.length > 0"
+    >
+      <app-card-list
+        [items]="mockProjects"
+        [cardComponent]="profileCardComponent"
+      ></app-card-list>
+    </div>
+  </div>
+
+  <!-- Schedules Tab Content -->
+  <div *ngIf="activeTab === 'schedules'" class="tab-content">
+    <!-- Project Selection for Schedules -->
+    <div class="schedule-controls">
+      <div class="project-selector">
+        <app-combo-selector
+          [projects]="transformedProjects"
+          [placeholder]="'PROJECT_MANAGEMENT.SELECT_PROJECT_TO_VIEW_SCHEDULES'"
+          (projectSelected)="onProjectSelected($event)"
+          [selectedValue]="selectedProjectId"
+        ></app-combo-selector>
+      </div>
+
+      <!-- Create Schedule Button -->
+      <button
+        class="create-schedule-btn"
+        (click)="openAddSchedule()"
+        [disabled]="!selectedProjectId"
+      >
+        {{ "PROJECT_MANAGEMENT.ADD_SCHEDULE" | translate }}
+      </button>
+    </div>
+
+    <!-- Schedules Content -->
+    <div class="schedules-content">
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-state">
+        {{ "PROJECT_MANAGEMENT.LOADING_SCHEDULES" | translate }}
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="error" class="error" role="alert">
+        {{ "PROJECT_MANAGEMENT.ERROR_LOADING_SCHEDULES" | translate }}
+      </div>
+
+      <!-- No project selected -->
+      <div *ngIf="!selectedProjectId" class="empty-state">
+        <p>
+          {{
+            "PROJECT_MANAGEMENT.SELECT_PROJECT_TO_VIEW_SCHEDULES" | translate
+          }}
+        </p>
+        <p>
+          {{ "PROJECT_MANAGEMENT.CHOOSE_PROJECT_FROM_DROPDOWN" | translate }}
+        </p>
+      </div>
+
+      <!-- No schedules for selected project -->
+      <div
+        *ngIf="selectedProjectId && filteredSchedules.length === 0"
+        class="empty-state"
+      >
+        <h3>
+          {{ "PROJECT_MANAGEMENT.SCHEDULES_FOR_PROJECT" | translate }}:
+          {{ selectedProject?.name?.en || "" }}
+        </h3>
+        <p>{{ "PROJECT_MANAGEMENT.NO_SCHEDULES_FOR_PROJECT" | translate }}</p>
+      </div>
+
+      <!-- Schedules list -->
+      <div
+        *ngIf="selectedProjectId && filteredSchedules.length > 0"
+        class="schedules-list"
+      >
+        <h3>
+          {{ "PROJECT_MANAGEMENT.SCHEDULES_FOR_PROJECT" | translate }}:
+          {{ selectedProject?.name?.en || "" }}
+        </h3>
+        <div class="schedule-cards">
+          <app-schedule-card
+            *ngFor="let schedule of filteredSchedules"
+            [schedule]="schedule"
+            (edit)="onScheduleEdit($event)"
+            (delete)="onScheduleDelete($event)"
+          ></app-schedule-card>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Schedule Modal -->
+  <app-add-schedule-modal
+    *ngIf="showAddSchedule"
     [projects]="transformedProjects"
-    (projectCreated)="onProjectCreated($event)"
-  ></app-topbar>
+    (close)="onScheduleModalClose()"
+    (create)="onScheduleCreated($event)"
+  ></app-add-schedule-modal>
 
-  <!-- show error -->
-  <div *ngIf="error" class="error" role="alert">
-    {{ "PROJECT_MANAGEMENT.ERROR_LOADING_PROJECTS" | translate }}
-  </div>
+  <!-- Edit Schedule Modal -->
+  <app-edit-schedule-modal
+    *ngIf="showEditSchedule && selectedSchedule"
+    [schedule]="selectedSchedule"
+    (close)="onScheduleEditClose()"
+    (update)="onScheduleEditUpdate($event)"
+  ></app-edit-schedule-modal>
 
-  <!-- show skeleton placeholders when loading -->
-  <div *ngIf="isLoading" class="card-list-skeleton">
-    <app-card-list-skeletion></app-card-list-skeletion>
-  </div>
-
-  <!-- show empty state if finished and no users -->
-  <div
-    *ngIf="
-      !isLoading && isFinished && mockProjects && mockProjects.length === 0
-    "
-    class="empty-state"
-  >
-    {{ "PROJECT_MANAGEMENT.NO_PROJECTS_FOUND" | translate }}
-  </div>
-
-  <!-- show real list when loaded -->
-  <div
-    class="card-list-container"
-    *ngIf="!isLoading && mockProjects && mockProjects.length > 0"
-  >
-    <app-card-list
-      [items]="mockProjects"
-      [cardComponent]="profileCardComponent"
-    ></app-card-list>
-  </div>
+  <!-- Delete Schedule Modal -->
+  <app-delete-modal
+    *ngIf="showDeleteSchedule && selectedSchedule"
+    [title]="'PROJECT_MANAGEMENT.DELETE_SCHEDULE_TITLE'"
+    [message]="'PROJECT_MANAGEMENT.DELETE_SCHEDULE_MESSAGE'"
+    (close)="onScheduleDeleteClose()"
+    (confirm)="onScheduleDeleteConfirm()"
+  ></app-delete-modal>
 </div>

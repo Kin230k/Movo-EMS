@@ -1,6 +1,8 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
@@ -29,11 +31,16 @@ export interface EmailData {
   selector: 'app-email-card',
   templateUrl: './email-card.component.html',
   styleUrls: ['./email-card.component.scss'],
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, ButtonComponent],
   standalone: true,
 })
 export class EmailCardComponent implements OnInit, OnDestroy {
   @Input() data: EmailData | null = null;
+
+  @Output() edit = new EventEmitter<EmailData>();
+  @Output() duplicate = new EventEmitter<EmailData>();
+  @Output() delete = new EventEmitter<EmailData>();
+  @Output() send = new EventEmitter<EmailData>();
 
   modalOpen = false;
   isMenuOpen = false;
@@ -122,17 +129,22 @@ export class EmailCardComponent implements OnInit, OnDestroy {
 
   onEditEmail(evt?: MouseEvent) {
     evt?.stopPropagation();
-    console.log('Edit email', this.data);
+    this.edit.emit(this.data!);
   }
 
   onDeleteEmail(evt?: MouseEvent) {
     evt?.stopPropagation();
-    console.log('Delete email', this.data);
+    this.delete.emit(this.data!);
   }
 
   onDuplicateEmail(evt?: MouseEvent) {
     evt?.stopPropagation();
-    console.log('Duplicate email', this.data);
+    this.duplicate.emit(this.data!);
+  }
+
+  onSendEmail(evt?: MouseEvent) {
+    evt?.stopPropagation();
+    this.send.emit(this.data!);
   }
 
   handleModalEdit = (payload: any) => {

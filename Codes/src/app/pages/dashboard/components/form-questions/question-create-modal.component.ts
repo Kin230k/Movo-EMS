@@ -48,7 +48,7 @@ export class QuestionCreateModalComponent {
     return this.fb.group({
       text: ['', Validators.required],
       description: [''],
-      type: ['SHORT_ANSWER', Validators.required],
+      type: ['', Validators.required],
       options: this.fb.array([]),
       criteria: this.fb.array([]),
     });
@@ -92,8 +92,14 @@ export class QuestionCreateModalComponent {
     );
   }
 
-  removeCriteria(index: number, ci: number) {
-    this.getCriteriaControls(index).removeAt(ci);
+  removeCriteria(index: number, ci: number | FormGroup) {
+    const criteria = this.getCriteriaControls(index);
+    if (typeof ci === 'number') {
+      criteria.removeAt(ci);
+      return;
+    }
+    const idx = (criteria.controls as FormGroup[]).indexOf(ci);
+    if (idx >= 0) criteria.removeAt(idx);
   }
 
   getPassCriteria(index: number): FormGroup[] {
@@ -133,26 +139,26 @@ export class QuestionCreateModalComponent {
 
   onQuestionTypeSelect(selectedType: string | null, itemIndex: number) {
     const item = this.items.at(itemIndex);
+    const typeControl = item.get('type');
     if (selectedType) {
-      item.get('type')?.setValue(selectedType);
+      typeControl?.setValue(selectedType);
     } else {
-      item.get('type')?.setValue('');
+      typeControl?.setValue('');
     }
+    typeControl?.markAsTouched();
+    typeControl?.updateValueAndValidity({ onlySelf: true });
   }
 
   onConditionSelect(
     selectedCondition: string | null,
     itemIndex: number,
-    criteriaIndex: number
+    criterion: FormGroup
   ) {
-    const item = this.items.at(itemIndex);
     const criteria = this.getCriteriaControls(itemIndex);
-    const criterion = criteria.at(criteriaIndex);
-    if (selectedCondition) {
-      criterion.get('condition')?.setValue(selectedCondition);
-    } else {
-      criterion.get('condition')?.setValue('');
-    }
+    const idx = (criteria.controls as FormGroup[]).indexOf(criterion);
+    if (idx === -1) return;
+    const target = criteria.at(idx) as FormGroup;
+    target.get('condition')?.setValue(selectedCondition ?? '');
   }
 
   onRadioChange(itemIndex: number, selectedOptionIndex: number) {

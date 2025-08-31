@@ -33,7 +33,7 @@ export class AttendanceManagementComponent {
       userId: i + 1,
       name: { en: `User A${i + 1}`, ar: `يوزر A${i + 1}` },
       role: 'Main User',
-      isPresent: true,
+      isPresent: false,
       attendanceTimestamp: new Date(),
       picture: '/assets/images/image.png',
     })),
@@ -97,7 +97,13 @@ export class AttendanceManagementComponent {
       this._isLoading = false;
     }
   }
-
+  onAddAttendance(payload: any) {
+    // payload has userId, name, projectId, role, isPresent, attendanceTimestamp, picture
+    const pid = payload.projectId;
+    // insert into users list for that project
+    this.users = [...this.users, payload]; // if you show full list; or add to mockUsers[pid]
+    // optionally persist to server here
+  }
   private async fetchUsers(projectId: number): Promise<any[]> {
     await new Promise((r) => setTimeout(r, 900));
     return this.mockUsers[projectId] || [];

@@ -243,3 +243,13 @@ select {
   padding-top: 1rem;
   border-top: 1px solid rgba(var(--white-rgb), 0.15);
 }
+
+/* Validation error */
+.field-error {
+  margin-top: 6px;
+}
+.error-text {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 500;
+}

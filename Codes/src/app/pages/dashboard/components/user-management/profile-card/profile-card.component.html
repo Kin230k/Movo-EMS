@@ -68,3 +68,14 @@
   (edit)="handleModalEdit($event)"
   (disable)="handleModalDisable($event)"
 ></app-profile-modal>
+
+<!-- Shared delete modal triggered when user chooses disable -->
+<app-delete-modal
+  *ngIf="deleteModalOpen"
+  title="USER.ACTIONS.CONFIRM_DISABLE_TITLE"
+  message="USER.ACTIONS.CONFIRM_DISABLE_MESSAGE"
+  confirmLabel="USER.ACTIONS.DISABLE"
+  cancelLabel="COMMON.BUTTONS.CANCEL"
+  (close)="closeDeleteModal()"
+  (confirm)="confirmDisable()"
+></app-delete-modal>

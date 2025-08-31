@@ -1,4 +1,36 @@
 <div class="page">
+  <!-- Header -->
+  <h1 class="title">{{`CREATE_FORM_QUESTIONS.TITLE` | translate}}</h1>
+  <!-- Question Type Selection -->
+  <div class="question-type-selection">
+    <div class="radio-group">
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="questionType"
+          value="form"
+          [checked]="selectedQuestionType === 'form'"
+          (change)="onQuestionTypeChange($event)"
+        />
+        <span class="radio-label">{{
+          "CREATE_FORM_QUESTIONS.FORM_QUESTIONS" | translate
+        }}</span>
+      </label>
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="questionType"
+          value="interview"
+          [checked]="selectedQuestionType === 'interview'"
+          (change)="onQuestionTypeChange($event)"
+        />
+        <span class="radio-label">{{
+          "CREATE_FORM_QUESTIONS.INTERVIEW_QUESTIONS" | translate
+        }}</span>
+      </label>
+    </div>
+  </div>
+
   <div class="toolbar">
     <form [formGroup]="form" class="toolbar-form">
       <app-combo-selector
@@ -7,18 +39,32 @@
         (projectSelected)="onProjectSelect($event)"
         placeholder="{{ 'CREATE_FORM_QUESTIONS.PROJECT_NAME' | translate }}"
       ></app-combo-selector>
-      <app-combo-selector
-        [projects]="forms"
-        [selectedValue]="form.get('formId')?.value"
-        (projectSelected)="onFormSelect($event)"
-        placeholder="{{ 'CREATE_FORM_QUESTIONS.FORM_NAME' | translate }}"
-      ></app-combo-selector>
-      <app-combo-selector
-        [projects]="languages"
-        [selectedValue]="form.get('language')?.value"
-        (projectSelected)="onLanguageSelect($event)"
-        placeholder="{{ 'CREATE_FORM_QUESTIONS.LANGUAGE' | translate }}"
-      ></app-combo-selector>
+
+      <!-- Form Questions: Show form and language dropdowns -->
+      <ng-container *ngIf="selectedQuestionType === 'form'">
+        <app-combo-selector
+          [projects]="forms"
+          [selectedValue]="form.get('formId')?.value"
+          (projectSelected)="onFormSelect($event)"
+          placeholder="{{ 'CREATE_FORM_QUESTIONS.FORM_NAME' | translate }}"
+        ></app-combo-selector>
+        <app-combo-selector
+          [projects]="languages"
+          [selectedValue]="form.get('language')?.value"
+          (projectSelected)="onLanguageSelect($event)"
+          placeholder="{{ 'CREATE_FORM_QUESTIONS.LANGUAGE' | translate }}"
+        ></app-combo-selector>
+      </ng-container>
+
+      <!-- Interview Questions: Show only interview dropdown -->
+      <ng-container *ngIf="selectedQuestionType === 'interview'">
+        <app-combo-selector
+          [projects]="interviews"
+          [selectedValue]="form.get('interviewId')?.value"
+          (projectSelected)="onInterviewSelect($event)"
+          placeholder="{{ 'CREATE_FORM_QUESTIONS.INTERVIEW_NAME' | translate }}"
+        ></app-combo-selector>
+      </ng-container>
 
       <button
         class="btn btn--purple"

@@ -3,9 +3,7 @@
     class="avatar"
     (click)="openModal($event)"
     title="{{ 'USER.ACTIONS.OPEN_USER' | translate }}"
-  >
-
-  </div>
+  ></div>
 
   <div class="meta">
     <div class="meta-top">
@@ -14,9 +12,18 @@
     </div>
 
     <div class="meta-body">
-      <p class="starting-date">{{ 'PROJECT_MANAGEMENT.STARTING_DATE' | translate }}: {{ data.startingDate | date:'dd/MM/yyyy' }}</p>
-      <p class="ending-date">{{ 'PROJECT_MANAGEMENT.ENDING_DATE' | translate }}: {{ data.endingDate | date:'dd/MM/yyyy' }}</p>
-      <div class="description">{{ 'PROJECT_MANAGEMENT.DESCRIPTION' | translate }}: {{ displayDescription }}</div>
+      <p class="starting-date">
+        {{ "PROJECT_MANAGEMENT.STARTING_DATE" | translate }}:
+        {{ data.startingDate | date : "dd/MM/yyyy" }}
+      </p>
+      <p class="ending-date">
+        {{ "PROJECT_MANAGEMENT.ENDING_DATE" | translate }}:
+        {{ data.endingDate | date : "dd/MM/yyyy" }}
+      </p>
+      <div class="description">
+        {{ "PROJECT_MANAGEMENT.DESCRIPTION" | translate }}:
+        {{ displayDescription }}
+      </div>
     </div>
   </div>
 
@@ -47,9 +54,8 @@
 
       <!-- Buttons that will show/hide based on menu state -->
       <div class="actions {{ isMenuOpen ? 'open' : '' }}">
-      
         <app-button class="action edit" (click)="openModal($event)">
-          {{ "USER.ACTIONS.EDIT" | translate }}
+          {{ "PROJECT_MANAGEMENT.EDIT" | translate }}
         </app-button>
       </div>
     </div>

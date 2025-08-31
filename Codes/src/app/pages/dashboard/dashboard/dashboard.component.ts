@@ -15,6 +15,6 @@ import { LanguageService } from '../../../../app/core/services/language.service'
 export class DashboardComponent {
   constructor(private translate: LanguageService) {}
   ngOnInit() {
-    // this.translate.use('ar');
+    this.translate.use('ar');
   }
 }

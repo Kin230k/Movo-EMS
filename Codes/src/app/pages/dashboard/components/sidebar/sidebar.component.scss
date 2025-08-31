@@ -188,7 +188,6 @@
 .sidebar-wrap.mobile .menu-item .menu-item-btn {
   width: 100%;
   max-width: calc(100vw - 2rem); /* cap at ~90% of viewport */
-  margin-inline: 1rem;
   box-sizing: border-box;
   height: 2.2rem;
   padding-inline: 0.75rem;
@@ -213,8 +212,7 @@
 :host-context(html[dir="rtl"]) .sidebar-wrap,
 .sidebar-wrap.rtl {
   border-radius: 1rem 0 0 1rem; /* mirror rounded corner */
-  padding-inline-start: 0.9rem;
-  padding-inline-end: 1.5rem;
+  padding: 0.9rem;
 }
 
 /* when menu hidden on mobile keep the same hide/open rules (no change needed) */

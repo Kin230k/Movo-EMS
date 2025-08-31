@@ -1,4 +1,9 @@
-<select #selectElement (change)="onSelect($event)" [value]="getSelectedValue()">
+<select
+  #selectElement
+  (change)="onSelect($event)"
+  [value]="getSelectedValue()"
+  [class.error-border]="hasError"
+>
   <option value="">{{ placeholder | translate }}</option>
   <option *ngFor="let project of projects" [value]="project.id">
     {{ project.name[currentLang] }}

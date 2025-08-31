@@ -18,13 +18,13 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
-import { QuestionCriteriaComponent } from './question-criteria.component';
 import { ApiQuestionListComponent } from './api-question-list.component';
 import { QuestionEditModalComponent } from './question-edit-modal.component';
 import { QuestionCreateModalComponent } from './question-create-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
 import { questionTypes } from '../../../../shared/types/questionTypes';
 import { conditionOptions } from '../../../../shared/types/conditionOptions';
+
 @Component({
   selector: 'app-form-questions',
   standalone: true,
@@ -43,6 +43,9 @@ import { conditionOptions } from '../../../../shared/types/conditionOptions';
 export class FormQuestionsComponent
   implements OnInit, OnDestroy, AfterViewInit
 {
+  // Question type selection
+  selectedQuestionType: 'form' | 'interview' = 'form';
+
   onCreateModalClose() {
     this.createModalVisible = false;
   }
@@ -65,6 +68,17 @@ export class FormQuestionsComponent
           })
         )
       );
+      // Restore criteria from modal items
+      const criteriaArray = group.get('criteria') as FormArray<FormGroup>;
+      (item.criteria || []).forEach((crit: any) => {
+        const critGroup = this.createCriteriaGroup(crit.effect || 'pass');
+        critGroup.patchValue({
+          condition: crit.condition ?? '=',
+          value: crit.value ?? '',
+          valueTo: crit.valueTo ?? '',
+        });
+        criteriaArray.push(critGroup);
+      });
       this.questions.push(group);
     });
     this.createModalVisible = false;
@@ -119,6 +133,39 @@ export class FormQuestionsComponent
     console.log(this.form.value);
   }
 
+  // Question type change handler
+  onQuestionTypeChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.selectedQuestionType = target.value as 'form' | 'interview';
+
+    // Clear form values when switching types
+    this.clearFormValues();
+
+    // Update URL query parameters
+    this.updateUrlQueryParams();
+
+    // Load data when ready
+    setTimeout(() => this.loadDataWhenReady(), 0);
+  }
+
+  // Clear form values when switching question types
+  private clearFormValues(): void {
+    if (this.selectedQuestionType === 'form') {
+      this.form.get('interviewId')?.setValue('');
+    } else {
+      this.form.get('formId')?.setValue('');
+      this.form.get('language')?.setValue('');
+    }
+
+    // Clear questions
+    while (this.questions.length > 0) {
+      this.questions.removeAt(0);
+    }
+
+    this.dataLoaded = false;
+    this.isApiData = false;
+  }
+
   projects = [
     { id: 1, name: { en: 'Project 1', ar: 'المشروع 1' } },
     { id: 2, name: { en: 'Project 2', ar: 'المشروع 2' } },
@@ -128,6 +175,11 @@ export class FormQuestionsComponent
     { id: 1, name: { en: 'Form 1', ar: 'النموذج 1' } },
     { id: 2, name: { en: 'Form 2', ar: 'النموذج 2' } },
     { id: 3, name: { en: 'Form 3', ar: 'النموذج 3' } },
+  ];
+  interviews = [
+    { id: 1, name: { en: 'Interview 1', ar: 'المقابلة 1' } },
+    { id: 2, name: { en: 'Interview 2', ar: 'المقابلة 2' } },
+    { id: 3, name: { en: 'Interview 3', ar: 'المقابلة 3' } },
   ];
   languages = [
     { id: 'en', name: { en: 'English', ar: 'الإنجليزية' } },
@@ -151,6 +203,7 @@ export class FormQuestionsComponent
     this.form = this.fb.group({
       projectId: [''],
       formId: [''],
+      interviewId: [''],
       language: [''],
       questions: this.fb.array([]),
     });
@@ -161,16 +214,23 @@ export class FormQuestionsComponent
   // Helper method to check if all required dropdowns are selected
   areAllDropdownsSelected(): boolean {
     const projectId = this.form.get('projectId')?.value;
-    const formId = this.form.get('formId')?.value;
-    const language = this.form.get('language')?.value;
-    return !!(projectId && formId && language);
+
+    if (this.selectedQuestionType === 'form') {
+      const formId = this.form.get('formId')?.value;
+      const language = this.form.get('language')?.value;
+      return !!(projectId && formId && language);
+    } else {
+      const interviewId = this.form.get('interviewId')?.value;
+      return !!(projectId && interviewId);
+    }
   }
 
   // Mock API call - simulate fetching questions from API
   private fetchQuestionsFromAPI(
     projectId: string,
-    formId: string,
-    language: string
+    formId?: string,
+    interviewId?: string,
+    language?: string
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       // Simulate API delay
@@ -182,7 +242,10 @@ export class FormQuestionsComponent
             questions: [
               {
                 id: 'q-1',
-                text: 'Sample question from API',
+                text:
+                  this.selectedQuestionType === 'form'
+                    ? 'Sample form question from API'
+                    : 'Sample interview question from API',
                 description: '',
                 type: 'SHORT_ANSWER',
                 order: 1,
@@ -229,13 +292,20 @@ export class FormQuestionsComponent
 
     try {
       const projectId = this.form.get('projectId')?.value;
-      const formId = this.form.get('formId')?.value;
-      const language = this.form.get('language')?.value;
+      let formId, interviewId, language;
+
+      if (this.selectedQuestionType === 'form') {
+        formId = this.form.get('formId')?.value;
+        language = this.form.get('language')?.value;
+      } else {
+        interviewId = this.form.get('interviewId')?.value;
+      }
 
       // Try to fetch from API first
       const apiData = await this.fetchQuestionsFromAPI(
         projectId,
         formId,
+        interviewId,
         language
       );
 
@@ -245,7 +315,11 @@ export class FormQuestionsComponent
         this.isApiData = true;
       } else {
         // Fallback to localStorage
-        const localData = this.loadQuestionsFromLocalStorage(formId, projectId);
+        const localData = this.loadQuestionsFromLocalStorage(
+          this.selectedQuestionType === 'form' ? formId : interviewId,
+          projectId,
+          this.selectedQuestionType
+        );
         if (localData) {
           this.restoreFormData(localData, 'local');
           this.isApiData = false;
@@ -263,11 +337,16 @@ export class FormQuestionsComponent
         error instanceof Error ? error.message : 'Unknown error occurred';
 
       // Fallback to localStorage on error
-      const formId = this.form.get('formId')?.value;
       const projectId = this.form.get('projectId')?.value;
+      const formId = this.form.get('formId')?.value;
+      const interviewId = this.form.get('interviewId')?.value;
 
-      if (formId && projectId) {
-        const localData = this.loadQuestionsFromLocalStorage(formId, projectId);
+      if (projectId && (formId || interviewId)) {
+        const localData = this.loadQuestionsFromLocalStorage(
+          this.selectedQuestionType === 'form' ? formId : interviewId,
+          projectId,
+          this.selectedQuestionType
+        );
         if (localData) {
           this.restoreFormData(localData, 'local');
           this.isApiData = false;
@@ -339,22 +418,33 @@ export class FormQuestionsComponent
     const params = this.route.snapshot.queryParams;
     let hasChanges = false;
 
+    // Set question type from URL
+    if (params['questionType']) {
+      this.selectedQuestionType = params['questionType'] as
+        | 'form'
+        | 'interview';
+      hasChanges = true;
+    }
+
     if (params['projectId']) {
       this.form.get('projectId')?.setValue(params['projectId']);
       hasChanges = true;
-    } else {
     }
 
-    if (params['formId']) {
-      this.form.get('formId')?.setValue(params['formId']);
-      hasChanges = true;
+    if (this.selectedQuestionType === 'form') {
+      if (params['formId']) {
+        this.form.get('formId')?.setValue(params['formId']);
+        hasChanges = true;
+      }
+      if (params['language']) {
+        this.form.get('language')?.setValue(params['language']);
+        hasChanges = true;
+      }
     } else {
-    }
-
-    if (params['language']) {
-      this.form.get('language')?.setValue(params['language']);
-      hasChanges = true;
-    } else {
+      if (params['interviewId']) {
+        this.form.get('interviewId')?.setValue(params['interviewId']);
+        hasChanges = true;
+      }
     }
 
     if (params['locationId']) {
@@ -383,12 +473,17 @@ export class FormQuestionsComponent
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        // Only auto-save if we have formId and projectId
-        const formId = this.form.get('formId')?.value;
+        // Only auto-save if we have required fields and projectId
         const projectId = this.form.get('projectId')?.value;
+        const formId = this.form.get('formId')?.value;
+        const interviewId = this.form.get('interviewId')?.value;
 
-        if (formId && projectId && this.questions.length > 0) {
-          this.saveDraftToLocalStorage();
+        if (projectId && this.questions.length > 0) {
+          if (this.selectedQuestionType === 'form' && formId) {
+            this.saveDraftToLocalStorage();
+          } else if (this.selectedQuestionType === 'interview' && interviewId) {
+            this.saveDraftToLocalStorage();
+          }
         }
       });
   }
@@ -401,7 +496,10 @@ export class FormQuestionsComponent
 
     // Restore form data
     if (data.projectId) this.form.get('projectId')?.setValue(data.projectId);
+    if (data.questionType) this.selectedQuestionType = data.questionType;
     if (data.formId) this.form.get('formId')?.setValue(data.formId);
+    if (data.interviewId)
+      this.form.get('interviewId')?.setValue(data.interviewId);
     if (data.language) this.form.get('language')?.setValue(data.language);
 
     // Restore questions
@@ -598,10 +696,25 @@ export class FormQuestionsComponent
     setTimeout(() => this.loadDataWhenReady(), 0);
   }
 
+  onInterviewSelect(value: string | null) {
+    if (value === null) {
+      this.form.get('interviewId')?.setValue('');
+    } else {
+      this.form.get('interviewId')?.setValue(value);
+    }
+
+    // Update URL with query parameters
+    this.updateUrlQueryParams();
+
+    // Load data when all dropdowns are selected
+    setTimeout(() => this.loadDataWhenReady(), 0);
+  }
+
   // Update URL query parameters when selections change
   private updateUrlQueryParams(): void {
     const projectId = this.form.get('projectId')?.value;
     const formId = this.form.get('formId')?.value;
+    const interviewId = this.form.get('interviewId')?.value;
     const language = this.form.get('language')?.value;
 
     // Get current query parameters
@@ -610,21 +723,36 @@ export class FormQuestionsComponent
     // Update with new values, remove empty values
     const newParams: any = { ...currentParams };
 
+    // Add question type
+    newParams.questionType = this.selectedQuestionType;
+
     if (projectId) {
       newParams.projectId = projectId;
     } else {
       delete newParams.projectId;
     }
 
-    if (formId) {
-      newParams.formId = formId;
+    if (this.selectedQuestionType === 'form') {
+      if (formId) {
+        newParams.formId = formId;
+      } else {
+        delete newParams.formId;
+      }
+      if (language) {
+        newParams.language = language;
+      } else {
+        delete newParams.language;
+      }
+      // Remove interview-specific params
+      delete newParams.interviewId;
     } else {
+      if (interviewId) {
+        newParams.interviewId = interviewId;
+      } else {
+        delete newParams.interviewId;
+      }
+      // Remove form-specific params
       delete newParams.formId;
-    }
-
-    if (language) {
-      newParams.language = language;
-    } else {
       delete newParams.language;
     }
 
@@ -637,36 +765,55 @@ export class FormQuestionsComponent
   }
 
   // LocalStorage keys
-  private getDraftKey(formId: string, projectId: string): string {
-    return `form-draft-${projectId}-${formId}`;
+  private getDraftKey(
+    id: string,
+    projectId: string,
+    type: 'form' | 'interview'
+  ): string {
+    const prefix = type === 'form' ? 'form-draft' : 'interview-draft';
+    return `${prefix}-${projectId}-${id}`;
   }
 
-  private getFormKey(formId: string, projectId: string): string {
-    return `form-questions-${projectId}-${formId}`;
+  private getFormKey(
+    id: string,
+    projectId: string,
+    type: 'form' | 'interview'
+  ): string {
+    const prefix = type === 'form' ? 'form-questions' : 'interview-questions';
+    return `${prefix}-${projectId}-${id}`;
   }
 
   // Save draft to localStorage
   private saveDraftToLocalStorage(): void {
-    const formId = this.form.get('formId')?.value;
     const projectId = this.form.get('projectId')?.value;
+    const formId = this.form.get('formId')?.value;
+    const interviewId = this.form.get('interviewId')?.value;
 
-    if (formId && projectId) {
-      const draftData = {
-        ...this.form.value,
-        timestamp: new Date().toISOString(),
-        isDraft: true,
-      };
-      localStorage.setItem(
-        this.getDraftKey(formId, projectId),
-        JSON.stringify(draftData)
-      );
-      console.log('Draft saved to localStorage:', draftData);
+    if (projectId) {
+      const id = this.selectedQuestionType === 'form' ? formId : interviewId;
+      if (id) {
+        const draftData = {
+          ...this.form.value,
+          questionType: this.selectedQuestionType,
+          timestamp: new Date().toISOString(),
+          isDraft: true,
+        };
+        localStorage.setItem(
+          this.getDraftKey(id, projectId, this.selectedQuestionType),
+          JSON.stringify(draftData)
+        );
+        console.log('Draft saved to localStorage:', draftData);
+      }
     }
   }
 
   // Load draft from localStorage
-  private loadDraftFromLocalStorage(formId: string, projectId: string): any {
-    const draftKey = this.getDraftKey(formId, projectId);
+  private loadDraftFromLocalStorage(
+    id: string,
+    projectId: string,
+    type: 'form' | 'interview'
+  ): any {
+    const draftKey = this.getDraftKey(id, projectId, type);
     const draftData = localStorage.getItem(draftKey);
     if (draftData) {
       try {
@@ -681,32 +828,42 @@ export class FormQuestionsComponent
 
   // Save final questions to localStorage
   private saveQuestionsToLocalStorage(): void {
-    const formId = this.form.get('formId')?.value;
     const projectId = this.form.get('projectId')?.value;
+    const formId = this.form.get('formId')?.value;
+    const interviewId = this.form.get('interviewId')?.value;
 
-    if (formId && projectId) {
-      const questionsData = {
-        ...this.form.value,
-        timestamp: new Date().toISOString(),
-        isDraft: false,
-      };
-      localStorage.setItem(
-        this.getFormKey(formId, projectId),
-        JSON.stringify(questionsData)
-      );
+    if (projectId) {
+      const id = this.selectedQuestionType === 'form' ? formId : interviewId;
+      if (id) {
+        const questionsData = {
+          ...this.form.value,
+          questionType: this.selectedQuestionType,
+          timestamp: new Date().toISOString(),
+          isDraft: false,
+        };
+        localStorage.setItem(
+          this.getFormKey(id, projectId, this.selectedQuestionType),
+          JSON.stringify(questionsData)
+        );
 
-      // Clear draft after saving final version
-      this.clearDraftFromLocalStorage(formId, projectId);
-      console.log('Questions saved to localStorage:', questionsData);
+        // Clear draft after saving final version
+        this.clearDraftFromLocalStorage(
+          id,
+          projectId,
+          this.selectedQuestionType
+        );
+        console.log('Questions saved to localStorage:', questionsData);
+      }
     }
   }
 
   // Load final questions from localStorage
   private loadQuestionsFromLocalStorage(
-    formId: string,
-    projectId: string
+    id: string,
+    projectId: string,
+    type: 'form' | 'interview' = 'form'
   ): any {
-    const formKey = this.getFormKey(formId, projectId);
+    const formKey = this.getFormKey(id, projectId, type);
     const questionsData = localStorage.getItem(formKey);
     if (questionsData) {
       try {
@@ -720,22 +877,119 @@ export class FormQuestionsComponent
   }
 
   // Clear draft from localStorage
-  private clearDraftFromLocalStorage(formId: string, projectId: string): void {
-    const draftKey = this.getDraftKey(formId, projectId);
+  private clearDraftFromLocalStorage(
+    id: string,
+    projectId: string,
+    type: 'form' | 'interview'
+  ): void {
+    const draftKey = this.getDraftKey(id, projectId, type);
     localStorage.removeItem(draftKey);
     console.log('Draft cleared from localStorage');
   }
 
-  // Save will validate and then send the payload to your API (placeholder here)
-  saveAll() {
+  // Mock API methods for CRUD operations
+  private async createQuestionsAPI(payload: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Simulate API success
+        const response = {
+          success: true,
+          message: 'Questions created successfully',
+          data: {
+            id: `created-${Date.now()}`,
+            ...payload,
+          },
+        };
+        resolve(response);
+      }, 1000);
+    });
+  }
+
+  private async updateQuestionsAPI(payload: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Simulate API success
+        const response = {
+          success: true,
+          message: 'Questions updated successfully',
+          data: {
+            id: payload.id || `updated-${Date.now()}`,
+            ...payload,
+          },
+        };
+        resolve(response);
+      }, 1000);
+    });
+  }
+
+  private async deleteQuestionsAPI(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Simulate API success
+        const response = {
+          success: true,
+          message: 'Questions deleted successfully',
+          data: { id },
+        };
+        resolve(response);
+      }, 1000);
+    });
+  }
+
+  // Save will validate and then send the payload to your API
+  async saveAll() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    // Save to localStorage
-    this.saveQuestionsToLocalStorage();
-    // TODO: call API
-    console.log('Saving', this.form.value);
+
+    this.isLoading = true;
+    try {
+      const payload = {
+        ...this.form.value,
+        questionType: this.selectedQuestionType,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Remove empty arrays and null values
+      if (payload.questions.length === 0) {
+        delete payload.questions;
+      }
+
+      // Call appropriate API based on question type
+      let response;
+      if (this.selectedQuestionType === 'form') {
+        // For form questions, send formId and language
+        const formPayload = {
+          projectId: payload.projectId,
+          formId: payload.formId,
+          language: payload.language,
+          questions: payload.questions || [],
+        };
+        response = await this.createQuestionsAPI(formPayload);
+      } else {
+        // For interview questions, send interviewId (no language)
+        const interviewPayload = {
+          projectId: payload.projectId,
+          interviewId: payload.interviewId,
+          questions: payload.questions || [],
+        };
+        response = await this.createQuestionsAPI(interviewPayload);
+      }
+
+      console.log('API Response:', response);
+
+      // Save to localStorage as backup
+      this.saveQuestionsToLocalStorage();
+
+      // Show success message (you can implement a toast/notification here)
+      alert('Questions saved successfully!');
+    } catch (error) {
+      console.error('Error saving questions:', error);
+      alert('Error saving questions. Please try again.');
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   // Save draft manually
@@ -799,8 +1053,32 @@ export class FormQuestionsComponent
     this.editModalVisible = true;
   }
 
-  onDeleteQuestion(index: number) {
-    this.removeQuestion(index);
+  async onDeleteQuestion(index: number) {
+    const question = this.questions.at(index);
+    const questionId = question.get('id')?.value;
+
+    if (questionId && questionId.startsWith('q-')) {
+      // Local question, just remove from form
+      this.removeQuestion(index);
+    } else {
+      // API question, call delete API
+      try {
+        this.isLoading = true;
+        const response = await this.deleteQuestionsAPI(questionId);
+        console.log('Delete API Response:', response);
+
+        // Remove from form after successful API call
+        this.removeQuestion(index);
+
+        // Show success message
+        alert('Question deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting question:', error);
+        alert('Error deleting question. Please try again.');
+      } finally {
+        this.isLoading = false;
+      }
+    }
   }
 
   onModalClose() {
@@ -808,9 +1086,12 @@ export class FormQuestionsComponent
     this.editingQuestionIndex = null;
   }
 
-  onModalSave(updated: any) {
+  async onModalSave(updated: any) {
     if (this.editingQuestionIndex === null) return;
     const qGroup = this.questions.at(this.editingQuestionIndex) as FormGroup;
+    const questionId = qGroup.get('id')?.value;
+
+    // Update the form group
     qGroup.patchValue({
       text: updated.text,
       description: updated.description ?? qGroup.get('description')?.value,
@@ -831,6 +1112,54 @@ export class FormQuestionsComponent
           })
         );
       });
+    }
+
+    // Update criteria if provided
+    if (Array.isArray(updated.criteria)) {
+      const criteriaArray = qGroup.get('criteria') as FormArray<FormGroup>;
+      while (criteriaArray.length > 0) {
+        criteriaArray.removeAt(0);
+      }
+      updated.criteria.forEach((crit: any) => {
+        const critGroup = this.createCriteriaGroup(crit.effect || 'pass');
+        critGroup.patchValue({
+          condition: crit.condition ?? '=',
+          value: crit.value ?? '',
+          valueTo: crit.valueTo ?? '',
+        });
+        criteriaArray.push(critGroup);
+      });
+    }
+
+    // If it's an API question, call update API
+    if (questionId && !questionId.startsWith('q-')) {
+      try {
+        this.isLoading = true;
+        const payload = {
+          id: questionId,
+          ...updated,
+          projectId: this.form.get('projectId')?.value,
+          questionType: this.selectedQuestionType,
+        };
+
+        if (this.selectedQuestionType === 'form') {
+          payload.formId = this.form.get('formId')?.value;
+          payload.language = this.form.get('language')?.value;
+        } else {
+          payload.interviewId = this.form.get('interviewId')?.value;
+        }
+
+        const response = await this.updateQuestionsAPI(payload);
+        console.log('Update API Response:', response);
+
+        // Show success message
+        alert('Question updated successfully!');
+      } catch (error) {
+        console.error('Error updating question:', error);
+        alert('Error updating question. Please try again.');
+      } finally {
+        this.isLoading = false;
+      }
     }
 
     this.onModalClose();

@@ -22,6 +22,7 @@
     "FORM_MANAGEMENT": "إدارة النماذج",
     "CREATE_FORM_QUESTIONS": "إنشاء أسئلة ",
     "LOCATION_MANAGEMENT": "إدارة المواقع",
+    "INTERVIEW": "إدارة المقابلات",
     "SEND_EMAILS": "إدارة البريد الإلكتروني",
     "VIEW_SUBMISSIONS": "عرض تقديمات",
     "CLIENT_DATA_MANAGEMENT": "إدارة بيانات العميل",
@@ -50,8 +51,9 @@
     "SELECT_FORM": "اختر النموذج",
     "SELECTED_FORM": "النموذج المختار",
     "FORM_ID": "رقم النموذج",
-    "FORM_NAME": "اسم النموذج",
+    "FORM_NAME": "اسم النموزج",
     "EMAIL": "البريد الإلكتروني",
+    "EMAIL_PLACEHOLDER": "أدخل البريد الإلكتروني ...",
     "EMAIL_ID": "رقم البريد الإلكتروني",
     "EMAIL_TEMPLATE": "قالب",
     "SUBJECT": "الموضوع",
@@ -62,7 +64,26 @@
     "DELETE_EMAIL": "حذف",
     "EMAILS_FOR_FORM": "البريد الإلكتروني للنموذج",
     "ALL_EMAILS": "جميع البريد الإلكتروني",
-    "NO_EMAILS_FOR_FORM": "لا يوجد بريد إلكتروني لهذا النموذج."
+    "NO_EMAILS_FOR_FORM": "لا يوجد بريد إلكتروني لهذا النموذج.",
+    "SEND_TAB": "إرسال",
+    "HISTORY_TAB": "التاريخ",
+    "CREATE_NEW_EMAIL": "إنشاء بريد إلكتروني جديد",
+    "COMPOSE_NEW_EMAIL": "إنشاء بريد إلكتروني جديد",
+    "ALL_USERS": "جميع المستخدمين",
+    "FORM_RECIPIENTS": "مستلمو النموذج",
+    "CUSTOM_RECIPIENTS": "مستلمون مخصصون",
+    "CUSTOM_RECIPIENTS_PLACEHOLDER": "أدخل عناوين البريد الإلكتروني مفصولة بفواصل",
+    "SELECT_TEMPLATE": "اختر قالب",
+    "NO_TEMPLATE": "بدون قالب",
+    "SUBJECT_PLACEHOLDER": "أدخل موضوع البريد الإلكتروني",
+    "BODY": "المحتوى",
+    "BODY_PLACEHOLDER": "أدخل محتوى البريد الإلكتروني",
+    "SEND_EMAIL": "إرسال البريد الإلكتروني",
+    "EMAIL_HISTORY": "تاريخ البريد الإلكتروني",
+    "REFRESH": "تحديث",
+    "NO_EMAIL_HISTORY": "لا يوجد تاريخ للبريد الإلكتروني.",
+    "SENT_TO": "مرسل إلى",
+    "RECIPIENTS": "مستلم"
   },
   "CLIENT_DATA_MANAGEMENT": {
     "TITLE": "إدارة بيانات العميل",
@@ -120,12 +141,33 @@
     "OPEN_USER": "فتح المستخدم"
   },
   "ATTENDANCE_MANAGEMENT": {
+    "ADD_ATTENDANCE": "إضافة الحضور",
     "TITLE": "إدارة الحضور",
     "PRESENT": "حضور",
     "ABSENCE": "غياب",
     "DATE": "التاريخ",
     "SELECT_PROJECT": "اختر المشروع",
-    "NO_USERS_FOUND": "لا يوجد مستخدمين لهذا المشروع."
+    "NO_USERS_FOUND": "لا يوجد مستخدمين لهذا المشروع.",
+    "DELETE_TITLE": "حذف الحضور",
+    "DELETE_MESSAGE": "هل أنت متأكد من حذف هذا الحضور؟",
+    "SELECT_USER": "اختر المستخدم",
+    "SELECT_AREA": "اختر المنطقة",
+    "EDIT_TITLE": "تعديل الحضور",
+    "CREATE_TITLE": "إضافة الحضور",
+    "BUTTON": {
+      "ADD_ATTENDANCE": "إضافة الحضور"
+    },
+    "LABEL": {
+      "PROJECT": "المشروع",
+      "NAME_EN": "الاسم (انجليزي)",
+      "NAME_AR": "الاسم (عربي)",
+      "ROLE": "الدور",
+      "PRESENT": "حاضر",
+      "DATE": "التاريخ",
+      "PICTURE_URL": "رابط الصورة",
+      "USER": "المستخدم",
+      "AREA": "المنطقة"
+    }
   },
   "USER_MANGEMENT": {
     "TITLE": "إدارة المستخدمين",
@@ -148,14 +190,42 @@
     "DESCRIPTION_EN": "الوصف (انجليزي)",
     "ADD_ROLE": "إضافة دور",
     "ADD_PROJECT": "إضافة مشروع",
+    "ADD_SCHEDULE": "إضافة جدول",
     "CREATE": "إنشاء",
+    "CREATE_SCHEDULE": "إنشاء جدول",
+    "SELECT_PROJECT": "اختر المشروع",
+    "CHOOSE_PROJECT": "اختر مشروع",
+    "START_TIME": "وقت البدء",
+    "END_TIME": "وقت الانتهاء",
+    "START_DATE_TIME": "تاريخ ووقت البدء",
+    "END_DATE_TIME": "تاريخ ووقت الانتهاء",
+    "PROJECTS_TAB": "المشاريع",
+    "SCHEDULES_TAB": "الجداول الزمنية",
+    "LOADING_SCHEDULES": "جار تحميل الجداول الزمنية...",
+    "ERROR_LOADING_SCHEDULES": "خطأ في تحميل الجداول الزمنية",
+    "SELECT_PROJECT_TO_VIEW_SCHEDULES": "اختر مشروع لعرض الجداول الزمنية",
+    "CHOOSE_PROJECT_FROM_DROPDOWN": "اختر مشروع من القائمة أعلاه لرؤية جداوله الزمنية",
+    "NO_SCHEDULES_FOUND": "لا توجد جداول زمنية",
+    "NO_SCHEDULES_FOR_PROJECT": "هذا المشروع لا يحتوي على جداول زمنية بعد",
+    "SCHEDULES_FOR_PROJECT": "الجداول الزمنية للمشروع",
+    "SCHEDULE": "جدول زمني",
+    "TIME_RANGE": "نطاق الوقت",
+    "DATE": "التاريخ",
+    "EDIT": "تعديل",
+    "DELETE": "حذف",
+    "EDIT_SCHEDULE": "تعديل الجدول الزمني",
+    "UPDATE_SCHEDULE": "تحديث الجدول الزمني",
+    "DELETE_SCHEDULE_TITLE": "حذف الجدول الزمني",
+    "DELETE_SCHEDULE_MESSAGE": "هل أنت متأكد من حذف هذا الجدول الزمني؟ لا يمكن التراجع عن هذا الإجراء.",
     "PLACEHOLDER": "اختر المشروع"
   },
   "USER": {
     "ACTIONS": {
       "DISABLE": "الغاء التفعيل ",
       "EDIT": "تعديل ",
-      "OPEN_USER": "فتح المستخدم    "
+      "OPEN_USER": "فتح المستخدم ",
+      "DISABLE_CONFIRM_TITLE": "تأكيد الغاء التفعيل",
+      "DISABLE_CONFIRM_MESSAGE": "هل أنت متأكد من غياب المستخدم؟"
     },
     "EDIT": "تعديل المستخدم"
   },
@@ -202,7 +272,10 @@
     }
   },
   "CREATE_FORM_QUESTIONS": {
-    "TITLE": "إنشاء أسئلة المقابلة",
+    "TITLE": "إنشاء أسئلة ",
+    "FORM_QUESTIONS": "أسئلة النموذج",
+    "INTERVIEW_QUESTIONS": "أسئلة المقابلة",
+    "INTERVIEW_NAME": "اسم المقابلة",
     "PROJECT_NAME": "اسم المشروع",
     "CLIENT_NAME": "اسم العميل",
     "QUESTION_TYPE": "نوع السؤال",
@@ -238,7 +311,7 @@
     "MULTIPLE_CHOICE_OPTIONS": "خيارات متعددة الاختيار",
     "RADIO_OPTIONS": "خيارات أزرار الراديو",
     "SELECT_TYPE_FIRST": "يرجى اختيار نوع السؤال أولاً لرؤية خيارات الإدخال.",
-    "SELECT_ALL_DROPDOWNS": "يرجى اختيار مشروع واستبيان ولغة لبدء إنشاء الأسئلة.",
+    "SELECT_ALL_DROPDOWNS": "يرجى اختيار جميع الحقول المطلوبة لبدء إنشاء الأسئلة.",
     "LOADING_QUESTIONS": "جار تحميل الأسئلة...",
     "ERROR_LOADING": "خطأ في تحميل الأسئلة",
     "RETRY": "إعادة المحاولة",
@@ -295,5 +368,24 @@
     "FORM_ID": "رقم النموزج",
     "CREATED": "تاريخ الإنشاء",
     "UPDATED_AT": "تاريخ التحديث"
+  },
+  "INTERVIEWS": {
+    "TITLE": "إدارة المقابلات",
+    "CREATE_TITLE": "إنشاء مقابلة",
+    "PAGE_TITLE": "إدارة المقابلات",
+    "PLACEHOLDER": {
+      "SELECT_PROJECT": "اختر المشروع",
+      "SELECT_INTERVIEW": "اختر المقابلة",
+      "INTERVIEW_NAME": "اسم المقابلة"
+    },
+    "BUTTON": {
+      "START_INTERVIEW": "ابدأ المقابلة",
+      "ADD_NEW_INTERVIEW": "إضافة مقابلة جديدة"
+    },
+    "LABEL": {
+      "NAME": "الاسم",
+      "PROJECT": "المشروع",
+      "INTERVIEW": "المقابلة"
+    }
   }
 }

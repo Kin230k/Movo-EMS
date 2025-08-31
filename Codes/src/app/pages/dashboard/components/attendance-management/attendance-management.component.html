@@ -6,6 +6,7 @@
   <app-topbar
     [projects]="projects"
     (projectSelected)="onProjectSelected($event)"
+    (createAttendance)="onAddAttendance($event)"
   ></app-topbar>
 
   <div *ngIf="isLoading" class="card-list-skeleton">

@@ -12,3 +12,11 @@
   (close)="onModalClose()"
   (create)="onProjectCreated($event)"
 ></app-add-project-modal>
+
+<!-- Add Schedule modal -->
+<app-add-schedule-modal
+  *ngIf="showAddSchedule"
+  [projects]="projects"
+  (close)="onScheduleModalClose()"
+  (create)="onScheduleCreated($event)"
+></app-add-schedule-modal>

@@ -96,21 +96,22 @@ export class QuestionEditModalComponent {
   }
 
   onQuestionTypeSelect(selectedType: string | null) {
+    const typeControl = this.form.get('type');
     if (selectedType) {
-      this.form.get('type')?.setValue(selectedType);
+      typeControl?.setValue(selectedType);
     } else {
-      this.form.get('type')?.setValue('');
+      typeControl?.setValue('');
     }
+    typeControl?.markAsTouched();
+    typeControl?.updateValueAndValidity({ onlySelf: true });
   }
 
-  onConditionSelect(selectedCondition: string | null, criteriaIndex: number) {
-    const criteria = this.form.get('criteria') as FormArray;
-    const criterion = criteria.at(criteriaIndex);
-    if (selectedCondition) {
-      criterion.get('condition')?.setValue(selectedCondition);
-    } else {
-      criterion.get('condition')?.setValue('');
-    }
+  onConditionSelect(selectedCondition: string | null, criterion: FormGroup) {
+    const criteria = this.form.get('criteria') as FormArray<FormGroup>;
+    const idx = (criteria.controls as FormGroup[]).indexOf(criterion);
+    if (idx === -1) return;
+    const target = criteria.at(idx) as FormGroup;
+    target.get('condition')?.setValue(selectedCondition ?? '');
   }
 
   onRadioChange(selectedOptionIndex: number) {
@@ -160,8 +161,14 @@ export class QuestionEditModalComponent {
     );
   }
 
-  removeCriteria(idx: number) {
-    this.criteriaControls.removeAt(idx);
+  removeCriteria(criterion: FormGroup | number) {
+    if (typeof criterion === 'number') {
+      this.criteriaControls.removeAt(criterion);
+      return;
+    }
+    const criteria = this.criteriaControls;
+    const idx = (criteria.controls as FormGroup[]).indexOf(criterion);
+    if (idx >= 0) criteria.removeAt(idx);
   }
 
   getFilteredConditionOptions(questionType: string) {

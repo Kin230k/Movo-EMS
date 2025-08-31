@@ -20,8 +20,9 @@
     "USER_MANAGEMENT": "User Management",
     "PROJECT_MANAGEMENT": "Project Management",
     "FORM_MANAGEMENT": "Form Management",
-    "CREATE_FORM_QUESTIONS": "Form Questions",
+    "CREATE_FORM_QUESTIONS": "Create Questions",
     "LOCATION_MANAGEMENT": "Location Management",
+    "INTERVIEW": "Interview Management",
     "SEND_EMAILS": "Email Management",
     "VIEW_SUBMISSIONS": "View Submissions",
     "CLIENT_DATA_MANAGEMENT": "Client Data Management",
@@ -37,10 +38,10 @@
     "LONGITUDE": "Longitude",
     "TITLE": "Locations",
     "COORDS": "Coordinates",
-    "USE_MY_LOCATION": "Use my location",
-    "CONFIRM_LOCATION": "Confirm location",
     "NAME_AR": "Location Name (Arabic)",
     "NAME_EN": "Location Name (English)",
+    "USE_MY_LOCATION": "Use my location",
+    "CONFIRM_LOCATION": "Confirm location",
     "SELECT_PROJECT": "Select Project",
     "PROJECT": "Project"
   },
@@ -52,6 +53,7 @@
     "FORM_ID": "Form ID",
     "FORM_NAME": "Form Name",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
     "EMAIL_ID": "Email ID",
     "EMAIL_TEMPLATE": "Template",
     "SUBJECT": "Subject",
@@ -62,7 +64,26 @@
     "DELETE_EMAIL": "Delete",
     "EMAILS_FOR_FORM": "Emails for Form",
     "ALL_EMAILS": "All Emails",
-    "NO_EMAILS_FOR_FORM": "No emails found for this form."
+    "NO_EMAILS_FOR_FORM": "No emails found for this form.",
+    "SEND_TAB": "Send",
+    "HISTORY_TAB": "History",
+    "CREATE_NEW_EMAIL": "Create New Email",
+    "COMPOSE_NEW_EMAIL": "Compose New Email",
+    "ALL_USERS": "All Users",
+    "FORM_RECIPIENTS": "Form Recipients",
+    "CUSTOM_RECIPIENTS": "Custom Recipients",
+    "CUSTOM_RECIPIENTS_PLACEHOLDER": "Enter email addresses separated by commas",
+    "SELECT_TEMPLATE": "Select Template",
+    "NO_TEMPLATE": "No Template",
+    "SUBJECT_PLACEHOLDER": "Enter email subject",
+    "BODY": "Body",
+    "BODY_PLACEHOLDER": "Enter email body",
+    "SEND_EMAIL": "Send Email",
+    "EMAIL_HISTORY": "Email History",
+    "REFRESH": "Refresh",
+    "NO_EMAIL_HISTORY": "No email history available.",
+    "SENT_TO": "Sent to",
+    "RECIPIENTS": "recipients"
   },
   "CLIENT_DATA_MANAGEMENT": {
     "TITLE": "Client Data Management",
@@ -119,13 +140,34 @@
     "ADD_ROLE": "Add Role"
   },
   "ATTENDANCE_MANAGEMENT": {
+    "ADD_ATTENDANCE": "Add Attendance",
     "TITLE": "Attendance Management",
     "PRESENT": "Present",
     "ABSENCE": "Absence",
     "DATE": "Date",
     "OPEN_USER": "Open User",
     "NO_USERS_FOUND": "No users found for this project.",
-    "SELECT_PROJECT": "Select Project"
+    "SELECT_PROJECT": "Select Project",
+    "SELECT_USER": "Select User",
+    "SELECT_AREA": "Select Area",
+    "DELETE_TITLE": "Delete Attendance",
+    "DELETE_MESSAGE": "Are you sure you want to delete this attendance?",
+    "EDIT_TITLE": "Edit Attendance",
+    "CREATE_TITLE": "Add Attendance",
+    "BUTTON": {
+      "ADD_ATTENDANCE": "Add Attendance"
+    },
+    "LABEL": {
+      "PROJECT": "Project",
+      "NAME_EN": "Name (English)",
+      "NAME_AR": "Name (Arabic)",
+      "ROLE": "Role",
+      "PRESENT": "Present",
+      "DATE": "Date",
+      "PICTURE_URL": "Picture URL",
+      "USER": "User",
+      "AREA": "Area"
+    }
   },
   "USER_MANGEMENT": {
     "TITLE": "User Management",
@@ -146,16 +188,43 @@
     "BADGE_BACKGROUND": "Badge Background",
     "DESCRIPTION_AR": "Description (Arabic)",
     "DESCRIPTION_EN": "Description (English)",
-    "PLACEHOLDER": "Select Project",
     "ADD_ROLE": "Add Role",
     "ADD_PROJECT": "Add Project",
-    "CREATE": "Create"
+    "ADD_SCHEDULE": "Add Schedule",
+    "CREATE": "Create",
+    "CREATE_SCHEDULE": "Create Schedule",
+    "SELECT_PROJECT": "Select Project",
+    "CHOOSE_PROJECT": "Choose a project",
+    "START_TIME": "Start Time",
+    "END_TIME": "End Time",
+    "START_DATE_TIME": "Start Date & Time",
+    "END_DATE_TIME": "End Date & Time",
+    "PROJECTS_TAB": "Projects",
+    "SCHEDULES_TAB": "Schedules",
+    "LOADING_SCHEDULES": "Loading schedules...",
+    "ERROR_LOADING_SCHEDULES": "Error loading schedules",
+    "SELECT_PROJECT_TO_VIEW_SCHEDULES": "Select a project to view schedules",
+    "CHOOSE_PROJECT_FROM_DROPDOWN": "Choose a project from the dropdown above to see its schedules",
+    "NO_SCHEDULES_FOUND": "No schedules found",
+    "NO_SCHEDULES_FOR_PROJECT": "This project doesn't have any schedules yet",
+    "SCHEDULES_FOR_PROJECT": "Schedules for Project",
+    "SCHEDULE": "Schedule",
+    "TIME_RANGE": "Time Range",
+    "DATE": "Date",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "EDIT_SCHEDULE": "Edit Schedule",
+    "UPDATE_SCHEDULE": "Update Schedule",
+    "DELETE_SCHEDULE_TITLE": "Delete Schedule",
+    "DELETE_SCHEDULE_MESSAGE": "Are you sure you want to delete this schedule? This action cannot be undone."
   },
   "USER": {
     "ACTIONS": {
       "DISABLE": "Disable User",
       "EDIT": "Edit User",
-      "OPEN_USER": "Open User"
+      "OPEN_USER": "Open User",
+      "DISABLE_CONFIRM_TITLE": "Confirm Disable",
+      "DISABLE_CONFIRM_MESSAGE": "Are you sure you want to disable the user?"
     },
     "EDIT": "Edit User"
   },
@@ -180,6 +249,9 @@
     "STATUS": {
       "PRESENT": "Present",
       "ABSENT": "Absent"
+    },
+    "ERRORS": {
+      "REQUIRED": "Required"
     }
   },
   "ADD_ROLE_MODAL": {
@@ -202,7 +274,10 @@
     }
   },
   "CREATE_FORM_QUESTIONS": {
-    "TITLE": "Create Interview Questions",
+    "TITLE": "Create  Questions",
+    "FORM_QUESTIONS": "Form Questions",
+    "INTERVIEW_QUESTIONS": "Interview Questions",
+    "INTERVIEW_NAME": "Interview Name",
     "PROJECT_NAME": "Project Name",
     "CLIENT_NAME": "Client Name",
     "QUESTION_TYPE": "Question Type",
@@ -238,7 +313,7 @@
     "MULTIPLE_CHOICE_OPTIONS": "Multiple Choice Options",
     "RADIO_OPTIONS": "Radio Button Options",
     "SELECT_TYPE_FIRST": "Please select a question type first to see the input options.",
-    "SELECT_ALL_DROPDOWNS": "Please select a project, form, and language to start creating questions.",
+    "SELECT_ALL_DROPDOWNS": "Please select all required fields to start creating questions.",
     "LOADING_QUESTIONS": "Loading questions...",
     "ERROR_LOADING": "Error Loading Questions",
     "RETRY": "Retry",
@@ -295,5 +370,24 @@
     "FORM_ID": "Form ID",
     "CREATED": "Created At",
     "UPDATED_AT": "Updated At"
+  },
+  "INTERVIEWS": {
+    "CREATE_TITLE": "Create Interview",
+    "PAGE_TITLE": "Interview Management",
+    "TITLE": "Interview Management",
+    "PLACEHOLDER": {
+      "SELECT_PROJECT": "Select Project",
+      "SELECT_INTERVIEW": "Select Interview",
+      "INTERVIEW_NAME": "Interview Name"
+    },
+    "BUTTON": {
+      "START_INTERVIEW": "Start Interview",
+      "ADD_NEW_INTERVIEW": "Add New Interview"
+    },
+    "LABEL": {
+      "PROJECT": "Project",
+      "NAME": "Name",
+      "INTERVIEW": "Interview"
+    }
   }
 }

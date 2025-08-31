@@ -13,6 +13,7 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../../../core/services/language.service';
 import { ButtonComponent } from '../../../../../components/shared/button/button';
 import { ProfileModalComponent } from './profile-modal/profile-modal.component';
+import { DeleteModalComponent } from '../../../../../components/shared/delete-modal/delete-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -24,6 +25,7 @@ import { takeUntil } from 'rxjs/operators';
     CommonModule,
     ButtonComponent,
     ProfileModalComponent,
+    DeleteModalComponent,
     TranslateModule,
   ],
   standalone: true,
@@ -32,6 +34,7 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
   @Input() data: any;
 
   modalOpen = false;
+  deleteModalOpen = false;
   isMenuOpen = false; // To toggle the visibility of the menu
   private destroy$ = new Subject<void>();
 
@@ -86,7 +89,8 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
 
   onDisableUser(evt?: MouseEvent) {
     evt?.stopPropagation();
-    console.log('Disable user', this.data);
+    // open delete confirmation modal instead of immediate disable
+    this.deleteModalOpen = true;
   }
 
   onEditUser(evt?: MouseEvent) {
@@ -104,6 +108,17 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     this.onDisableUser();
     this.closeModal();
   };
+
+  closeDeleteModal() {
+    this.deleteModalOpen = false;
+  }
+
+  confirmDisable() {
+    // emit or call disable logic here
+    console.log('Confirmed disable for', this.data);
+    this.deleteModalOpen = false;
+    this.closeModal();
+  }
 
   get displayName(): string {
     if (!this.data) return '';

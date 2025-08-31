@@ -35,11 +35,30 @@
           <app-combo-selector
             [projects]="questionTypes"
             [selectedValue]="item.get('type')?.value"
+            [hasError]="
+              !!(
+                items.at(i).get('type')?.invalid &&
+                (items.at(i).get('type')?.touched ||
+                  items.at(i).get('type')?.dirty)
+              )
+            "
             (projectSelected)="onQuestionTypeSelect($event, i)"
             placeholder="{{
               'CREATE_FORM_QUESTIONS.MODAL.TYPE_LABEL' | translate
             }}"
           ></app-combo-selector>
+          <div
+            class="field-error"
+            *ngIf="
+              items.at(i).get('type')?.invalid &&
+              (items.at(i).get('type')?.touched ||
+                items.at(i).get('type')?.dirty)
+            "
+          >
+            <small class="error-text">{{
+              "CREATE_FORM_QUESTIONS.SELECT_TYPE_FIRST" | translate
+            }}</small>
+          </div>
 
           <!-- Multiple Choice Options -->
           <div *ngIf="item.get('type')?.value === 'MULTIPLE_CHOICE'">
@@ -163,12 +182,29 @@
                   getFilteredConditionOptions(item.get('type')?.value)
                 "
                 [selectedValue]="c.get('condition')?.value"
-                (projectSelected)="onConditionSelect($event, i, ci)"
+                [hasError]="
+                  !!(
+                    c.get('condition')?.invalid &&
+                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  )
+                "
+                (projectSelected)="onConditionSelect($event, i, c)"
                 placeholder="{{
                   'CREATE_FORM_QUESTIONS.MODAL.CONDITION_PLACEHOLDER'
                     | translate
                 }}"
               ></app-combo-selector>
+              <div
+                class="field-error"
+                *ngIf="
+                  c.get('condition')?.invalid &&
+                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                "
+              >
+                <small class="error-text">{{
+                  "COMMON.ERRORS.REQUIRED" | translate
+                }}</small>
+              </div>
               <input
                 class="text-input"
                 formControlName="value"
@@ -187,7 +223,7 @@
               <button
                 type="button"
                 class="secondary-btn"
-                (click)="removeCriteria(i, ci)"
+                (click)="removeCriteria(i, c)"
               >
                 {{ "CREATE_FORM_QUESTIONS.MODAL.DELETE" | translate }}
               </button>
@@ -219,12 +255,29 @@
                   getFilteredConditionOptions(item.get('type')?.value)
                 "
                 [selectedValue]="c.get('condition')?.value"
-                (projectSelected)="onConditionSelect($event, i, ci)"
+                [hasError]="
+                  !!(
+                    c.get('condition')?.invalid &&
+                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  )
+                "
+                (projectSelected)="onConditionSelect($event, i, c)"
                 placeholder="{{
                   'CREATE_FORM_QUESTIONS.MODAL.CONDITION_PLACEHOLDER'
                     | translate
                 }}"
               ></app-combo-selector>
+              <div
+                class="field-error"
+                *ngIf="
+                  c.get('condition')?.invalid &&
+                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                "
+              >
+                <small class="error-text">{{
+                  "COMMON.ERRORS.REQUIRED" | translate
+                }}</small>
+              </div>
               <input
                 class="text-input"
                 formControlName="value"
@@ -243,7 +296,7 @@
               <button
                 type="button"
                 class="secondary-btn"
-                (click)="removeCriteria(i, ci)"
+                (click)="removeCriteria(i, c)"
               >
                 {{ "CREATE_FORM_QUESTIONS.MODAL.DELETE" | translate }}
               </button>

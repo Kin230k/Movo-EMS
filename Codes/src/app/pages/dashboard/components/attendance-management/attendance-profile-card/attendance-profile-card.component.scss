@@ -47,7 +47,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 15%;
+  width: 7.5rem;
   height: 2.5rem;
 }
 
@@ -76,4 +76,27 @@
 }
 .prestion.active {
   background-color: var(--secondary);
+}
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid rgba(var(--white-rgb), 0.12);
+  color: var(--color-font);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.secondary-btn:hover {
+  background: rgba(var(--white-rgb), 0.04);
+}
+@media (max-width: 768px) {
+  .actions-container {
+    flex-direction: column;
+  }
 }

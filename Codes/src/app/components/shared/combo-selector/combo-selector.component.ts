@@ -24,6 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export class ComboSelectorComponent implements AfterViewInit, OnChanges {
   @Input() projects: { id: any; name: { en: string; ar: string } }[] = [];
   @Input() selectedValue: any = '';
+  @Input() hasError: boolean = false;
   @Output() projectSelected = new EventEmitter<any | null>();
   @Input() placeholder: string = '';
   @ViewChild('selectElement', { static: false })

@@ -1,0 +1,91 @@
+/* reuse modal look & feel */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rbg), 0.32);
+  backdrop-filter: blur(2px);
+  z-index: 1200;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1210;
+  max-width: 420px;
+  width: 94%;
+}
+
+.modal-inner {
+  background: var(--bg-dark);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 30px var(--shadow-modal);
+  color: var(--color-font);
+}
+
+.user-summary {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.avatar-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.label {
+  display: block;
+  margin: 0.6rem 0 0.35rem;
+  color: var(--color-font);
+  font-weight: 600;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.field {
+  display: flex;
+  gap: 0.5rem;
+}
+.text-input {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--color-text);
+  color: var(--color-font);
+  border: 1px solid rgba(var(--white-rgb), 0.12);
+}
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.btn {
+  min-width: 110px;
+  padding: 0.58rem 0.9rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn.danger {
+  background: var(--secondary);
+  color: var(--white);
+}
+.btn.neutral {
+  background: var(--white);
+  color: var(--color-dark-text);
+}
+.field-error {
+  margin-top: 6px;
+}
+.error-text {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 500;
+}

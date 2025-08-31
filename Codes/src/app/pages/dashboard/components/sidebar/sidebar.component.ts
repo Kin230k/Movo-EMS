@@ -12,15 +12,14 @@ import { ResponsiveService } from '../../../../core/services/responsive.service'
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [CommonModule, RouterModule, ButtonComponent, TranslateModule], // <-- added TranslateModule
+  imports: [CommonModule, RouterModule, ButtonComponent, TranslateModule],
   standalone: true,
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  collapsed = false; // collapsed = true => compact/hidden menu on desktop; on mobile toggles menu
+  collapsed = false;
   isMobile = false;
   private destroy$ = new Subject<void>();
 
-  // explicit mapping label -> path (kebab-case paths used in your routes)
   menu = [
     { labelKey: 'SIDEBAR.USER_MANAGEMENT', path: 'user-management' },
     {
@@ -31,8 +30,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { labelKey: 'SIDEBAR.FORM_MANAGEMENT', path: 'form-management' },
     {
       labelKey: 'SIDEBAR.CREATE_FORM_QUESTIONS',
-      path: 'create-form-questions',
+      path: 'create-questions',
     },
+    { labelKey: 'SIDEBAR.INTERVIEW', path: 'interview' },
     { labelKey: 'SIDEBAR.LOCATION_MANAGEMENT', path: 'location-management' },
     { labelKey: 'SIDEBAR.SEND_EMAILS', path: 'send-emails' },
     { labelKey: 'SIDEBAR.VIEW_SUBMISSIONS', path: 'view-submissions' },
