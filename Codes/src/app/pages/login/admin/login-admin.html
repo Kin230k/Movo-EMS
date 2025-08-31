@@ -1,4 +1,7 @@
 <div class="login">
+  <div class="logo">
+    <img src="../../../assets/images/logo.png" alt="" />
+  </div>
   <div class="login-container">
     <div class="login-form">
       <h2 class="login-title">{{ 'LOGIN_ADMIN.TITLE' | translate }}</h2>
@@ -20,10 +23,10 @@
         >
         </app-input>
 
-        <div class="forgot-password">
-          <a class="forgot-password" href="">
-            {{ 'LOGIN_ADMIN.FORGOT_PASSWORD' | translate }}
-          </a>
+        <div class="forget-password">
+          <a (click)="goToForgetPassword()"
+            >{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a
+          >
         </div>
 
         <themed-button
