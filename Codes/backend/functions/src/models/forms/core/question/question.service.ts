@@ -46,6 +46,10 @@ export class QuestionService {
   static async getAllQuestionsByFormId(formId: string): Promise<Question[]> {
     return await questionMapper.getAllByFormId(formId);
   }
+  static async getAllQuestionsByInterviewId(interviewId:string):Promise<Question[]>
+  {
+    return await questionMapper.getAllByInterviewId(interviewId);
+  }
 
   static async deleteQuestion(id: string): Promise<void> {
     await questionMapper.delete(id);

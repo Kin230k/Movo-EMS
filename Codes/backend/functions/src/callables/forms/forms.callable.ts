@@ -26,7 +26,7 @@ import { createSubmissionWithAnswersHandler } from '../../handlers/forms/submiss
 import { getManualAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getManualAnswersBySubmissionHandler';
 import { getSubmissionsByFormHandler } from '../../handlers/forms/submissions/getSubmissionsByFormHandler';
 import { getAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getAnswersBySubmissionHandler';
-import { updateSubmissionStatusForManualHandler } from '../../handlers/forms/submissions/updateSubmissionStatusForManualHandler';
+import { updateSubmissionStatusHandler } from '../../handlers/forms/submissions/updateSubmissionStatusHandler';
 // Interview handlers
 import { createInterviewHandler } from '../../handlers/forms/core/interview/createInterviewHandler';
 import { deleteInterviewHandler } from '../../handlers/forms/core/interview/deleteInterviewHandler';
@@ -67,8 +67,8 @@ export const getManualAnswersBySubmissionId = onCall(
 );
 export const getSubmissionsByForm = onCall(getSubmissionsByFormHandler);
 export const getAnswersBySubmissionId = onCall(getAnswersBySubmissionIdHandler);
-export const updateSubmissionStatusForManual = onCall(
-  updateSubmissionStatusForManualHandler
+export const updateSubmissionStatus = onCall(
+  updateSubmissionStatusHandler
 );
 //Interview
 export const createInterview = onCall(createInterviewHandler);

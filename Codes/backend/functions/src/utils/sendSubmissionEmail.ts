@@ -9,7 +9,7 @@ export async function sendSubmissionEmail(
   actionLink?: string,
   confirmLink?: string,
   userId?: string
-): Promise<void> {
+): Promise<string> {
   try {
     // Call submissionResult to generate email content
     const { subject, html } = await submissionResult(
@@ -23,6 +23,7 @@ export async function sendSubmissionEmail(
 
     // Use sendEmailManually to send the email with the generated content
     await sendEmailManually(to, subject, html);
+    return html;
     
   } catch (error) {
     console.error('Failed to send submission email:', error);

@@ -76,15 +76,14 @@ export class EmailMapper extends BaseMapper<Email> {
     await pool.query('CALL delete_email($1, $2)', [currentUserId, id]);
   }
 
-  private mapRowToEmail = (row: any): Email => {
-    return new Email(
-      row.title,
-      row.body,
-      row.formId,
-      row.emailId ? Operation.UPDATE : Operation.CREATE,
-      row.emailId
-    );
-  };
+private mapRowToEmail = (row: any): Email => {
+  return new Email(
+    row.title,
+    row.body,
+    row.formid,
+    row.emailid
+  );
+};
 }
 
 const emailMapper = new EmailMapper();

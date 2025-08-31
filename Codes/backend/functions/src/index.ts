@@ -49,7 +49,7 @@ import {
   getAnswersBySubmissionId,
   getManualAnswersBySubmissionId,
   getSubmissionsByForm,
-  updateSubmissionStatusForManual,
+  updateSubmissionStatus,
   updateSubmission,
   createInterview,
   updateInterview,
@@ -166,7 +166,7 @@ export {
   getAnswersBySubmissionId,
   getSubmissionsByForm,
   getManualAnswersBySubmissionId,
-  updateSubmissionStatusForManual,
+  updateSubmissionStatus,
 
   // Projects
   createProject,

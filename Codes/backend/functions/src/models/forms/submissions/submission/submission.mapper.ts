@@ -153,19 +153,21 @@ export class SubmissionMapper extends BaseMapper<Submission> {
 
     return result.rows.map(this.mapRowToSubmission);
   }
-  async updateSubmissionStatusForManual(
+  async updateSubmissionStatus(
     submissionId: string,
-    outcome: string
+    outcome: string,
+    decisionNotes?: string
   ): Promise<void> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!submissionId) throw new Error('Submission ID is required');
     if (!outcome) throw new Error('Outcome is required');
 
-    await pool.query('CALL update_submission_status($1, $2, $3)', [
+    await pool.query('CALL update_submission_status($1, $2, $3,$4)', [
       currentUserId,
       submissionId,
       outcome,
+      decisionNotes,
     ]);
   }
 

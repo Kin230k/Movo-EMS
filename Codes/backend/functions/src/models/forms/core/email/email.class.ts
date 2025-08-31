@@ -2,10 +2,9 @@ import { Operation } from '../../../operation.enum';
 
 export class Email {
   constructor(
-    public title: any,
-    public body: any,
+    public title: string,
+    public body: string,
     public formId: string,
-    public op: Operation,
     public emailId?: string
   ) {}
 

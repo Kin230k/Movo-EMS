@@ -7,22 +7,24 @@ import { authorizeUserProjectAccessWorkerFirst } from '../../../utils/authUtils'
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 
-export interface UpdateSubmissionStatusForManualData {
+export interface UpdateSubmissionStatusData {
   submissionId: string;
   outcome: string;
+  decisionNotes?: string;
   projectId: string;
 }
 
-export interface UpdateSubmissionStatusForManualResult {
+export interface UpdateSubmissionStatusResult {
   success: boolean;
   issues?: FieldIssue[];
 }
 
-export async function updateSubmissionStatusForManualHandler(
-  request: CallableRequest<UpdateSubmissionStatusForManualData>
-): Promise<UpdateSubmissionStatusForManualResult> {
+export async function updateSubmissionStatusHandler(
+  request: CallableRequest<UpdateSubmissionStatusData>
+): Promise<UpdateSubmissionStatusResult> {
   const issues: FieldIssue[] = [];
-  const { submissionId, outcome, projectId } = request.data || {};
+ const { submissionId, outcome, decisionNotes, projectId } = request.data || {};
+
 
   if (!submissionId) {
     issues.push({ field: 'submissionId', message: 'submissionId is required' });
@@ -53,7 +55,7 @@ export async function updateSubmissionStatusForManualHandler(
     }
 
     // Update submission status
-    await SubmissionService.updateSubmissionStatusForManual(submissionId, outcome);
+    await SubmissionService.updateSubmissionStatus(submissionId, outcome,decisionNotes);
 
     return { success: true };
   } catch (dbErr: any) {
