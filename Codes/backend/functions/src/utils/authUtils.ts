@@ -332,13 +332,12 @@ export async function authorizeClientAccess(
     logger.error('authorizeClientAccess: failed to authorize caller', err);
     return { success: false, issues: parseDbError(err) };
   }
-  
 }
 export interface AuthorizeUserProjectAccessSuccess {
   success: true;
   isAdmin: boolean;
   callerAdmin?: any;
-  callerClient?: any;        // added so we can return client objects
+  callerClient?: any; // added so we can return client objects
   callerUser?: any;
   callerUserProject?: any;
   callerUid: string;
@@ -368,13 +367,13 @@ export async function authorizeUserProjectAccessWorkerFirst(
   const { callerUid, callerUuid } = auth;
 
   try {
-    
     // 2) Worker-first: check if caller is assigned to the project (weak privilege)
-    const callerUserProject = await ProjectUserRoleService.getProjectUserRolesByUserAndProject(
-      callerUuid,
-      targetProjectId
-    );
-   
+    const callerUserProject =
+      await ProjectUserRoleService.getProjectUserRolesByUserAndProject(
+        callerUuid,
+        targetProjectId
+      );
+
     if (callerUserProject) {
       const callerUser = await UserService.getUserById(callerUuid);
       return {

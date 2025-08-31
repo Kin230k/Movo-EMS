@@ -9,7 +9,6 @@ import { AreaService } from '../../../models/project/area/area.service';
 import { RoleService } from '../../../models/auth/role/role.service';
 
 export interface CreateAttendanceData {
-  timestamp?: string | null;
   signedWith: 'BARCODE' | 'MANUAL';
   userId: string;
   areaId: string;
@@ -25,22 +24,13 @@ export async function createAttendanceHandler(
 ): Promise<CreateAttendanceResult> {
   const issues: FieldIssue[] = [];
   const data = request.data || {};
-  const { timestamp = null, signedWith, userId, areaId } = data;
+  const { signedWith, userId, areaId } = data;
 
   // presence validation (no UUID format checks per your request)
   if (!signedWith)
     issues.push({ field: 'signedWith', message: 'signedWith is required' });
   if (!userId) issues.push({ field: 'userId', message: 'userId is required' });
   if (!areaId) issues.push({ field: 'areaId', message: 'areaId is required' });
-  // timestamp parse check (optional)
-  if (timestamp !== null && timestamp !== undefined) {
-    if (isNaN(Date.parse(String(timestamp)))) {
-      issues.push({
-        field: 'timestamp',
-        message: 'timestamp must be a valid date/time string or omitted',
-      });
-    }
-  }
 
   if (issues.length > 0) return { success: false, issues };
   let auth;
@@ -103,7 +93,7 @@ export async function createAttendanceHandler(
 
   try {
     await AttendanceService.createAttendance(
-      timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
+      new Date().toISOString(),
       signedWith,
       auth.callerUuid,
       userId,
