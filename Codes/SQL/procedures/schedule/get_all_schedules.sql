@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_all_schedules(p_auth_user_id UUID)
 RETURNS TABLE (
     scheduleId UUID,
-    date DATE,
+    createdAt DATE,
     startTime TIME,
     endTime TIME,
     projectId UUID,
@@ -13,7 +13,7 @@ BEGIN
 RETURN QUERY 
     SELECT 
         s.scheduleId,
-        s.date,
+        s.createdAt,
         s.startTime,
         s.endTime,
         s.projectId,

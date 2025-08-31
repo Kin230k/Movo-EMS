@@ -12,7 +12,7 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
 
     const op = entity.operation;
     const { scheduleId, createdAt, startTime, endTime, projectId, locationId } =
-      entity; 
+      entity;
 
     // Validation
     if (op === Operation.CREATE) {
@@ -20,8 +20,6 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
     }
     if (!startTime) throw new Error('Start time is required');
     if (!endTime) throw new Error('End time is required');
-    if (!projectId) throw new Error('Project ID is required');
-    if (!locationId) throw new Error('Location ID is required');
 
     if (op === Operation.UPDATE) {
       if (!scheduleId) throw new Error('Schedule ID is required for update');
@@ -34,7 +32,6 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
         locationId,
       ]);
     } else {
-    
       await pool.query('CALL create_schedule($1, $2, $3, $4, $5, $6)', [
         currentUserId,
         createdAt,
@@ -74,6 +71,34 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
     if (!id) throw new Error('Schedule ID is required');
 
     await pool.query('CALL delete_schedule($1, $2)', [currentUserId, id]);
+  }
+
+  async getByLocation(locationId: string): Promise<Schedule[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!locationId) throw new Error('Location ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_schedule_by_location($1, $2)',
+      [currentUserId, locationId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getByProjectOrLocation(
+    projectId?: string,
+    locationId?: string
+  ): Promise<Schedule[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId && !locationId)
+      throw new Error('Either project ID or location ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_schedules_by_project_or_location($1, $2, $3)',
+      [currentUserId, projectId || null, locationId || null]
+    );
+    return result.rows.map(this.mapRowToEntity);
   }
 
   private mapRowToEntity = (row: any): Schedule => {

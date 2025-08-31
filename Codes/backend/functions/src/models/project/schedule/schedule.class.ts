@@ -4,8 +4,8 @@ export class Schedule {
   constructor(
     public startTime: string,
     public endTime: string,
-    public projectId: string,
-    public locationId: string,
+    public projectId?: string,
+    public locationId?: string,
     public createdAt?: string,
     public scheduleId?: string
   ) {}

@@ -79,6 +79,8 @@ import {
   deleteSchedule,
   getSchedule,
   updateSchedule,
+  getSchedulesByLocation,
+  getSchedulesByProjectOrLocation,
   createUserSchedule,
   updateUserSchedule,
   createAttendance,
@@ -192,6 +194,8 @@ export {
   deleteSchedule,
   getSchedule,
   updateSchedule,
+  getSchedulesByLocation,
+  getSchedulesByProjectOrLocation,
 
   // User Schedules
   createUserSchedule,

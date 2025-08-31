@@ -24,6 +24,8 @@ import { createScheduleHandler } from '../../handlers/projects/schedules/createS
 import { deleteScheduleHandler } from '../../handlers/projects/schedules/deleteScheduleHandler';
 import { getScheduleByIdHandler } from '../../handlers/projects/schedules/getScheduleByIdHandler';
 import { updateScheduleHandler } from '../../handlers/projects/schedules/updateScheduleHandler';
+import { getSchedulesByLocationHandler } from '../../handlers/projects/schedules/getSchedulesByLocationHandler';
+import { getSchedulesByProjectOrLocationHandler } from '../../handlers/projects/schedules/getSchedulesByProjectOrLocationHandler';
 
 // --- User Schedule Handlers ---
 import { createUserProjectWithScheduleHandler } from '../../handlers/projects/user_schedule/createUserProjectWithScheduleHandler';
@@ -51,9 +53,9 @@ export const createProject = onCall(createProjectHandler);
 export const deleteProject = onCall(deleteProjectHandler);
 export const getProject = onCall(getProjectByIdHandler);
 export const updateProject = onCall(updateProjectHandler);
-export const getProjectByClient=onCall(getProjectByClientHandler);
-export const getAllProjects=onCall(getAllProjectsHandler)
-export const getAllActiveProjects=onCall(getAllActiveProjectsHandler)
+export const getProjectByClient = onCall(getProjectByClientHandler);
+export const getAllProjects = onCall(getAllProjectsHandler);
+export const getAllActiveProjects = onCall(getAllActiveProjectsHandler);
 // --- Location Callables ---
 export const createLocation = onCall(createLocationHandler);
 export const deleteLocation = onCall(deleteLocationHandler);
@@ -71,6 +73,10 @@ export const createSchedule = onCall(createScheduleHandler);
 export const deleteSchedule = onCall(deleteScheduleHandler);
 export const getSchedule = onCall(getScheduleByIdHandler);
 export const updateSchedule = onCall(updateScheduleHandler);
+export const getSchedulesByLocation = onCall(getSchedulesByLocationHandler);
+export const getSchedulesByProjectOrLocation = onCall(
+  getSchedulesByProjectOrLocationHandler
+);
 
 // --- User Schedule Callables ---
 export const createUserSchedule = onCall(createUserProjectWithScheduleHandler);
@@ -81,9 +87,10 @@ export const createAttendance = onCall(createAttendanceHandler);
 export const deleteAttendance = onCall(deleteAttendanceHandler);
 export const getAttendance = onCall(getAttendanceByIdHandler);
 export const updateAttendance = onCall(updateAttendanceHandler);
-export const getAttendancesByProject=onCall(getAttendancesByProjectHandler);
-export const getUserAttendancesByProject=onCall(getUserAttendancesByProjectHandler);
-
+export const getAttendancesByProject = onCall(getAttendancesByProjectHandler);
+export const getUserAttendancesByProject = onCall(
+  getUserAttendancesByProjectHandler
+);
 
 // --- Area Callables ---
 export const createArea = onCall(createAreaHandler);
