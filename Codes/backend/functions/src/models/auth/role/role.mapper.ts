@@ -51,6 +51,17 @@ export class RoleMapper extends BaseMapper<Role> {
     
     await pool.query('CALL delete_role($1, $2)', [currentUserId, id]);
   }
+  async getRoleIdByName(roleName: string): Promise<string | null> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  
+  const result: QueryResult = await pool.query(
+    'SELECT get_role_by_name($1, $2) as role_id',
+    [currentUserId, roleName]
+  );
+  
+  return result.rows[0]?.role_id || null;
+}
 
   private mapRowToEntity = (row: any): Role => {
     return new Role(

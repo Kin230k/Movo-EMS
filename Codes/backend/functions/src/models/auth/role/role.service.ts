@@ -39,4 +39,10 @@ export class RoleService {
   static async getRoleByUserID(userId: string): Promise<string | null> {
     return await UserService.getUserRoleById(userId);
   }
+  // role.service.ts
+// Add this method to the RoleService class
+
+static async getRoleIdByhName(roleName: string): Promise<string | null> {
+  return await roleMapper.getRoleIdByName(roleName);
+}
 }

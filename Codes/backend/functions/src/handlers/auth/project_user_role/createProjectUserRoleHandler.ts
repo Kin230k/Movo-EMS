@@ -3,6 +3,7 @@ import * as logger from 'firebase-functions/logger';
 import { FieldIssue } from '../../../utils/types';
 import { ProjectUserRoleService } from '../../../models/auth/project_user_role/project_user_role.service';
 import { authenticateClient } from '../../../utils/authUtils';
+import { RoleService } from '../../../models/auth/role/role.service';
 
 export interface CreateProjectUserRoleRequestData {
   userId?: string |null;
@@ -18,13 +19,23 @@ export async function createProjectUserRoleHandler(
   if (!auth.success) return auth;
 
   const data = request.data;
- const userId = data?.userId?.trim() ?? null;
+  const userId = data?.userId?.trim() ?? null;
   const projectId = data?.projectId?.trim() ?? null;
-  const roleId = data?.roleId?.trim() ?? null;
+  let roleId = data?.roleId?.trim() ??null;
 
   if (!userId) issues.push({ field: 'userId', message: 'User ID is required' });
   if (!projectId) issues.push({ field: 'projectId', message: 'Project ID is required' });
-  if (!roleId) issues.push({ field: 'roleId', message: 'Role ID is required' });
+    if (!roleId) {
+    try {
+      roleId = await RoleService.getRoleIdByhName("User");
+      if (!roleId) {
+        issues.push({ field: 'roleId', message: 'Default User role not found' });
+      }
+    } catch (error) {
+      logger.error('Failed to get default User role ID', { error });
+      issues.push({ field: 'roleId', message: 'Failed to get default role' });
+    }
+  }
   if (issues.length > 0) return { success: false, issues };
 
   try {

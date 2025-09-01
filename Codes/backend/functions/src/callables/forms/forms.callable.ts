@@ -7,6 +7,7 @@ import { createQuestionsHandler } from '../../handlers/forms/core/createQuestion
 import { deleteFormHandler } from '../../handlers/forms/core/deleteFormHandler';
 import { getFormHandler } from '../../handlers/forms/core/getFormHandler';
 import { updateFormHandler } from '../../handlers/forms/core/updateFormHandler';
+import { getFormByUserHandler } from '../../handlers/forms/core/getFormsByUserHandler';
 
 // Question handlers
 import { createQuestionHandler } from '../../handlers/forms/core/question/createQuestionHandler';
@@ -28,6 +29,7 @@ import { getManualAnswersBySubmissionIdHandler } from '../../handlers/forms/subm
 import { getSubmissionsByFormHandler } from '../../handlers/forms/submissions/getSubmissionsByFormHandler';
 import { getAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getAnswersBySubmissionHandler';
 import { updateSubmissionStatusHandler } from '../../handlers/forms/submissions/updateSubmissionStatusHandler';
+import { getQuestionAnswersBySubmissionIdHandler } from '../../handlers/forms/submissions/getQuestionAnswersBySubmissionHandler';
 // Interview handlers
 import { createInterviewHandler } from '../../handlers/forms/core/interview/createInterviewHandler';
 import { deleteInterviewHandler } from '../../handlers/forms/core/interview/deleteInterviewHandler';
@@ -43,7 +45,7 @@ export const createQuestions = onCall(createQuestionsHandler);
 export const deleteForm = onCall(deleteFormHandler);
 export const getForm = onCall(getFormHandler);
 export const updateForm = onCall(updateFormHandler);
-
+export const getFormByUser=onCall(getFormByUserHandler);
 // Question
 export const createQuestion = onCall(createQuestionHandler);
 export const deleteQuestion = onCall(deleteQuestionHandler);
@@ -72,6 +74,7 @@ export const getAnswersBySubmissionId = onCall(getAnswersBySubmissionIdHandler);
 export const updateSubmissionStatus = onCall(
   updateSubmissionStatusHandler
 );
+export const getQuestionAnswersBySubmission=onCall(getQuestionAnswersBySubmissionIdHandler);
 //Interview
 export const createInterview = onCall(createInterviewHandler);
 export const updateInterview = onCall(updateInterviewHandler);

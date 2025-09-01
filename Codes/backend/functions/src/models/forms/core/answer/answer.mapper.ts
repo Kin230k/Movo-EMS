@@ -12,6 +12,15 @@ import {
   NumericAnswer,
   OptionsAnswer,
 } from './answer.class';
+export interface AnswerWithContext {
+  answer: Answer; // the mapped Answer object
+  questionText: string;
+  typeCode: string; // question_types
+  formId: string | null;
+  formLanguage: string | null;
+  formTitle: string | null;
+  interviewId: string | null;
+}
 
 export class AnswersMapper extends BaseMapper<Answer> {
   getById(id: string): Promise<Answer | null> {
@@ -156,6 +165,19 @@ async createAnswers(
 
   return result.rows[0].answer_ids;
 }
+async getQuestionAnswersWithContextBySubmissionId(submissionId: string): Promise<AnswerWithContext[]> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  if (!submissionId) throw new Error('Submission ID is required');
+
+  const result: QueryResult = await pool.query(
+    'SELECT * FROM get_question_answers_by_submission_id($1,$2)',
+    [currentUserId, submissionId]
+  );
+
+  return result.rows.map(this.mapRowToAnswerWithContext);
+}
+
  
 private mapRowToAnswer = (row: any): Answer => {
     const answerId = row.answerid;
@@ -225,6 +247,20 @@ private mapRowToAnswer = (row: any): Answer => {
 
     throw new Error(`Unable to infer answer subtype for answerId=${answerId}`);
 };
+private mapRowToAnswerWithContext = (row: any): AnswerWithContext => {
+  const baseAnswer = this.mapRowToAnswer(row);
+
+  return {
+    answer: baseAnswer,
+    questionText: row.questiontext,
+    typeCode: row.typecode,
+    formId: row.formid ?? null,
+    formLanguage: row.form_language ?? null,
+    formTitle: row.form_title ?? null,
+    interviewId: row.interviewid ?? null,
+  };
+};
+
 }
 
 const answersMapper = new AnswersMapper();

@@ -43,5 +43,8 @@ export class FormService {
   static async getFormsByProject(projectId: string): Promise<Form[]> {
     return await formMapper.getFormsByProject(projectId);
   }
+  static async getFormsByUser(userId: string): Promise<Form[]> {
+    return await formMapper.getFormsByUser(userId);
+  }
 
 }

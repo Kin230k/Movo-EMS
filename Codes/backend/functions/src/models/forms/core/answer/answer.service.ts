@@ -1,5 +1,5 @@
 import { Operation } from '../../../operation.enum';
-import answersMapper from './answer.mapper';
+import answersMapper, { AnswerWithContext } from './answer.mapper';
 import {
   Answer,
   TextAnswer,
@@ -123,6 +123,11 @@ export class AnswerService {
     submissionId: string
   ): Promise<Answer[]> {
     return await answersMapper.getManualAnswersBySubmissionId(submissionId);
+  }
+   static async getQuestionAnswersBySubmissionId(
+    submissionId: string
+  ): Promise<AnswerWithContext[]> {
+    return await answersMapper.getQuestionAnswersWithContextBySubmissionId(submissionId);
   }
 
 

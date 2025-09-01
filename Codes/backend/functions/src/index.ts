@@ -26,6 +26,7 @@ import {
   editUserInfo,
   getProjectUsers,
   getUserInfoByEmail,
+  getCallerIdentity,
 } from './callables/auth/auth.callable';
 
 // Import forms callables
@@ -35,6 +36,7 @@ import {
   deleteForm,
   getForm,
   updateForm,
+  getFormByUser,
   createQuestion,
   deleteQuestion,
   getAllQuestions,
@@ -52,6 +54,7 @@ import {
   getSubmissionsByForm,
   updateSubmissionStatus,
   updateSubmission,
+  getQuestionAnswersBySubmission,
   createInterview,
   updateInterview,
   getInterview,
@@ -126,7 +129,7 @@ export {
   editUserInfo,
   getProjectUsers,
   getUserInfoByEmail,
-
+  getCallerIdentity,
   // Auth admin
   createAdmin,
   getAdmin,
@@ -148,6 +151,7 @@ export {
   deleteForm,
   getForm,
   updateForm,
+  getFormByUser,
 
   // Forms - questions
   createQuestion,
@@ -169,6 +173,7 @@ export {
   getSubmissionsByForm,
   getManualAnswersBySubmissionId,
   updateSubmissionStatus,
+  getQuestionAnswersBySubmission,
 
   // Projects
   createProject,

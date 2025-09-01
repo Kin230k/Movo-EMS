@@ -262,6 +262,11 @@
     ]
   },
   {
+    "name": "getCallerIdentity",
+    "description": "",
+    "parameters": []
+  },
+  {
     "name": "createClient",
     "description": "",
     "parameters": [
@@ -1028,6 +1033,24 @@
         "name": "decisionNotes",
         "type": "string | undefined",
         "required": false,
+        "description": ""
+      },
+      {
+        "name": "projectId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getQuestionAnswersBySubmission",
+    "description": "",
+    "parameters": [
+      {
+        "name": "submissionId",
+        "type": "string",
+        "required": true,
         "description": ""
       },
       {
