@@ -13,7 +13,7 @@ export interface GetProjectByClientData {
 
 export interface GetProjectByClientResult {
   success: boolean;
-  data?: Project | null;
+  data?: Project[] | null;
   issues?: FieldIssue[];
 }
 

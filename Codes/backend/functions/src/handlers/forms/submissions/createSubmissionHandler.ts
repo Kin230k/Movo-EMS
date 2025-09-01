@@ -10,7 +10,6 @@ import { authenticateUser } from '../../../utils/authUtils';
 export interface CreateSubmissionRequestData {
   formId?: string;
   interviewId?: string;
-  dateSubmitted?: string;
   decisionNotes?: string;
 }
 export async function createSubmissionHandler(
@@ -22,10 +21,10 @@ export async function createSubmissionHandler(
   if (!auth.success) return auth;
 
   // 2) Extract and validate input
-  const { formId, interviewId, dateSubmitted, decisionNotes } =
+  const { formId, interviewId, decisionNotes } =
     request.data || {};
   
-  if (!formId ||  !dateSubmitted) {
+  if (!formId ) {
     issues.push({
       field: 'input',
       message: 'Missing required fields: formId,  dateSubmitted',
@@ -46,7 +45,7 @@ export async function createSubmissionHandler(
       formId,
       userId,
       interviewId,
-      new Date(dateSubmitted),
+      new Date(Date.now()),
       decisionNotes
     );
     return { success: true };

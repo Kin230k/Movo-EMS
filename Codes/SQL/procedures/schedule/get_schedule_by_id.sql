@@ -2,8 +2,8 @@ CREATE OR REPLACE FUNCTION get_schedule_by_id(p_auth_user_id UUID,p_schedule_id 
 RETURNS TABLE (
     scheduleId UUID,
     createdAt DATE,
-    startTime TIME,
-    endTime TIME,
+    startTime TIMESTAMP,
+    endTime TIMESTAMP,
     projectId UUID,
     locationId UUID
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$

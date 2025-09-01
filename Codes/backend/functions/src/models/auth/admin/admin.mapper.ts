@@ -75,9 +75,9 @@ export class AdminMapper extends BaseMapper<Admin> {
     return new Admin(
       row.qid,
       row.name,
-      row.adminId,
-      row.dateOfBirth,
-      row.jobPosition
+      row.adminid,
+      row.dateofbirth,
+      row.jobposition
     );
   };
 }

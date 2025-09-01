@@ -14,6 +14,7 @@ import { deleteQuestionHandler } from '../../handlers/forms/core/question/delete
 import { getAllQuestionsHandler } from '../../handlers/forms/core/question/getAllQuestionsHandler';
 import { getQuestionHandler } from '../../handlers/forms/core/question/getQuestionHandler';
 import { updateQuestionHandler } from '../../handlers/forms/core/question/updateQuestionHandler';
+import { getQuestionsByInterviewHandler } from '../../handlers/forms/core/question/getInterviewQuestionsHandler';
 
 // Submission handlers
 import { createSubmissionHandler } from '../../handlers/forms/submissions/createSubmissionHandler';
@@ -49,6 +50,7 @@ export const deleteQuestion = onCall(deleteQuestionHandler);
 export const getAllQuestions = onCall(getAllQuestionsHandler);
 export const getQuestion = onCall(getQuestionHandler);
 export const updateQuestion = onCall(updateQuestionHandler);
+export const getInterviewQuestions=onCall(getQuestionsByInterviewHandler);
 
 // Submission
 export const createSubmission = onCall(createSubmissionHandler);

@@ -13,18 +13,18 @@ export class EmailMapper extends BaseMapper<Email> {
     const op = entity.operation;
     const { emailId, title, body, formId } = entity;
 
-    if (!formId) throw new Error('Form ID is required');
 
     if (op === Operation.UPDATE) {
       if (!emailId) throw new Error('Email ID is required for update');
       await pool.query('CALL update_email($1, $2, $3, $4, $5)', [
         currentUserId,
         emailId,
-        title,
+        title,  
         body,
         formId,
       ]);
     } else {
+      console.log(title,body,currentUserId,formId )
       await pool.query('CALL create_email($1, $2, $3, $4)', [
         currentUserId,
         title,

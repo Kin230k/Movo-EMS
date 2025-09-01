@@ -40,6 +40,7 @@ import {
   getAllQuestions,
   getQuestion,
   updateQuestion,
+  getInterviewQuestions,
   createSubmission,
   deleteSubmission,
   getSubmission,
@@ -154,6 +155,7 @@ export {
   getAllQuestions,
   getQuestion,
   updateQuestion,
+  getInterviewQuestions,
 
   // Forms - submissions
   createSubmission,

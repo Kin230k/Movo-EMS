@@ -13,7 +13,7 @@ export interface CreateClientData {
   contactPhone: string;
   company: Multilingual;
   logo?: string;
-  status?: ClientStatus;
+  
 }
 
 export interface OperationResult {
@@ -33,8 +33,7 @@ export async function createClientHandler(
     contactEmail,
     contactPhone,
     logo,
-    company,
-    status = ClientStatus.Pending,
+    company
   } = request.data || ({} as CreateClientData);
 
   const issues: FieldIssue[] = [];
@@ -55,7 +54,7 @@ export async function createClientHandler(
       company,
       auth.callerUuid,
       logo,
-      status
+      ClientStatus.Accepted
     );
   } catch (dbErr: any) {
     logger.error('createClientHandler: Failed to create client:', dbErr);

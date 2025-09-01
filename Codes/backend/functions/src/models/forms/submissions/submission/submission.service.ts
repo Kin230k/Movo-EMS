@@ -37,7 +37,7 @@ export class SubmissionService {
     formId: string,
     userId: string,
     interviewId: string,
-    dateSubmitted: Date,
+    dateSubmitted?: Date|null,
     outcome?: SubmissionOutcome,
     decisionNotes?: string
   ): Promise<void> {
@@ -45,7 +45,7 @@ export class SubmissionService {
       formId,
       userId,
       interviewId,
-      dateSubmitted,
+      dateSubmitted!,
       decisionNotes,
       outcome,
       submissionId

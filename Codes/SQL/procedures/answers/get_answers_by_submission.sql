@@ -62,7 +62,7 @@ RETURNS TABLE (
     ratingValue SMALLINT,
     numericResponse NUMERIC,
     optionIds UUID[],
-    optionTexts JSONB[]
+    optionTexts TEXT[]
 )
 LANGUAGE SQL SECURITY DEFINER
 AS $$

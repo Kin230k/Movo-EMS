@@ -17,7 +17,6 @@ UPDATE SUBMISSIONS
  formId = COALESCE(p_form_id, formId),
  userId = COALESCE(p_user_id, userId),
  interviewId = COALESCE(p_interview_id, interviewId),
- dateSubmitted = COALESCE(p_date_submitted, dateSubmitted),
  outcome = COALESCE(p_outcome::varchar(20), outcome),
  decisionNotes = COALESCE(p_decision_notes, decisionNotes)
  WHERE submissionId = p_submission_id;

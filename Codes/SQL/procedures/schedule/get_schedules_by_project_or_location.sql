@@ -6,8 +6,8 @@ CREATE OR REPLACE FUNCTION get_schedules_by_project_or_location(
 RETURNS TABLE (
     scheduleId UUID,
     createdAt DATE,
-    startTime TIME,
-    endTime TIME,
+    startTime TIMESTAMP,
+    endTime TIMESTAMP,
     projectId UUID,
     locationId UUID
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$

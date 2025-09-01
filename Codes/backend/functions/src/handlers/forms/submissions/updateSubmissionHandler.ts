@@ -8,10 +8,9 @@ import { firebaseUidToUuid } from '../../../utils/firebaseUidToUuid';
 import { authenticateUser } from '../../../utils/authUtils';
 interface UpdateSubmissionRequestData {
   submissionId: string;
-  formId: string;
+  formId?: string;
   userId: string;
-  interviewId: string;
-  dateSubmitted: Date;
+  interviewId?: string;
   outcome?: SubmissionOutcome;
   decisionNotes?: string;
 }
@@ -27,15 +26,14 @@ export async function updateSubmissionHandler(
     submissionId,
     formId,
     interviewId,
-    dateSubmitted,
     outcome,
     decisionNotes,
   } = request.data || {};
-  if (!submissionId || !formId || !interviewId || !dateSubmitted) {
+  if (!submissionId ) {
     issues.push({
       field: 'input',
       message:
-        'Missing required fields: submissionId, formId, interviewId, dateSubmitted',
+        'Missing required fields: submissionId, formId, interviewId',
     });
     return { success: false, issues };
   }
@@ -45,14 +43,15 @@ export async function updateSubmissionHandler(
     issues.push({ field: 'userId', message: 'Invalid user ID' });
     return { success: false, issues };
   }
+  
 
   try {
     await SubmissionService.updateSubmission(
       submissionId,
-      formId,
+      formId!,
       userId,
-      interviewId,
-      new Date(dateSubmitted),
+      interviewId!,
+      null,
       outcome as SubmissionOutcome | undefined,
       decisionNotes
     );

@@ -1,7 +1,7 @@
 CREATE OR REPLACE PROCEDURE create_schedule(p_auth_user_id UUID,
  p_date DATE,
- p_start_time TIME,
- p_end_time TIME,
+ p_start_time TIMESTAMP,
+ p_end_time TIMESTAMP,
  p_project_id UUID,
  p_location_id UUID
 )
@@ -33,3 +33,4 @@ BEGIN
  );
 END;
 $$;
+

@@ -67,8 +67,8 @@ export class ProjectService {
   static async getProjectById(id: string): Promise<Project | null> {
     return await projectMapper.getById(id);
   }
-   static async getProjectByClient(clientId: string): Promise<Project | null> {
-    return await projectMapper.getById(clientId);
+   static async getProjectByClient(clientId: string): Promise<Project[] | null> {
+    return await projectMapper.getByClient(clientId);
   }
 
   static async getAllProjects(): Promise<Project[]> {

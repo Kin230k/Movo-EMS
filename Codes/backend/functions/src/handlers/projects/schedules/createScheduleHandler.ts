@@ -9,8 +9,8 @@ import { ScheduleService } from '../../../models/project/schedule/schedule.servi
 export interface CreateScheduleData {
   startTime: string;
   endTime: string;
-  projectId: string;
-  locationId: string;
+  projectId?: string;
+  locationId?: string;
 }
 
 export interface CreateScheduleResult {
@@ -30,8 +30,28 @@ export async function createScheduleHandler(
   // Basic required fields
   if (!startTime) issues.push({ field: 'startTime', message: 'startTime is required' });
   if (!endTime) issues.push({ field: 'endTime', message: 'endTime is required' });
-  if (!projectId) issues.push({ field: 'projectId', message: 'projectId is required' });
-  if (!locationId) issues.push({ field: 'locationId', message: 'locationId is required' });
+  if (!projectId && !locationId) {
+    issues.push({ 
+      field: 'projectId', 
+      message: 'Either projectId or locationId must be provided' 
+    });
+    issues.push({ 
+      field: 'locationId', 
+      message: 'Either projectId or locationId must be provided' 
+    });
+  }
+
+  // Validate that both aren't provided (if that's not allowed)
+  if (projectId && locationId) {
+    issues.push({ 
+      field: 'projectId', 
+      message: 'Cannot provide both projectId and locationId' 
+    });
+    issues.push({ 
+      field: 'locationId', 
+      message: 'Cannot provide both projectId and locationId' 
+    });
+  }
 
   // Date/time parse checks
   if (startTime && isNaN(Date.parse(startTime))) {
@@ -53,8 +73,8 @@ export async function createScheduleHandler(
       createdAt,
       startTime,
       endTime,
-      projectId,
-      locationId
+      projectId!,
+      locationId!
     );
     return { success: true };
   } catch (dbErr: any) {

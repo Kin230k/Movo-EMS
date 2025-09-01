@@ -294,12 +294,6 @@
         "type": "string | undefined",
         "required": false,
         "description": ""
-      },
-      {
-        "name": "status",
-        "type": "\"accepted\" | \"rejected\" | \"pending\" | undefined",
-        "required": false,
-        "description": ""
       }
     ]
   },
@@ -735,13 +729,13 @@
         "type": "string",
         "required": true,
         "description": ""
-      },
-      {
-        "name": "formId",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
+      }
+    ]
+  },
+  {
+    "name": "getInterviewQuestions",
+    "description": "",
+    "parameters": [
       {
         "name": "interviewId",
         "type": "string",
@@ -762,12 +756,6 @@
       },
       {
         "name": "interviewId",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "dateSubmitted",
         "type": "string | undefined",
         "required": false,
         "description": ""
@@ -816,8 +804,8 @@
       },
       {
         "name": "formId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
@@ -828,14 +816,8 @@
       },
       {
         "name": "interviewId",
-        "type": "string",
-        "required": true,
-        "description": ""
-      },
-      {
-        "name": "dateSubmitted",
-        "type": "Date",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
@@ -887,12 +869,6 @@
         "description": ""
       },
       {
-        "name": "dateSubmitted",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
         "name": "outcome",
         "type": "string | undefined",
         "required": false,
@@ -906,12 +882,6 @@
       },
       {
         "name": "questionId",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
-        "name": "answeredAt",
         "type": "string | undefined",
         "required": false,
         "description": ""
@@ -965,12 +935,6 @@
         "description": ""
       },
       {
-        "name": "dateSubmitted",
-        "type": "string | undefined",
-        "required": false,
-        "description": ""
-      },
-      {
         "name": "outcome",
         "type": "string | undefined",
         "required": false,
@@ -984,7 +948,7 @@
       },
       {
         "name": "answers",
-        "type": "{ questionId?: string | undefined; answeredAt?: string | undefined; answerType?: \"text\" | \"rating\" | \"numeric\" | \"options\" | undefined; textResponse?: string | undefined; rating?: number | undefined; numericResponse?: number | undefined; optionIds?: string[] | undefined }[]",
+        "type": "{ questionId?: string | undefined; answerType?: \"text\" | \"rating\" | \"numeric\" | \"options\" | undefined; textResponse?: string | undefined; rating?: number | undefined; numericResponse?: number | undefined; optionIds?: string[] | undefined }[]",
         "required": true,
         "description": ""
       }
@@ -1045,7 +1009,7 @@
     ]
   },
   {
-    "name": "updateSubmissionStatusForManual",
+    "name": "updateSubmissionStatus",
     "description": "",
     "parameters": [
       {
@@ -1058,6 +1022,12 @@
         "name": "outcome",
         "type": "string",
         "required": true,
+        "description": ""
+      },
+      {
+        "name": "decisionNotes",
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
@@ -1450,14 +1420,14 @@
       },
       {
         "name": "projectId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
         "name": "locationId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       }
     ]
@@ -1498,26 +1468,56 @@
       },
       {
         "name": "startTime",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
         "name": "endTime",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
         "name": "projectId",
-        "type": "string",
-        "required": true,
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       },
       {
         "name": "locationId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSchedulesByLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "locationId",
         "type": "string",
         "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getSchedulesByProjectOrLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       }
     ]
@@ -1610,12 +1610,6 @@
     "name": "createAttendance",
     "description": "",
     "parameters": [
-      {
-        "name": "timestamp",
-        "type": "string | null | undefined",
-        "required": false,
-        "description": ""
-      },
       {
         "name": "signedWith",
         "type": "\"BARCODE\" | \"MANUAL\"",

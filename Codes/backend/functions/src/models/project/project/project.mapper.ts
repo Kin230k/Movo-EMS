@@ -143,7 +143,7 @@ export class ProjectMapper extends BaseMapper<Project> {
       row.clientid,
       row.name,
       row.startingdate,
-      row.projectId,
+      row.projectid,
       row.badgebackground,
       row.endingdate,
       row.description
@@ -151,10 +151,9 @@ export class ProjectMapper extends BaseMapper<Project> {
   };
   
     private mapRowToEntityWithClient = (row: any): ProjectWithClient => {
-    const project = this.mapRowToEntity(row);
     return {
       
-      ...project,
+       ...this.mapRowToEntity(row),
       clientName: row.clientname
       
     }};

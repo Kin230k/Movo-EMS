@@ -22,7 +22,6 @@ export class SubmissionMapper extends BaseMapper<Submission> {
     } = entity;
 
     if (!userId) throw new Error('User ID is required');
-    if (!dateSubmitted) throw new Error('Date Submitted is required');
 
     if (op === Operation.UPDATE) {
       if (!submissionId)
@@ -42,14 +41,6 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       );
     } else {
       // CREATE: call the DB function that RETURNS TABLE(...) and read the returned row
-      console.log(
-        currentUserId,
-        formId,
-        userId,
-        interviewId,
-        dateSubmitted,
-        decisionNotes
-      );
       const result: QueryResult = await pool.query(
         `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6)`,
         [

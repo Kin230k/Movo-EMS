@@ -53,7 +53,21 @@ export const sendEmail = async (
 export const sendEmailManually = async (
   to: string,
   subject: string,
-  body: string
+  body: string,
+  attachments?: {
+    filename?: string;
+    content?: Buffer | string;
+    path?: string;
+    cid?: string;
+    contentType?: string;
+  }[]
 ) => {
-  await transporter.sendMail({ to, subject, html: body });
+  await transporter.sendMail({
+    from: EMAIL_FROM, // optional if transporter already has a default
+    to,
+    subject,
+    html: body,
+    attachments, // nodemailer will inline attachments with cid when referenced in the HTML
+  });
 };
+

@@ -1,7 +1,8 @@
+
 CREATE OR REPLACE FUNCTION get_all_questions(p_auth_user_id UUID)
 RETURNS TABLE (
     questionId UUID,
-    typeCode VARCHAR(30),
+    typeCode question_types,
     questionText TEXT,  -- Changed from JSONB to TEXT
     formId UUID,
     interviewId UUID
@@ -12,7 +13,7 @@ BEGIN
 RETURN QUERY 
     SELECT 
         q.questionId,
-        q.typeCode,
+        q.typeCode::question_types,
         q.questionText,  -- Now returns TEXT
         q.formId,
         q.interviewId

@@ -12,14 +12,12 @@ export interface CreateSubmissionWithAnswersRequestData {
   // Submission fields
   formId?: string;
   interviewId?: string;
-  dateSubmitted?: string;
   outcome?: string;
   decisionNotes?: string;
 
   // Array of answer fields
   answers: Array<{
     questionId?: string;
-    answeredAt?: string;
     answerType?: 'text' | 'rating' | 'numeric' | 'options';
     textResponse?: string;
     rating?: number;
@@ -41,7 +39,6 @@ export async function createSubmissionWithAnswersHandler(
   const {
     formId,
     interviewId,
-    dateSubmitted,
     decisionNotes,
     answers,
     outcome,
@@ -122,7 +119,7 @@ export async function createSubmissionWithAnswersHandler(
       formId!,
       auth.callerUuid,
       interviewId!,
-      new Date(dateSubmitted || Date.now()),
+      new Date(Date.now()),
       decisionNotes
     );
 
@@ -155,7 +152,7 @@ export async function createSubmissionWithAnswersHandler(
 
       // Optional links (set if you have a frontend route)
       const actionLink = formId ? undefined : undefined;
-      const confirmLink = status === 'PASSED' ? undefined : undefined;
+      const confirmLink = status === 'ACCEPTED' ? undefined : undefined;
 
       if (to) {
        const html= await sendSubmissionEmail(

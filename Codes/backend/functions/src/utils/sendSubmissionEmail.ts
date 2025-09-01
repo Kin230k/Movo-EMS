@@ -1,18 +1,18 @@
-import { sendEmailManually } from '../services/emailService'; // Adjust path if necessary
-import { submissionResult } from './emailTemplates'; // Import the named function
+// wherever you call the email sending (e.g., services/sendSubmissionEmail.ts)
+import { sendEmailManually } from '../services/emailService';
+import { submissionResult } from './emailTemplates';
 
 export async function sendSubmissionEmail(
   to: string,
   displayName: string,
-  status: 'PASSED' | 'REJECTED' | 'MANUAL_REVIEW',
+  status: 'ACCEPTED' | 'REJECTED' | 'MANUAL_REVIEW',
   details?: string,
   actionLink?: string,
   confirmLink?: string,
   userId?: string
 ): Promise<string> {
   try {
-    // Call submissionResult to generate email content
-    const { subject, html } = await submissionResult(
+    const { subject, html, attachments } = await submissionResult(
       displayName,
       status,
       details,
@@ -21,10 +21,9 @@ export async function sendSubmissionEmail(
       userId
     );
 
-    // Use sendEmailManually to send the email with the generated content
-    await sendEmailManually(to, subject, html);
+    // pass attachments to the mailer
+    await sendEmailManually(to, subject, html, attachments);
     return html;
-    
   } catch (error) {
     console.error('Failed to send submission email:', error);
     throw error;

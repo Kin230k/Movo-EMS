@@ -2,8 +2,8 @@ CREATE OR REPLACE FUNCTION get_all_schedules(p_auth_user_id UUID)
 RETURNS TABLE (
     scheduleId UUID,
     createdAt DATE,
-    startTime TIME,
-    endTime TIME,
+    startTime TIMESTAMP,
+    endTime TIMESTAMP,
     projectId UUID,
     locationId UUID
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$

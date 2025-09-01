@@ -11,13 +11,11 @@ export interface CreateSubmissionWithAnswerRequestData {
   // Submission fields
   formId?: string;
   interviewId?: string;
-  dateSubmitted?: string;
   outcome?: string;
   decisionNotes?: string;
 
   // Answer fields
   questionId?: string;
-  answeredAt?: string;
   answerType?: 'text' | 'rating' | 'numeric' | 'options';
   textResponse?: string;
   rating?: number;
@@ -38,11 +36,8 @@ export async function createSubmissionWithAnswerHandler(
   const {
     formId,
     interviewId,
-    dateSubmitted,
-
     decisionNotes,
     questionId,
-    answeredAt,
     answerType,
     textResponse,
     rating,
@@ -103,7 +98,7 @@ export async function createSubmissionWithAnswerHandler(
       formId!,
       auth.callerUuid,
       interviewId!,
-      new Date(dateSubmitted || Date.now()),
+      new Date(Date.now()),
       decisionNotes
     );
 
@@ -116,7 +111,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           textResponse!,
-          answeredAt ? new Date(answeredAt) : new Date()
+          new Date(Date.now())
         );
         console.log(answerId);
         break;
@@ -125,7 +120,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           rating!,
-          answeredAt ? new Date(answeredAt) : new Date()
+          new Date(Date.now())
         );
         break;
       case 'numeric':
@@ -133,7 +128,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           numericResponse!,
-          answeredAt ? new Date(answeredAt) : new Date()
+          new Date(Date.now())
         );
         break;
       case 'options':
@@ -142,7 +137,7 @@ export async function createSubmissionWithAnswerHandler(
           questionId!,
           optionIds!,
           undefined, // optionTexts can be populated later if needed
-          answeredAt ? new Date(answeredAt) : new Date()
+          new Date(Date.now())
         );
         break;
       default:
