@@ -1,0 +1,54 @@
+<div class="schedule-card">
+  <div class="card-header">
+    <h3 class="schedule-title">
+      {{ "PROJECT_MANAGEMENT.SCHEDULE" | translate }} #{{
+        schedule.scheduleId.slice(0, 8)
+      }}
+    </h3>
+    <div class="project-badge" *ngIf="schedule.projectName">
+      {{ schedule.projectName.en }}
+    </div>
+  </div>
+
+  <div class="card-content">
+    <div class="schedule-info">
+      <div class="info-row">
+        <span class="label"
+          >{{ "PROJECT_MANAGEMENT.START_DATE_TIME" | translate }}:</span
+        >
+        <span class="value">{{ formatDateTime(schedule.startDateTime) }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label"
+          >{{ "PROJECT_MANAGEMENT.END_DATE_TIME" | translate }}:</span
+        >
+        <span class="value">{{ formatDateTime(schedule.endDateTime) }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">{{ "PROJECT_MANAGEMENT.DATE" | translate }}:</span>
+        <span class="value">{{ formatDate(schedule.startDateTime) }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label"
+          >{{ "PROJECT_MANAGEMENT.TIME_RANGE" | translate }}:</span
+        >
+        <span class="value"
+          >{{ formatTime(schedule.startDateTime) }} -
+          {{ formatTime(schedule.endDateTime) }}</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <button class="btn edit-btn" (click)="onEdit()">
+      {{ "PROJECT_MANAGEMENT.EDIT" | translate }}
+    </button>
+    <button class="btn delete-btn" (click)="onDelete()">
+      {{ "PROJECT_MANAGEMENT.DELETE" | translate }}
+    </button>
+  </div>
+</div>

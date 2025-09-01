@@ -1,0 +1,32 @@
+<article class="profile-card skeleton" (click)="$event.stopPropagation()">
+  <div class="avatar">
+    <app-loading-skeleton class="avatar-skel"></app-loading-skeleton>
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <div class="name-skel">
+        <app-loading-skeleton></app-loading-skeleton>
+      </div>
+    </div>
+
+    <div class="meta-body">
+      <div class="row">
+        <app-loading-skeleton class="pill-skel"></app-loading-skeleton>
+        <app-loading-skeleton class="pill-skel"></app-loading-skeleton>
+      </div>
+
+      <div class="date-skel">
+        <app-loading-skeleton></app-loading-skeleton>
+      </div>
+
+      <div *ngIf="showRole" class="role-skel">
+        <app-loading-skeleton></app-loading-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-container">
+    <app-loading-skeleton class="action-skel"></app-loading-skeleton>
+  </div>
+</article>

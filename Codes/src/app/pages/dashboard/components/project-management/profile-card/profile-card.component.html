@@ -1,0 +1,73 @@
+<article class="profile-card" (click)="$event.stopPropagation()">
+  <div
+    class="avatar"
+    (click)="openModal($event)"
+    title="{{ 'USER.ACTIONS.OPEN_USER' | translate }}"
+  ></div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="name">{{ displayName }}</h3>
+      <span class="role">{{ displayClientName }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="starting-date">
+        {{ "PROJECT_MANAGEMENT.STARTING_DATE" | translate }}:
+        {{ data.startingDate | date : "dd/MM/yyyy" }}
+      </p>
+      <p class="ending-date">
+        {{ "PROJECT_MANAGEMENT.ENDING_DATE" | translate }}:
+        {{ data.endingDate | date : "dd/MM/yyyy" }}
+      </p>
+      <div class="description">
+        {{ "PROJECT_MANAGEMENT.DESCRIPTION" | translate }}:
+        {{ displayDescription }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions container with a hamburger menu -->
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <div class="menu-action-wrapper" #menuWrapper>
+      <button
+        class="mobile-hamburger"
+        type="button"
+        aria-label="Open actions menu"
+        (click)="toggleMenu($event)"
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 6h18M3 12h18M3 18h18"
+            stroke="#000"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <!-- Buttons that will show/hide based on menu state -->
+      <div class="actions {{ isMenuOpen ? 'open' : '' }}">
+        <app-button class="action edit" (click)="openModal($event)">
+          {{ "PROJECT_MANAGEMENT.EDIT" | translate }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Component (conditionally shown based on modalOpen state) -->
+</article>
+
+<app-profile-modal
+  *ngIf="modalOpen"
+  [data]="data"
+  (close)="closeModal()"
+  (edit)="handleModalEdit($event)"
+  (disable)="handleModalDisable($event)"
+></app-profile-modal>

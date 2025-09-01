@@ -1,0 +1,42 @@
+<div class="overlay" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>
+        {{
+          "LOCATION_MANAGEMENT.ADD_ZONE" | translate : { default: "Add Zone" }
+        }}
+      </h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <label class="label">{{
+        "LOCATION_MANAGEMENT.LOCATION" | translate
+      }}</label>
+      <app-combo-selector
+        [projects]="locations"
+        [selectedValue]="selectedLocationId"
+        (projectSelected)="onLocationSelected($event)"
+        [placeholder]="'LOCATION_MANAGEMENT.SELECT_LOCATION' | translate"
+      ></app-combo-selector>
+
+      <label class="label">{{
+        "LOCATION_MANAGEMENT.ZONE_NAME" | translate
+      }}</label>
+      <input type="text" class="text-input" [(ngModel)]="name" />
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <div class="actions">
+        <button class="cancel-btn" (click)="onClose()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate }}
+        </button>
+        <button class="update-btn" (click)="validateAndCreate()">
+          {{ "COMMON.BUTTONS.CREATE" | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<article class="form-card" (click)="$event.stopPropagation()">
+  <div
+    class="form-icon"
+    (click)="openModal($event)"
+    title="{{ 'FORM_MANAGEMENT.OPEN_FORM' | translate }}"
+  >
+    <svg
+      width="48"
+      height="48"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path
+        d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+      />
+    </svg>
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="form-title">{{ formTitle }}</h3>
+      <span class="form-type">{{
+        "FORM_MANAGEMENT." + formType + "_FORM_TITLE" | translate
+      }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="related-entity">
+        <strong
+          >{{
+            (data?.projectId
+              ? "FORM_MANAGEMENT.PROJECT"
+              : "FORM_MANAGEMENT.LOCATION"
+            ) | translate
+          }}:</strong
+        >
+        {{ relatedEntityName }}
+      </p>
+      <p class="form-id">
+        {{ "FORM_MANAGEMENT.FORM_ID" | translate }}: {{ data?.formId }}
+      </p>
+      <div class="created-date" *ngIf="data?.createdAt">
+        {{ "FORM_MANAGEMENT.CREATED" | translate }}:
+        {{ data?.createdAt | date : "short" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions container with a hamburger menu -->
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <div class="menu-action-wrapper" #menuWrapper>
+      <button
+        class="mobile-hamburger"
+        type="button"
+        aria-label="Open actions menu"
+        (click)="toggleMenu($event)"
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 6h18M3 12h18M3 18h18"
+            stroke="#000"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <!-- Buttons that will show/hide based on menu state -->
+      <div class="actions {{ isMenuOpen ? 'open' : '' }}">
+        <app-button class="action edit" (click)="onEditForm($event)">
+          {{ "FORM_MANAGEMENT.EDIT_FORM" | translate }}
+        </app-button>
+        <hr />
+        <app-button class="action delete" (click)="onDeleteForm($event)">
+          {{ "FORM_MANAGEMENT.DELETE_FORM" | translate }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+</article>

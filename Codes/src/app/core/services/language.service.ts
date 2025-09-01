@@ -15,13 +15,16 @@ export class LanguageService {
     const browserLang = this.translate.getBrowserLang();
     this.use(browserLang === 'ar' ? 'ar' : 'en');
   }
-
+  setLanguage(lang: string) {
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang; // good practice
+  }
   use(lang: 'en' | 'ar') {
     this.translate.use(lang);
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    this.setLanguage(lang);
   }
 
   get currentLang() {
-    return this.translate.currentLang;
+    return this.translate.getCurrentLang() as 'en' | 'ar';
   }
 }

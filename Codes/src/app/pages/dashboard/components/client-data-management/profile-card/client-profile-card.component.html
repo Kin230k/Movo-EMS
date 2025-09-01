@@ -1,0 +1,59 @@
+<article class="profile-card" (click)="$event.stopPropagation()">
+  <div class="avatar" (click)="openModal($event)">
+    <img
+      [src]="data.logo || data.picture"
+      alt="client logo"
+      class="client-image"
+    />
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="name">{{ displayName }}</h3>
+      <span class="company" *ngIf="companyName">{{ companyName }}</span>
+    </div>
+
+    <div class="meta-body">
+      <p class="phone">{{ data.phone || data.contactPhone }}</p>
+      <p class="email">{{ data.email || data.contactEmail }}</p>
+      <p>company: {{ companyName }}</p>
+    </div>
+  </div>
+  <div class="actions-container" (click)="$event.stopPropagation()">
+    <div class="menu-action-wrapper" #menuWrapper>
+      <button
+        class="mobile-hamburger"
+        type="button"
+        (click)="toggleMenu($event)"
+      >
+        <svg
+          width="24"
+          height="24"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 6h18M3 12h18M3 18h18"
+            stroke="var(--color-font)"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div class="actions {{ isMenuOpen ? 'open' : '' }}">
+        <button class="action edit" type="button" (click)="openModal($event)">
+          {{ "COMMON.BUTTONS.EDIT" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</article>
+
+<app-edit-client-modal
+  *ngIf="modalOpen"
+  [data]="data"
+  (close)="closeModal()"
+  (save)="handleModalEdit($event)"
+></app-edit-client-modal>

@@ -1,1 +1,137 @@
-<p>location-management works!</p>
+<div class="location-management-container">
+  <h1 class="title">
+    {{ "LOCATION_MANAGEMENT.TITLE" | translate : { default: "Locations" } }}
+  </h1>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'locations'"
+      (click)="openLocationsTab()"
+    >
+      {{
+        "LOCATION_MANAGEMENT.TAB_LOCATIONS"
+          | translate : { default: "Locations" }
+      }}
+    </button>
+
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'zones'"
+      (click)="openZonesTab()"
+    >
+      {{ "LOCATION_MANAGEMENT.TAB_ZONES" | translate : { default: "Zones" } }}
+    </button>
+  </div>
+
+  <!-- LOCATIONS TAB -->
+  <div *ngIf="activeTab === 'locations'" class="tab-content">
+    <header class="header">
+      <themed-button
+        (click)="openAddModal()"
+        [text]="'LOCATION_MANAGEMENT.ADD_LOCATION' | translate"
+      >
+      </themed-button>
+    </header>
+
+    <div class="card-list">
+      <app-location-card
+        *ngFor="let loc of locations"
+        [data]="loc"
+        (deleteLocation)="handleDeleteLocation($event)"
+        (updateLocation)="handleUpdateLocation($event)"
+      ></app-location-card>
+    </div>
+
+    <app-add-location-modal
+      *ngIf="isAddModalOpen"
+      [projects]="projects"
+      (close)="closeAddModal()"
+      (create)="handleCreateLocation($event)"
+    ></app-add-location-modal>
+
+    <app-update-location-modal
+      *ngIf="isUpdateModalOpen"
+      [locationData]="selectedLocation"
+      [projects]="projects"
+      (close)="closeUpdateModal()"
+      (update)="handleLocationUpdate($event)"
+    ></app-update-location-modal>
+  </div>
+
+  <!-- ZONES TAB -->
+  <div *ngIf="activeTab === 'zones'" class="tab-content">
+    <div class="header header-zones">
+      <div class="filters">
+        <!-- Only location selector — no project dropdown -->
+        <app-combo-selector
+          [projects]="locationsForCombo"
+          [selectedValue]="selectedLocationForZones"
+          (projectSelected)="onLocationForZonesSelected($event)"
+          [placeholder]="'LOCATION_MANAGEMENT.SELECT_LOCATION' | translate"
+        ></app-combo-selector>
+      </div>
+
+      <themed-button
+        (click)="openAddZoneModal()"
+        [text]="'LOCATION_MANAGEMENT.ADD_ZONE' | translate"
+      ></themed-button>
+    </div>
+
+    <div
+      class="zone-list"
+      *ngIf="selectedLocationForZones; else chooseLocation"
+    >
+      <div *ngIf="zonesForSelectedLocation.length === 0" class="empty">
+        {{
+          "LOCATION_MANAGEMENT.NO_ZONES"
+            | translate : { default: "No zones found for this location" }
+        }}
+      </div>
+
+      <div class="zone-item" *ngFor="let z of zonesForSelectedLocation">
+        <div class="zone-info">
+          <!-- display localized name if it's an object, fallback to string -->
+          <div class="zone-name">
+            {{ z.name }}
+          </div>
+          <div class="meta">
+            {{ getLocationNameById(z.locationId) }}
+          </div>
+        </div>
+        <div class="zone-actions">
+          <button class="delete-btn" (click)="confirmDeleteZone(z)">
+            {{ "COMMON.BUTTONS.DELETE" | translate : { default: "Delete" } }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #chooseLocation>
+      <div class="empty">
+        {{
+          "LOCATION_MANAGEMENT.CHOOSE_LOCATION_TO_VIEW_ZONES"
+            | translate : { default: "Choose a location to view zones" }
+        }}
+      </div>
+    </ng-template>
+
+    <!-- Add Zone modal -->
+    <app-add-zone-modal
+      *ngIf="isAddZoneModalOpen"
+      [locations]="locationsForCombo"
+      (close)="closeAddZoneModal()"
+      (create)="handleCreateZone($event)"
+    ></app-add-zone-modal>
+
+    <!-- Delete confirmation modal -->
+    <app-delete-modal
+      *ngIf="isDeleteModalOpen"
+      [title]="'LOCATION_MANAGEMENT.DELETE_ZONE_TITLE' | translate"
+      [message]="'LOCATION_MANAGEMENT.DELETE_ZONE_MESSAGE' | translate"
+      (close)="handleCancelDelete()"
+      (confirm)="handleConfirmDeleteZone()"
+    ></app-delete-modal>
+  </div>
+</div>

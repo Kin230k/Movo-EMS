@@ -54,8 +54,8 @@
     display: inline-block;
     margin-top: 0.6rem;
     padding: 0.35rem 0.6rem;
-    background: #fff;
-    color: #000;
+    background: var(--white);
+    color: var(--color-dark-text);
     border-radius: 0.6rem;
   }
 }
@@ -75,4 +75,15 @@
 .dashboard-main {
   margin-left: 2rem;
   width: 75%;
+}
+
+:host-context(html[dir="rtl"]) .dashboard-main {
+  margin-left: 0;
+}
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-top: 5rem;
+    margin-left: 0;
+    width: 100vw;
+  }
 }

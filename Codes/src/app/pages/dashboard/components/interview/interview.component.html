@@ -1,0 +1,89 @@
+<div class="page-container">
+  <h2 class="page-title">{{ "INTERVIEWS.PAGE_TITLE" | translate }}</h2>
+
+  <form [formGroup]="form" class="form-grid">
+    <div class="field">
+      <label class="label">{{ "INTERVIEWS.LABEL.PROJECT" | translate }}</label>
+      <app-combo-selector
+        [projects]="projects"
+        [selectedValue]="form.get('projectId')?.value"
+        [hasError]="
+          !!(
+            form.get('projectId')?.invalid &&
+            (form.get('projectId')?.touched || form.get('projectId')?.dirty)
+          )
+        "
+        (projectSelected)="onProjectSelect($event)"
+        placeholder="{{ 'INTERVIEWS.PLACEHOLDER.SELECT_PROJECT' | translate }}"
+      ></app-combo-selector>
+      <div
+        class="field-error"
+        *ngIf="
+          form.get('projectId')?.invalid &&
+          (form.get('projectId')?.touched || form.get('projectId')?.dirty)
+        "
+      >
+        <small class="error-text">{{
+          "COMMON.ERRORS.REQUIRED" | translate
+        }}</small>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">{{
+        "INTERVIEWS.LABEL.INTERVIEW" | translate
+      }}</label>
+      <app-combo-selector
+        [projects]="transformedFilteredInterviews"
+        [selectedValue]="form.get('interviewId')?.value"
+        [hasError]="
+          !!(
+            form.get('interviewId')?.invalid &&
+            (form.get('interviewId')?.touched || form.get('interviewId')?.dirty)
+          )
+        "
+        (projectSelected)="onInterviewSelect($event)"
+        placeholder="{{
+          'INTERVIEWS.PLACEHOLDER.SELECT_INTERVIEW' | translate
+        }}"
+      ></app-combo-selector>
+
+      <div
+        class="field-error"
+        *ngIf="
+          form.get('interviewId')?.invalid &&
+          (form.get('interviewId')?.touched || form.get('interviewId')?.dirty)
+        "
+      >
+        <small class="error-text">{{
+          "COMMON.ERRORS.REQUIRED" | translate
+        }}</small>
+      </div>
+    </div>
+
+    <div class="actions">
+      <themed-button
+        type="button"
+        class="primary-btn"
+        (click)="onStartInterview()"
+        text="{{ 'INTERVIEWS.BUTTON.START_INTERVIEW' | translate }}"
+      >
+      </themed-button>
+      <themed-button
+        type="button"
+        class="secondary-btn"
+        (click)="onAddNewInterview()"
+        text="{{ 'INTERVIEWS.BUTTON.ADD_NEW_INTERVIEW' | translate }}"
+      >
+      </themed-button>
+    </div>
+  </form>
+
+  <!-- create interview modal -->
+  <app-create-interview-modal
+    [visible]="createInterviewModalVisible"
+    [projects]="projects"
+    (close)="onCancelCreateInterview()"
+    (create)="onCreateInterview($event)"
+  ></app-create-interview-modal>
+</div>

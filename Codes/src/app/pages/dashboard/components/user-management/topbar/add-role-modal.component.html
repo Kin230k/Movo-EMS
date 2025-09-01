@@ -1,0 +1,73 @@
+<div class="overlay" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ "ADD_ROLE_MODAL.TITLE" | translate }}</h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <label class="label">{{
+        "ADD_ROLE_MODAL.EMAIL_LABEL" | translate
+      }}</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        [placeholder]="'ADD_ROLE_MODAL.EMAIL_PLACEHOLDER' | translate"
+        [disabled]="checking || checkSucceeded"
+      />
+
+      <div class="actions">
+        <button
+          class="verify-btn"
+          (click)="onVerifyEmail()"
+          [disabled]="checking || checkSucceeded"
+        >
+          {{
+            checking
+              ? ("ADD_ROLE_MODAL.CHECKING_BTN" | translate)
+              : checkSucceeded
+              ? ("ADD_ROLE_MODAL.VERIFIED_BTN" | translate)
+              : ("ADD_ROLE_MODAL.VERIFY_EMAIL_BTN" | translate)
+          }}
+        </button>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <div *ngIf="checkSucceeded" class="project-select">
+        <label class="label">{{
+          "ADD_ROLE_MODAL.SELECT_PROJECT_LABEL" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="projects"
+          (projectSelected)="onProjectSelected($event)"
+        ></app-combo-selector>
+
+        <label class="label" style="margin-top: 0.75rem">{{
+          "ADD_ROLE_MODAL.SELECT_ROLE_LABEL" | translate
+        }}</label>
+        <select
+          class="role-select"
+          (change)="onRoleSelected($event)"
+          [value]="selectedRoleId ?? ''"
+        >
+          <option value="">
+            {{ "ADD_ROLE_MODAL.CHOOSE_ROLE_OPTION" | translate }}
+          </option>
+          <option *ngFor="let r of roles" [value]="r.id">{{ ('ROLES.' + r.name) | translate }}</option>
+        </select>
+
+        <div class="assign-actions">
+          <button class="assign-btn" (click)="assignRole()">
+            {{ "ADD_ROLE_MODAL.ASSIGN_ROLE_BTN" | translate }}
+          </button>
+          <button class="cancel-btn" (click)="onClose()">
+            {{ "ADD_ROLE_MODAL.CANCEL_BTN" | translate }}
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

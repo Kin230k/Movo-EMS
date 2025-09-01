@@ -1,0 +1,88 @@
+// Variables (using global CSS vars where possible)
+$muted-border: #e6e7ea;
+$text-default: var(--color-text);
+$trash-red: var(--secondary);
+$dark-pill: var(--bg-dark);
+$accent-purple: var(--btn-color);
+$accent-purple-light: rgba(var(--btn-color-rgb), 0.9);
+
+$radius-card: 0.5rem;
+$radius-input: 0.5rem;
+$radius-pill: 0.5rem;
+
+.criteria-container {
+  .criteria-section {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    h5 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-default;
+    }
+
+    .criteria {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid $muted-border;
+
+      select,
+      input {
+        padding: 0.6rem 1rem;
+        border: 1px solid $muted-border;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+
+      button {
+        background: $trash-red;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+    }
+
+    .btn {
+      border-radius: $radius-pill;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: var(--app-font);
+
+      &--purple {
+        background: linear-gradient(
+          90deg,
+          $accent-purple,
+          $accent-purple-light
+        );
+        color: white;
+      }
+
+      &--dark {
+        background: $dark-pill;
+        color: white;
+        border: 1px solid rgba(0, 0, 0, 0.3);
+      }
+
+      &.small {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
+    }
+  }
+}

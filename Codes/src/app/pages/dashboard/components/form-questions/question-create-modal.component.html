@@ -1,0 +1,331 @@
+<div class="overlay" *ngIf="visible" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>
+        {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_QUESTIONS_TITLE" | translate }}
+      </h3>
+      <button
+        class="close-btn"
+        [attr.aria-label]="'COMMON.BUTTONS.CANCEL' | translate"
+        (click)="onClose()"
+      >
+        ✕
+      </button>
+    </header>
+    <section class="modal-body" [formGroup]="form">
+      <div
+        class="item"
+        formArrayName="items"
+        *ngFor="let item of items.controls; let i = index"
+      >
+        <div [formGroupName]="i" class="item-card">
+          <label class="label">{{
+            "CREATE_FORM_QUESTIONS.MODAL.TEXT_LABEL" | translate
+          }}</label>
+          <input class="text-input" formControlName="text" />
+
+          <label class="label">{{
+            "CREATE_FORM_QUESTIONS.MODAL.DESCRIPTION_LABEL" | translate
+          }}</label>
+          <input class="text-input" formControlName="description" />
+
+          <label class="label">{{
+            "CREATE_FORM_QUESTIONS.MODAL.TYPE_LABEL" | translate
+          }}</label>
+          <app-combo-selector
+            [projects]="questionTypes"
+            [selectedValue]="item.get('type')?.value"
+            [hasError]="
+              !!(
+                items.at(i).get('type')?.invalid &&
+                (items.at(i).get('type')?.touched ||
+                  items.at(i).get('type')?.dirty)
+              )
+            "
+            (projectSelected)="onQuestionTypeSelect($event, i)"
+            placeholder="{{
+              'CREATE_FORM_QUESTIONS.MODAL.TYPE_LABEL' | translate
+            }}"
+          ></app-combo-selector>
+          <div
+            class="field-error"
+            *ngIf="
+              items.at(i).get('type')?.invalid &&
+              (items.at(i).get('type')?.touched ||
+                items.at(i).get('type')?.dirty)
+            "
+          >
+            <small class="error-text">{{
+              "CREATE_FORM_QUESTIONS.SELECT_TYPE_FIRST" | translate
+            }}</small>
+          </div>
+
+          <!-- Multiple Choice Options -->
+          <div *ngIf="item.get('type')?.value === 'MULTIPLE_CHOICE'">
+            <label class="label">{{
+              "CREATE_FORM_QUESTIONS.MULTIPLE_CHOICE_OPTIONS" | translate
+            }}</label>
+            <div class="options-list">
+              <div
+                class="option-row"
+                *ngFor="
+                  let opt of getOptionsControls(i).controls;
+                  let oi = index
+                "
+                [formGroup]="opt"
+              >
+                <input
+                  class="text-input"
+                  formControlName="optionText"
+                  [placeholder]="
+                    'CREATE_FORM_QUESTIONS.MODAL.OPTION_PLACEHOLDER' | translate
+                  "
+                />
+                <input
+                  class="checkbox"
+                  type="checkbox"
+                  formControlName="isCorrect"
+                />
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="removeOption(i, oi)"
+                >
+                  {{ "CREATE_FORM_QUESTIONS.MODAL.REMOVE_OPTION" | translate }}
+                </button>
+              </div>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="primary-btn"
+                  (click)="addOption(i)"
+                >
+                  {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_OPTION" | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Radio Options -->
+          <div *ngIf="item.get('type')?.value === 'RADIO'">
+            <label class="label">{{
+              "CREATE_FORM_QUESTIONS.RADIO_OPTIONS" | translate
+            }}</label>
+            <div class="options-list">
+              <div
+                class="option-row"
+                *ngFor="
+                  let opt of getOptionsControls(i).controls;
+                  let oi = index
+                "
+                [formGroup]="opt"
+              >
+                <input
+                  class="text-input"
+                  formControlName="optionText"
+                  [placeholder]="
+                    'CREATE_FORM_QUESTIONS.MODAL.OPTION_PLACEHOLDER' | translate
+                  "
+                />
+                <input
+                  class="radio"
+                  type="radio"
+                  [name]="'radio-option-' + i"
+                  [value]="oi"
+                  [checked]="opt.get('isCorrect')?.value"
+                  (change)="onRadioChange(i, oi)"
+                />
+                <button
+                  type="button"
+                  class="secondary-btn"
+                  (click)="removeOption(i, oi)"
+                >
+                  {{ "CREATE_FORM_QUESTIONS.MODAL.REMOVE_OPTION" | translate }}
+                </button>
+              </div>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="primary-btn"
+                  (click)="addOption(i)"
+                >
+                  {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_OPTION" | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="actions right">
+            <button type="button" class="secondary-btn" (click)="removeItem(i)">
+              {{ "CREATE_FORM_QUESTIONS.MODAL.REMOVE_QUESTION" | translate }}
+            </button>
+          </div>
+        </div>
+        <!-- Criteria sections for text/number types -->
+        <div
+          *ngIf="
+            !['RADIO', 'MULTIPLE_CHOICE'].includes(item.get('type')?.value)
+          "
+        >
+          <div class="criteria-section">
+            <h5 class="label">
+              {{
+                "CREATE_FORM_QUESTIONS.MODAL.FAILED_CRITERIA_TITLE" | translate
+              }}
+            </h5>
+            <div
+              class="criteria-row"
+              *ngFor="let c of getFailCriteria(i); let ci = index"
+              [formGroup]="c"
+            >
+              <app-combo-selector
+                [projects]="
+                  getFilteredConditionOptions(item.get('type')?.value)
+                "
+                [selectedValue]="c.get('condition')?.value"
+                [hasError]="
+                  !!(
+                    c.get('condition')?.invalid &&
+                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  )
+                "
+                (projectSelected)="onConditionSelect($event, i, c)"
+                placeholder="{{
+                  'CREATE_FORM_QUESTIONS.MODAL.CONDITION_PLACEHOLDER'
+                    | translate
+                }}"
+              ></app-combo-selector>
+              <div
+                class="field-error"
+                *ngIf="
+                  c.get('condition')?.invalid &&
+                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                "
+              >
+                <small class="error-text">{{
+                  "COMMON.ERRORS.REQUIRED" | translate
+                }}</small>
+              </div>
+              <input
+                class="text-input"
+                formControlName="value"
+                [placeholder]="
+                  'CREATE_FORM_QUESTIONS.MODAL.VALUE_PLACEHOLDER' | translate
+                "
+              />
+              <input
+                class="text-input"
+                *ngIf="c.get('condition')?.value === 'between'"
+                formControlName="valueTo"
+                [placeholder]="
+                  'CREATE_FORM_QUESTIONS.MODAL.VALUE_TO_PLACEHOLDER' | translate
+                "
+              />
+              <button
+                type="button"
+                class="secondary-btn"
+                (click)="removeCriteria(i, c)"
+              >
+                {{ "CREATE_FORM_QUESTIONS.MODAL.DELETE" | translate }}
+              </button>
+            </div>
+            <div class="actions">
+              <button
+                type="button"
+                class="primary-btn"
+                (click)="addCriteria(i, 'fail')"
+              >
+                {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_FAILED" | translate }}
+              </button>
+            </div>
+          </div>
+
+          <div class="criteria-section">
+            <h5 class="label">
+              {{
+                "CREATE_FORM_QUESTIONS.MODAL.PASS_CRITERIA_TITLE" | translate
+              }}
+            </h5>
+            <div
+              class="criteria-row"
+              *ngFor="let c of getPassCriteria(i); let ci = index"
+              [formGroup]="c"
+            >
+              <app-combo-selector
+                [projects]="
+                  getFilteredConditionOptions(item.get('type')?.value)
+                "
+                [selectedValue]="c.get('condition')?.value"
+                [hasError]="
+                  !!(
+                    c.get('condition')?.invalid &&
+                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  )
+                "
+                (projectSelected)="onConditionSelect($event, i, c)"
+                placeholder="{{
+                  'CREATE_FORM_QUESTIONS.MODAL.CONDITION_PLACEHOLDER'
+                    | translate
+                }}"
+              ></app-combo-selector>
+              <div
+                class="field-error"
+                *ngIf="
+                  c.get('condition')?.invalid &&
+                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                "
+              >
+                <small class="error-text">{{
+                  "COMMON.ERRORS.REQUIRED" | translate
+                }}</small>
+              </div>
+              <input
+                class="text-input"
+                formControlName="value"
+                [placeholder]="
+                  'CREATE_FORM_QUESTIONS.MODAL.VALUE_PLACEHOLDER' | translate
+                "
+              />
+              <input
+                class="text-input"
+                *ngIf="c.get('condition')?.value === 'between'"
+                formControlName="valueTo"
+                [placeholder]="
+                  'CREATE_FORM_QUESTIONS.MODAL.VALUE_TO_PLACEHOLDER' | translate
+                "
+              />
+              <button
+                type="button"
+                class="secondary-btn"
+                (click)="removeCriteria(i, c)"
+              >
+                {{ "CREATE_FORM_QUESTIONS.MODAL.DELETE" | translate }}
+              </button>
+            </div>
+            <div class="actions">
+              <button
+                type="button"
+                class="primary-btn"
+                (click)="addCriteria(i, 'pass')"
+              >
+                {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_PASS" | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="primary-btn" (click)="addItem()">
+          {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_ANOTHER" | translate }}
+        </button>
+      </div>
+    </section>
+    <footer class="modal-footer">
+      <button type="button" class="secondary-btn" (click)="onClose()">
+        {{ "CREATE_FORM_QUESTIONS.MODAL.CANCEL" | translate }}
+      </button>
+      <button type="button" class="primary-btn" (click)="onSave()">
+        {{ "CREATE_FORM_QUESTIONS.MODAL.SAVE" | translate }}
+      </button>
+    </footer>
+  </div>
+</div>
