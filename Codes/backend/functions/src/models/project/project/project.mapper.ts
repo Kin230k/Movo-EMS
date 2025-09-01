@@ -93,6 +93,16 @@ export class ProjectMapper extends BaseMapper<Project> {
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
+    async getByForm(formId: string): Promise<Project | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!formId) throw new Error('Form ID is required');
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_project_by_form_id($1,$2)',
+      [currentUserId,formId]
+    );
+    return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
+  }
 
   async getAll(): Promise<Project[]> {
     const currentUserId = CurrentUser.uuid;
