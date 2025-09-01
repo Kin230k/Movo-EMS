@@ -19,7 +19,7 @@ import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
 export interface RegisterUserData {
   name: Multilingual;
   // email and phone are taken from Firebase Auth, not from client
-  twoFaEnabled: boolean;
+  
   picture?: string | null;
 }
 
@@ -35,7 +35,7 @@ const DEFAULT_ROLE = 'Main User';
 export async function registerUserHandler(
   request: CallableRequest<RegisterUserData>
 ): Promise<RegisterUserResult> {
-  const { name, twoFaEnabled, picture } = request.data ?? ({} as any);
+  const { name, picture } = request.data ?? ({} as any);
   const auth = await authenticateCaller(request);
   if (!auth.success) return auth;
 
@@ -46,8 +46,7 @@ export async function registerUserHandler(
   if (!uid) issues.push({ field: 'uid', message: 'UID is required' });
   if (!name) issues.push({ field: 'name', message: 'Name is required' });
 
-  if (twoFaEnabled === undefined)
-    issues.push({ field: 'twoFaEnabled', message: '2FA setting required' });
+
 
   // Return early if client-side issues
   if (issues.length > 0) {
@@ -142,7 +141,7 @@ export async function registerUserHandler(
       phoneFromAuth,
       DEFAULT_ROLE,
       UserStatus.Active,
-      twoFaEnabled,
+      false,
       firebaseUidToUuid(uid),
       picture ?? ''
     );
