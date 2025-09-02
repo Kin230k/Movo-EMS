@@ -34,7 +34,7 @@ BEGIN
 
     FROM USERS u
     INNER JOIN PROJECT_USER_ROLES pur ON u.userId = pur.userId 
-    INNER JOIN rates r on r.userId=u.userId 
+    LEFT JOIN rates r on r.userId=u.userId 
     WHERE pur.projectId = p_project_id;
 END;
 $$;

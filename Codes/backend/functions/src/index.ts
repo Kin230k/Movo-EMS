@@ -43,6 +43,8 @@ import {
   getQuestion,
   updateQuestion,
   getInterviewQuestions,
+  getAllFormQuestions,
+  getFormQuestionsByProjectOrLocation,
   createSubmission,
   deleteSubmission,
   getSubmission,
@@ -71,6 +73,7 @@ import {
   getAllProjects,
   getAllActiveProjects,
   updateProject,
+  getProjectInfoByForm,
   createLocation,
   deleteLocation,
   getLocation,
@@ -160,6 +163,9 @@ export {
   getQuestion,
   updateQuestion,
   getInterviewQuestions,
+  getAllFormQuestions,
+  getFormQuestionsByProjectOrLocation,
+  
 
   // Forms - submissions
   createSubmission,
@@ -183,6 +189,7 @@ export {
   getProjectByClient,
   getAllProjects,
   getAllActiveProjects,
+  getProjectInfoByForm,
 
   // Locations
   createLocation,

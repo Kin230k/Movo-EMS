@@ -188,12 +188,6 @@
         "description": ""
       },
       {
-        "name": "twoFaEnabled",
-        "type": "boolean",
-        "required": true,
-        "description": ""
-      },
-      {
         "name": "picture",
         "type": "string | null | undefined",
         "required": false,
@@ -655,6 +649,18 @@
     ]
   },
   {
+    "name": "getFormByUser",
+    "description": "",
+    "parameters": [
+      {
+        "name": "userId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
+  },
+  {
     "name": "createQuestion",
     "description": "",
     "parameters": [
@@ -745,6 +751,36 @@
         "name": "interviewId",
         "type": "string",
         "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getAllFormQuestions",
+    "description": "",
+    "parameters": [
+      {
+        "name": "formId",
+        "type": "string",
+        "required": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "name": "getFormQuestionsByProjectOrLocation",
+    "description": "",
+    "parameters": [
+      {
+        "name": "projectId",
+        "type": "string | undefined",
+        "required": false,
+        "description": ""
+      },
+      {
+        "name": "locationId",
+        "type": "string | undefined",
+        "required": false,
         "description": ""
       }
     ]
@@ -1250,6 +1286,18 @@
     "name": "getAllActiveProjects",
     "description": "",
     "parameters": []
+  },
+  {
+    "name": "getProjectInfoByForm",
+    "description": "",
+    "parameters": [
+      {
+        "name": "fromId",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": ""
+      }
+    ]
   },
   {
     "name": "createLocation",
