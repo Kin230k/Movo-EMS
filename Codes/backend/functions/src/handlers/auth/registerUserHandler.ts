@@ -30,7 +30,7 @@ export interface RegisterUserResult {
 }
 
 // default role assigned to new users
-const DEFAULT_ROLE = 'Main User';
+const DEFAULT_ROLE = 'User';
 
 export async function registerUserHandler(
   request: CallableRequest<RegisterUserData>
