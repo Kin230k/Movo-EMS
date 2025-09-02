@@ -31,6 +31,8 @@ export interface Submission {
 })
 export class SubmissionCardComponent {
   @Input() submission!: Submission;
+  @Input() onlyManual: boolean = false;
+  @Output() goToManualQuestions = new EventEmitter<string>();
   @Output() statusUpdated = new EventEmitter<{
     submissionId: string;
     outcome: string;
@@ -122,6 +124,10 @@ export class SubmissionCardComponent {
   }
 
   openStatusModal() {
+    if (this.onlyManual) {
+      this.goToManualQuestions.emit(this.submission.submissionId);
+      return;
+    }
     // initialize modal state from current submission
     this.statusDecisionNotes = this.submission.decisionNotes || '';
     this.showStatusModal = true;

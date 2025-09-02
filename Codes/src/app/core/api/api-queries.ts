@@ -106,10 +106,21 @@ function queryKeyFor(payload: any, base: string | string[]): any[] {
   return key;
 }
 
-// Admin queries and mutations
+// --- General functions ---
 export function injectSendEmailMutation() {
+  const queryClient = inject(QueryClient);
   return injectMutation(() => ({
     mutationFn: (payload: SendEmailPayload) => api.sendEmail(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['emails'] }),
+  }));
+}
+
+export function injectGetUserInfoByEmailQuery(
+  payload: GetUserInfoByEmailPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['userInfoByEmail', payload.email]),
+    queryFn: () => api.getUserInfoByEmail(payload),
   }));
 }
 
@@ -127,7 +138,7 @@ export function injectGetAdminQuery(payload?: GetAdminPayload) {
       'admin',
       payload?.adminId ?? 'current',
     ]),
-    queryFn: () => api.getAdmin(payload),
+    queryFn: () => api.getAdmin(payload ?? {}),
   }));
 }
 
@@ -143,26 +154,9 @@ export function injectUpdateAdminMutation() {
   return injectMutation(() => ({
     mutationFn: (payload: UpdateAdminPayload) => api.updateAdmin(payload),
     onSuccess: (_, payload) =>
-      queryClient.invalidateQueries({ queryKey: ['admin', payload.adminId] }),
-  }));
-}
-
-// User queries and mutations
-export function injectGetUserInfoByEmailQuery(
-  payload: GetUserInfoByEmailPayload
-) {
-  return injectQuery(() => ({
-    queryKey: queryKeyFor(payload, ['userInfoByEmail', payload.email]),
-    queryFn: () => api.getUserInfoByEmail(payload),
-  }));
-}
-
-export function injectGetCallerIdentityQuery(
-  payload?: GetCallerIdentityPayload
-) {
-  return injectQuery(() => ({
-    queryKey: ['callerIdentity'],
-    queryFn: () => api.getCallerIdentity(payload),
+      queryClient.invalidateQueries({
+        queryKey: ['admin', (payload as any).adminId],
+      }),
   }));
 }
 
@@ -268,7 +262,9 @@ export function injectApproveRejectClientMutation() {
     mutationFn: (payload: ApproveRejectClientPayload) =>
       api.approveRejectClient(payload),
     onSuccess: (_, payload) =>
-      queryClient.invalidateQueries({ queryKey: ['client', payload.clientId] }),
+      queryClient.invalidateQueries({
+        queryKey: ['client', (payload as any).clientId],
+      }),
   }));
 }
 
@@ -299,7 +295,9 @@ export function injectUpdateClientMutation() {
   return injectMutation(() => ({
     mutationFn: (payload: UpdateClientPayload) => api.updateClient(payload),
     onSuccess: (_, payload) =>
-      queryClient.invalidateQueries({ queryKey: ['client', payload.clientId] }),
+      queryClient.invalidateQueries({
+        queryKey: ['client', (payload as any).clientId],
+      }),
   }));
 }
 
@@ -404,7 +402,9 @@ export function injectUpdateFormMutation() {
   return injectMutation(() => ({
     mutationFn: (payload: UpdateFormPayload = {}) => api.updateForm(payload),
     onSuccess: (_, payload) =>
-      queryClient.invalidateQueries({ queryKey: ['form', payload!.formId] }),
+      queryClient.invalidateQueries({
+        queryKey: ['form', (payload as any).formId],
+      }),
   }));
 }
 
@@ -452,7 +452,7 @@ export function injectUpdateQuestionMutation() {
     mutationFn: (payload: UpdateQuestionPayload) => api.updateQuestion(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['question', payload.questionId],
+        queryKey: ['question', (payload as any).questionId],
       }),
   }));
 }
@@ -521,7 +521,7 @@ export function injectUpdateSubmissionMutation() {
       api.updateSubmission(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['submission', payload.submissionId],
+        queryKey: ['submission', (payload as any).submissionId],
       }),
   }));
 }
@@ -535,6 +535,14 @@ export function injectGetManualByFormIdQuery(
   }));
 }
 
+export function injectGetCallerIdentityQuery(
+  payload?: GetCallerIdentityPayload
+) {
+  return injectQuery(() => ({
+    queryKey: ['callerIdentity'],
+    queryFn: () => api.getCallerIdentity(payload),
+  }));
+}
 export function injectGetManualAnswersBySubmissionIdQuery(
   payload: GetManualAnswersBySubmissionIdPayload
 ) {
@@ -608,7 +616,7 @@ export function injectUpdateInterviewMutation() {
       api.updateInterview(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['interview', payload.interviewId],
+        queryKey: ['interview', (payload as any).interviewId],
       }),
   }));
 }
@@ -669,7 +677,7 @@ export function injectUpdateProjectMutation() {
     mutationFn: (payload: UpdateProjectPayload) => api.updateProject(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['project', payload.projectId],
+        queryKey: ['project', (payload as any).projectId],
       }),
   }));
 }
@@ -727,7 +735,7 @@ export function injectUpdateLocationMutation() {
     mutationFn: (payload: UpdateLocationPayload) => api.updateLocation(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['location', payload.locationId],
+        queryKey: ['location', (payload as any).locationId],
       }),
   }));
 }
@@ -767,7 +775,7 @@ export function injectUpdateUserProjectMutation() {
       api.updateUserProject(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['userProject', payload.userProjectId],
+        queryKey: ['userProject', (payload as any).userProjectId],
       }),
   }));
 }
@@ -802,7 +810,7 @@ export function injectUpdateScheduleMutation() {
     mutationFn: (payload: UpdateSchedulePayload) => api.updateSchedule(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['schedule', payload.scheduleId],
+        queryKey: ['schedule', (payload as any).scheduleId],
       }),
   }));
 }
@@ -885,7 +893,7 @@ export function injectUpdateAttendanceMutation() {
       api.updateAttendance(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({
-        queryKey: ['attendance', payload.attendanceId],
+        queryKey: ['attendance', (payload as any).attendanceId],
       }),
   }));
 }
@@ -940,7 +948,9 @@ export function injectUpdateAreaMutation() {
   return injectMutation(() => ({
     mutationFn: (payload: UpdateAreaPayload) => api.updateArea(payload),
     onSuccess: (_, payload) =>
-      queryClient.invalidateQueries({ queryKey: ['area', payload.areaId] }),
+      queryClient.invalidateQueries({
+        queryKey: ['area', (payload as any).areaId],
+      }),
   }));
 }
 

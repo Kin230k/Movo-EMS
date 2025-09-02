@@ -130,12 +130,15 @@
     "STATUS": "Status",
     "ACCEPTED": "Accepted",
     "REJECTED": "Rejected",
-    "MANUAL_REVIEW": "Manual Review"
+    "MANUAL_REVIEW": "Manual Review",
+    "VIEW_MANUAL_QUESTIONS": "View Manual Questions",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "View manual questions for this submission"
   },
   "WELCOME": {
     "TITLE": "Welcome to EMS Dashboard"
   },
   "ROLES": {
+    "USER": "User",
     "MARSHALL": "Marshall",
     "SUPERVISOR": "Supervisor",
     "SENIOR_SUPERVISOR": "Senior Supervisor",
@@ -394,14 +397,6 @@
       "PROJECT": "Project",
       "NAME": "Name",
       "INTERVIEW": "Interview"
-    },
-
-    "FORGET_PASSWORD": {
-      "TITLE": "Forget password",
-      "EMAIL_PLACEHOLDER": "Enter email address ...",
-      "BUTTON": "Done",
-      "LINK_TO_LOGIN": "Back to login",
-      "TEXT2": "Enter your email address to start We'll send you a link where you can change your password from it!"
     }
   },
   "SIGNUP": {
@@ -415,5 +410,49 @@
     "UPLOAD_PICTURE": "Upload picture",
     "FORGET_PASSWORD": "Forgot password?",
     "SWITCH_TO_LOGIN": "Back to login"
+  },
+  "FORGET_PASSWORD": {
+    "TITLE": "Forget password",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
+    "BUTTON": "Done",
+    "LINK_TO_LOGIN": "Back to login",
+    "TEXT2": "Enter your email address to start We'll send you a link where you can change your password from it!"
+  },
+  "NAV": {
+    "MANUAL_SUBMISSIONS": "Manual Submissions",
+    "MANUAL_QUESTIONS": "Manual Questions",
+    "TAKE_ATTENDANCE": "Take Attendance"
+  },
+  "MANUAL_QUESTIONS": {
+    "GO_BACK": "Go Back",
+    "TITLE": "Manual Questions",
+    "VIEW_MANUAL_QUESTIONS": "View Manual Questions",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "View manual questions for this submission"
+  },
+  "ATTENDANCE": {
+    "TITLE": "Attendance Management",
+    "ADD_MANUAL": "Add Attendance (Manual)",
+    "ADD": "Add",
+    "QR": "Scan QR to Add Attendance",
+    "QR_DESC": "Use your camera to scan a QR that contains userId",
+    "START_SCAN": "Start Scanner",
+    "STOP_SCAN": "Stop Scanner",
+    "SIM_QR": "Simulate QR Scan",
+    "LIST": "Recent Attendance",
+    "NO_RECORDS": "No attendance records yet",
+    "METHOD": "Method",
+    "SELECT_ZONE": "Select Zone",
+    "CHOOSE_ZONE": "Choose Zone"
+  },
+  "PROJECTS": {
+    "TITLE": "Projects",
+    "NO_PROJECTS_FOUND": "No projects found.",
+    "LOADING": "Loading projects...",
+    "STARTING_DATE": "Starting Date",
+    "ENDING_DATE": "Ending Date",
+    "FORM": "Form",
+    "OPEN_SELECTED_FORM": "Open Selected Form",
+    "SELECTED_LOCATION_HAS_NO_FORM_CONFIGURED": "Selected location has no form configured.",
+    "NO_FORM_IS_CONFIGURED_FOR_THIS_PROJECT": "No form is configured for this project."
   }
 }

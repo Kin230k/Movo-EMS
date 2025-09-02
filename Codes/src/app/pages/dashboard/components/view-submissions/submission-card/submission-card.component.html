@@ -36,7 +36,11 @@
       type="button"
       class="update-status-btn"
       (click)="openStatusModal()"
-      [text]="'VIEW_SUBMISSIONS.UPDATE_STATUS' | translate"
+      [text]="
+        onlyManual
+          ? ('VIEW_SUBMISSIONS.VIEW_MANUAL_QUESTIONS' | translate)
+          : ('VIEW_SUBMISSIONS.UPDATE_STATUS' | translate)
+      "
     >
     </themed-button>
   </div>

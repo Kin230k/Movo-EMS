@@ -1,3 +1,4 @@
+<app-manual-navbar *ngIf="onlyManual"> </app-manual-navbar>
 <div class="view-submissions-container">
   <div class="header-section">
     <h1>{{ "VIEW_SUBMISSIONS.TITLE" | translate }}</h1>
@@ -31,6 +32,8 @@
         <app-submission-card
           *ngFor="let submission of filteredSubmissions"
           [submission]="submission"
+          [onlyManual]="onlyManual"
+          (goToManualQuestions)="onGoToManualQuestions($event)"
         >
         </app-submission-card>
       </ng-container>
@@ -50,6 +53,8 @@
     class="initial-state"
     *ngIf="!selectedFormId && !isLoading && filteredSubmissions.length === 0"
   >
-    <p>{{ "VIEW_SUBMISSIONS.SELECT_FORM_TO_VIEW_SUBMISSIONS" | translate }}</p>
+    <p>
+      {{ "VIEW_SUBMISSIONS.SELECT_FORM_TO_VIEW_SUBMISSIONS" | translate }}
+    </p>
   </div>
 </div>

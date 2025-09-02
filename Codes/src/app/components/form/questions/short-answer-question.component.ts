@@ -17,6 +17,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
         type="text"
         class="q-input"
         [formControl]="control"
+        [disabled]="disabled"
         (blur)="control.markAsTouched()"
       />
       <div
@@ -44,6 +45,12 @@ import { FormQuestionDto } from '../../../shared/types/form';
         background: rgba(var(--white-rgb), 0.9);
         color: var(--color-text);
       }
+
+      .q-input:disabled {
+        color: white;
+        background: rgba(var(--shadow-dark), 0.1);
+        opacity: 1;
+      }
       .q-input:focus {
         outline: 2px solid var(--accent);
         border-color: var(--accent);
@@ -62,4 +69,5 @@ export class ShortAnswerQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 }

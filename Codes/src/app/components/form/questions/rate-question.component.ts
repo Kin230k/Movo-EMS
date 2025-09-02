@@ -19,6 +19,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
           class="rate-btn"
           *ngFor="let star of stars"
           [class.active]="control.value === star"
+          [disabled]="disabled"
           (click)="select(star)"
         >
           {{ star }}
@@ -59,6 +60,13 @@ import { FormQuestionDto } from '../../../shared/types/form';
         color: var(--white);
         border-color: var(--accent);
       }
+
+      
+
+      .rate-btn:disabled.active {
+        background: rgba(var(--accent-rgb), 0.3);
+        color: white;
+      }
       .q-error {
         color: var(--error);
         font-size: 0.85rem;
@@ -73,6 +81,7 @@ export class RateQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 
   get stars(): number[] {
     const min = this.question.min ?? 1;
@@ -81,6 +90,8 @@ export class RateQuestionComponent {
   }
 
   select(value: number) {
+    if (this.disabled) return;
+
     this.control.setValue(value);
     this.control.markAsDirty();
     this.control.markAsTouched();

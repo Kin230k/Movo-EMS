@@ -113,6 +113,9 @@ export interface SendVerificationEmailPayload {
 export interface GetProjectUsersPayload {
   projectId: string;
 }
+export interface GetUserInfoByEmailPayload {
+  email: string;
+}
 export interface CreateClientPayload {
   name: Multilingual;
   contactEmail: string;
@@ -148,6 +151,7 @@ export interface UpdateClientPayload {
   company?: Multilingual | null;
   status?: 'accepted' | 'rejected' | 'pending';
 }
+
 export interface CreateProjectUserRolePayload {
   userId?: string | null;
   projectId?: string | null;
@@ -169,9 +173,12 @@ export interface GetProjectUserRolesByUserAndProjectPayload {
   userId?: string | null;
   projectId?: string | null;
 }
+
 export interface CreateFormPayload {
-  projectId?: string | null;
-  locationId?: string | null;
+  projectId?: string | undefined | null;
+  locationId?: string | undefined | null;
+  formLanguage?: string | undefined;
+  formTitle?: string | undefined;
 }
 export interface CreateQuestionsPayload {
   interviewId?: string;
@@ -203,22 +210,31 @@ export interface CreateQuestionsPayload {
   }[];
 }
 export interface DeleteFormPayload {
-  formId?: string | null;
+  formId?: string | null | undefined;
 }
 export interface GetFormPayload {
-  formId?: string | null;
+  formId?: string | null | undefined;
 }
 export interface UpdateFormPayload {
-  formId?: string | null;
-  projectId?: string | null;
-  locationId?: string | null;
+  formId?: string | null | undefined;
+  projectId?: string | null | undefined;
+  locationId?: string | null | undefined;
+  formLanguage?: string | null | undefined;
+  formTitle?: string | null | undefined;
 }
 export interface GetFormByUserPayload {
   userId?: string | null;
 }
 export interface CreateQuestionPayload {
-  typeCode: string;
-  questionText: Multilingual;
+  typeCode:
+    | 'OPEN_ENDED'
+    | 'SHORT_ANSWER'
+    | 'NUMBER'
+    | 'RATE'
+    | 'DROPDOWN'
+    | 'RADIO'
+    | 'MULTIPLE_CHOICE';
+  questionText: string;
   formId: string;
   interviewId: string;
 }
@@ -230,9 +246,17 @@ export interface GetQuestionPayload {
 }
 export interface UpdateQuestionPayload {
   questionId: string;
-  typeCode: string;
-  questionText: Multilingual;
-  formId: string;
+  typeCode:
+    | 'OPEN_ENDED'
+    | 'SHORT_ANSWER'
+    | 'NUMBER'
+    | 'RATE'
+    | 'DROPDOWN'
+    | 'RADIO'
+    | 'MULTIPLE_CHOICE';
+  questionText: string;
+}
+export interface GetInterviewQuestionsPayload {
   interviewId: string;
 }
 export interface GetInterviewQuestionsPayload {
@@ -256,7 +280,7 @@ export interface UpdateSubmissionPayload {
   userId: string;
   interviewId?: string;
   outcome?: 'pass' | 'fail' | 'manual_review';
-  decisionNotes?: string;
+  decisionNotes?: string | undefined;
 }
 export interface GetManualByFormIdPayload {
   formId: string;
@@ -326,6 +350,7 @@ export interface GetInterviewByProjectPayload {
 export interface DeleteInterviewPayload {
   interviewId: string;
 }
+
 export interface CreateProjectPayload {
   name: Multilingual;
   startingDate: string;
@@ -350,6 +375,7 @@ export interface UpdateProjectPayload {
 export interface GetProjectByClientPayload {
   clientId: string;
 }
+
 export interface CreateLocationPayload {
   name: Multilingual;
   projectId: string;
@@ -372,6 +398,7 @@ export interface UpdateLocationPayload {
   longitude?: number;
   latitude?: number;
 }
+
 export interface CreateUserProjectPayload {
   userId: string;
   projectId: string;
@@ -387,6 +414,7 @@ export interface UpdateUserProjectPayload {
   userId: string;
   projectId: string;
 }
+
 export interface CreateSchedulePayload {
   startTime: string;
   endTime: string;
@@ -406,6 +434,11 @@ export interface UpdateSchedulePayload {
   projectId?: string;
   locationId?: string;
 }
+export interface GetSchedulesByProjectOrLocationPayload {
+  projectId?: string | undefined;
+  locationId?: string | undefined;
+}
+
 export interface CreateUserSchedulePayload {
   userId: string;
   projectId: string;
@@ -422,10 +455,12 @@ export interface UpdateUserSchedulePayload {
   endTime: string;
   locationId: string;
 }
+
 export interface CreateAttendancePayload {
   signedWith: 'BARCODE' | 'MANUAL';
   userId: string;
   areaId: string;
+  timestamp?: string | null;
 }
 export interface DeleteAttendancePayload {
   attendanceId: string;
@@ -438,6 +473,7 @@ export interface UpdateAttendancePayload {
   timestamp?: string | null;
   userId?: string | null;
   areaId?: string | null;
+  signedWith?: 'BARCODE' | 'MANUAL';
 }
 export interface GetAttendancesByProjectPayload {
   projectId: string;
@@ -445,6 +481,7 @@ export interface GetAttendancesByProjectPayload {
 export interface GetUserAttendancesByProjectPayload {
   projectId: string;
 }
+
 export interface CreateAreaPayload {
   name: Multilingual;
   locationId: string;
@@ -491,12 +528,7 @@ export async function updateAdmin(payload: UpdateAdminPayload) {
 }
 
 // User functions
-export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
-  return post('getUserInfoByEmail', payload);
-}
-export async function getCallerIdentity(payload?: GetCallerIdentityPayload) {
-  return post('getCallerIdentity', payload ?? {});
-}
+
 export async function changeUserEmail(payload: ChangeUserEmailPayload) {
   return post('changeUserEmail', payload);
 }
@@ -528,6 +560,12 @@ export async function sendVerificationEmail(
 }
 export async function getProjectUsers(payload: GetProjectUsersPayload) {
   return post('getProjectUsers', payload);
+}
+export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
+  return post('getUserInfoByEmail', payload);
+}
+export async function getCallerIdentity() {
+  return post('getCallerIdentity', {});
 }
 
 // Client functions
@@ -583,7 +621,7 @@ export async function getProjectUserRolesByUserAndProject(
   return post('getProjectUserRolesByUserAndProject', payload);
 }
 
-// Form functions
+// Form / Question functions
 export async function createForm(payload: CreateFormPayload = {}) {
   return post('createForm', payload);
 }
@@ -603,7 +641,6 @@ export async function getFormByUser(payload: GetFormByUserPayload = {}) {
   return post('getFormByUser', payload);
 }
 
-// Question functions
 export async function createQuestion(payload: CreateQuestionPayload) {
   return post('createQuestion', payload);
 }

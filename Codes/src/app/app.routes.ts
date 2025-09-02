@@ -28,7 +28,7 @@ export const routes: Routes = [
         (m) => m.ForgetPasswordComponent
       ),
   },
-  // dashboard (parent)
+  // isAdmin or isClient
   {
     path: 'dashboard',
     loadComponent: () =>
@@ -118,8 +118,28 @@ export const routes: Routes = [
       },
     ],
   },
-
-  // fallback
+  {
+    path: 'interviews/:interviewId',
+    loadComponent: () =>
+      import('./pages/interview/interview-questions-page.component').then(
+        (m) => m.InterviewQuestionsPageComponent
+      ),
+  },
+  // isUser
+  {
+    path: 'projects',
+    loadComponent: () =>
+      import('./pages/projects/projects-page.component').then(
+        (m) => m.ProjectsPageComponent
+      ),
+  },
+  {
+    path: 'projects/:projectId',
+    loadComponent: () =>
+      import('./pages/projects/project-detail.component').then(
+        (m) => m.ProjectDetailComponent
+      ),
+  },
   {
     path: 'form/:formId',
     loadComponent: () =>
@@ -127,11 +147,27 @@ export const routes: Routes = [
         (m) => m.FormPageComponent
       ),
   },
+  // IsWorker
   {
-    path: 'interviews/:interviewId',
+    path: 'manual-submissions',
     loadComponent: () =>
-      import('./pages/interview/interview-questions-page.component').then(
-        (m) => m.InterviewQuestionsPageComponent
+      import(
+        './pages/dashboard/components/view-submissions/view-submissions.component'
+      ).then((m) => m.ViewSubmissionsComponent),
+    data: { onlyManual: true },
+  },
+  {
+    path: 'manual-questions/:submissionId',
+    loadComponent: () =>
+      import('./pages/manual-questions/manual-questions.component').then(
+        (m) => m.ManualQuestionsComponent
+      ),
+  },
+  {
+    path: 'take-attendance',
+    loadComponent: () =>
+      import('./pages/take-attendance/take-attendance.component').then(
+        (m) => m.TakeAttendanceComponent
       ),
   },
   { path: '**', redirectTo: 'login' },

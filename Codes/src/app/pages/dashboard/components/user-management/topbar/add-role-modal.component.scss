@@ -2,7 +2,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(var(--bg-dark-rbg), var(--backdrop-opacity));
+  background: rgba(var(--bg-dark-rgb), var(--backdrop-opacity));
   display: flex;
   align-items: center;
   justify-content: center;

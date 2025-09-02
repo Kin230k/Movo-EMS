@@ -107,7 +107,7 @@
 // Dark theme adjustments
 @media (prefers-color-scheme: dark) {
   .submission-card {
-    background: rgba(var(--bg-dark-rbg), 0.95);
+    background: rgba(var(--bg-dark-rgb), 0.95);
     border-color: rgba(var(--color-font-rgb), 0.15);
   }
 }

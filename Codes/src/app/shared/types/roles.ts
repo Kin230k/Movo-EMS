@@ -1,24 +1,49 @@
 export const rolesLable = [
-  { value: 'Marshall', key: 'MARSHALL' },
-  { value: 'Supervisor', key: 'SUPERVISOR' },
-  { value: 'Senior Supervisor', key: 'SENIOR_SUPERVISOR' },
-  { value: 'Super Admin', key: 'SUPER_ADMIN' },
-  { value: 'Main User', key: 'MAIN_USER' },
-  { value: 'System Admin', key: 'SYSTEM_ADMIN' },
+  { value: '89898989-1234-8989-8989-898989898989', key: 'USER' },
+  { value: '89898989-1235-8989-8989-898989898989', key: 'MARSHALL' },
+  { value: '89898989-1236-8989-8989-898989898989', key: 'SUPERVISOR' },
+  { value: '89898989-1237-8989-8989-898989898989', key: 'SENIOR_SUPERVISOR' },
+  { value: '89898989-1238-8989-8989-898989898989', key: 'SUPER_ADMIN' },
+  { value: '89898989-1239-8989-8989-898989898989', key: 'MAIN_USER' },
+  { value: '89898989-1230-8989-8989-898989898989', key: 'SYSTEM_ADMIN' },
 ];
+
 export const rolesDropDown = [
-  { id: 'Marshall', name: { en: 'Marshall', ar: 'مارشال' } },
-  { id: 'Supervisor', name: { en: 'Supervisor', ar: 'مشرف' } },
-  { id: 'Senior Supervisor', name: { en: 'Senior Supervisor', ar: 'مشرف سنوي' } },
-  { id: 'Super Admin', name: { en: 'Super Admin', ar: 'مدير عام' } },
-  { id: 'Main User', name: { en: 'Main User', ar: 'مستخدم رئيسي' } },
-  { id: 'System Admin', name: { en: 'System Admin', ar: 'مدير النظام' } },
+  {
+    id: '89898989-1234-8989-8989-898989898989',
+    name: { en: 'User', ar: 'مستخدم' },
+  },
+  {
+    id: '89898989-1235-8989-8989-898989898989',
+    name: { en: 'Marshall', ar: 'مارشال' },
+  },
+  {
+    id: '89898989-1236-8989-8989-898989898989',
+    name: { en: 'Supervisor', ar: 'مشرف' },
+  },
+  {
+    id: '89898989-1237-8989-8989-898989898989',
+    name: { en: 'Senior Supervisor', ar: 'مشرف سنوي' },
+  },
+  {
+    id: '89898989-1238-8989-8989-898989898989',
+    name: { en: 'Super Admin', ar: 'مدير عام' },
+  },
+  {
+    id: '89898989-1239-8989-8989-898989898989',
+    name: { en: 'Main User', ar: 'مستخدم رئيسي' },
+  },
+  {
+    id: '89898989-1230-8989-8989-898989898989',
+    name: { en: 'System Admin', ar: 'مدير النظام' },
+  },
 ];
-export const rolesBinding =  {
-  Marshall: 'MARSHALL',
-  Supervisor: 'SUPERVISOR',
-  'Senior Supervisor': 'SENIOR_SUPERVISOR',
-  'Super Admin': 'SUPER_ADMIN',
-  'Main User': 'MAIN_USER',
-  'System Admin': 'SYSTEM_ADMIN',
+export const rolesBinding = {
+  '89898989-1234-8989-8989-898989898989': 'USER',
+  '89898989-1235-8989-8989-898989898989': 'MARSHALL',
+  '89898989-1236-8989-8989-898989898989': 'SUPERVISOR',
+  '89898989-1237-8989-8989-898989898989': 'SENIOR_SUPERVISOR',
+  '89898989-1238-8989-8989-898989898989': 'SUPER_ADMIN',
+  '89898989-1239-8989-8989-898989898989': 'MAIN_USER',
+  '89898989-1230-8989-8989-898989898989': 'SYSTEM_ADMIN',
 };

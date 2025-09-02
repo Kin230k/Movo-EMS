@@ -134,12 +134,15 @@
     "STATUS": "الحالة",
     "ACCEPTED": "مقبول",
     "REJECTED": "مرفوض",
-    "MANUAL_REVIEW": "مراجعة يدوية"
+    "MANUAL_REVIEW": "مراجعة يدوية",
+    "VIEW_MANUAL_QUESTIONS": "عرض أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "عرض أسئلة يدوية لهذا التقديم"
   },
   "WELCOME": {
     "TITLE": "مرحباً بك في لوحة تحكم نظام إدارة الموظفين"
   },
   "ROLES": {
+    "USER": "مستخدم",
     "MARSHALL": "مارشال",
     "SUPERVISOR": "مشرف",
     "SENIOR_SUPERVISOR": "مشرف أول",
@@ -178,6 +181,21 @@
       "USER": "المستخدم",
       "AREA": "المنطقة"
     }
+  },
+  "ATTENDANCE": {
+    "TITLE": "إدارة الحضور",
+    "ADD_MANUAL": "إضافة الحضور (يدوية)",
+    "ADD": "إضافة",
+    "QR": "مسح الباركود لإضافة الحضور",
+    "QR_DESC": "استخدم عدسة الكاميرا لمسح الباركود الذي يحتوي على رقم المستخدم",
+    "START_SCAN": "ابدأ المسح",
+    "STOP_SCAN": "أوقف المسح",
+    "SIM_QR": "مسح الباركود (محاكاة)",
+    "LIST": "الحضور الأخير",
+    "NO_RECORDS": "لا يوجد حضور بعد",
+    "METHOD": "الطريقة",
+    "SELECT_ZONE": "اختر المنطقة",
+    "CHOOSE_ZONE": "اختر المنطقة"
   },
   "USER_MANGEMENT": {
     "TITLE": "إدارة المستخدمين",
@@ -416,5 +434,27 @@
     "UPLOAD_PICTURE": "رفع الصورة",
     "FORGET_PASSWORD": "نسيت كلمة المرور؟",
     "SWITCH_TO_LOGIN": "عد الى صفحة تسجيل الدخول"
+  },
+  "NAV": {
+    "MANUAL_SUBMISSIONS": "تقديمات يدوية",
+    "MANUAL_QUESTIONS": "أسئلة يدوية",
+    "TAKE_ATTENDANCE": "إدارة الحضور"
+  },
+  "MANUAL_QUESTIONS": {
+    "GO_BACK": "عد الى صفحة تقديمات يدوية",
+    "TITLE": "أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS": "عرض أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "عرض أسئلة يدوية لهذا التقديم"
+  },
+  "PROJECTS": {
+    "TITLE": "إدارة المشاريع",
+    "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
+    "LOADING": "جار تحميل المشاريع...",
+    "STARTING_DATE": "تاريخ البدء",
+    "ENDING_DATE": "تاريخ الانتهاء",
+    "FORM": "النموزج",
+    "OPEN_SELECTED_FORM": "فتح النموزج المختار",
+    "SELECTED_LOCATION_HAS_NO_FORM_CONFIGURED": "الموقع المختار لا يحتوي على نموزج مكون.",
+    "NO_FORM_IS_CONFIGURED_FOR_THIS_PROJECT": "لا يوجد نموزج مكون لهذا المشروع."
   }
 }

@@ -16,6 +16,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
       <select
         class="q-input"
         [formControl]="control"
+        [disabled]="disabled"
         (blur)="control.markAsTouched()"
       >
         <option value="" disabled selected>Select...</option>
@@ -51,6 +52,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
         background: rgba(var(--white-rgb), 0.9);
         color: var(--color-text);
       }
+
       .q-input:focus {
         outline: 2px solid var(--accent);
         border-color: var(--accent);
@@ -69,4 +71,5 @@ export class DropdownQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 }

@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
@@ -29,7 +22,8 @@ import { RateQuestionComponent } from '../../components/form/questions/rate-ques
 import { DropdownQuestionComponent } from '../../components/form/questions/dropdown-question.component';
 import { RadioQuestionComponent } from '../../components/form/questions/radio-question.component';
 import { MultipleChoiceQuestionComponent } from '../../components/form/questions/multiple-choice-question.component';
-
+import { Location } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-form-page',
   standalone: true,
@@ -45,9 +39,13 @@ import { MultipleChoiceQuestionComponent } from '../../components/form/questions
     DropdownQuestionComponent,
     RadioQuestionComponent,
     MultipleChoiceQuestionComponent,
+    TranslateModule,
   ],
   template: `
     <section class="form-page">
+      <button class="back" (click)="goBack()">
+        &larr; {{ 'COMMON.BUTTONS.CANCEL' | translate }}
+      </button>
       <div class="title" *ngIf="loading(); else content">{{ title() }}</div>
       <ng-template #content>
         <div class="title">{{ title() }}</div>
@@ -115,6 +113,13 @@ import { MultipleChoiceQuestionComponent } from '../../components/form/questions
   `,
   styles: [
     `
+      .back {
+        background: transparent;
+        border: none;
+        color: rgba(var(--bg-dark-rgb), 0.7);
+        cursor: pointer;
+        margin-bottom: 1rem;
+      }
       .form-page {
         position: relative;
         padding: var(--padding-section);
@@ -178,6 +183,7 @@ export class FormPageComponent implements OnInit {
   questions = signal<FormQuestionDto[]>([]);
   formGroup!: FormGroup;
   showErrors = signal(false);
+  private readonly location = inject(Location);
 
   private get storageKey(): string {
     const formId = this.route.snapshot.paramMap.get('formId') || 'form';
@@ -254,5 +260,8 @@ export class FormPageComponent implements OnInit {
     // For now, keep in storage and potentially navigate/notify
     this.persistDraft();
     alert('Form submitted successfully!');
+  }
+  goBack() {
+    this.location.back();
   }
 }

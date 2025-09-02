@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
+import { ManualNavbarComponent } from '../../../../components/manual-navbar/manual-navbar.component';
 import { SkeletonFormCardComponent } from '../../../../components/shared/skeleton-form-card/skeleton-form-card.component';
 import {
   SubmissionCardComponent,
@@ -24,12 +26,14 @@ export interface Form {
     ComboSelectorComponent,
     SkeletonFormCardComponent,
     SubmissionCardComponent,
+    ManualNavbarComponent,
   ],
   templateUrl: './view-submissions.component.html',
   styleUrl: './view-submissions.component.scss',
 })
 export class ViewSubmissionsComponent {
   forms: Form[] = [];
+  onlyManual: boolean | undefined;
   get formsForSelector() {
     return (this.forms || []).map((form) => ({
       id: form.formId,
@@ -41,10 +45,24 @@ export class ViewSubmissionsComponent {
   selectedFormId: string | undefined = undefined;
   isLoading = false;
 
-  constructor(private apiQueries: ApiQueriesService) {}
-
+  constructor(
+    private apiQueries: ApiQueriesService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    // Read optional route data flag to filter only manual submissions
+    const data = this.route.snapshot.data as { onlyManual?: boolean };
+    if (data && typeof data.onlyManual === 'boolean') {
+      this.onlyManual = data.onlyManual;
+    }
+  }
   async ngOnInit() {
     await this.loadForms();
+    // Set initial default form if needed
+  }
+
+  onGoToManualQuestions(submissionId: string) {
+    this.router.navigate(['/manual-questions/', submissionId]);
   }
 
   onFormSelected(formId: string | undefined) {
@@ -63,12 +81,18 @@ export class ViewSubmissionsComponent {
   }
 
   get filteredSubmissions() {
-    if (!this.selectedFormId) {
-      return this.submissions;
+    let list = this.submissions;
+    if (this.selectedFormId) {
+      list = list.filter(
+        // call API to get the submissions for the form
+        (submission) => submission.formId === this.selectedFormId
+      );
     }
-    return this.submissions.filter(
-      (submission) => submission.formId === this.selectedFormId
-    );
+    if (this.onlyManual) {
+      // call API to get the submissions for the form manual
+      list = list.filter((submission) => submission.outcome === 'manual');
+    }
+    return list;
   }
 
   getFormTitle(formId?: string): string {
@@ -108,8 +132,6 @@ export class ViewSubmissionsComponent {
       })();
     });
   }
-
-  // Removed mock submissions helper; data is sourced via queries
 
   // Handle API call completion
   onSubmissionsLoaded(submissions: Submission[]) {
