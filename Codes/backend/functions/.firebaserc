@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "local"
-  }
+    "default": "local",
+    "movo-ems": "movo-ems"
+  },
+  "targets": {},
+  "etags": {}
 }

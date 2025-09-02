@@ -10,7 +10,6 @@ import {
   phoneExists,
 } from '../../utils/authUtils';
 import { UserService } from '../../models/auth/user/user.service';
-import { sendVerificationEmailHandler } from './sendVerificationEmailHandler';
 import { parseDbError } from '../../utils/dbErrorParser';
 import { FieldIssue } from '../../utils/types';
 import { UserStatus } from '../../models/auth/user/user_status.enum';
@@ -19,7 +18,7 @@ import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
 export interface RegisterUserData {
   name: Multilingual;
   // email and phone are taken from Firebase Auth, not from client
-  
+
   picture?: string | null;
 }
 
@@ -45,8 +44,6 @@ export async function registerUserHandler(
   // 1) Field-level validation (client-provided fields where appropriate)
   if (!uid) issues.push({ field: 'uid', message: 'UID is required' });
   if (!name) issues.push({ field: 'name', message: 'Name is required' });
-
-
 
   // Return early if client-side issues
   if (issues.length > 0) {
@@ -155,30 +152,7 @@ export async function registerUserHandler(
   }
 
   // 7) Send verification email (only if email exists on Firebase Auth)
-  let emailSent = false;
-  if (emailFromAuth) {
-    try {
-      // Reuse existing handler — build a small fake request object preserving original auth/context
-      const fakeRequest = {
-        ...request,
-        data: { email: emailFromAuth },
-      } as CallableRequest<{ email: string }>;
-
-      const results = await sendVerificationEmailHandler(fakeRequest);
-      if (!results.success) {
-        // If handler returns a structured error, log it and continue (do not fail registration)
-        logger.warn('sendVerificationEmailHandler returned failure:', results);
-      } else {
-        emailSent = true;
-      }
-    } catch (mailErr: any) {
-      logger.error(
-        'Verification email send failed:',
-        (mailErr?.message || String(mailErr)).split('\n')[0]
-      );
-    }
-  }
 
   // 8) Return success
-  return { success: true, emailSent };
+  return { success: true };
 }

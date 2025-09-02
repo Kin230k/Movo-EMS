@@ -36,9 +36,12 @@ describe('registerUserHandler', () => {
     jest.clearAllMocks();
 
     // ensure admin.auth().getUser(...) is mocked to return email/phone by default
-    jest.spyOn(admin, 'auth').mockImplementation(() => ({
-      getUser: mockGetUser,
-    } as any));
+    jest.spyOn(admin, 'auth').mockImplementation(
+      () =>
+        ({
+          getUser: mockGetUser,
+        } as any)
+    );
 
     mockGetUser.mockResolvedValue({
       email: 'test@example.com',
@@ -62,8 +65,7 @@ describe('registerUserHandler', () => {
 
   // NOTE: RegisterUserData (handler) only includes name, twoFaEnabled, picture (email/phone come from Firebase Auth)
   const validData: RegisterUserData = {
-    name: { en: 'Test User', ar: 'تيمبت' },
-    twoFaEnabled: false,
+    name: { en: 'Test User', ar: 'تيمت' },
   };
 
   it('returns issues for missing fields', async () => {
@@ -87,7 +89,9 @@ describe('registerUserHandler', () => {
     const result = await registerUserHandler(makeReq(validData));
     expect(result).toEqual({
       success: false,
-      issues: [{ field: 'email', message: 'Email from Auth has invalid format' }],
+      issues: [
+        { field: 'email', message: 'Email from Auth has invalid format' },
+      ],
     });
   });
 

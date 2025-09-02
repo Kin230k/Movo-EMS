@@ -93,7 +93,7 @@ export class ProjectMapper extends BaseMapper<Project> {
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
-    async getByForm(formId: string): Promise<Project | null> {
+  async getByForm(formId: string): Promise<Project | null> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!formId) throw new Error('Form ID is required');
