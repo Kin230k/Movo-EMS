@@ -3,20 +3,14 @@
     <h1>{{ "USER_MANGEMENT.TITLE" | translate }}</h1>
   </div>
 
-  <app-topbar
-    [projects]="projects"
-    (projectSelected)="onProjectSelected($event)"
-  ></app-topbar>
+  <app-query-status [query]="projectsQuery">
+    <app-topbar
+      [projects]="projects"
+      (projectSelected)="onProjectSelected($event)"
+    ></app-topbar>
+  </app-query-status>
 
-  <!-- show error -->
-  <div *ngIf="error" class="error" role="alert">
-    {{ "USER_MANGEMENT.ERROR_LOADING_PROJECTS" | translate }}
-  </div>
-
-  <!-- show skeleton placeholders when loading -->
-  <div *ngIf="isLoading" class="card-list-skeleton">
-    <app-card-list-skeletion></app-card-list-skeletion>
-  </div>
+  <!-- legacy local loading/errors below can remain for users list -->
 
   <!-- show empty state if finished and no users -->
   <div

@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth';
 
 export type Multilingual = { en: string; ar: string };
 
-let BASE_URL = '/api';
+let BASE_URL = 'http://127.0.0.1:5001/local/us-central1';
 
 export function setBaseUrl(url: string) {
   BASE_URL = url.replace(/\/$/, '');
@@ -57,6 +57,15 @@ async function post(fnName: string, payload: unknown): Promise<any> {
 }
 
 // --- Types ---
+export interface SendEmailPayload {
+  email: string;
+  subject: string;
+  body: string;
+}
+export interface GetUserInfoByEmailPayload {
+  email: string;
+}
+export interface GetCallerIdentityPayload {}
 export interface CreateAdminPayload {
   qid: string;
   name: Multilingual;
@@ -90,7 +99,6 @@ export interface EditUserInfoPayload {
 }
 export interface RegisterUserPayload {
   name: Multilingual;
-  twoFaEnabled: boolean;
   picture?: string | null;
 }
 export interface SendLoginAlertPayload {
@@ -111,7 +119,15 @@ export interface CreateClientPayload {
   contactPhone: string;
   company: Multilingual;
   logo?: string;
-  status?: 'accepted' | 'rejected' | 'pending';
+  // status?: 'accepted' | 'rejected' | 'pending';
+}
+export interface AdminCreateClientPayload {
+  name: Multilingual;
+  contactEmail: string;
+  contactPhone: string;
+  password: string;
+  logo?: string;
+  company?: Multilingual | null;
 }
 export interface ApproveRejectClientPayload {
   clientId: string;
@@ -157,28 +173,34 @@ export interface CreateFormPayload {
   projectId?: string | null;
   locationId?: string | null;
 }
-export interface CreateFormWithQuestionsPayload {
-  projectId?: string | null;
-  locationId?: string | null;
-  questions?:
-    | {
-        typeCode: string;
-        questionText: Multilingual;
-        interviewId: string;
-        criteria?: {
-          type:
-            | 'equals'
-            | 'greater_than'
-            | 'less_than'
-            | 'contains'
-            | 'between'
-            | 'not_equals'
-            | 'greater_than_or_equal'
-            | 'less_than_or_equal';
-          value: string;
-        }[];
-      }[]
-    | null;
+export interface CreateQuestionsPayload {
+  interviewId?: string;
+  formId?: string;
+  questions: {
+    typeCode:
+      | 'OPEN_ENDED'
+      | 'SHORT_ANSWER'
+      | 'NUMBER'
+      | 'RATE'
+      | 'DROPDOWN'
+      | 'RADIO'
+      | 'MULTIPLE_CHOICE';
+    questionText: string;
+    criteria?: {
+      type:
+        | 'equals'
+        | 'greater_than'
+        | 'less_than'
+        | 'contains'
+        | 'between'
+        | 'not_equals'
+        | 'greater_than_or_equal'
+        | 'less_than_or_equal';
+      value: string;
+      effect: 'PASS' | 'FAIL';
+    }[];
+    options?: { optionText: string; isCorrect: boolean }[];
+  }[];
 }
 export interface DeleteFormPayload {
   formId?: string | null;
@@ -190,6 +212,9 @@ export interface UpdateFormPayload {
   formId?: string | null;
   projectId?: string | null;
   locationId?: string | null;
+}
+export interface GetFormByUserPayload {
+  userId?: string | null;
 }
 export interface CreateQuestionPayload {
   typeCode: string;
@@ -210,10 +235,12 @@ export interface UpdateQuestionPayload {
   formId: string;
   interviewId: string;
 }
+export interface GetInterviewQuestionsPayload {
+  interviewId: string;
+}
 export interface CreateSubmissionPayload {
   formId?: string;
   interviewId?: string;
-  dateSubmitted?: string;
   outcome?: string;
   decisionNotes?: string;
 }
@@ -225,12 +252,63 @@ export interface GetSubmissionPayload {
 }
 export interface UpdateSubmissionPayload {
   submissionId: string;
-  formId: string;
+  formId?: string;
   userId: string;
-  interviewId: string;
-  dateSubmitted: Date;
+  interviewId?: string;
   outcome?: 'pass' | 'fail' | 'manual_review';
   decisionNotes?: string;
+}
+export interface GetManualByFormIdPayload {
+  formId: string;
+  projectId: string;
+}
+export interface CreateSubmissionWithAnswerPayload {
+  formId?: string;
+  interviewId?: string;
+  outcome?: string;
+  decisionNotes?: string;
+  questionId?: string;
+  answerType?: 'text' | 'rating' | 'numeric' | 'options';
+  textResponse?: string;
+  rating?: number;
+  numericResponse?: number;
+  optionIds?: string[];
+}
+export interface CreateSubmissionWithAnswersPayload {
+  formId?: string;
+  interviewId?: string;
+  outcome?: string;
+  decisionNotes?: string;
+  answers: {
+    questionId?: string;
+    answerType?: 'text' | 'rating' | 'numeric' | 'options';
+    textResponse?: string;
+    rating?: number;
+    numericResponse?: number;
+    optionIds?: string[];
+  }[];
+}
+export interface GetManualAnswersBySubmissionIdPayload {
+  submissionId: string;
+  projectId: string;
+}
+export interface GetSubmissionsByFormPayload {
+  formId: string;
+  projectId: string;
+}
+export interface GetAnswersBySubmissionIdPayload {
+  submissionId: string;
+  projectId: string;
+}
+export interface UpdateSubmissionStatusPayload {
+  submissionId: string;
+  outcome: string;
+  decisionNotes?: string;
+  projectId: string;
+}
+export interface GetQuestionAnswersBySubmissionPayload {
+  submissionId: string;
+  projectId: string;
 }
 export interface CreateInterviewPayload {
   projectId: string;
@@ -249,11 +327,10 @@ export interface DeleteInterviewPayload {
   interviewId: string;
 }
 export interface CreateProjectPayload {
-  clientId: string;
   name: Multilingual;
   startingDate: string;
   badgeBackground?: string;
-  endingDate?: string;
+  endingDate: string;
   description?: Multilingual | null;
 }
 export interface DeleteProjectPayload {
@@ -274,7 +351,6 @@ export interface GetProjectByClientPayload {
   clientId: string;
 }
 export interface CreateLocationPayload {
-  clientId: string;
   name: Multilingual;
   projectId: string;
   siteMap?: string;
@@ -289,10 +365,9 @@ export interface GetLocationPayload {
   locationId: string;
 }
 export interface UpdateLocationPayload {
-  clientId: string;
   locationId: string;
   name: Multilingual;
-  projectId: string;
+  projectId?: string;
   siteMap?: string;
   longitude?: number;
   latitude?: number;
@@ -315,8 +390,8 @@ export interface UpdateUserProjectPayload {
 export interface CreateSchedulePayload {
   startTime: string;
   endTime: string;
-  projectId: string;
-  locationId: string;
+  projectId?: string;
+  locationId?: string;
 }
 export interface DeleteSchedulePayload {
   scheduleId: string;
@@ -326,10 +401,10 @@ export interface GetSchedulePayload {
 }
 export interface UpdateSchedulePayload {
   scheduleId: string;
-  startTime: string;
-  endTime: string;
-  projectId: string;
-  locationId: string;
+  startTime?: string;
+  endTime?: string;
+  projectId?: string;
+  locationId?: string;
 }
 export interface CreateUserSchedulePayload {
   userId: string;
@@ -348,9 +423,7 @@ export interface UpdateUserSchedulePayload {
   locationId: string;
 }
 export interface CreateAttendancePayload {
-  timestamp?: string | null;
-  signedWith: 'QR_CODE' | 'MANUAL';
-  signedBy: string;
+  signedWith: 'BARCODE' | 'MANUAL';
   userId: string;
   areaId: string;
 }
@@ -362,9 +435,7 @@ export interface GetAttendancePayload {
 }
 export interface UpdateAttendancePayload {
   attendanceId: string;
-  signedWith: 'QR_CODE' | 'MANUAL';
   timestamp?: string | null;
-  signedBy?: string | null;
   userId?: string | null;
   areaId?: string | null;
 }
@@ -392,10 +463,20 @@ export interface UpdateAreaPayload {
 export interface GetAreasByLocationPayload {
   locationId: string;
 }
+export interface GetSchedulesByLocationPayload {
+  locationId: string;
+}
+export interface GetSchedulesByProjectOrLocationPayload {
+  projectId?: string;
+  locationId?: string;
+}
 
 // --- Functions ---
 
 // Admin functions
+export async function sendEmail(payload: SendEmailPayload) {
+  return post('sendEmail', payload);
+}
 export async function createAdmin(payload: CreateAdminPayload) {
   return post('createAdmin', payload);
 }
@@ -410,6 +491,12 @@ export async function updateAdmin(payload: UpdateAdminPayload) {
 }
 
 // User functions
+export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
+  return post('getUserInfoByEmail', payload);
+}
+export async function getCallerIdentity(payload?: GetCallerIdentityPayload) {
+  return post('getCallerIdentity', payload ?? {});
+}
 export async function changeUserEmail(payload: ChangeUserEmailPayload) {
   return post('changeUserEmail', payload);
 }
@@ -446,6 +533,9 @@ export async function getProjectUsers(payload: GetProjectUsersPayload) {
 // Client functions
 export async function createClient(payload: CreateClientPayload) {
   return post('createClient', payload);
+}
+export async function adminCreateClient(payload: AdminCreateClientPayload) {
+  return post('adminCreateClient', payload);
 }
 export async function approveRejectClient(payload: ApproveRejectClientPayload) {
   return post('approveRejectClient', payload);
@@ -497,10 +587,8 @@ export async function getProjectUserRolesByUserAndProject(
 export async function createForm(payload: CreateFormPayload = {}) {
   return post('createForm', payload);
 }
-export async function createFormWithQuestions(
-  payload: CreateFormWithQuestionsPayload = {}
-) {
-  return post('createFormWithQuestions', payload);
+export async function createQuestions(payload: CreateQuestionsPayload) {
+  return post('createQuestions', payload);
 }
 export async function deleteForm(payload: DeleteFormPayload = {}) {
   return post('deleteForm', payload);
@@ -510,6 +598,9 @@ export async function getForm(payload: GetFormPayload = {}) {
 }
 export async function updateForm(payload: UpdateFormPayload = {}) {
   return post('updateForm', payload);
+}
+export async function getFormByUser(payload: GetFormByUserPayload = {}) {
+  return post('getFormByUser', payload);
 }
 
 // Question functions
@@ -528,10 +619,25 @@ export async function getQuestion(payload: GetQuestionPayload) {
 export async function updateQuestion(payload: UpdateQuestionPayload) {
   return post('updateQuestion', payload);
 }
+export async function getInterviewQuestions(
+  payload: GetInterviewQuestionsPayload
+) {
+  return post('getInterviewQuestions', payload);
+}
 
 // Submission functions
 export async function createSubmission(payload: CreateSubmissionPayload = {}) {
   return post('createSubmission', payload);
+}
+export async function createSubmissionWithAnswer(
+  payload: CreateSubmissionWithAnswerPayload
+) {
+  return post('createSubmissionWithAnswer', payload);
+}
+export async function createSubmissionWithAnswers(
+  payload: CreateSubmissionWithAnswersPayload
+) {
+  return post('createSubmissionWithAnswers', payload);
 }
 export async function deleteSubmission(payload: DeleteSubmissionPayload = {}) {
   return post('deleteSubmission', payload);
@@ -541,6 +647,34 @@ export async function getSubmission(payload: GetSubmissionPayload = {}) {
 }
 export async function updateSubmission(payload: UpdateSubmissionPayload) {
   return post('updateSubmission', payload);
+}
+export async function getManualByFormId(payload: GetManualByFormIdPayload) {
+  return post('getManualByFormId', payload);
+}
+export async function getManualAnswersBySubmissionId(
+  payload: GetManualAnswersBySubmissionIdPayload
+) {
+  return post('getManualAnswersBySubmissionId', payload);
+}
+export async function getSubmissionsByForm(
+  payload: GetSubmissionsByFormPayload
+) {
+  return post('getSubmissionsByForm', payload);
+}
+export async function getAnswersBySubmissionId(
+  payload: GetAnswersBySubmissionIdPayload
+) {
+  return post('getAnswersBySubmissionId', payload);
+}
+export async function updateSubmissionStatus(
+  payload: UpdateSubmissionStatusPayload
+) {
+  return post('updateSubmissionStatus', payload);
+}
+export async function getQuestionAnswersBySubmission(
+  payload: GetQuestionAnswersBySubmissionPayload
+) {
+  return post('getQuestionAnswersBySubmission', payload);
 }
 
 // Interview functions
@@ -577,6 +711,12 @@ export async function updateProject(payload: UpdateProjectPayload) {
 }
 export async function getProjectByClient(payload: GetProjectByClientPayload) {
   return post('getProjectByClient', payload);
+}
+export async function getAllProjects() {
+  return post('getAllProjects', {});
+}
+export async function getAllActiveProjects() {
+  return post('getAllActiveProjects', {});
 }
 
 // Location functions
@@ -619,6 +759,16 @@ export async function getSchedule(payload: GetSchedulePayload) {
 }
 export async function updateSchedule(payload: UpdateSchedulePayload) {
   return post('updateSchedule', payload);
+}
+export async function getSchedulesByLocation(
+  payload: GetSchedulesByLocationPayload
+) {
+  return post('getSchedulesByLocation', payload);
+}
+export async function getSchedulesByProjectOrLocation(
+  payload: GetSchedulesByProjectOrLocationPayload
+) {
+  return post('getSchedulesByProjectOrLocation', payload);
 }
 
 // UserSchedule functions
@@ -674,10 +824,13 @@ export async function getAllAreas() {
 }
 
 const api = {
+  sendEmail,
   createAdmin,
   getAdmin,
   getAllAdmins,
   updateAdmin,
+  getUserInfoByEmail,
+  getCallerIdentity,
   changeUserEmail,
   changeUserPhone,
   checkServiceStatus,
@@ -689,6 +842,7 @@ const api = {
   sendVerificationEmail,
   getProjectUsers,
   createClient,
+  adminCreateClient,
   approveRejectClient,
   deleteClient,
   getAllClients,
@@ -701,19 +855,29 @@ const api = {
   getAllProjectUserRoles,
   getProjectUserRolesByUserAndProject,
   createForm,
-  createFormWithQuestions,
+  createQuestions,
   deleteForm,
   getForm,
   updateForm,
+  getFormByUser,
   createQuestion,
   deleteQuestion,
   getAllQuestions,
   getQuestion,
   updateQuestion,
+  getInterviewQuestions,
   createSubmission,
+  createSubmissionWithAnswer,
+  createSubmissionWithAnswers,
   deleteSubmission,
   getSubmission,
   updateSubmission,
+  getManualByFormId,
+  getManualAnswersBySubmissionId,
+  getSubmissionsByForm,
+  getAnswersBySubmissionId,
+  updateSubmissionStatus,
+  getQuestionAnswersBySubmission,
   createInterview,
   updateInterview,
   getInterview,
@@ -724,6 +888,8 @@ const api = {
   getProject,
   updateProject,
   getProjectByClient,
+  getAllProjects,
+  getAllActiveProjects,
   createLocation,
   deleteLocation,
   getLocation,
@@ -736,6 +902,8 @@ const api = {
   deleteSchedule,
   getSchedule,
   updateSchedule,
+  getSchedulesByLocation,
+  getSchedulesByProjectOrLocation,
   createUserSchedule,
   updateUserSchedule,
   createAttendance,

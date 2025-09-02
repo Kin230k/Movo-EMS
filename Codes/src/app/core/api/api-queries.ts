@@ -9,9 +9,12 @@ import { inject } from '@angular/core';
 import { QueryClient } from '@tanstack/query-core';
 import api from './api';
 import type {
+  SendEmailPayload,
   CreateAdminPayload,
   GetAdminPayload,
   UpdateAdminPayload,
+  GetUserInfoByEmailPayload,
+  GetCallerIdentityPayload,
   ChangeUserEmailPayload,
   ChangeUserPhonePayload,
   CheckServiceStatusPayload,
@@ -22,6 +25,7 @@ import type {
   SendVerificationEmailPayload,
   GetProjectUsersPayload,
   CreateClientPayload,
+  AdminCreateClientPayload,
   ApproveRejectClientPayload,
   DeleteClientPayload,
   GetClientPayload,
@@ -32,18 +36,28 @@ import type {
   GetProjectUserRolePayload,
   GetProjectUserRolesByUserAndProjectPayload,
   CreateFormPayload,
-  CreateFormWithQuestionsPayload,
+  CreateQuestionsPayload,
   DeleteFormPayload,
   GetFormPayload,
   UpdateFormPayload,
+  GetFormByUserPayload,
   CreateQuestionPayload,
   DeleteQuestionPayload,
   GetQuestionPayload,
   UpdateQuestionPayload,
+  GetInterviewQuestionsPayload,
   CreateSubmissionPayload,
+  CreateSubmissionWithAnswerPayload,
+  CreateSubmissionWithAnswersPayload,
   DeleteSubmissionPayload,
   GetSubmissionPayload,
   UpdateSubmissionPayload,
+  GetManualByFormIdPayload,
+  GetManualAnswersBySubmissionIdPayload,
+  GetSubmissionsByFormPayload,
+  GetAnswersBySubmissionIdPayload,
+  UpdateSubmissionStatusPayload,
+  GetQuestionAnswersBySubmissionPayload,
   CreateInterviewPayload,
   UpdateInterviewPayload,
   GetInterviewPayload,
@@ -54,6 +68,8 @@ import type {
   GetProjectPayload,
   UpdateProjectPayload,
   GetProjectByClientPayload,
+  GetSchedulesByLocationPayload,
+  GetSchedulesByProjectOrLocationPayload,
   CreateLocationPayload,
   DeleteLocationPayload,
   GetLocationPayload,
@@ -91,6 +107,12 @@ function queryKeyFor(payload: any, base: string | string[]): any[] {
 }
 
 // Admin queries and mutations
+export function injectSendEmailMutation() {
+  return injectMutation(() => ({
+    mutationFn: (payload: SendEmailPayload) => api.sendEmail(payload),
+  }));
+}
+
 export function injectCreateAdminMutation() {
   const queryClient = inject(QueryClient);
   return injectMutation(() => ({
@@ -126,6 +148,24 @@ export function injectUpdateAdminMutation() {
 }
 
 // User queries and mutations
+export function injectGetUserInfoByEmailQuery(
+  payload: GetUserInfoByEmailPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['userInfoByEmail', payload.email]),
+    queryFn: () => api.getUserInfoByEmail(payload),
+  }));
+}
+
+export function injectGetCallerIdentityQuery(
+  payload?: GetCallerIdentityPayload
+) {
+  return injectQuery(() => ({
+    queryKey: ['callerIdentity'],
+    queryFn: () => api.getCallerIdentity(payload),
+  }));
+}
+
 export function injectChangeUserEmailMutation() {
   const queryClient = inject(QueryClient);
   return injectMutation(() => ({
@@ -209,6 +249,15 @@ export function injectCreateClientMutation() {
   const queryClient = inject(QueryClient);
   return injectMutation(() => ({
     mutationFn: (payload: CreateClientPayload) => api.createClient(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clients'] }),
+  }));
+}
+
+export function injectAdminCreateClientMutation() {
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: (payload: AdminCreateClientPayload) =>
+      api.adminCreateClient(payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clients'] }),
   }));
 }
@@ -326,11 +375,11 @@ export function injectCreateFormMutation() {
   }));
 }
 
-export function injectCreateFormWithQuestionsMutation() {
+export function injectCreateQuestionsMutation() {
   const queryClient = inject(QueryClient);
   return injectMutation(() => ({
-    mutationFn: (payload: CreateFormWithQuestionsPayload = {}) =>
-      api.createFormWithQuestions(payload),
+    mutationFn: (payload: CreateQuestionsPayload) =>
+      api.createQuestions(payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['forms'] }),
   }));
 }
@@ -356,6 +405,13 @@ export function injectUpdateFormMutation() {
     mutationFn: (payload: UpdateFormPayload = {}) => api.updateForm(payload),
     onSuccess: (_, payload) =>
       queryClient.invalidateQueries({ queryKey: ['form', payload!.formId] }),
+  }));
+}
+
+export function injectGetFormByUserQuery(payload: GetFormByUserPayload = {}) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['formByUser', payload.userId!]),
+    queryFn: () => api.getFormByUser(payload),
   }));
 }
 
@@ -401,12 +457,41 @@ export function injectUpdateQuestionMutation() {
   }));
 }
 
+export function injectGetInterviewQuestionsQuery(
+  payload: GetInterviewQuestionsPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['interviewQuestions', payload.interviewId]),
+    queryFn: () => api.getInterviewQuestions(payload),
+  }));
+}
+
 // Submission queries and mutations
 export function injectCreateSubmissionMutation() {
   const queryClient = inject(QueryClient);
   return injectMutation(() => ({
     mutationFn: (payload: CreateSubmissionPayload = {}) =>
       api.createSubmission(payload),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['submissions'] }),
+  }));
+}
+
+export function injectCreateSubmissionWithAnswerMutation() {
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: (payload: CreateSubmissionWithAnswerPayload) =>
+      api.createSubmissionWithAnswer(payload),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['submissions'] }),
+  }));
+}
+
+export function injectCreateSubmissionWithAnswersMutation() {
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: (payload: CreateSubmissionWithAnswersPayload) =>
+      api.createSubmissionWithAnswers(payload),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['submissions'] }),
   }));
@@ -438,6 +523,70 @@ export function injectUpdateSubmissionMutation() {
       queryClient.invalidateQueries({
         queryKey: ['submission', payload.submissionId],
       }),
+  }));
+}
+
+export function injectGetManualByFormIdQuery(
+  payload: GetManualByFormIdPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['manualByForm', payload.formId]),
+    queryFn: () => api.getManualByFormId(payload),
+  }));
+}
+
+export function injectGetManualAnswersBySubmissionIdQuery(
+  payload: GetManualAnswersBySubmissionIdPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, [
+      'manualAnswersBySubmission',
+      payload.submissionId,
+    ]),
+    queryFn: () => api.getManualAnswersBySubmissionId(payload),
+  }));
+}
+
+export function injectGetSubmissionsByFormQuery(
+  payload: GetSubmissionsByFormPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['submissionsByForm', payload.formId]),
+    queryFn: () => api.getSubmissionsByForm(payload),
+  }));
+}
+
+export function injectGetAnswersBySubmissionIdQuery(
+  payload: GetAnswersBySubmissionIdPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, [
+      'answersBySubmissionId',
+      payload.submissionId,
+    ]),
+    queryFn: () => api.getAnswersBySubmissionId(payload),
+  }));
+}
+
+export function injectUpdateSubmissionStatusMutation() {
+  const queryClient = inject(QueryClient);
+  return injectMutation(() => ({
+    mutationFn: (payload: UpdateSubmissionStatusPayload) =>
+      api.updateSubmissionStatus(payload),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['submissions'] }),
+  }));
+}
+
+export function injectGetQuestionAnswersBySubmissionQuery(
+  payload: GetQuestionAnswersBySubmissionPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, [
+      'questionAnswersBySubmission',
+      payload.submissionId,
+    ]),
+    queryFn: () => api.getQuestionAnswersBySubmission(payload),
   }));
 }
 
@@ -531,6 +680,20 @@ export function injectGetProjectByClientQuery(
   return injectQuery(() => ({
     queryKey: queryKeyFor(payload, ['projectsByClient', payload.clientId]),
     queryFn: () => api.getProjectByClient(payload),
+  }));
+}
+
+export function injectGetAllProjectsQuery() {
+  return injectQuery(() => ({
+    queryKey: ['projects'],
+    queryFn: () => api.getAllProjects(),
+  }));
+}
+
+export function injectGetAllActiveProjectsQuery() {
+  return injectQuery(() => ({
+    queryKey: ['projectsActive'],
+    queryFn: () => api.getAllActiveProjects(),
   }));
 }
 
@@ -641,6 +804,28 @@ export function injectUpdateScheduleMutation() {
       queryClient.invalidateQueries({
         queryKey: ['schedule', payload.scheduleId],
       }),
+  }));
+}
+
+export function injectGetSchedulesByLocationQuery(
+  payload: GetSchedulesByLocationPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['schedulesByLocation', payload.locationId]),
+    queryFn: () => api.getSchedulesByLocation(payload),
+  }));
+}
+
+export function injectGetSchedulesByProjectOrLocationQuery(
+  payload: GetSchedulesByProjectOrLocationPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, [
+      'schedulesByProjectOrLocation',
+      payload.projectId ?? 'none',
+      payload.locationId ?? 'none',
+    ]),
+    queryFn: () => api.getSchedulesByProjectOrLocation(payload),
   }));
 }
 

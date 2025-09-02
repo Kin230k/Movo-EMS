@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'signup', pathMatch: 'full' },
 
   // login routes
   {
@@ -14,15 +14,20 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/login/admin/login-admin').then((m) => m.LoginAdmin),
   },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./pages/signup/user-signup').then((m) => m.SignUpUser),
+  },
 
   // forgot password route
-{
-  path: 'forget-password',
-  loadComponent: () =>
-    import('./pages/login/forget-password/forget-password.component').then(
-      (m) => m.ForgetPasswordComponent
-    ),
-},
+  {
+    path: 'forget-password',
+    loadComponent: () =>
+      import('./pages/login/forget-password/forget-password.component').then(
+        (m) => m.ForgetPasswordComponent
+      ),
+  },
   // dashboard (parent)
   {
     path: 'dashboard',

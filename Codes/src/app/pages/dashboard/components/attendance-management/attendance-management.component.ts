@@ -6,6 +6,7 @@ import { TopbarComponent } from '../attendance-management/topbar/topbar.componen
 import { AttendanceProfileCardComponent } from '../attendance-management/attendance-profile-card/attendance-profile-card.component'; // adjust path if needed
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-attendance-management',
@@ -21,39 +22,13 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./attendance-management.component.scss'],
 })
 export class AttendanceManagementComponent {
-  projects = [
-    { id: 1, name: { ar: 'مشروع A', en: 'Project A' } },
-    { id: 2, name: { ar: 'مشروع B', en: 'Project B' } },
-    { id: 3, name: { ar: 'مشروع C', en: 'Project C' } },
-  ];
+  constructor(private apiQueries: ApiQueriesService) {}
 
-  // Mock users data per project
-  private mockUsers: { [key: number]: any[] } = {
-    1: Array.from({ length: 3 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User A${i + 1}`, ar: `يوزر A${i + 1}` },
-      role: 'Main User',
-      isPresent: false,
-      attendanceTimestamp: new Date(),
-      picture: '/assets/images/image.png',
-    })),
-    2: Array.from({ length: 4 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User B${i + 1}`, ar: `يوزر B${i + 1}` },
-      role: 'Supervisor',
-      isPresent: true,
-      attendanceTimestamp: new Date(),
-      picture: '/assets/images/image.png',
-    })),
-    3: Array.from({ length: 2 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User C${i + 1}`, ar: `يوزر C${i + 1}` },
-      role: 'Senior Supervisor',
-      isPresent: true,
-      attendanceTimestamp: new Date(),
-      picture: '/assets/images/image.png',
-    })),
-  };
+  projectsQuery: any;
+  get projects() {
+    const data = this.projectsQuery?.data?.() ?? [];
+    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
 
   users: any[] = []; // Initially no users
   private _isLoading = false;
@@ -71,7 +46,7 @@ export class AttendanceManagementComponent {
     return this._isFinished;
   }
   // Add this line so the template binding exists at runtime:
-  async onProjectSelected(projectId: number | null) {
+  async onProjectSelected(projectId: string | null) {
     if (projectId === null) {
       // Handle deselection - clear users list
       this.users = [];
@@ -87,8 +62,23 @@ export class AttendanceManagementComponent {
     this.users = [];
 
     try {
-      const users = await this.fetchUsers(projectId);
-      this.users = users;
+      const q = this.apiQueries.getProjectUsersQuery({
+        projectId: String(projectId),
+      });
+      const data = q.data?.() ?? [];
+      this.users = Array.isArray(data)
+        ? data.map((u: any, idx: number) => ({
+            userId: String(u.userId ?? u.id ?? idx + 1),
+            name: u.name ?? {
+              en: u.displayName ?? 'User',
+              ar: u.displayName ?? 'User',
+            },
+            role: u.role ?? 'User',
+            isPresent: false,
+            attendanceTimestamp: new Date(),
+            picture: u.picture ?? '/assets/images/image.png',
+          }))
+        : [];
       this._isFinished = true;
     } catch (err) {
       this._error = err;
@@ -99,14 +89,22 @@ export class AttendanceManagementComponent {
   }
   onAddAttendance(payload: any) {
     // payload has userId, name, projectId, role, isPresent, attendanceTimestamp, picture
-    const pid = payload.projectId;
-    // insert into users list for that project
-    this.users = [...this.users, payload]; // if you show full list; or add to mockUsers[pid]
-    // optionally persist to server here
+    const mutate = this.apiQueries.createAttendanceMutation();
+    mutate.mutate(
+      {
+        signedWith: payload.signedWith ?? 'MANUAL',
+        userId: String(payload.userId),
+        areaId: String(payload.areaId),
+      },
+      {
+        onSuccess: () => {
+          this.users = [...this.users, payload];
+        },
+      } as any
+    );
   }
-  private async fetchUsers(projectId: number): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockUsers[projectId] || [];
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
   }
   // Add this line so the template binding exists at runtime:
   attendanceCardComponent = AttendanceProfileCardComponent;

@@ -403,5 +403,17 @@
       "LINK_TO_LOGIN": "Back to login",
       "TEXT2": "Enter your email address to start We'll send you a link where you can change your password from it!"
     }
+  },
+  "SIGNUP": {
+    "TITLE": "Sign up",
+    "EMAIL_PLACEHOLDER": "Enter email address ...",
+    "PASSWORD_PLACEHOLDER": "Enter password ...",
+    "BUTTON": "Sign up",
+    "NAME_EN": "Enter name (English) ...",
+    "NAME_AR": "Enter name (Arabic) ...",
+    "CONFIRM_PASSWORD": "Enter password again ...",
+    "UPLOAD_PICTURE": "Upload picture",
+    "FORGET_PASSWORD": "Forgot password?",
+    "SWITCH_TO_LOGIN": "Back to login"
   }
 }

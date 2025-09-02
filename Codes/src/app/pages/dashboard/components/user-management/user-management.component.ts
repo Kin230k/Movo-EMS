@@ -5,6 +5,8 @@ import { TopbarComponent } from './topbar/topbar.component';
 import { ProfileCardComponent } from './profile-card/profile-card.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { QueryStatusComponent } from '../../../../components/shared/query-status/query-status.component';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-user-management',
@@ -13,51 +15,24 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     CardListComponent,
     TopbarComponent,
-    CardListSkeletionComponent,
     TranslateModule,
+    QueryStatusComponent,
   ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
 export class UserManagementComponent {
-  projects = [
-    { id: 1, name: { en: 'Project A', ar: 'المشروع A' } },
-    { id: 2, name: { en: 'Project B', ar: 'المشروع B' } },
-    { id: 3, name: { en: 'Project C', ar: 'المشروع C' } },
-  ];
+  constructor(private apiQueries: ApiQueriesService) {}
 
-  private mockUsers: { [key: number]: any[] } = {
-    1: Array.from({ length: 3 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User A${i + 1}`, ar: `يوزر A${i + 1}` },
-      role: 'Main User',
-      phone: '0987654321',
-      email: 'testA@gmail.com',
-      rate: '1000$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-    2: Array.from({ length: 4 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User B${i + 1}`, ar: `يوزر B${i + 1}` },
-      role: 'Supervisor',
-      phone: '1234567890',
-      email: 'testB@gmail.com',
-      rate: '1200$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-    3: Array.from({ length: 2 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User C${i + 1}`, ar: `يوزر C${i + 1}` },
-      role: 'Senior Supervisor',
-      phone: '5555555555',
-      email: 'testC@gmail.com',
-      rate: '1500$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-  };
+  projectsQuery: any;
+  get projects() {
+    const data = this.projectsQuery?.data() ?? [];
+    return data?.result?.projects;
+  }
+
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllActiveProjectsQuery();
+  }
 
   users: any[] = [];
   profileCardComponent = ProfileCardComponent;
@@ -96,7 +71,26 @@ export class UserManagementComponent {
   }
 
   private async fetchUsers(projectId: number): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockUsers[projectId] || [];
+    const query = this.apiQueries.getProjectUsersQuery({
+      projectId: String(projectId),
+    });
+    console.log('query', query);
+    const data = query.data?.() ?? [];  
+    console.log('data', data);
+    return Array.isArray(data)
+      ? data.map((u: any, idx: number) => ({
+          userId: String(u.userId ?? u.id ?? idx + 1),
+          name: u.name ?? {
+            en: u.displayName ?? 'User',
+            ar: u.displayName ?? 'User',
+          },
+          role: u.role ?? 'User',
+          phone: u.phone ?? '',
+          email: u.email ?? '',
+          rate: u.rate ?? '',
+          picture: u.picture ?? '/assets/images/image.png',
+          isPresent: false,
+        }))
+      : [];
   }
 }

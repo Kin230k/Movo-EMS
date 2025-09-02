@@ -4,6 +4,7 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { TranslateModule } from '@ngx-translate/core';
 import { CreateAttendanceModalComponent } from './create-attendance-modal.component';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
+import { ApiQueriesService } from '../../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-topbar',
@@ -19,33 +20,44 @@ import { ThemedButtonComponent } from '../../../../../components/shared/themed-b
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: { ar: string; en: string } }[] = [];
+  @Input() projects: { id: string; name: { ar: string; en: string } }[] = [];
+  @Input() selectedProjectId: string | null = null;
 
-  @Output() projectSelected = new EventEmitter<number>();
+  @Output() projectSelected = new EventEmitter<string>();
   @Output() createAttendance = new EventEmitter<any>();
 
   showCreateModal = false;
+  constructor(private apiQueries: ApiQueriesService) {}
 
-  // Mocked data
-  mockUsers = [
-    {
-      id: 1,
-      name: { en: 'John Doe', ar: 'جون دو' },
-      role: 'Engineer',
-      picture: 'https://i.pravatar.cc/100?img=1',
-    },
-    {
-      id: 2,
-      name: { en: 'Jane Smith', ar: 'جين سميث' },
-      role: 'Manager',
-      picture: 'https://i.pravatar.cc/100?img=2',
-    },
-  ];
+  get usersForSelector() {
+    if (!this.selectedProjectId) return [];
+    const q = this.apiQueries.getProjectUsersQuery({
+      projectId: String(this.selectedProjectId),
+    });
+    const data = q.data?.() ?? [];
+    return Array.isArray(data)
+      ? data.map((u: any, idx: number) => ({
+          id: u.userId ?? u.id ?? idx + 1,
+          name: u.name ?? {
+            en: u.displayName ?? 'User',
+            ar: u.displayName ?? 'User',
+          },
+          role: u.role ?? 'User',
+          picture: u.picture ?? '/assets/images/image.png',
+        }))
+      : [];
+  }
 
-  mockAreas = [
-    { id: 101, name: { en: 'Main Office', ar: 'المكتب الرئيسي' } },
-    { id: 102, name: { en: 'Warehouse', ar: 'المستودع' } },
-  ];
+  get areasForSelector() {
+    const q = this.apiQueries.getAllAreasQuery();
+    const data = q.data?.() ?? [];
+    return Array.isArray(data)
+      ? data.map((a: any, idx: number) => ({
+          id: a.areaId ?? a.id ?? idx + 1,
+          name: a.name,
+        }))
+      : [];
+  }
 
   openCreateModal() {
     this.showCreateModal = true;

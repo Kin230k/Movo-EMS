@@ -9,6 +9,7 @@ import { CardListComponent } from '../../../../components/shared/card-list/card-
 import { FormCardComponent, FormData } from './form-card.component';
 import { FormListSkeletonComponent } from '../../../../components/shared/form-list-skeleton/form-list-skeleton.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-form-management',
@@ -23,73 +24,15 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './form-management.component.scss',
 })
 export class FormManagementComponent {
-  // Mock data for projects and locations
-  projects: Project[] = [
-    { id: '1', name: { en: 'Project Alpha', ar: 'مشروع ألفا' } },
-    { id: '2', name: { en: 'Project Beta', ar: 'مشروع بيتا' } },
-    { id: '3', name: { en: 'Project Gamma', ar: 'مشروع غاما' } },
-    { id: '4', name: { en: 'Project Delta', ar: 'مشروع دلتا' } },
-  ];
+  constructor(private apiQueries: ApiQueriesService) {}
 
-  locations: Location[] = [
-    { id: '1', name: { en: 'New York Office', ar: 'مكتب نيويورك' } },
-    { id: '2', name: { en: 'London Office', ar: 'مكتب لندن' } },
-    { id: '3', name: { en: 'Dubai Office', ar: 'مكتب دبي' } },
-    { id: '4', name: { en: 'Singapore Office', ar: 'مكتب سنغافورة' } },
-  ];
+  projectsQuery: any;
+  get projects(): Project[] {
+    const data = this.projectsQuery?.data() ?? [];
+    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
 
-  private mockForms: { [key: string]: FormData[] } = {
-    '1': [
-      {
-        formId: 'f1a2b3c4-d5e6-7890-abcd-ef1234567890',
-        projectId: '1',
-        projectName: { en: 'Project Alpha', ar: 'مشروع ألفا' },
-        createdAt: '2024-01-15T10:30:00Z',
-      },
-      {
-        formId: 'f2b3c4d5-e6f7-8901-bcde-f23456789012',
-        locationId: '1',
-        locationName: { en: 'New York Office', ar: 'مكتب نيويورك' },
-        createdAt: '2024-01-20T14:45:00Z',
-      },
-    ],
-    '2': [
-      {
-        formId: 'f3c4d5e6-f7g8-9012-cdef-g34567890123',
-        projectId: '2',
-        projectName: { en: 'Project Beta', ar: 'مشروع بيتا' },
-        createdAt: '2024-01-10T09:15:00Z',
-      },
-      {
-        formId: 'f4d5e6f7-g8h9-0123-defg-h45678901234',
-        locationId: '2',
-        locationName: { en: 'London Office', ar: 'مكتب لندن' },
-        createdAt: '2024-01-25T16:20:00Z',
-      },
-      {
-        formId: 'f5e6f7g8-h9i0-1234-efgh-i56789012345',
-        locationId: '3',
-        locationName: { en: 'Dubai Office', ar: 'مكتب دبي' },
-        createdAt: '2024-01-18T11:00:00Z',
-      },
-    ],
-    '3': [
-      {
-        formId: 'f6f7g8h9-i0j1-2345-fghi-j67890123456',
-        projectId: '3',
-        projectName: { en: 'Project Gamma', ar: 'مشروع غاما' },
-        createdAt: '2024-01-12T13:30:00Z',
-      },
-    ],
-    '4': [
-      {
-        formId: 'f7g8h9i0-j1k2-3456-ghij-k78901234567',
-        locationId: '4',
-        locationName: { en: 'Singapore Office', ar: 'مكتب سنغافورة' },
-        createdAt: '2024-01-22T08:45:00Z',
-      },
-    ],
-  };
+  locations: Location[] = [];
 
   forms: FormData[] = [];
   formCardComponent = FormCardComponent;
@@ -110,6 +53,10 @@ export class FormManagementComponent {
   }
 
   selectedProjectId: string | null = null;
+
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  }
 
   onProjectSelected(projectId: string | null) {
     this.selectedProjectId = projectId;
@@ -141,8 +88,21 @@ export class FormManagementComponent {
   }
 
   private async fetchForms(projectId: string): Promise<FormData[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockForms[projectId] || [];
+    const q = this.apiQueries.getFormByUserQuery({});
+    const resp = q.data?.() ?? [];
+    const list: FormData[] = Array.isArray(resp)
+      ? resp
+          .filter((f: any) => f.projectId === projectId || f.locationId)
+          .map((f: any) => ({
+            formId: f.formId ?? f.id,
+            projectId: f.projectId,
+            projectName: f.projectName,
+            locationId: f.locationId,
+            locationName: f.locationName,
+            createdAt: f.createdAt ?? new Date().toISOString(),
+          }))
+      : [];
+    return list;
   }
 
   getProjectName(projectId?: string): string {

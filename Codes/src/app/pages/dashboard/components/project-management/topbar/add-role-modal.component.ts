@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
+import { ApiQueriesService } from '../../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-add-role-modal',
@@ -27,14 +28,16 @@ export class AddRoleModalComponent {
   selectedProjectId: string | null = null;
   selectedRoleId: string | null = null; // new
 
-  // Mock async check — returns Promise<boolean>
+  constructor(private apiQueries: ApiQueriesService) {}
+
+  // Verify email via queries
   async checkEmailAsync(email: string): Promise<boolean> {
     this.checking = true;
     this.errorMessage = '';
     try {
-      await new Promise((r) => setTimeout(r, 900));
-      const ok = typeof email === 'string' && email.includes('@');
-      return ok;
+      const q = this.apiQueries.getUserInfoByEmailQuery({ email });
+      const user = q?.data?.();
+      return !!user;
     } finally {
       this.checking = false;
     }
@@ -51,7 +54,7 @@ export class AddRoleModalComponent {
       this.checkSucceeded = true;
     } else {
       this.checkSucceeded = false;
-      this.errorMessage = 'Email verification failed (mock).';
+      this.errorMessage = 'Email not found.';
     }
   }
 

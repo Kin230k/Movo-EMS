@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
 // Import TranslateModule and TranslateService
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-add-role-modal',
@@ -29,17 +30,20 @@ export class AddRoleModalComponent {
   selectedProjectId: number | null = null;
   selectedRoleId: string | null = null;
 
-  // Inject TranslateService in the constructor
-  constructor(private translate: TranslateService) {}
+  // Inject TranslateService and ApiQueriesService in the constructor
+  constructor(
+    private translate: TranslateService,
+    private apiQueries: ApiQueriesService
+  ) {}
 
-  // Mock async check — returns Promise<boolean>
+  // Verify email via queries service
   async checkEmailAsync(email: string): Promise<boolean> {
     this.checking = true;
     this.errorMessage = '';
     try {
-      await new Promise((r) => setTimeout(r, 900));
-      const ok = typeof email === 'string' && email.includes('@');
-      return ok;
+      const q = this.apiQueries.getUserInfoByEmailQuery({ email });
+      const user = q?.data?.();
+      return !!user;
     } finally {
       this.checking = false;
     }

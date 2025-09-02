@@ -1,26 +1,27 @@
 // src/app/core/services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import {
-  Auth,
   User,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   createUserWithEmailAndPassword,
   UserCredential,
+  getAuth,
 } from '@angular/fire/auth';
-import { BehaviorSubject, Observable } from 'rxjs';
 
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ApiQueriesService } from '../../core/services/queries.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private auth = inject(Auth);
+  private auth = getAuth();
 
   // Local BehaviorSubject to track current user
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$: Observable<User | null> =
     this.currentUserSubject.asObservable();
 
-  constructor() {
+  constructor(private apiQueries: ApiQueriesService) {
     // Keep track of Firebase auth state
     onAuthStateChanged(this.auth, (user) => {
       this.currentUserSubject.next(user);
@@ -28,8 +29,39 @@ export class AuthService {
   }
 
   /** Register a new user with email + password */
-  async register(email: string, password: string): Promise<UserCredential> {
-    return await createUserWithEmailAndPassword(this.auth, email, password);
+  async register(
+    email: string,
+    password: string,
+    name: { en: string; ar: string },
+    picture: string
+  ): Promise<UserCredential> {
+    let userCredential: UserCredential;
+    try {
+      userCredential = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+    } catch (error) {
+      throw error;
+    }
+
+    // try {
+    //   const { results } = await this.apiQueries
+    //     .registerUserMutation()
+    //     .mutateAsync({
+    //       name,
+    //       picture,
+    //     });
+    //   if (!results.success) {
+    //     throw results.issues;
+    //   }
+    // } catch (error) {
+    //   throw error;
+    // }
+    // registerUser mutation api call
+
+    return userCredential;
   }
 
   /** Login with email + password */

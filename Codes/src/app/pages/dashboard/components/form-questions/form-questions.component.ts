@@ -24,6 +24,7 @@ import { QuestionCreateModalComponent } from './question-create-modal.component'
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
 import { questionTypes } from '../../../../shared/types/questionTypes';
 import { conditionOptions } from '../../../../shared/types/conditionOptions';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-form-questions',
@@ -166,21 +167,41 @@ export class FormQuestionsComponent
     this.isApiData = false;
   }
 
-  projects = [
-    { id: 1, name: { en: 'Project 1', ar: 'المشروع 1' } },
-    { id: 2, name: { en: 'Project 2', ar: 'المشروع 2' } },
-    { id: 3, name: { en: 'Project 3', ar: 'المشروع 3' } },
-  ];
-  forms = [
-    { id: 1, name: { en: 'Form 1', ar: 'النموذج 1' } },
-    { id: 2, name: { en: 'Form 2', ar: 'النموذج 2' } },
-    { id: 3, name: { en: 'Form 3', ar: 'النموذج 3' } },
-  ];
-  interviews = [
-    { id: 1, name: { en: 'Interview 1', ar: 'المقابلة 1' } },
-    { id: 2, name: { en: 'Interview 2', ar: 'المقابلة 2' } },
-    { id: 3, name: { en: 'Interview 3', ar: 'المقابلة 3' } },
-  ];
+  projectsQuery: any;
+  get projects() {
+    const data = this.projectsQuery?.data?.() ?? [];
+    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
+  formsQuery: any;
+  get forms() {
+    const data = this.formsQuery?.data?.() ?? [];
+    const projectId = this.form.get('projectId')?.value;
+    const list = Array.isArray(data)
+      ? data
+          .filter(
+            (f: any) => !projectId || f.projectId === projectId || f.locationId
+          )
+          .map((f: any, idx: number) => ({
+            id: String(f.formId ?? f.id ?? idx + 1),
+            name: {
+              en: f.formTitle ?? f.title ?? 'Form',
+              ar: f.formTitle ?? f.title ?? 'Form',
+            },
+          }))
+      : [];
+    return list;
+  }
+  interviewsQuery: any;
+  get interviews() {
+    const data = this.interviewsQuery?.data?.() ?? [];
+    return Array.isArray(data)
+      ? data.map((i: any, idx: number) => ({
+          id: String(i.interviewId ?? i.id ?? idx + 1),
+          name: { en: i.name ?? 'Interview', ar: i.name ?? 'Interview' },
+        }))
+      : [];
+  }
+  // do not remove this languages array
   languages = [
     { id: 'en', name: { en: 'English', ar: 'الإنجليزية' } },
     { id: 'ar', name: { en: 'Arabic', ar: 'العربية' } },
@@ -198,7 +219,8 @@ export class FormQuestionsComponent
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private apiQueries: ApiQueriesService
   ) {
     this.form = this.fb.group({
       projectId: [''],
@@ -225,51 +247,7 @@ export class FormQuestionsComponent
     }
   }
 
-  // Mock API call - simulate fetching questions from API
-  private fetchQuestionsFromAPI(
-    projectId: string,
-    formId?: string,
-    interviewId?: string,
-    language?: string
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // Simulate API delay
-      setTimeout(() => {
-        // Mock API response - sometimes return data, sometimes empty
-        const mockResponses = [
-          // Sometimes return data
-          {
-            questions: [
-              {
-                id: 'q-1',
-                text:
-                  this.selectedQuestionType === 'form'
-                    ? 'Sample form question from API'
-                    : 'Sample interview question from API',
-                description: '',
-                type: 'SHORT_ANSWER',
-                order: 1,
-                criteria: [],
-                options: [],
-              },
-            ],
-          },
-          // Sometimes return empty
-          { questions: [] },
-          // Sometimes throw error
-          null, // This will trigger the error simulation below
-        ];
-
-        const randomResponse = mockResponses[0];
-
-        if (randomResponse === null) {
-          reject(new Error('API Error: Failed to fetch questions'));
-        } else {
-          resolve(randomResponse);
-        }
-      }, 1500); // 1.5 second delay to simulate network
-    });
-  }
+  // Load questions via queries instead of mocks
 
   // Load data when all dropdowns are selected
   async loadDataWhenReady(): Promise<void> {
@@ -292,69 +270,50 @@ export class FormQuestionsComponent
 
     try {
       const projectId = this.form.get('projectId')?.value;
-      let formId, interviewId, language;
-
-      if (this.selectedQuestionType === 'form') {
-        formId = this.form.get('formId')?.value;
-        language = this.form.get('language')?.value;
-      } else {
-        interviewId = this.form.get('interviewId')?.value;
-      }
-
-      // Try to fetch from API first
-      const apiData = await this.fetchQuestionsFromAPI(
-        projectId,
-        formId,
-        interviewId,
-        language
-      );
-
-      if (apiData && apiData.questions && apiData.questions.length > 0) {
-        // Use API data
-        this.restoreFormData(apiData, 'api');
-        this.isApiData = true;
-      } else {
-        // Fallback to localStorage
-        const localData = this.loadQuestionsFromLocalStorage(
-          this.selectedQuestionType === 'form' ? formId : interviewId,
-          projectId,
-          this.selectedQuestionType
-        );
-        if (localData) {
-          this.restoreFormData(localData, 'local');
-          this.isApiData = false;
-        } else {
-          // No data from either source, add a default question
-          this.addQuestion();
-          this.isApiData = false;
-        }
-      }
-
-      this.dataLoaded = true;
-    } catch (error) {
-      this.hasError = true;
-      this.errorMessage =
-        error instanceof Error ? error.message : 'Unknown error occurred';
-
-      // Fallback to localStorage on error
-      const projectId = this.form.get('projectId')?.value;
       const formId = this.form.get('formId')?.value;
       const interviewId = this.form.get('interviewId')?.value;
+      const language = this.form.get('language')?.value;
 
-      if (projectId && (formId || interviewId)) {
-        const localData = this.loadQuestionsFromLocalStorage(
-          this.selectedQuestionType === 'form' ? formId : interviewId,
+      let apiQuestions: any[] = [];
+      if (this.selectedQuestionType === 'form' && formId) {
+        const q = this.apiQueries.getAllQuestionsQuery();
+        const data = q.data?.() ?? [];
+        apiQuestions = Array.isArray(data)
+          ? data.filter((x: any) => String(x.formId ?? '') === String(formId))
+          : [];
+      } else if (this.selectedQuestionType === 'interview' && interviewId) {
+        const iq = this.apiQueries.getInterviewQuestionsQuery({ interviewId });
+        const data = iq.data?.() ?? [];
+        apiQuestions = Array.isArray(data) ? data : [];
+      }
+
+      if (apiQuestions.length > 0) {
+        // Map API questions to form state
+        const payload = {
           projectId,
-          this.selectedQuestionType
-        );
-        if (localData) {
-          this.restoreFormData(localData, 'local');
-          this.isApiData = false;
-        } else {
-          // No local data either, add default question
-          this.addQuestion();
-          this.isApiData = false;
-        }
+          questionType: this.selectedQuestionType,
+          formId,
+          interviewId,
+          language,
+          questions: apiQuestions.map((q: any, idx: number) => ({
+            id: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+            text: q.text ?? q.title ?? '',
+            description: q.description ?? '',
+            type: q.type ?? 'SHORT_ANSWER',
+            order: q.order ?? idx + 1,
+            criteria: q.criteria ?? [],
+            options: (q.options || []).map((opt: any) => ({
+              optionText: opt.optionText ?? opt.text ?? '',
+              isCorrect: !!opt.isCorrect,
+            })),
+          })),
+        };
+        this.restoreFormData(payload, 'api');
+        this.isApiData = true;
+      } else {
+        // No API questions — keep empty and allow authoring
+        this.addQuestion();
+        this.isApiData = false;
       }
 
       this.dataLoaded = true;
@@ -364,6 +323,15 @@ export class FormQuestionsComponent
   }
 
   ngOnInit() {
+    // Initialize queries
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    this.formsQuery = this.apiQueries.getFormByUserQuery({});
+    const initialProjectId = this.form.get('projectId')?.value;
+    if (initialProjectId) {
+      this.interviewsQuery = this.apiQueries.getInterviewByProjectQuery({
+        projectId: initialProjectId,
+      });
+    }
     // First, set initial values from URL query parameters synchronously
     this.setInitialValuesFromUrl();
 
@@ -664,6 +632,15 @@ export class FormQuestionsComponent
     }
     console.log('Project selected:', value);
 
+    // Update interviews query for selected project
+    if (value) {
+      this.interviewsQuery = this.apiQueries.getInterviewByProjectQuery({
+        projectId: value,
+      });
+    } else {
+      this.interviewsQuery = null;
+    }
+
     // Update URL with query parameters
     this.updateUrlQueryParams();
 
@@ -957,33 +934,27 @@ export class FormQuestionsComponent
       }
 
       // Call appropriate API based on question type
-      let response;
       if (this.selectedQuestionType === 'form') {
-        // For form questions, send formId and language
-        const formPayload = {
-          projectId: payload.projectId,
-          formId: payload.formId,
-          language: payload.language,
-          questions: payload.questions || [],
-        };
-        response = await this.createQuestionsAPI(formPayload);
+        const mutate = this.apiQueries.createQuestionsMutation();
+        mutate.mutate(
+          {
+            formId: payload.formId,
+            language: payload.language,
+            questions: payload.questions || [],
+          } as any,
+          {
+            onSuccess: () => {
+              this.saveQuestionsToLocalStorage();
+              alert('Questions saved successfully!');
+            },
+          } as any
+        );
       } else {
-        // For interview questions, send interviewId (no language)
-        const interviewPayload = {
-          projectId: payload.projectId,
-          interviewId: payload.interviewId,
-          questions: payload.questions || [],
-        };
-        response = await this.createQuestionsAPI(interviewPayload);
+        alert(
+          'Saving interview questions via API is not yet supported. Draft saved locally.'
+        );
+        this.saveQuestionsToLocalStorage();
       }
-
-      console.log('API Response:', response);
-
-      // Save to localStorage as backup
-      this.saveQuestionsToLocalStorage();
-
-      // Show success message (you can implement a toast/notification here)
-      alert('Questions saved successfully!');
     } catch (error) {
       console.error('Error saving questions:', error);
       alert('Error saving questions. Please try again.');
@@ -1062,22 +1033,13 @@ export class FormQuestionsComponent
       this.removeQuestion(index);
     } else {
       // API question, call delete API
-      try {
-        this.isLoading = true;
-        const response = await this.deleteQuestionsAPI(questionId);
-        console.log('Delete API Response:', response);
-
-        // Remove from form after successful API call
-        this.removeQuestion(index);
-
-        // Show success message
-        alert('Question deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting question:', error);
-        alert('Error deleting question. Please try again.');
-      } finally {
-        this.isLoading = false;
-      }
+      const mutate = this.apiQueries.deleteQuestionMutation();
+      mutate.mutate({ questionId }, {
+        onSuccess: () => {
+          this.removeQuestion(index);
+          alert('Question deleted successfully!');
+        },
+      } as any);
     }
   }
 
@@ -1131,35 +1093,32 @@ export class FormQuestionsComponent
       });
     }
 
-    // If it's an API question, call update API
+    // If it's an API question, call update mutation
     if (questionId && !questionId.startsWith('q-')) {
-      try {
-        this.isLoading = true;
-        const payload = {
-          id: questionId,
-          ...updated,
-          projectId: this.form.get('projectId')?.value,
-          questionType: this.selectedQuestionType,
-        };
-
-        if (this.selectedQuestionType === 'form') {
-          payload.formId = this.form.get('formId')?.value;
-          payload.language = this.form.get('language')?.value;
-        } else {
-          payload.interviewId = this.form.get('interviewId')?.value;
-        }
-
-        const response = await this.updateQuestionsAPI(payload);
-        console.log('Update API Response:', response);
-
-        // Show success message
-        alert('Question updated successfully!');
-      } catch (error) {
-        console.error('Error updating question:', error);
-        alert('Error updating question. Please try again.');
-      } finally {
-        this.isLoading = false;
+      const mutate = this.apiQueries.updateQuestionMutation();
+      const payload: any = {
+        questionId,
+        text: qGroup.get('text')?.value,
+        description: qGroup.get('description')?.value,
+        type: qGroup.get('type')?.value,
+        order: qGroup.get('order')?.value,
+        options: (qGroup.get('options') as FormArray<FormGroup>).value,
+        criteria: (qGroup.get('criteria') as FormArray<FormGroup>).value,
+      };
+      if (this.selectedQuestionType === 'form') {
+        payload.formId = this.form.get('formId')?.value;
+        payload.language = this.form.get('language')?.value;
+      } else {
+        payload.interviewId = this.form.get('interviewId')?.value;
       }
+      mutate.mutate(
+        payload as any,
+        {
+          onSuccess: () => {
+            alert('Question updated successfully!');
+          },
+        } as any
+      );
     }
 
     this.onModalClose();

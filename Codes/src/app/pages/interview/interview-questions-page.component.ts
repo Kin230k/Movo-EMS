@@ -220,12 +220,14 @@ export class InterviewQuestionsPageComponent implements OnInit {
     const projectId =
       this.route.snapshot.queryParamMap.get('projectId') || undefined;
 
-    // If you have an API that maps interviewId -> formId, resolve it here.
-    // For now: prefer formId if present; otherwise attempt to pass interviewId as formId (mock).
-    const idToLoad = formId ?? interviewId ?? 'default-form';
+    const idToLoad = (formId ?? interviewId ?? 'default-form') as string;
 
     this.formService
-      .getFormById(idToLoad, { locationId, projectId })
+      .getFormById(idToLoad, {
+        locationId: locationId ?? undefined,
+        projectId: projectId ?? undefined,
+        interviewId: interviewId ?? undefined,
+      })
       .subscribe((dto: DynamicFormDto) => {
         this.title.set(dto.formTitle);
         this.meta.set(

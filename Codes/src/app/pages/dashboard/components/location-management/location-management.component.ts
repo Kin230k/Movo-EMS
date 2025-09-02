@@ -8,6 +8,7 @@ import { ThemedButtonComponent } from '../../../../components/shared/themed-butt
 import { AddZoneModalComponent } from './add-zone-modal.component';
 import { DeleteModalComponent } from '../../../../components/shared/delete-modal/delete-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component'; // adjust path if needed
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-location-management',
@@ -30,23 +31,13 @@ export class LocationManagementComponent {
   // tabs: 'locations' | 'zones'
   activeTab: 'locations' | 'zones' = 'locations';
 
-  projects: Array<{
-    id: string;
-    name: { en: string; ar: string };
-  }> = [
-    {
-      id: 'proj-1',
-      name: { en: 'Project A', ar: 'المشروع أ' },
-    },
-    {
-      id: 'proj-2',
-      name: { en: 'Project B', ar: 'المشروع ب' },
-    },
-    {
-      id: 'proj-3',
-      name: { en: 'Project C', ar: 'المشروع ج' },
-    },
-  ];
+  constructor(private apiQueries: ApiQueriesService) {}
+
+  projectsQuery: any;
+  get projects(): Array<{ id: string; name: { en: string; ar: string } }> {
+    const data = this.projectsQuery?.data?.() ?? [];
+    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
 
   locations: Array<{
     locationId: string;
@@ -71,13 +62,9 @@ export class LocationManagementComponent {
     zoneId: string;
     name: string;
     locationId?: string;
-  }> = [
-    {
-      zoneId: 'zone-1',
-      name: 'Main Yard',
-      locationId: 'loc-1',
-    },
-  ];
+  }> = [];
+
+  areasQuery: any | null = null;
 
   // Location modals
   isAddModalOpen = false;
@@ -92,9 +79,18 @@ export class LocationManagementComponent {
   // zone filters - NOTE: removed selectedProjectForZones to force selection via location only
   selectedLocationForZones: string = '';
 
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  }
+
   // Handle location selection for zones
   onLocationForZonesSelected(locationId: string | null) {
     this.selectedLocationForZones = locationId || '';
+    this.areasQuery = this.selectedLocationForZones
+      ? this.apiQueries.getAreasByLocationQuery({
+          locationId: this.selectedLocationForZones,
+        })
+      : null;
   }
 
   // --- location handlers (unchanged except small improvements) ---
@@ -115,32 +111,44 @@ export class LocationManagementComponent {
     latitude?: number;
     longitude?: number;
   }) {
-    const selectedProject = payload.projectId
-      ? this.projects.find((p) => p.id === payload.projectId)
-      : null;
-
-    const newLocation = {
-      locationId: crypto?.randomUUID
-        ? crypto.randomUUID()
-        : `loc-${Date.now()}`,
-      name: { en: payload.nameEn, ar: payload.nameAr },
-      projectName: selectedProject?.name,
-      projectId: selectedProject?.id,
-      latitude: payload.latitude,
-      longitude: payload.longitude,
-    };
-    this.locations = [newLocation, ...this.locations];
-    this.closeAddModal();
+    const mutate = this.apiQueries.createLocationMutation();
+    mutate.mutate(
+      {
+        name: { en: payload.nameEn, ar: payload.nameAr },
+        projectId: payload.projectId,
+        latitude: payload.latitude,
+        longitude: payload.longitude,
+      } as any,
+      {
+        onSuccess: (created: any) => {
+          const newLocation = {
+            locationId: String(created?.locationId ?? `loc-${Date.now()}`),
+            name: { en: payload.nameEn, ar: payload.nameAr },
+            projectId: payload.projectId,
+            latitude: payload.latitude,
+            longitude: payload.longitude,
+          };
+          this.locations = [newLocation, ...this.locations];
+          this.closeAddModal();
+        },
+      } as any
+    );
   }
 
   handleDeleteLocation(locationId: string) {
-    if (confirm('Are you sure you want to delete this location?')) {
-      this.locations = this.locations.filter(
-        (loc) => loc.locationId !== locationId
-      );
-      // optionally remove zones belonging to this location:
-      this.zones = this.zones.filter((z) => z.locationId !== locationId);
-    }
+    if (!confirm('Are you sure you want to delete this location?')) return;
+    const mutate = this.apiQueries.deleteLocationMutation();
+    mutate.mutate(
+      { locationId: String(locationId) } as any,
+      {
+        onSuccess: () => {
+          this.locations = this.locations.filter(
+            (loc) => loc.locationId !== locationId
+          );
+          this.zones = this.zones.filter((z) => z.locationId !== locationId);
+        },
+      } as any
+    );
   }
 
   handleUpdateLocation(location: any) {
@@ -157,23 +165,33 @@ export class LocationManagementComponent {
     latitude?: number;
     longitude?: number;
   }) {
-    const index = this.locations.findIndex(
-      (loc) => loc.locationId === payload.locationId
-    );
-    if (index !== -1) {
-      const selectedProject = payload.projectId
-        ? this.projects.find((p) => p.id === payload.projectId)
-        : null;
-
-      this.locations[index] = {
-        ...this.locations[index],
+    const mutate = this.apiQueries.updateLocationMutation();
+    mutate.mutate(
+      {
+        locationId: String(payload.locationId),
         name: { en: payload.nameEn, ar: payload.nameAr },
-        projectId: selectedProject?.id,
+        projectId: payload.projectId,
         latitude: payload.latitude,
         longitude: payload.longitude,
-      };
-    }
-    this.closeUpdateModal();
+      } as any,
+      {
+        onSuccess: () => {
+          const index = this.locations.findIndex(
+            (loc) => loc.locationId === payload.locationId
+          );
+          if (index !== -1) {
+            this.locations[index] = {
+              ...this.locations[index],
+              name: { en: payload.nameEn, ar: payload.nameAr },
+              projectId: payload.projectId,
+              latitude: payload.latitude,
+              longitude: payload.longitude,
+            };
+          }
+          this.closeUpdateModal();
+        },
+      } as any
+    );
   }
 
   closeUpdateModal() {
@@ -209,13 +227,19 @@ export class LocationManagementComponent {
     projectId?: string;
     locationId?: string;
   }) {
-    const newZone = {
-      zoneId: crypto?.randomUUID ? crypto.randomUUID() : `zone-${Date.now()}`,
-      name: payload.name,
-      locationId: payload.locationId,
-    };
-    this.zones = [newZone, ...this.zones];
-    this.closeAddZoneModal();
+    const mutate = this.apiQueries.createAreaMutation();
+    mutate.mutate(
+      {
+        name: payload.name,
+        locationId: String(payload.locationId || this.selectedLocationForZones),
+      } as any,
+      {
+        onSuccess: () => {
+          this.areasQuery?.refetch?.();
+          this.closeAddZoneModal();
+        },
+      } as any
+    );
   }
 
   // open delete confirmation modal
@@ -228,10 +252,16 @@ export class LocationManagementComponent {
   // called by DeleteModal confirm
   handleConfirmDeleteZone() {
     if (this.zoneToDelete) {
-      this.zones = this.zones.filter(
-        (z) => z.zoneId !== this.zoneToDelete.zoneId
+      const mutate = this.apiQueries.deleteAreaMutation();
+      mutate.mutate(
+        { areaId: String(this.zoneToDelete.zoneId) } as any,
+        {
+          onSuccess: () => {
+            this.areasQuery?.refetch?.();
+            this.zoneToDelete = null;
+          },
+        } as any
       );
-      this.zoneToDelete = null;
     }
     this.isDeleteModalOpen = false;
     document.body.style.overflow = '';
@@ -247,9 +277,14 @@ export class LocationManagementComponent {
   // helpers for UI
   get zonesForSelectedLocation() {
     if (!this.selectedLocationForZones) return [];
-    return this.zones.filter(
-      (z) => z.locationId === this.selectedLocationForZones
-    );
+    const data = this.areasQuery?.data?.() ?? [];
+    return Array.isArray(data)
+      ? data.map((a: any, idx: number) => ({
+          zoneId: String(a.areaId ?? a.id ?? idx + 1),
+          name: a.name ?? '',
+          locationId: String(a.locationId ?? this.selectedLocationForZones),
+        }))
+      : [];
   }
 
   getProjectNameById(id?: string) {

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 import { CardListComponent } from '../../../../components/shared/card-list/card-list.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { ClientTopbarComponent } from './topbar/topbar.component';
@@ -19,6 +20,9 @@ import { ClientProfileCardComponent } from './profile-card/client-profile-card.c
   styleUrl: './client-data-management.component.scss',
 })
 export class ClientDataManagementComponent {
+  constructor(private apiQueries: ApiQueriesService) {}
+
+  clientsQuery: any;
   clients: any[] = [];
   profileCardComponent = ClientProfileCardComponent;
 
@@ -36,6 +40,7 @@ export class ClientDataManagementComponent {
     return this._isFinished;
   }
   async ngOnInit() {
+    this.clientsQuery = this.apiQueries.getAllClientsQuery();
     await this.onClientSelected();
   }
   async onClientSelected() {
@@ -45,8 +50,18 @@ export class ClientDataManagementComponent {
     this.clients = [];
 
     try {
-      const clients = await this.fetchClients();
-      this.clients = clients;
+      const data = this.clientsQuery?.data?.() ?? [];
+      this.clients = Array.isArray(data)
+        ? data.map((c: any, idx: number) => ({
+            clientId: c.clientId ?? c.id ?? idx + 1,
+            name: c.name,
+            phone: c.contactPhone ?? c.phone ?? '',
+            email: c.contactEmail ?? c.email ?? '',
+            picture: c.logo ?? '/assets/images/image.png',
+            logo: c.logo ?? '/assets/images/image.png',
+            company: c.company ?? null,
+          }))
+        : [];
       this._isFinished = true;
     } catch (err) {
       this._error = err;
@@ -57,16 +72,7 @@ export class ClientDataManagementComponent {
   }
 
   async fetchClients(): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return (this.clients = Array.from({ length: 10 }).map((_, i) => ({
-      clientId: i + 1,
-      name: { en: `Client A${i + 1}`, ar: `عميل A${i + 1}` },
-      phone: '0987654321',
-      email: `clientA${i + 1}@example.com`,
-      picture: '/assets/images/image.png',
-      logo: '/assets/images/image.png',
-      company: { en: `Client A${i + 1}`, ar: `عميل A${i + 1}` },
-    })));
+    return [];
   }
 
   onClientCreated(payload: {
@@ -77,16 +83,12 @@ export class ClientDataManagementComponent {
     logo?: string;
     company?: { en: string; ar: string } | null;
   }) {
-    const newClient = {
-      clientId: Date.now(),
-      name: payload.name,
-      phone: payload.contactPhone,
-      email: payload.contactEmail,
-      picture: payload.logo || '/assets/images/image.png',
-      logo: payload.logo || '/assets/images/image.png',
-      company: payload.company ?? null,
-      isPresent: true,
-    };
-    this.clients = [newClient, ...this.clients];
+    const mutate = this.apiQueries.adminCreateClientMutation();
+    mutate.mutate(
+      payload as any,
+      {
+        onSuccess: () => this.clientsQuery?.refetch?.(),
+      } as any
+    );
   }
 }

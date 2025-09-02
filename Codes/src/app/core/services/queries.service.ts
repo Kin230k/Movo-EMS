@@ -1,6 +1,7 @@
 // src/app/core/services/api-queries.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, runInInjectionContext } from '@angular/core';
 import {
+  injectSendEmailMutation,
   injectCreateAdminMutation,
   injectGetAdminQuery,
   injectGetAllAdminsQuery,
@@ -10,12 +11,15 @@ import {
   injectCheckServiceStatusQuery,
   injectEditUserInfoMutation,
   injectGetUserInfoQuery,
+  injectGetUserInfoByEmailQuery,
+  injectGetCallerIdentityQuery,
   injectRegisterUserMutation,
   injectSendLoginAlertMutation,
   injectSendPasswordResetMutation,
   injectSendVerificationEmailMutation,
   injectGetProjectUsersQuery,
   injectCreateClientMutation,
+  injectAdminCreateClientMutation,
   injectApproveRejectClientMutation,
   injectDeleteClientMutation,
   injectGetAllClientsQuery,
@@ -28,19 +32,29 @@ import {
   injectGetAllProjectUserRolesQuery,
   injectGetProjectUserRolesByUserAndProjectQuery,
   injectCreateFormMutation,
-  injectCreateFormWithQuestionsMutation,
+  injectCreateQuestionsMutation,
   injectDeleteFormMutation,
   injectGetFormQuery,
   injectUpdateFormMutation,
+  injectGetFormByUserQuery,
   injectCreateQuestionMutation,
   injectDeleteQuestionMutation,
   injectGetAllQuestionsQuery,
   injectGetQuestionQuery,
   injectUpdateQuestionMutation,
+  injectGetInterviewQuestionsQuery,
   injectCreateSubmissionMutation,
+  injectCreateSubmissionWithAnswerMutation,
+  injectCreateSubmissionWithAnswersMutation,
   injectDeleteSubmissionMutation,
   injectGetSubmissionQuery,
   injectUpdateSubmissionMutation,
+  injectGetManualByFormIdQuery,
+  injectGetManualAnswersBySubmissionIdQuery,
+  injectGetSubmissionsByFormQuery,
+  injectGetAnswersBySubmissionIdQuery,
+  injectUpdateSubmissionStatusMutation,
+  injectGetQuestionAnswersBySubmissionQuery,
   injectCreateInterviewMutation,
   injectUpdateInterviewMutation,
   injectGetInterviewQuery,
@@ -51,6 +65,8 @@ import {
   injectGetProjectQuery,
   injectUpdateProjectMutation,
   injectGetProjectByClientQuery,
+  injectGetAllProjectsQuery,
+  injectGetAllActiveProjectsQuery,
   injectCreateLocationMutation,
   injectDeleteLocationMutation,
   injectGetLocationQuery,
@@ -63,6 +79,8 @@ import {
   injectDeleteScheduleMutation,
   injectGetScheduleQuery,
   injectUpdateScheduleMutation,
+  injectGetSchedulesByLocationQuery,
+  injectGetSchedulesByProjectOrLocationQuery,
   injectCreateUserScheduleMutation,
   injectUpdateUserScheduleMutation,
   injectCreateAttendanceMutation,
@@ -77,265 +95,333 @@ import {
   injectUpdateAreaMutation,
   injectGetAreasByLocationQuery,
   injectGetAllAreasQuery,
+  injectGetAllAreasQuery as injectGetAllAreasQueryAlias,
 } from '../api/api-queries';
 
 @Injectable({ providedIn: 'root' })
 export class ApiQueriesService {
+  constructor(private injector: Injector) {}
+
+  private run<T>(factory: () => T): T {
+    return runInInjectionContext(this.injector, factory);
+  }
+
+  private run1<A, T>(factory: (a: A) => T, a: A): T {
+    return runInInjectionContext(this.injector, () => factory(a));
+  }
+  // General
+  sendEmailMutation() {
+    return this.run(() => injectSendEmailMutation());
+  }
+
+  getUserInfoByEmailQuery(payload: any) {
+    return this.run1(injectGetUserInfoByEmailQuery, payload);
+  }
+
+  getCallerIdentityQuery() {
+    return this.run(() => injectGetCallerIdentityQuery());
+  }
+
   // Admin
   createAdminMutation() {
-    return injectCreateAdminMutation();
+    return this.run(() => injectCreateAdminMutation());
   }
   getAdminQuery(payload?: any) {
-    return injectGetAdminQuery(payload);
+    return this.run1(injectGetAdminQuery, payload as any);
   }
   getAllAdminsQuery() {
-    return injectGetAllAdminsQuery();
+    return this.run(() => injectGetAllAdminsQuery());
   }
   updateAdminMutation() {
-    return injectUpdateAdminMutation();
+    return this.run(() => injectUpdateAdminMutation());
   }
 
   // User
   changeUserEmailMutation() {
-    return injectChangeUserEmailMutation();
+    return this.run(() => injectChangeUserEmailMutation());
   }
   changeUserPhoneMutation() {
-    return injectChangeUserPhoneMutation();
+    return this.run(() => injectChangeUserPhoneMutation());
   }
   checkServiceStatusQuery(payload: any) {
-    return injectCheckServiceStatusQuery(payload);
+    return this.run1(injectCheckServiceStatusQuery, payload);
   }
   editUserInfoMutation() {
-    return injectEditUserInfoMutation();
+    return this.run(() => injectEditUserInfoMutation());
   }
   getUserInfoQuery() {
-    return injectGetUserInfoQuery();
+    return this.run(() => injectGetUserInfoQuery());
   }
   registerUserMutation() {
-    return injectRegisterUserMutation();
+    return this.run(() => injectRegisterUserMutation());
   }
   sendLoginAlertMutation() {
-    return injectSendLoginAlertMutation();
+    return this.run(() => injectSendLoginAlertMutation());
   }
   sendPasswordResetMutation() {
-    return injectSendPasswordResetMutation();
+    return this.run(() => injectSendPasswordResetMutation());
   }
   sendVerificationEmailMutation() {
-    return injectSendVerificationEmailMutation();
+    return this.run(() => injectSendVerificationEmailMutation());
   }
   getProjectUsersQuery(payload: any) {
-    return injectGetProjectUsersQuery(payload);
+    return this.run1(injectGetProjectUsersQuery, payload);
   }
 
   // Clients
   createClientMutation() {
-    return injectCreateClientMutation();
+    return this.run(() => injectCreateClientMutation());
+  }
+  adminCreateClientMutation() {
+    return this.run(() => injectAdminCreateClientMutation());
   }
   approveRejectClientMutation() {
-    return injectApproveRejectClientMutation();
+    return this.run(() => injectApproveRejectClientMutation());
   }
   deleteClientMutation() {
-    return injectDeleteClientMutation();
+    return this.run(() => injectDeleteClientMutation());
   }
   getAllClientsQuery() {
-    return injectGetAllClientsQuery();
+    return this.run(() => injectGetAllClientsQuery());
   }
   getClientQuery(payload: any) {
-    return injectGetClientQuery(payload);
+    return this.run1(injectGetClientQuery, payload);
   }
   updateClientMutation() {
-    return injectUpdateClientMutation();
+    return this.run(() => injectUpdateClientMutation());
   }
 
   // ProjectUserRole
   createProjectUserRoleMutation() {
-    return injectCreateProjectUserRoleMutation();
+    return this.run(() => injectCreateProjectUserRoleMutation());
   }
   updateProjectUserRoleMutation() {
-    return injectUpdateProjectUserRoleMutation();
+    return this.run(() => injectUpdateProjectUserRoleMutation());
   }
   deleteProjectUserRoleMutation() {
-    return injectDeleteProjectUserRoleMutation();
+    return this.run(() => injectDeleteProjectUserRoleMutation());
   }
   getProjectUserRoleQuery(payload?: any) {
-    return injectGetProjectUserRoleQuery(payload);
+    return this.run1(injectGetProjectUserRoleQuery, payload as any);
   }
   getAllProjectUserRolesQuery() {
-    return injectGetAllProjectUserRolesQuery();
+    return this.run(() => injectGetAllProjectUserRolesQuery());
   }
   getProjectUserRolesByUserAndProjectQuery(payload?: any) {
-    return injectGetProjectUserRolesByUserAndProjectQuery(payload);
+    return this.run1(
+      injectGetProjectUserRolesByUserAndProjectQuery,
+      payload as any
+    );
   }
 
   // Forms
   createFormMutation() {
-    return injectCreateFormMutation();
+    return this.run(() => injectCreateFormMutation());
   }
-  createFormWithQuestionsMutation() {
-    return injectCreateFormWithQuestionsMutation();
+  createQuestionsMutation() {
+    return this.run(() => injectCreateQuestionsMutation());
   }
   deleteFormMutation() {
-    return injectDeleteFormMutation();
+    return this.run(() => injectDeleteFormMutation());
   }
   getFormQuery(payload?: any) {
-    return injectGetFormQuery(payload);
+    return this.run1(injectGetFormQuery, payload as any);
   }
   updateFormMutation() {
-    return injectUpdateFormMutation();
+    return this.run(() => injectUpdateFormMutation());
+  }
+  getFormByUserQuery(payload?: any) {
+    return this.run1(injectGetFormByUserQuery, payload as any);
   }
 
   // Questions
   createQuestionMutation() {
-    return injectCreateQuestionMutation();
+    return this.run(() => injectCreateQuestionMutation());
   }
   deleteQuestionMutation() {
-    return injectDeleteQuestionMutation();
+    return this.run(() => injectDeleteQuestionMutation());
   }
   getAllQuestionsQuery() {
-    return injectGetAllQuestionsQuery();
+    return this.run(() => injectGetAllQuestionsQuery());
   }
   getQuestionQuery(payload: any) {
-    return injectGetQuestionQuery(payload);
+    return this.run1(injectGetQuestionQuery, payload);
   }
   updateQuestionMutation() {
-    return injectUpdateQuestionMutation();
+    return this.run(() => injectUpdateQuestionMutation());
+  }
+  getInterviewQuestionsQuery(payload: any) {
+    return this.run1(injectGetInterviewQuestionsQuery, payload);
   }
 
   // Submissions
   createSubmissionMutation() {
-    return injectCreateSubmissionMutation();
+    return this.run(() => injectCreateSubmissionMutation());
+  }
+  createSubmissionWithAnswerMutation() {
+    return this.run(() => injectCreateSubmissionWithAnswerMutation());
+  }
+  createSubmissionWithAnswersMutation() {
+    return this.run(() => injectCreateSubmissionWithAnswersMutation());
   }
   deleteSubmissionMutation() {
-    return injectDeleteSubmissionMutation();
+    return this.run(() => injectDeleteSubmissionMutation());
   }
   getSubmissionQuery(payload?: any) {
-    return injectGetSubmissionQuery(payload);
+    return this.run1(injectGetSubmissionQuery, payload as any);
   }
   updateSubmissionMutation() {
-    return injectUpdateSubmissionMutation();
+    return this.run(() => injectUpdateSubmissionMutation());
+  }
+  getManualByFormIdQuery(payload: any) {
+    return this.run1(injectGetManualByFormIdQuery, payload);
+  }
+  getManualAnswersBySubmissionIdQuery(payload: any) {
+    return this.run1(injectGetManualAnswersBySubmissionIdQuery, payload);
+  }
+  getSubmissionsByFormQuery(payload: any) {
+    return this.run1(injectGetSubmissionsByFormQuery, payload);
+  }
+  getAnswersBySubmissionIdQuery(payload: any) {
+    return this.run1(injectGetAnswersBySubmissionIdQuery, payload);
+  }
+  updateSubmissionStatusMutation() {
+    return this.run(() => injectUpdateSubmissionStatusMutation());
+  }
+  getQuestionAnswersBySubmissionQuery(payload: any) {
+    return this.run1(injectGetQuestionAnswersBySubmissionQuery, payload);
   }
 
   // Interviews
   createInterviewMutation() {
-    return injectCreateInterviewMutation();
+    return this.run(() => injectCreateInterviewMutation());
   }
   updateInterviewMutation() {
-    return injectUpdateInterviewMutation();
+    return this.run(() => injectUpdateInterviewMutation());
   }
   getInterviewQuery(payload: any) {
-    return injectGetInterviewQuery(payload);
+    return this.run1(injectGetInterviewQuery, payload);
   }
   getInterviewByProjectQuery(payload: any) {
-    return injectGetInterviewByProjectQuery(payload);
+    return this.run1(injectGetInterviewByProjectQuery, payload);
   }
   deleteInterviewMutation() {
-    return injectDeleteInterviewMutation();
+    return this.run(() => injectDeleteInterviewMutation());
   }
 
   // Projects
   createProjectMutation() {
-    return injectCreateProjectMutation();
+    return this.run(() => injectCreateProjectMutation());
   }
   deleteProjectMutation() {
-    return injectDeleteProjectMutation();
+    return this.run(() => injectDeleteProjectMutation());
   }
   getProjectQuery(payload: any) {
-    return injectGetProjectQuery(payload);
+    return this.run1(injectGetProjectQuery, payload);
   }
   updateProjectMutation() {
-    return injectUpdateProjectMutation();
+    return this.run(() => injectUpdateProjectMutation());
   }
   getProjectByClientQuery(payload: any) {
-    return injectGetProjectByClientQuery(payload);
+    return this.run1(injectGetProjectByClientQuery, payload);
+  }
+  getAllProjectsQuery() {
+    return this.run(() => injectGetAllProjectsQuery());
+  }
+  getAllActiveProjectsQuery() {
+    return this.run(() => injectGetAllActiveProjectsQuery());
   }
 
   // Locations
   createLocationMutation() {
-    return injectCreateLocationMutation();
+    return this.run(() => injectCreateLocationMutation());
   }
   deleteLocationMutation() {
-    return injectDeleteLocationMutation();
+    return this.run(() => injectDeleteLocationMutation());
   }
   getLocationQuery(payload: any) {
-    return injectGetLocationQuery(payload);
+    return this.run1(injectGetLocationQuery, payload);
   }
   updateLocationMutation() {
-    return injectUpdateLocationMutation();
+    return this.run(() => injectUpdateLocationMutation());
   }
 
   // UserProject
   createUserProjectMutation() {
-    return injectCreateUserProjectMutation();
+    return this.run(() => injectCreateUserProjectMutation());
   }
   deleteUserProjectMutation() {
-    return injectDeleteUserProjectMutation();
+    return this.run(() => injectDeleteUserProjectMutation());
   }
   getUserProjectQuery(payload: any) {
-    return injectGetUserProjectQuery(payload);
+    return this.run1(injectGetUserProjectQuery, payload);
   }
   updateUserProjectMutation() {
-    return injectUpdateUserProjectMutation();
+    return this.run(() => injectUpdateUserProjectMutation());
   }
 
   // Schedule
   createScheduleMutation() {
-    return injectCreateScheduleMutation();
+    return this.run(() => injectCreateScheduleMutation());
   }
   deleteScheduleMutation() {
-    return injectDeleteScheduleMutation();
+    return this.run(() => injectDeleteScheduleMutation());
   }
   getScheduleQuery(payload: any) {
-    return injectGetScheduleQuery(payload);
+    return this.run1(injectGetScheduleQuery, payload);
   }
   updateScheduleMutation() {
-    return injectUpdateScheduleMutation();
+    return this.run(() => injectUpdateScheduleMutation());
+  }
+  getSchedulesByProjectOrLocationQuery(payload: any) {
+    return this.run1(injectGetSchedulesByProjectOrLocationQuery, payload);
   }
 
   // UserSchedule
   createUserScheduleMutation() {
-    return injectCreateUserScheduleMutation();
+    return this.run(() => injectCreateUserScheduleMutation());
   }
   updateUserScheduleMutation() {
-    return injectUpdateUserScheduleMutation();
+    return this.run(() => injectUpdateUserScheduleMutation());
   }
 
   // Attendance
   createAttendanceMutation() {
-    return injectCreateAttendanceMutation();
+    return this.run(() => injectCreateAttendanceMutation());
   }
   deleteAttendanceMutation() {
-    return injectDeleteAttendanceMutation();
+    return this.run(() => injectDeleteAttendanceMutation());
   }
   getAttendanceQuery(payload: any) {
-    return injectGetAttendanceQuery(payload);
+    return this.run1(injectGetAttendanceQuery, payload);
   }
   updateAttendanceMutation() {
-    return injectUpdateAttendanceMutation();
+    return this.run(() => injectUpdateAttendanceMutation());
   }
   getAttendancesByProjectQuery(payload: any) {
-    return injectGetAttendancesByProjectQuery(payload);
+    return this.run1(injectGetAttendancesByProjectQuery, payload);
   }
   getUserAttendancesByProjectQuery(payload: any) {
-    return injectGetUserAttendancesByProjectQuery(payload);
+    return this.run1(injectGetUserAttendancesByProjectQuery, payload);
   }
 
   // Areas
   createAreaMutation() {
-    return injectCreateAreaMutation();
+    return this.run(() => injectCreateAreaMutation());
   }
   deleteAreaMutation() {
-    return injectDeleteAreaMutation();
+    return this.run(() => injectDeleteAreaMutation());
   }
   getAreaQuery(payload: any) {
-    return injectGetAreaQuery(payload);
+    return this.run1(injectGetAreaQuery, payload);
   }
   updateAreaMutation() {
-    return injectUpdateAreaMutation();
+    return this.run(() => injectUpdateAreaMutation());
   }
   getAreasByLocationQuery(payload: any) {
-    return injectGetAreasByLocationQuery(payload);
+    return this.run1(injectGetAreasByLocationQuery, payload);
   }
   getAllAreasQuery() {
-    return injectGetAllAreasQuery();
+    return this.run(() => injectGetAllAreasQuery());
   }
 }

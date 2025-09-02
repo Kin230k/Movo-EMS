@@ -1,6 +1,7 @@
 <div class="container topbar-grid">
   <app-combo-selector
     [projects]="projects"
+    [selectedValue]="selectedProjectId"
     (projectSelected)="projectSelected.emit($event)"
     [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT' | translate"
   ></app-combo-selector>
@@ -14,8 +15,8 @@
   <!-- Create attendance modal -->
   <app-create-attendance-modal
     *ngIf="showCreateModal"
-    [users]="mockUsers"
-    [areas]="mockAreas"
+    [users]="usersForSelector"
+    [areas]="areasForSelector"
     (close)="closeCreateModal()"
     (create)="handleCreateAttendance($event)"
   ></app-create-attendance-modal>

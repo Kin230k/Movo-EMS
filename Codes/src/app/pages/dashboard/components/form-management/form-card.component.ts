@@ -109,7 +109,7 @@ export class FormCardComponent implements OnInit, OnDestroy {
 
   onEditForm(evt?: MouseEvent) {
     evt?.stopPropagation();
-    this.router.navigate(['/dashboard/create-form-questions'], {
+    this.router.navigate(['/dashboard/create-questions'], {
       queryParams: {
         projectId: this.data?.projectId,
         locationId: this.data?.locationId,

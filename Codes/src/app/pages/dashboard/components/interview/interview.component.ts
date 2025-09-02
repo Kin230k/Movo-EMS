@@ -11,6 +11,7 @@ import { ComboSelectorComponent } from '../../../../components/shared/combo-sele
 import { CreateInterviewModalComponent } from './create-interview-modal/create-interview-modal.component';
 import { Router } from '@angular/router';
 import { ThemedButtonComponent } from '../../../../components/shared/themed-button/themed-button';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 export interface IProject {
   id: string;
   name: { en: string; ar: string };
@@ -39,16 +40,27 @@ export interface IInterview {
   styleUrls: ['./interview.component.scss'],
 })
 export class InterviewerFormPageComponent {
-  // sample projects — replace with real data from API
-  projects: IProject[] = [
-    { id: 'p1', name: { en: 'Project Alpha', ar: 'مشروع ألفا' } },
-    { id: 'p2', name: { en: 'Project Beta', ar: 'مشروع بيتا' } },
-  ];
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private apiQueries: ApiQueriesService
+  ) {
+    this.form = this.fb.group({
+      projectId: ['', Validators.required],
+      interviewId: ['', Validators.required],
+    });
 
-  interviews: IInterview[] = [
-    { id: 'i1', projectId: 'p1', name: 'Frontend Screening - Alice' },
-    { id: 'i2', projectId: 'p2', name: 'Backend Screening - Bob' },
-  ];
+    // Initialize the transformed interviews
+    this.updateTransformedInterviews();
+  }
+
+  projectsQuery: any;
+  get projects(): IProject[] {
+    const data = this.projectsQuery?.data() ?? [];
+    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
+
+  interviews: IInterview[] = [];
 
   // UI state
   createInterviewModalVisible = false;
@@ -64,16 +76,6 @@ export class InterviewerFormPageComponent {
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.form = this.fb.group({
-      projectId: ['', Validators.required],
-      interviewId: ['', Validators.required],
-    });
-
-    // Initialize the transformed interviews
-    this.updateTransformedInterviews();
-  }
-
   // Update the static transformed interviews array
   private updateTransformedInterviews() {
     const pid = this.form.get('projectId')?.value;
@@ -86,6 +88,9 @@ export class InterviewerFormPageComponent {
       name: { en: interview.name, ar: interview.name }, // Use same name for both languages
     }));
   }
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  }
   // handlers for ComboSelector
   onProjectSelect(projectId: string | null) {
     this.form.get('projectId')?.setValue(projectId ?? '');
@@ -93,6 +98,11 @@ export class InterviewerFormPageComponent {
     this.form.get('interviewId')?.setValue('');
     // Update the transformed interviews list
     this.updateTransformedInterviews();
+    if (projectId) {
+      this.loadInterviews(projectId);
+    } else {
+      this.interviews = [];
+    }
   }
 
   onInterviewSelect(interviewId: string | null) {
@@ -106,12 +116,41 @@ export class InterviewerFormPageComponent {
 
   // modal outputs
   onCreateInterview(interview: IInterview) {
-    this.interviews = [interview, ...this.interviews];
-    this.createInterviewModalVisible = false;
-    // auto-select created interview
-    this.form.get('projectId')?.setValue(interview.projectId);
-    this.form.get('interviewId')?.setValue(interview.id);
-    // Update the transformed interviews list
+    const mutate = this.apiQueries.createInterviewMutation();
+    mutate.mutate(
+      {
+        projectId: interview.projectId,
+        name: interview.name,
+      } as any,
+      {
+        onSuccess: () => {
+          // refetch list and select the created one if possible
+          this.loadInterviews(interview.projectId).then(() => {
+            const created = this.interviews.find(
+              (i) =>
+                i.name === interview.name && i.projectId === interview.projectId
+            );
+            this.form.get('projectId')?.setValue(interview.projectId);
+            if (created) this.form.get('interviewId')?.setValue(created.id);
+            this.updateTransformedInterviews();
+          });
+          this.createInterviewModalVisible = false;
+        },
+      } as any
+    );
+  }
+
+  private async loadInterviews(projectId: string) {
+    const query = this.apiQueries.getInterviewByProjectQuery({ projectId });
+    const resp = query.data?.() ?? [];
+    this.interviews = Array.isArray(resp)
+      ? resp.map((i: any) => ({
+          id: i.interviewId ?? i.id,
+          projectId: i.projectId ?? projectId,
+          name: i.name ?? i.title ?? 'Interview',
+          createdAt: i.createdAt,
+        }))
+      : [];
     this.updateTransformedInterviews();
   }
 

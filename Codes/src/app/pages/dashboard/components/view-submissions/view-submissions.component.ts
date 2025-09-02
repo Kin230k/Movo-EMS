@@ -7,9 +7,8 @@ import {
   SubmissionCardComponent,
   Submission,
 } from './submission-card/submission-card.component';
-import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 
 export interface Form {
   formId: string;
@@ -30,32 +29,23 @@ export interface Form {
   styleUrl: './view-submissions.component.scss',
 })
 export class ViewSubmissionsComponent {
-  // Mock forms data - in real app this would come from an API
-  forms: Form[] = [
-    {
-      formId: 'form-1',
-      formTitle: 'Customer Feedback Form',
-      formLanguage: 'en',
-    },
-    { formId: 'form-2', formTitle: 'Employee Survey', formLanguage: 'en' },
-    { formId: 'form-3', formTitle: 'Project Evaluation', formLanguage: 'ar' },
-    {
-      formId: 'form-4',
-      formTitle: 'Training Registration',
-      formLanguage: 'en',
-    },
-  ];
-
-  formsForSelector = this.forms.map((form) => ({
-    id: form.formId,
-    name: { en: form.formTitle, ar: form.formTitle },
-  }));
+  forms: Form[] = [];
+  get formsForSelector() {
+    return (this.forms || []).map((form) => ({
+      id: form.formId,
+      name: { en: form.formTitle, ar: form.formTitle },
+    }));
+  }
 
   submissions: any[] = [];
   selectedFormId: string | undefined = undefined;
   isLoading = false;
 
-  constructor() {}
+  constructor(private apiQueries: ApiQueriesService) {}
+
+  async ngOnInit() {
+    await this.loadForms();
+  }
 
   onFormSelected(formId: string | undefined) {
     this.selectedFormId = formId;
@@ -88,53 +78,38 @@ export class ViewSubmissionsComponent {
     return form.formTitle;
   }
 
-  // Mock API call - Angular Query compatible
   private loadSubmissionsForForm(formId: string): Observable<Submission[]> {
     this.isLoading = true;
-
-    // Mock API response with delay (simulating network request)
-    return of(this.getMockSubmissionsForForm(formId)).pipe(
-      delay(2000) // 2 second delay to show loading
-    );
+    return new Observable<Submission[]>((subscriber) => {
+      (async () => {
+        try {
+          const q = this.apiQueries.getSubmissionsByFormQuery({
+            formId,
+            projectId: '',
+          });
+          const data = q.data?.() ?? [];
+          const submissions = Array.isArray(data)
+            ? data.map((s: any) => ({
+                submissionId: s.submissionId ?? s.id,
+                formId: s.formId ?? formId,
+                formTitle: this.getFormTitle(s.formId ?? formId),
+                userId: s.userId ?? '',
+                interviewId: s.interviewId ?? '',
+                dateSubmitted: s.dateSubmitted ?? new Date().toISOString(),
+                outcome: s.outcome ?? 'pending',
+                decisionNotes: s.decisionNotes,
+              }))
+            : [];
+          subscriber.next(submissions);
+          subscriber.complete();
+        } catch (e) {
+          subscriber.error(e);
+        }
+      })();
+    });
   }
 
-  private getMockSubmissionsForForm(formId: string): Submission[] {
-    const form = this.forms.find((f) => f.formId === formId);
-    const formTitle = form?.formTitle || `Form ${formId}`;
-
-    return [
-      {
-        submissionId: `${formId}-sub-1`,
-        formId: formId,
-        formTitle: formTitle,
-        userId: 'user-1',
-        interviewId: 'interview-1',
-        dateSubmitted: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        outcome: 'approved',
-        decisionNotes: 'Submission approved after review',
-      },
-      {
-        submissionId: `${formId}-sub-2`,
-        formId: formId,
-        formTitle: formTitle,
-        userId: 'user-2',
-        interviewId: 'interview-2',
-        dateSubmitted: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-        outcome: 'pending',
-        decisionNotes: undefined,
-      },
-      {
-        submissionId: `${formId}-sub-3`,
-        formId: formId,
-        formTitle: formTitle,
-        userId: 'user-3',
-        interviewId: 'interview-3',
-        dateSubmitted: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-        outcome: 'rejected',
-        decisionNotes: 'Incomplete information provided',
-      },
-    ];
-  }
+  // Removed mock submissions helper; data is sourced via queries
 
   // Handle API call completion
   onSubmissionsLoaded(submissions: Submission[]) {
@@ -145,9 +120,18 @@ export class ViewSubmissionsComponent {
   onSubmissionsLoadError(error: any) {
     console.error('Error loading submissions:', error);
     this.isLoading = false;
-    // Fallback to mock data
-    this.submissions = this.getMockSubmissionsForForm(
-      this.selectedFormId || 'form-1'
-    );
+    this.submissions = [];
+  }
+
+  private async loadForms() {
+    const q = this.apiQueries.getFormByUserQuery({});
+    const resp = q.data?.() ?? [];
+    this.forms = Array.isArray(resp)
+      ? resp.map((f: any) => ({
+          formId: f.formId ?? f.id,
+          formTitle: f.formTitle ?? f.title ?? 'Form',
+          formLanguage: f.formLanguage ?? 'en',
+        }))
+      : [];
   }
 }

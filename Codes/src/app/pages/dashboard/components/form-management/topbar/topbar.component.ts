@@ -5,6 +5,7 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { AddFormModalComponent } from './add-form-modal.component';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 import { TranslateModule } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../../core/services/queries.service';
 export interface Project {
   id: string;
   name: { en: string; ar: string };
@@ -36,7 +37,7 @@ export class FormManagementTopbarComponent {
   showAddFormModal = false;
   selectedProjectId: string | null = null;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private apiQueries: ApiQueriesService) {}
 
   onProjectSelected(projectId: string | null) {
     this.selectedProjectId = projectId;
@@ -52,14 +53,27 @@ export class FormManagementTopbarComponent {
   }
 
   onFormCreated(formData: { projectId: string; locationId?: string }) {
-    // Navigate to create-form-questions with form data
-    this.router.navigate(['/dashboard/create-form-questions'], {
-      queryParams: {
+    const mutate = this.apiQueries.createFormMutation();
+    mutate.mutate(
+      {
         projectId: formData.projectId,
         locationId: formData.locationId,
-        formName: (formData as any).formName,
-      },
-    });
-    this.showAddFormModal = false;
+        formTitle: (formData as any).formName,
+      } as any,
+      {
+        onSuccess: (created: any) => {
+          const formId = String(created?.formId ?? created?.id ?? '');
+          this.router.navigate(['/dashboard/create--questions'], {
+            queryParams: {
+              projectId: formData.projectId,
+              locationId: formData.locationId,
+              formId,
+              formName: (formData as any).formName,
+            },
+          });
+          this.showAddFormModal = false;
+        },
+      } as any
+    );
   }
 }

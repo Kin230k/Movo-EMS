@@ -9,6 +9,7 @@ import {
 } from './schedule-card/schedule-card.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ApiQueriesService } from '../../../../core/services/queries.service';
 import { TopbarComponent } from './topbar/topbar.component';
 import { AddScheduleModalComponent } from './topbar/add-schedule-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
@@ -35,98 +36,37 @@ import { DeleteModalComponent } from '../../../../components/shared/delete-modal
   styleUrls: ['./project-management.component.scss'],
 })
 export class ProjectManagementComponent {
-  constructor(private translate: TranslateService) {}
+  constructor(
+    private translate: TranslateService,
+    private apiQueries: ApiQueriesService
+  ) {}
 
   activeTab: 'projects' | 'schedules' = 'projects';
   selectedProjectId: string = '';
 
-  mockProjects = [
-    {
-      projectId: 'slf',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project A', ar: 'المشروع A' },
-      badgeBackground: 'red',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf2',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project B', ar: 'المشروع B' },
-      badgeBackground: 'blue',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf3',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project C', ar: 'المشروع C' },
-      badgeBackground: 'green',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf4',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project D', ar: 'المشروع D' },
-      badgeBackground: 'yellow',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf5',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project E', ar: 'المشروع E' },
-      badgeBackground: 'purple',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-  ];
+  projectsQuery: any;
+  schedulesQuery: any | null = null;
+
+  ngOnInit() {
+    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  }
+
+  get mockProjects() {
+    return this.projectsQuery.data() ?? [];
+  }
 
   // Stable transformed projects array for combo selector
-  transformedProjects: { id: string; name: { en: string; ar: string } }[] =
-    this.mockProjects.map((p) => ({ id: p.projectId, name: p.name }));
+  get transformedProjects(): {
+    id: string;
+    name: { en: string; ar: string };
+  }[] {
+    return (this.mockProjects || []).map((p: any) => ({
+      id: p.projectId,
+      name: p.name,
+    }));
+  }
 
-  // Mock schedules data
-  mockSchedules: ScheduleData[] = [
-    {
-      scheduleId: 'schedule-1',
-      projectId: 'slf',
-      startDateTime: '2025-01-15T09:00:00',
-      endDateTime: '2025-01-15T17:00:00',
-      createdAt: '2025-01-10T10:00:00',
-      projectName: { en: 'Project A', ar: 'المشروع A' },
-    },
-    {
-      scheduleId: 'schedule-2',
-      projectId: 'slf',
-      startDateTime: '2025-01-16T10:00:00',
-      endDateTime: '2025-01-16T18:00:00',
-      createdAt: '2025-01-11T11:00:00',
-      projectName: { en: 'Project A', ar: 'المشروع A' },
-    },
-    {
-      scheduleId: 'schedule-3',
-      projectId: 'slf2',
-      startDateTime: '2025-01-20T08:00:00',
-      endDateTime: '2025-01-20T16:00:00',
-      createdAt: '2025-01-12T12:00:00',
-      projectName: { en: 'Project B', ar: 'المشروع B' },
-    },
-    {
-      scheduleId: 'schedule-4',
-      projectId: 'slf3',
-      startDateTime: '2025-01-25T09:30:00',
-      endDateTime: '2025-01-25T17:30:00',
-      createdAt: '2025-01-13T13:00:00',
-      projectName: { en: 'Project C', ar: 'المشروع C' },
-    },
-  ];
+  schedules: ScheduleData[] = [];
 
   profileCardComponent = ProfileCardComponent;
   scheduleCardComponent = ScheduleCardComponent;
@@ -137,83 +77,82 @@ export class ProjectManagementComponent {
   showDeleteSchedule = false;
   selectedSchedule: ScheduleData | null = null;
 
-  private _isLoading = false;
-  // expose error as any so template can use error?.message
-  private _error: any = null;
-  private _isFinished = false;
-
   get isLoading() {
-    return this._isLoading;
+    return this.projectsQuery.isLoading();
   }
   get error(): any {
-    return this._error;
+    return this.projectsQuery.error();
   }
   get isFinished() {
-    return this._isFinished;
+    return this.projectsQuery.isSuccess();
   }
 
   get filteredSchedules(): ScheduleData[] {
     if (!this.selectedProjectId) {
       return [];
     }
-    return this.mockSchedules.filter(
-      (schedule) => schedule.projectId === this.selectedProjectId
+    const raw = this.schedulesQuery?.data?.() ?? [];
+    const proj = (this.mockProjects || []).find(
+      (p: any) => p.projectId === this.selectedProjectId
     );
+    const projectName = proj?.name;
+    return Array.isArray(raw)
+      ? raw
+          .filter((s: any) => s.projectId === this.selectedProjectId)
+          .map((s: any) => ({
+            scheduleId: s.scheduleId ?? s.id ?? `${s.projectId}-${s.startTime}`,
+            projectId: s.projectId,
+            startDateTime: s.startTime ?? s.startDateTime,
+            endDateTime: s.endTime ?? s.endDateTime,
+            createdAt: s.createdAt ?? new Date().toISOString(),
+            projectName,
+          }))
+      : [];
   }
 
   get selectedProject() {
-    return this.mockProjects.find(
-      (project) => project.projectId === this.selectedProjectId
+    return (this.mockProjects || []).find(
+      (project: any) => project.projectId === this.selectedProjectId
     );
   }
 
-  private async fetchProjects(): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockProjects || [];
+  private setupSchedulesQuery(projectId: string): void {
+    this.schedulesQuery = this.apiQueries.getSchedulesByProjectOrLocationQuery({
+      projectId,
+    });
   }
 
-  onProjectCreated(projectData: any) {
-    const newProject = {
-      projectId: Date.now().toString(),
-      clientName: 'New Client',
-      name: {
-        en: projectData.nameEn,
-        ar: projectData.nameAr,
-      },
-      badgeBackground: 'blue',
-      startingDate: projectData.startingDate,
-      endingDate: projectData.endingDate,
-      description: {
-        en: projectData.descriptionEn,
-        ar: projectData.descriptionAr,
-      },
-    };
-    this.mockProjects = [...this.mockProjects, newProject];
-    // keep transformed list in sync
-    this.transformedProjects = [
-      ...this.transformedProjects,
-      { id: newProject.projectId, name: newProject.name },
-    ];
+  onProjectCreated(_projectData: any) {
+    // Project creation handled by modal via API; the projects query invalidates automatically.
+    // Optionally, force a refetch if available.
+    if (this.projectsQuery?.refetch) {
+      this.projectsQuery.refetch();
+    }
   }
 
   onScheduleCreated(scheduleData: any) {
-    console.log('New schedule created:', scheduleData);
-    const selectedProject = this.mockProjects.find(
-      (p) => p.projectId === scheduleData.projectId
+    const mutate = this.apiQueries.createScheduleMutation();
+    mutate.mutate(
+      {
+        startTime: scheduleData.startDateTime,
+        endTime: scheduleData.endDateTime,
+        projectId: scheduleData.projectId,
+        locationId: scheduleData.locationId,
+      },
+      {
+        onSuccess: () => this.schedulesQuery?.refetch?.(),
+      } as any
     );
-    const newSchedule: ScheduleData = {
-      scheduleId: Date.now().toString(),
-      projectId: scheduleData.projectId,
-      startDateTime: scheduleData.startDateTime,
-      endDateTime: scheduleData.endDateTime,
-      createdAt: new Date().toISOString(),
-      projectName: selectedProject?.name,
-    };
-    this.mockSchedules = [...this.mockSchedules, newSchedule];
   }
 
   onProjectSelected(projectId: string | null) {
     this.selectedProjectId = projectId ?? '';
+    if (this.selectedProjectId) {
+      this.setupSchedulesQuery(this.selectedProjectId);
+    } else {
+      this.schedulesQuery = null;
+      this.schedules = [];
+    }
   }
 
   setActiveTab(tab: 'projects' | 'schedules') {
@@ -231,16 +170,17 @@ export class ProjectManagementComponent {
     startDateTime: string;
     endDateTime: string;
   }) {
-    const scheduleIndex = this.mockSchedules.findIndex(
-      (s) => s.scheduleId === updateData.scheduleId
+    const mutate = this.apiQueries.updateScheduleMutation();
+    mutate.mutate(
+      {
+        scheduleId: updateData.scheduleId,
+        startTime: updateData.startDateTime,
+        endTime: updateData.endDateTime,
+      },
+      {
+        onSuccess: () => this.schedulesQuery?.refetch?.(),
+      } as any
     );
-    if (scheduleIndex !== -1) {
-      this.mockSchedules[scheduleIndex] = {
-        ...this.mockSchedules[scheduleIndex],
-        startDateTime: updateData.startDateTime,
-        endDateTime: updateData.endDateTime,
-      };
-    }
     this.showEditSchedule = false;
     this.selectedSchedule = null;
   }
@@ -258,9 +198,10 @@ export class ProjectManagementComponent {
 
   onScheduleDeleteConfirm() {
     if (this.selectedSchedule) {
-      this.mockSchedules = this.mockSchedules.filter(
-        (s) => s.scheduleId !== this.selectedSchedule!.scheduleId
-      );
+      const mutate = this.apiQueries.deleteScheduleMutation();
+      mutate.mutate({ scheduleId: this.selectedSchedule.scheduleId }, {
+        onSuccess: () => this.schedulesQuery?.refetch?.(),
+      } as any);
     }
     this.showDeleteSchedule = false;
     this.selectedSchedule = null;
