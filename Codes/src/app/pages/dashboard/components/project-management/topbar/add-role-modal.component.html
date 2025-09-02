@@ -1,0 +1,62 @@
+<div class="overlay" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>Add Role</h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <label class="label">Email</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="name@example.com"
+        [disabled]="checking || checkSucceeded"
+      />
+
+      <div class="actions">
+        <button
+          class="verify-btn"
+          (click)="onVerifyEmail()"
+          [disabled]="checking || checkSucceeded"
+        >
+          {{
+            checking
+              ? "Checking…"
+              : checkSucceeded
+              ? "Verified"
+              : "Verify Email"
+          }}
+        </button>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <!-- Show dropdowns only if check succeeded -->
+      <div *ngIf="checkSucceeded" class="project-select">
+        <label class="label">Select Project</label>
+        <app-combo-selector
+          [projects]="projects"
+          (projectSelected)="onProjectSelected($event)"
+        ></app-combo-selector>
+
+        <label class="label" style="margin-top: 0.75rem">Select Role</label>
+        <select
+          class="role-select"
+          (change)="onRoleSelected($event)"
+          [value]="selectedRoleId ?? ''"
+        >
+          <option value="">-- choose role --</option>
+          <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+        </select>
+
+        <div class="assign-actions">
+          <button class="cancel-btn" (click)="onClose()">Cancel</button>
+          <button class="assign-btn" (click)="assignRole()">Assign Role</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

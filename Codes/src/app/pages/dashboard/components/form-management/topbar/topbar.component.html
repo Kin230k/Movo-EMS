@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="dropdowns-container">
+    <app-combo-selector
+      class="combo-selector"
+      [projects]="projects"
+      placeholder="{{ 'FORM_MANAGEMENT.SELECT_PROJECT' | translate }}"
+      (projectSelected)="onProjectSelected($event)"
+    ></app-combo-selector>
+  </div>
+
+  <themed-button
+    text="{{ 'FORM_MANAGEMENT.CREATE_FORM' | translate }}"
+    (onClick)="openAddFormModal()"
+    class="add-form-btn"
+  ></themed-button>
+</div>
+
+<!-- Add Form Modal -->
+<app-add-form-modal
+  *ngIf="showAddFormModal"
+  [projects]="projects"
+  [locations]="locations"
+  [selectedProjectId]="selectedProjectId"
+  [selectedLocationId]="null"
+  (close)="onModalClose()"
+  (formCreated)="onFormCreated($event)"
+></app-add-form-modal>

@@ -1,0 +1,189 @@
+<div class="emails-container">
+  <div class="header-section">
+    <h1>{{ "EMAILS.TITLE" | translate }}</h1>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tabs-section">
+    <div class="tabs">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'compose'"
+        (click)="setActiveTab('compose')"
+      >
+        {{ "EMAILS.SEND_TAB" | translate }}
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'history'"
+        (click)="setActiveTab('history')"
+      >
+        {{ "EMAILS.HISTORY_TAB" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Compose Tab -->
+  <div *ngIf="activeTab === 'compose'" class="tab-content">
+    <div class="compose-section">
+      <div class="compose-header">
+        <h3>{{ "EMAILS.COMPOSE_NEW_EMAIL" | translate }}</h3>
+      </div>
+
+      <form class="compose-form" [formGroup]="composeForm">
+        <!-- Recipient Selection
+        <div class="form-group">
+          <label>{{ "EMAILS.RECIPIENTS" | translate }}</label>
+          <div class="recipient-selection">
+            <select
+              formControlName="recipientType"
+              class="recipient-type-select"
+              (change)="onRecipientTypeChange()"
+            >
+              <option value="users">
+                {{ "EMAILS.ALL_USERS" | translate }}
+              </option>
+              <option value="form">
+                {{ "EMAILS.FORM_RECIPIENTS" | translate }}
+              </option>
+              <option value="custom">
+                {{ "EMAILS.CUSTOM_RECIPIENTS" | translate }}
+              </option>
+            </select>
+
+            <app-combo-selector
+              *ngIf="composeForm.value.recipientType === 'form'"
+              [projects]="formsForSelector"
+              [selectedValue]="selectedFormId"
+              placeholder="{{ 'EMAILS.SELECT_FORM' | translate }}"
+              (projectSelected)="onFormSelected($event)"
+              class="form-selector"
+            >
+            </app-combo-selector>
+
+            <textarea
+              *ngIf="composeForm.value.recipientType === 'custom'"
+              formControlName="customRecipients"
+              placeholder="{{
+                'EMAILS.CUSTOM_RECIPIENTS_PLACEHOLDER' | translate
+              }}"
+              class="custom-recipients-input"
+              rows="3"
+            ></textarea>
+          </div>
+        </div> -->
+
+        <!-- Email Input -->
+        <div class="form-group">
+          <label>{{ "EMAILS.EMAIL" | translate }}</label>
+          <input
+            type="text"
+            formControlName="email"
+            placeholder="{{ 'EMAILS.EMAIL_PLACEHOLDER' | translate }}"
+            class="subject-input"
+          />
+        </div>
+        <!-- Email Subject -->
+        <div class="form-group">
+          <label>{{ "EMAILS.SUBJECT" | translate }}</label>
+          <input
+            type="text"
+            formControlName="subject"
+            placeholder="{{ 'EMAILS.SUBJECT_PLACEHOLDER' | translate }}"
+            class="subject-input"
+          />
+        </div>
+
+        <!-- Email Body -->
+        <div class="form-group">
+          <label>{{ "EMAILS.BODY" | translate }}</label>
+          <textarea
+            formControlName="body"
+            placeholder="{{ 'EMAILS.BODY_PLACEHOLDER' | translate }}"
+            class="body-input"
+            rows="10"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn cancel-btn"
+            (click)="resetComposeForm()"
+          >
+            {{ "COMMON.BUTTONS.CANCEL" | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn send-btn"
+            (click)="sendEmail()"
+            [disabled]="composeForm.invalid"
+          >
+            {{ "EMAILS.SEND_EMAIL" | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- History Tab -->
+  <div *ngIf="activeTab === 'history'" class="tab-content">
+    <div class="history-section">
+      <div class="section-header">
+        <h3>{{ "EMAILS.EMAIL_HISTORY" | translate }}</h3>
+        <div class="history-controls">
+          <app-combo-selector
+            [projects]="formsForSelector"
+            [selectedValue]="selectedFormId"
+            placeholder="{{ 'EMAILS.SELECT_FORM' | translate }}"
+            (projectSelected)="onHistoryFormSelected($event)"
+            class="form-selector"
+          >
+          </app-combo-selector>
+        </div>
+      </div>
+
+      <div
+        class="history-list"
+        *ngIf="!isHistoryLoading && emailHistory.length > 0; else noHistory"
+      >
+        <div class="history-item" *ngFor="let item of emailHistory">
+          <div class="history-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+              />
+            </svg>
+          </div>
+          <div class="history-content">
+            <div class="history-subject">{{ item.subject }}</div>
+            <div class="history-body">{{ item.body }}</div>
+            <div class="history-meta">
+              {{ item.sentAt | date : "short" }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noHistory>
+        <div class="no-history" *ngIf="!selectedFormId && !isHistoryLoading">
+          <p>{{ "EMAILS.SELECT_FORM" | translate }}</p>
+        </div>
+        <div
+          class="no-history"
+          *ngIf="
+            selectedFormId && !isHistoryLoading && emailHistory.length === 0
+          "
+        >
+          <p>{{ "EMAILS.NO_EMAIL_HISTORY" | translate }}</p>
+        </div>
+        <div class="history-loading" *ngIf="isHistoryLoading">
+          <app-skeleton-form-card
+            *ngFor="let i of [1, 2, 3, 4]"
+          ></app-skeleton-form-card>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

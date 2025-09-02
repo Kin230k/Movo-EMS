@@ -1,0 +1,71 @@
+<div class="modal-backdrop" *ngIf="visible">
+  <div class="modal">
+    <header class="modal-header">
+      <h3>{{ "INTERVIEWS.CREATE_TITLE" | translate }}</h3>
+      <button class="close-btn" (click)="onCancel()">✕</button>
+    </header>
+
+    <section class="modal-body" [formGroup]="form">
+      <label class="label">{{ "INTERVIEWS.LABEL.PROJECT" | translate }}</label>
+
+      <app-combo-selector
+        [projects]="projects"
+        [selectedValue]="form.get('projectId')?.value"
+        [hasError]="
+          !!(
+            form.get('projectId')?.invalid &&
+            (form.get('projectId')?.touched || form.get('projectId')?.dirty)
+          )
+        "
+        (projectSelected)="onProjectSelected($event)"
+        placeholder="{{ 'INTERVIEWS.PLACEHOLDER.SELECT_PROJECT' | translate }}"
+      ></app-combo-selector>
+
+      <div
+        class="field-error"
+        *ngIf="
+          form.get('projectId')?.invalid &&
+          (form.get('projectId')?.touched || form.get('projectId')?.dirty)
+        "
+      >
+        <small class="error-text">{{
+          "COMMON.ERRORS.REQUIRED" | translate
+        }}</small>
+      </div>
+
+      <label class="label">{{ "INTERVIEWS.LABEL.NAME" | translate }}</label>
+      <input
+        class="text-input"
+        formControlName="name"
+        [placeholder]="'INTERVIEWS.PLACEHOLDER.INTERVIEW_NAME' | translate"
+      />
+      <div
+        class="field-error"
+        *ngIf="
+          form.get('name')?.invalid &&
+          (form.get('name')?.touched || form.get('name')?.dirty)
+        "
+      >
+        <small
+          class="error-text"
+          *ngIf="form.get('name')?.errors?.['required']"
+          >{{ "COMMON.ERRORS.REQUIRED" | translate }}</small
+        >
+        <small
+          class="error-text"
+          *ngIf="form.get('name')?.errors?.['maxlength']"
+          >{{ "COMMON.ERRORS.TOO_LONG" | translate }}</small
+        >
+      </div>
+    </section>
+
+    <footer class="modal-footer">
+      <button type="button" class="secondary-btn" (click)="onCancel()">
+        {{ "COMMON.BUTTONS.CANCEL" | translate }}
+      </button>
+      <button type="button" class="primary-btn" (click)="onCreate()">
+        {{ "COMMON.BUTTONS.CREATE" | translate }}
+      </button>
+    </footer>
+  </div>
+</div>

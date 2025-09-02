@@ -1,0 +1,102 @@
+.profile-card {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-dark);
+  color: var(--color-font);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) inset;
+}
+
+.avatar {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--radius-img);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.2)
+  );
+  overflow: hidden;
+}
+
+.user-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meta-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.role {
+  background: white;
+  margin-top: 0.4rem;
+  color: var(--color-body);
+  border-radius: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 7.5rem;
+  height: 2.5rem;
+}
+
+.meta-body {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.actions-container {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.prestion {
+  border-radius: 2.5rem;
+  background-color: var(--color-delete);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  width: 6.5rem;
+  height: 2.5rem;
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+.prestion.active {
+  background-color: var(--secondary);
+}
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid rgba(var(--white-rgb), 0.12);
+  color: var(--color-font);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.secondary-btn:hover {
+  background: rgba(var(--white-rgb), 0.04);
+}
+@media (max-width: 768px) {
+  .actions-container {
+    flex-direction: column;
+  }
+}

@@ -13,7 +13,7 @@
   color: var(--color-font);
   width: 100%;
   max-width: 26rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-login);
 }
 
 .forget-password a {

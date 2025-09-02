@@ -1,0 +1,58 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-inner">
+      <header class="modal-header">
+        <h3 class="modal-title">
+          {{ "VIEW_SUBMISSIONS.UPDATE_STATUS" | translate }}
+        </h3>
+        <button class="close" aria-label="Close" (click)="onClose()">✕</button>
+      </header>
+
+      <div class="fields">
+        <div class="field">
+          <label class="label">{{
+            "VIEW_SUBMISSIONS.STATUS" | translate
+          }}</label>
+          <div class="radio-group">
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="accepted"
+              />
+              {{ "VIEW_SUBMISSIONS.ACCEPTED" | translate }}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="rejected"
+              />
+              {{ "VIEW_SUBMISSIONS.REJECTED" | translate }}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="manual_review"
+              />
+              {{ "VIEW_SUBMISSIONS.MANUAL_REVIEW" | translate }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn neutral" (click)="onClose()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate }}
+        </button>
+        <button class="btn primary" (click)="onSave()">
+          {{ "COMMON.BUTTONS.SAVE" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,81 @@
+/* reuse patterns from update-location modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rbg), var(--backdrop-opacity));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+.modal {
+  background: var(--color-dark-text);
+  color: var(--white);
+  border-radius: 12px;
+  max-width: 480px;
+  width: 94%;
+  padding: 1rem;
+  box-shadow: 0 8px 30px var(--shadow-modal);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.close-btn {
+  background: transparent;
+  color: var(--white);
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.text-input {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+  background-color: rgba(var(--white-rgb), 0.05);
+  color: var(--white);
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  justify-content: flex-end;
+}
+.update-btn {
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}
+.cancel-btn {
+  background: transparent;
+  border: 1px solid var(--color-medium-gray);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  color: var(--white);
+}
+.label {
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+.error {
+  color: var(--secondary);
+  font-size: 0.85rem;
+  background-color: var(--bg-dark);
+  padding: 0.5rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--secondary);
+}

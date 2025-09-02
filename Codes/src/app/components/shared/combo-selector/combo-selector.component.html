@@ -1,0 +1,11 @@
+<select
+  #selectElement
+  [(ngModel)]="selectedValue"
+  (ngModelChange)="onModelChange($event)"
+  [class.error-border]="hasError"
+>
+  <option value="">{{ placeholder | translate }}</option>
+  <option *ngFor="let project of projects" [value]="project.id">
+    {{ project.name[currentLang] }}
+  </option>
+</select>

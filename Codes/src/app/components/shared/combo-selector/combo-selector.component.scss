@@ -1,0 +1,13 @@
+select {
+  padding: 0.7rem;
+  background-color: var(--bg-dark);
+  border-radius: 0.7rem;
+  border: 1px solid var(--bg-dark);
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.error-border {
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}

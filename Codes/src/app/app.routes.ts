@@ -41,7 +41,7 @@ export const routes: Routes = [
         (m) => m.DashboardComponent
       ),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'permissions-management' },
+      { path: '', pathMatch: 'full', redirectTo: 'user-management' },
 
       // child routes for each feature
       {
@@ -59,11 +59,18 @@ export const routes: Routes = [
           ).then((m) => m.FormManagementComponent),
       },
       {
-        path: 'create-interview-questions',
+        path: 'create-questions',
         loadComponent: () =>
           import(
-            './pages/dashboard/components/create-interview-questions/create-interview-questions.component'
-          ).then((m) => m.CreateInterviewQuestionsComponent),
+            './pages/dashboard/components/form-questions/form-questions.component'
+          ).then((m) => m.FormQuestionsComponent),
+      },
+      {
+        path: 'interview',
+        loadComponent: () =>
+          import(
+            './pages/dashboard/components/interview/interview.component'
+          ).then((m) => m.InterviewerFormPageComponent),
       },
       {
         path: 'location-management',
@@ -82,16 +89,16 @@ export const routes: Routes = [
       {
         path: 'send-emails',
         loadComponent: () =>
-          import(
-            './pages/dashboard/components/send-emails/send-emails.component'
-          ).then((m) => m.SendEmailsComponent),
+          import('./pages/dashboard/components/emails/emails.component').then(
+            (m) => m.EmailsComponent
+          ),
       },
       {
-        path: 'view-records',
+        path: 'view-submissions',
         loadComponent: () =>
           import(
-            './pages/dashboard/components/view-records/view-records.component'
-          ).then((m) => m.ViewRecordsComponent),
+            './pages/dashboard/components/view-submissions/view-submissions.component'
+          ).then((m) => m.ViewSubmissionsComponent),
       },
       {
         path: 'client-data-management',
@@ -118,5 +125,19 @@ export const routes: Routes = [
   },
 
   // fallback
+  {
+    path: 'form/:formId',
+    loadComponent: () =>
+      import('./pages/form/form-page.component').then(
+        (m) => m.FormPageComponent
+      ),
+  },
+  {
+    path: 'interviews/:interviewId',
+    loadComponent: () =>
+      import('./pages/interview/interview-questions-page.component').then(
+        (m) => m.InterviewQuestionsPageComponent
+      ),
+  },
   { path: '**', redirectTo: 'login' },
 ];

@@ -1,0 +1,103 @@
+<div class="modal-backdrop">
+  <form class="modal" [formGroup]="form" (ngSubmit)="onCreate()">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          {{ "ATTENDANCE_MANAGEMENT.CREATE_TITLE" | translate }}
+        </h3>
+      </div>
+
+      <div class="modal-body">
+        <!-- User selector -->
+        <label class="label">{{
+          "ATTENDANCE_MANAGEMENT.LABEL.USER" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="users"
+          [selectedValue]="form.get('userId')?.value"
+          (projectSelected)="onUserSelected($event)"
+          placeholder="{{ 'ATTENDANCE_MANAGEMENT.SELECT_USER' | translate }}"
+        ></app-combo-selector>
+        <div
+          class="field-error"
+          *ngIf="
+            form.get('userId')?.invalid &&
+            (form.get('userId')?.touched || form.get('userId')?.dirty)
+          "
+        >
+          <small class="error-text">{{
+            "COMMON.ERRORS.REQUIRED" | translate
+          }}</small>
+        </div>
+
+        <!-- Area selector -->
+        <label class="label" style="margin-top: 0.75rem">{{
+          "ATTENDANCE_MANAGEMENT.LABEL.AREA" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="areas"
+          [selectedValue]="form.get('areaId')?.value"
+          (projectSelected)="onAreaSelected($event)"
+          placeholder="{{ 'ATTENDANCE_MANAGEMENT.SELECT_AREA' | translate }}"
+        ></app-combo-selector>
+        <div
+          class="field-error"
+          *ngIf="
+            form.get('areaId')?.invalid &&
+            (form.get('areaId')?.touched || form.get('areaId')?.dirty)
+          "
+        >
+          <small class="error-text">{{
+            "COMMON.ERRORS.REQUIRED" | translate
+          }}</small>
+        </div>
+
+        <!-- isPresent radio group -->
+        <label class="label" style="margin-top: 0.75rem">{{
+          "ATTENDANCE_MANAGEMENT.LABEL.PRESENT" | translate
+        }}</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" [value]="true" formControlName="isPresent" />
+            {{ "ATTENDANCE_MANAGEMENT.PRESENT" | translate }}
+          </label>
+          <label class="radio-item">
+            <input type="radio" [value]="false" formControlName="isPresent" />
+            {{ "ATTENDANCE_MANAGEMENT.ABSENCE" | translate }}
+          </label>
+        </div>
+
+        <!-- timestamp -->
+        <label class="label" style="margin-top: 0.75rem">{{
+          "ATTENDANCE_MANAGEMENT.LABEL.DATE" | translate
+        }}</label>
+        <input
+          type="datetime-local"
+          class="text-input"
+          formControlName="attendanceTimestamp"
+        />
+        <div
+          class="field-error"
+          *ngIf="
+            form.get('attendanceTimestamp')?.invalid &&
+            (form.get('attendanceTimestamp')?.touched ||
+              form.get('attendanceTimestamp')?.dirty)
+          "
+        >
+          <small class="error-text">{{
+            "COMMON.ERRORS.REQUIRED" | translate
+          }}</small>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn neutral" (click)="onCancel()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate }}
+        </button>
+        <button type="submit" class="btn danger">
+          {{ "COMMON.BUTTONS.CREATE" | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
