@@ -535,12 +535,10 @@ export function injectGetManualByFormIdQuery(
   }));
 }
 
-export function injectGetCallerIdentityQuery(
-  payload?: GetCallerIdentityPayload
-) {
+export function injectGetCallerIdentityQuery() {
   return injectQuery(() => ({
     queryKey: ['callerIdentity'],
-    queryFn: () => api.getCallerIdentity(payload),
+    queryFn: () => api.getCallerIdentity(),
   }));
 }
 export function injectGetManualAnswersBySubmissionIdQuery(

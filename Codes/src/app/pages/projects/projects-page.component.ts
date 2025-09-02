@@ -15,7 +15,7 @@ import {
 @Component({
   selector: 'app-projects-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ThemedButtonComponent],
+  imports: [CommonModule, RouterModule, TranslateModule],
   template: `
     <div class="projects-container">
       <h1 class="title">{{ 'PROJECTS.TITLE' | translate }}</h1>

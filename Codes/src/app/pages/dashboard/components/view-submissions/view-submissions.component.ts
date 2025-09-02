@@ -33,7 +33,7 @@ export interface Form {
 })
 export class ViewSubmissionsComponent {
   forms: Form[] = [];
-  onlyManual: boolean | undefined;
+  onlyManual: boolean = false;
   get formsForSelector() {
     return (this.forms || []).map((form) => ({
       id: form.formId,
