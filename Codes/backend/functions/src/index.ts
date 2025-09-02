@@ -111,6 +111,7 @@ import {
   getProjectUserRole,
   getAllProjectUserRoles,
   getProjectUserRolesByUserAndProject,
+  deleteProjectUserRolesByUserAndProject,
 } from './callables/auth/projectUserRole.callable';
 
 import { getFunctions } from './callables/getFunctions';
@@ -238,6 +239,7 @@ export {
   getProjectUserRole,
   getAllProjectUserRoles,
   getProjectUserRolesByUserAndProject,
+  deleteProjectUserRolesByUserAndProject,
 
   // Interview
   createInterview,

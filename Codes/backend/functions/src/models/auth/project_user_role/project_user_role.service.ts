@@ -41,6 +41,9 @@ export class ProjectUserRoleService {
   static async deleteProjectUserRole(id: string): Promise<void> {
     await projectUserRoleMapper.delete(id);
   }
+  static async deleteProjectUserRoleByUserProject(projectId: string,userId:string): Promise<void> {
+    await projectUserRoleMapper.deleteByUserAndProject(projectId,userId);
+  }
   static async getProjectUserRolesByUserAndProject(userId: string, projectId: string): Promise<ProjectUserRole[]> {
   return await projectUserRoleMapper.getByUserAndProject(userId, projectId);
 }

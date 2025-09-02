@@ -16,7 +16,6 @@ export interface CallerIdentity {
 }
 
 export async function getCallerIdentityHandler(request: CallableRequest): Promise<CallerIdentity> {
-  // First authenticate the caller
   const authResult = await authenticateCaller(request);
   if (!authResult.success) {
     return {
@@ -32,26 +31,56 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
   const callerUuid = authResult.callerUuid;
 
   try {
-    // Check all identities in parallel
-    const [admin, client, user, projectRoles] = await Promise.all([
-      AdminService.getAdminById(callerUuid),
-      ClientService.getClientById(callerUuid),
-      UserService.getUserById(callerUuid),
-      ProjectUserRoleService.getProjectUserRolesByUserAndProject(callerUuid, '%') // Check for any project
-    ]);
+    // Check User first
+    const user = await UserService.getUserById(callerUuid);
+    if (user) {
+      const projectRoles = await ProjectUserRoleService.getProjectUserRolesByUserAndProject(callerUuid, '%');
+      const isUserWorker = projectRoles.length > 0;
+      
+      return {
+        isAdmin: false,
+        isClient: false,
+        isUserWorker, // Can be true or false
+        isUser: true, // Always true if user exists
+        isCaller: false,
+        role: user.role
+      };
+    }
 
-    const isAdmin = !!admin;
-    const isClient = !!client;
-    const isUser = !!user;
-    const isUserWorker = isUser && projectRoles.length > 0;
+    // Check Client next
+    const client = await ClientService.getClientById(callerUuid);
+    if (client) {
+      return {
+        isAdmin: false,
+        isClient: true,
+        isUserWorker: false,
+        isUser: false,
+        isCaller: false,
+        role: null
+      };
+    }
 
+    // Check Admin last
+    const admin = await AdminService.getAdminById(callerUuid);
+    if (admin) {
+      return {
+        isAdmin: true,
+        isClient: false,
+        isUserWorker: false,
+        isUser: false,
+        isCaller: false,
+        role: null
+      };
+    }
+
+    // Fallback to basic caller if no identity found
     return {
-      isAdmin,
-      isClient,
-      isUserWorker,
-      isUser: isUser && !isUserWorker, // User without project assignments
-      isCaller: !isAdmin && !isClient && !isUser,
-      role: user?.role || null
+      isAdmin: false,
+      isClient: false,
+      isUserWorker: false,
+      isUser: false,
+      isCaller: true,
+      role: null
     };
   } catch (error) {
     console.error('Error getting caller identity:', error);
@@ -60,7 +89,7 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
       isClient: false,
       isUserWorker: false,
       isUser: false,
-      isCaller: true, // Fallback to basic caller if error occurs
+      isCaller: true,
       role: null
     };
   }
