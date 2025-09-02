@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { TranslateModule } from '@ngx-translate/core';
 import { ThemedButtonComponent } from '../../../components/shared/themed-button/themed-button';
 import { InputComponent } from '../../../components/shared/input/input';
