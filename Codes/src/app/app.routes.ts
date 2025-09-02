@@ -16,13 +16,23 @@ export const routes: Routes = [
   },
 
   // forgot password route
-{
-  path: 'forget-password',
-  loadComponent: () =>
-    import('./pages/login/forget-password/forget-password.component').then(
-      (m) => m.ForgetPasswordComponent
-    ),
-},
+  {
+    path: 'forget-password',
+    loadComponent: () =>
+      import('./pages/login/forget-password/forget-password.component').then(
+        (m) => m.ForgetPasswordComponent
+      ),
+  },
+
+  // two-factor authentication route
+  {
+    path: 'two-factor-auth',
+    loadComponent: () =>
+      import('./pages/login/app-two-f-a/app-two-f-a.component').then(
+        (m) => m.TwoFAComponent
+      ),
+  },
+
   // dashboard (parent)
   {
     path: 'dashboard',

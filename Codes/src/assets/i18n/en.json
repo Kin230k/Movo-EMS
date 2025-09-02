@@ -23,5 +23,20 @@
     "BUTTON": "Done",
     "LINK_TO_LOGIN": "Back to login",
     "TEXT2": "Enter your email address to start We'll send you a link where you can change your password from it!"
+  }  , 
+  
+ 
+  "TWO_FA": {
+    "TITLE": "Two-Factor Authentication",
+    "INSTRUCTION": "A verification code has been sent to your phone. Please enter it below.",
+    "PHONE_PLACEHOLDER": "Enter your phone number",
+    "VERIFY_BUTTON": "Verify",
+    "CANCEL_BUTTON": "Cancel",
+    "NOT_RECEIVED": "Didn't receive the code?",
+    "RESEND_LINK": "Resend"
+    
+
+
   }
 }
+  
