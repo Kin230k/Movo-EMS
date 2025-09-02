@@ -7,7 +7,7 @@ import { connectAuthEmulator } from '@angular/fire/auth';
 import { getAuth } from '@angular/fire/auth';
 
 initializeApp(firebaseConfig);
-const auth = getAuth();
+export const auth = getAuth();
 if (typeof window !== 'undefined' && location.hostname === 'localhost') {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 }

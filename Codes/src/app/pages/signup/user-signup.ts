@@ -107,7 +107,6 @@ import { CommonModule } from '@angular/common';
           <themed-button
             type="submit"
             [text]="'SIGNUP.BUTTON' | translate"
-            (onClick)="onSignUp()"
           ></themed-button>
 
           <div class="switch-login-type">
@@ -367,6 +366,7 @@ export class SignUpUser {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  isSubmitting: boolean = false;
 
   showToast: boolean = false;
   toastMessage: string = '';
@@ -439,6 +439,7 @@ export class SignUpUser {
 
   async onSignUp(event?: Event) {
     if (event) event.preventDefault();
+    if (this.isSubmitting) return;
 
     if (!this.email || !this.password) {
       this.triggerToast('Please fill email and password', 'error');
@@ -450,6 +451,7 @@ export class SignUpUser {
       return;
     }
 
+    this.isSubmitting = true;
     try {
       const picture = this.pictureURL ?? '';
       const credential = await this.authService.register(
@@ -472,6 +474,8 @@ export class SignUpUser {
         'Registration failed: ' + (error?.message ?? error),
         'error'
       );
+    } finally {
+      this.isSubmitting = false;
     }
   }
 

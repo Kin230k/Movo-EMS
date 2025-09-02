@@ -1,0 +1,90 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+
+@Component({
+  selector: 'app-manual-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule, TranslateModule],
+  template: `
+    <nav class="manual-navbar">
+      <div class="navbar-container">
+        <a
+          routerLink="/manual-submissions"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          {{
+            'NAV.MANUAL_SUBMISSIONS'
+              | translate : { default: 'Manual Submissions' }
+          }}
+        </a>
+
+        <a
+          routerLink="/take-attendance"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          {{
+            'NAV.TAKE_ATTENDANCE' | translate : { default: 'Take Attendance' }
+          }}
+        </a>
+      </div>
+    </nav>
+  `,
+  styles: [
+    `
+      .manual-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        border-bottom: 1px solid var(--color-font-primary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-container {
+        margin: 0 auto;
+        max-width: 1200px;
+        padding: 1rem 2rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      .nav-link {
+        color: var(--color-font-primary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-card);
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--color-font-primary);
+          color: var(--color-font-primary);
+        }
+
+        &.active {
+          background: rgba(var(--accent-rgb), 0.1);
+          color: var(--accent);
+          font-weight: 600;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar-container {
+          padding: 1rem;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .nav-link {
+          text-align: center;
+          padding: 0.75rem 1rem;
+        }
+      }
+    `,
+  ],
+})
+export class ManualNavbarComponent {}

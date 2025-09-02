@@ -1,6 +1,10 @@
 // src/app/core/config/app.config.server.ts
 import { ApplicationConfig, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { provideQueryClient } from '@tanstack/angular-query-experimental';
+import {
+  provideQueryClient,
+  provideTanStackQuery,
+  withDevtools,
+} from '@tanstack/angular-query-experimental';
 import { QueryClient } from '@tanstack/query-core';
 import { isPlatformBrowser } from '@angular/common';
 import { persistQueryClient } from '@tanstack/query-persist-client-core';
@@ -66,6 +70,8 @@ export const appConfig: ApplicationConfig = {
 
     // Tell @tanstack/angular-query to use the QueryClient from DI (the token above)
     provideQueryClient(QUERY_CLIENT),
+    // show tanstack devtools
+    provideTanStackQuery(QUERY_CLIENT, withDevtools()),
 
     // Firebase providers (modular @angular/fire)
     provideFirebaseApp(() => initializeApp(firebaseConfig)),

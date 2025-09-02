@@ -7,14 +7,14 @@ import {
   signOut,
   createUserWithEmailAndPassword,
   UserCredential,
-  getAuth,
 } from '@angular/fire/auth';
+import { auth as Auth } from '../../../main';
 
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiQueriesService } from '../../core/services/queries.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private auth = getAuth();
+  private auth = Auth;
 
   // Local BehaviorSubject to track current user
   private currentUserSubject = new BehaviorSubject<User | null>(null);
@@ -46,20 +46,17 @@ export class AuthService {
       throw error;
     }
 
-    // try {
-    //   const { results } = await this.apiQueries
-    //     .registerUserMutation()
-    //     .mutateAsync({
-    //       name,
-    //       picture,
-    //     });
-    //   if (!results.success) {
-    //     throw results.issues;
-    //   }
-    // } catch (error) {
-    //   throw error;
-    // }
-    // registerUser mutation api call
+    try {
+      const results = await this.apiQueries.registerUserMutation().mutateAsync({
+        name,
+        picture,
+      });
+      if (!results.success) {
+        throw results.issues;
+      }
+    } catch (error) {
+      throw error;
+    }
 
     return userCredential;
   }
