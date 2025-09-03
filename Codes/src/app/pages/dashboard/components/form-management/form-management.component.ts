@@ -10,6 +10,7 @@ import { FormCardComponent, FormData } from './form-card.component';
 import { FormListSkeletonComponent } from '../../../../components/shared/form-list-skeleton/form-list-skeleton.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 
 @Component({
   selector: 'app-form-management',
@@ -24,7 +25,10 @@ import { ApiQueriesService } from '../../../../core/services/queries.service';
   styleUrl: './form-management.component.scss',
 })
 export class FormManagementComponent {
-  constructor(private apiQueries: ApiQueriesService) {}
+  constructor(
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
+  ) {}
 
   projectsQuery: any;
   get projects(): Project[] {
@@ -54,8 +58,13 @@ export class FormManagementComponent {
 
   selectedProjectId: string | null = null;
 
-  ngOnInit() {
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
   }
 
   onProjectSelected(projectId: string | null) {

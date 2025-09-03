@@ -5,7 +5,7 @@
     "PASSWORD_PLACEHOLDER": "Password",
     "FORGOT_PASSWORD": "Forgot password?",
     "BUTTON": "Log in",
-    "SWITCH_TO_ADMIN": "Log in as Admin"
+    "SIGN_UP": "Sign Up"
   },
   "LOGIN_ADMIN": {
     "TITLE": "Log in as Admin",
@@ -261,7 +261,10 @@
     },
     "ERRORS": {
       "REQUIRED": "Required"
-    }
+    },
+    "LOADING": "Loading...",
+    "SIGN_UP": "Sign Up",
+    "SIGN_OUT": "Sign Out"
   },
   "ADD_ROLE_MODAL": {
     "TITLE": "Add Role",
@@ -409,7 +412,8 @@
     "CONFIRM_PASSWORD": "Enter password again ...",
     "UPLOAD_PICTURE": "Upload picture",
     "FORGET_PASSWORD": "Forgot password?",
-    "SWITCH_TO_LOGIN": "Back to login"
+    "SWITCH_TO_LOGIN": "Back to login",
+    "SWITCH_TO_CLIENT": "Sign up as Client"
   },
   "FORGET_PASSWORD": {
     "TITLE": "Forget password",
@@ -421,7 +425,8 @@
   "NAV": {
     "MANUAL_SUBMISSIONS": "Manual Submissions",
     "MANUAL_QUESTIONS": "Manual Questions",
-    "TAKE_ATTENDANCE": "Take Attendance"
+    "TAKE_ATTENDANCE": "Take Attendance",
+    "PROJECTS": "Projects"
   },
   "MANUAL_QUESTIONS": {
     "GO_BACK": "Go Back",
@@ -446,6 +451,7 @@
   },
   "PROJECTS": {
     "TITLE": "Projects",
+    "SUBTITLE": "Explore available projects",
     "NO_PROJECTS_FOUND": "No projects found.",
     "LOADING": "Loading projects...",
     "STARTING_DATE": "Starting Date",
@@ -454,5 +460,22 @@
     "OPEN_SELECTED_FORM": "Open Selected Form",
     "SELECTED_LOCATION_HAS_NO_FORM_CONFIGURED": "Selected location has no form configured.",
     "NO_FORM_IS_CONFIGURED_FOR_THIS_PROJECT": "No form is configured for this project."
+  },
+  "CLIENT": {
+    "TITLE": "Create Client",
+    "CREATE_TITLE": "Create Client",
+    "NAME_EN": "Enter name (English) ...",
+    "NAME_AR": "Enter name (Arabic) ...",
+    "CONTACT_EMAIL": "Enter contact email ...",
+    "CONTACT_PHONE": "Enter contact phone ...",
+    "PASSWORD": "Enter password ...",
+    "COMPANY_EN": "Enter company name (English) ...",
+    "COMPANY_AR": "Enter company name (Arabic) ...",
+    "UPLOAD_LOGO": "Upload Logo",
+    "CREATING": "Creating client...",
+    "CREATE_BUTTON": "Create Client",
+    "BACK_TO_LIST": "Back to List",
+    "BACK_TO_CLIENTS": "Back to Clients",
+    "GO_TO_LOGIN": "Go to Login"
   }
 }

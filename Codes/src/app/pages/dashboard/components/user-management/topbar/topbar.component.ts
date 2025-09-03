@@ -20,8 +20,8 @@ import { TranslateModule } from '@ngx-translate/core';
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: { en: string; ar: string } }[] = [];
-  @Output() projectSelected = new EventEmitter<number>();
+  @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
+  @Output() projectSelected = new EventEmitter<string>();
 
   showAddRole = false;
 
@@ -37,12 +37,12 @@ export class TopbarComponent {
     this.showAddRole = false;
   }
 
-  onProjectAssigned(projectId: number) {
+  onProjectAssigned(projectId: string) {
     // The modal emitted a project assignment (e.g., after mock async succeeded and user selected)
     this.projectSelected.emit(projectId);
     this.showAddRole = false;
   }
-  onAssigned(payload: { projectId: number; roleId: string }) {
+  onAssigned(payload: { projectId: string; roleId: string }) {
     const mutate = this.apiQueries.createUserProjectMutation();
     mutate.mutate(
       {

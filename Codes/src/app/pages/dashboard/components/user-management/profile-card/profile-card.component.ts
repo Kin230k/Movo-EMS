@@ -16,6 +16,7 @@ import { ProfileModalComponent } from './profile-modal/profile-modal.component';
 import { DeleteModalComponent } from '../../../../../components/shared/delete-modal/delete-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ApiQueriesService } from '../../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-profile-card',
@@ -43,7 +44,8 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
   constructor(
     public language: LanguageService,
     private translate: TranslateService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private apiQueries: ApiQueriesService
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +92,7 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
   onDisableUser(evt?: MouseEvent) {
     evt?.stopPropagation();
     // open delete confirmation modal instead of immediate disable
+
     this.deleteModalOpen = true;
   }
 

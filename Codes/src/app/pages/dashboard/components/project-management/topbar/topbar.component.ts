@@ -6,7 +6,7 @@ import { AddScheduleModalComponent } from './add-schedule-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-topbar',
+  selector: 'app-project-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss'],
   imports: [
@@ -46,7 +46,7 @@ export class TopbarComponent {
   onProjectCreated(projectData: any) {
     // Handle project creation
     this.projectCreated.emit(projectData);
-    console.log('New project created:', projectData);
+
     this.showAddProject = false;
   }
 

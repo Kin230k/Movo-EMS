@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
+import { IdentityService } from '../../core/services/identity.service';
 
 @Component({
   selector: 'app-manual-navbar',
@@ -29,6 +32,10 @@ import { TranslateModule } from '@ngx-translate/core';
           {{
             'NAV.TAKE_ATTENDANCE' | translate : { default: 'Take Attendance' }
           }}
+        </a>
+
+        <a (click)="signOut()" class="nav-link" role="button" tabindex="0">
+          {{ 'COMMON.SIGN_OUT' | translate : { default: 'Sign out' } }}
         </a>
       </div>
     </nav>
@@ -87,4 +94,16 @@ import { TranslateModule } from '@ngx-translate/core';
     `,
   ],
 })
-export class ManualNavbarComponent {}
+export class ManualNavbarComponent {
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private identity: IdentityService
+  ) {}
+
+  async signOut() {
+    await this.auth.logout();
+    this.identity.resetIdentity();
+    this.router.navigate(['/login']);
+  }
+}

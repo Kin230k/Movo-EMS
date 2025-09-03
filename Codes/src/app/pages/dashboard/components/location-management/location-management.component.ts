@@ -9,6 +9,7 @@ import { AddZoneModalComponent } from './add-zone-modal.component';
 import { DeleteModalComponent } from '../../../../components/shared/delete-modal/delete-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component'; // adjust path if needed
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 
 @Component({
   selector: 'app-location-management',
@@ -31,7 +32,10 @@ export class LocationManagementComponent {
   // tabs: 'locations' | 'zones'
   activeTab: 'locations' | 'zones' = 'locations';
 
-  constructor(private apiQueries: ApiQueriesService) {}
+  constructor(
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
+  ) {}
 
   projectsQuery: any;
   get projects(): Array<{ id: string; name: { en: string; ar: string } }> {
@@ -79,8 +83,13 @@ export class LocationManagementComponent {
   // zone filters - NOTE: removed selectedProjectForZones to force selection via location only
   selectedLocationForZones: string = '';
 
-  ngOnInit() {
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
   }
 
   // Handle location selection for zones

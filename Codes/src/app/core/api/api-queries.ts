@@ -67,7 +67,7 @@ import type {
   DeleteProjectPayload,
   GetProjectPayload,
   UpdateProjectPayload,
-  GetProjectByClientPayload,
+  getProjectsByClientPayload,
   GetSchedulesByLocationPayload,
   GetSchedulesByProjectOrLocationPayload,
   CreateLocationPayload,
@@ -95,6 +95,8 @@ import type {
   GetAreaPayload,
   UpdateAreaPayload,
   GetAreasByLocationPayload,
+  getProjectInfoByIdPayload,
+  GetAllFormQuestionsPayload,
 } from './api';
 
 // Helper to generate unique query keys based on payloads
@@ -438,6 +440,14 @@ export function injectGetAllQuestionsQuery() {
     queryFn: () => api.getAllQuestions(),
   }));
 }
+export function injectGetAllFormQuestionsQuery(
+  payload: GetAllFormQuestionsPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['formQuestions', payload.formId]),
+    queryFn: () => api.getAllFormQuestions(payload),
+  }));
+}
 
 export function injectGetQuestionQuery(payload: GetQuestionPayload) {
   return injectQuery(() => ({
@@ -680,15 +690,23 @@ export function injectUpdateProjectMutation() {
   }));
 }
 
-export function injectGetProjectByClientQuery(
-  payload: GetProjectByClientPayload
+export function injectgetProjectsByClientQuery(
+  payload: getProjectsByClientPayload
 ) {
   return injectQuery(() => ({
-    queryKey: queryKeyFor(payload, ['projectsByClient', payload.clientId]),
-    queryFn: () => api.getProjectByClient(payload),
+    queryKey: queryKeyFor(payload, ['projectsByClient']),
+    queryFn: () => api.getProjectsByClient(payload),
   }));
 }
 
+export function injectGetProjectInfoByIdQuery(
+  payload: getProjectInfoByIdPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['projectInfoById', payload.projectId]),
+    queryFn: () => api.getProjectInfoById(payload),
+  }));
+}
 export function injectGetAllProjectsQuery() {
   return injectQuery(() => ({
     queryKey: ['projects'],

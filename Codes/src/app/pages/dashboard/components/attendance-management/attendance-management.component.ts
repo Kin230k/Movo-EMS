@@ -7,6 +7,7 @@ import { AttendanceProfileCardComponent } from '../attendance-management/attenda
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 
 @Component({
   selector: 'app-attendance-management',
@@ -22,15 +23,29 @@ import { ApiQueriesService } from '../../../../core/services/queries.service';
   styleUrls: ['./attendance-management.component.scss'],
 })
 export class AttendanceManagementComponent {
-  constructor(private apiQueries: ApiQueriesService) {}
+  constructor(
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
+  ) {}
 
   projectsQuery: any;
   get projects() {
     const data = this.projectsQuery?.data?.() ?? [];
-    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+    return data?.projects?.map((p: any) => ({ id: p.projectId, name: p.name }));
   }
 
   users: any[] = []; // Initially no users
+  selectedProjectId: string | null = null;
+  usersForSelector: {
+    id: string;
+    name: { en: string; ar: string };
+    role?: string;
+    picture?: string;
+  }[] = [];
+  areasForSelector: {
+    id: string;
+    name: { en: string; ar: string };
+  }[] = [];
   private _isLoading = false;
   // expose error as any so template can use error?.message
   private _error: any = null;
@@ -47,14 +62,18 @@ export class AttendanceManagementComponent {
   }
   // Add this line so the template binding exists at runtime:
   async onProjectSelected(projectId: string | null) {
+    console.log('projectId', projectId);
     if (projectId === null) {
       // Handle deselection - clear users list
       this.users = [];
+      this.usersForSelector = [];
+      this.selectedProjectId = null;
       this._isFinished = true;
       this._isLoading = false;
       this._error = null;
       return;
     }
+    this.selectedProjectId = String(projectId);
 
     this._isLoading = true;
     this._error = null;
@@ -65,9 +84,10 @@ export class AttendanceManagementComponent {
       const q = this.apiQueries.getProjectUsersQuery({
         projectId: String(projectId),
       });
-      const data = q.data?.() ?? [];
-      this.users = Array.isArray(data)
-        ? data.map((u: any, idx: number) => ({
+      const data = q.data?.() ?? {};
+      const normalizedUsers = Array.isArray(data.users)
+        ? data.users.map((u: any, idx: number) => ({
+            id: u.userId ?? u.id ?? idx + 1,
             userId: String(u.userId ?? u.id ?? idx + 1),
             name: u.name ?? {
               en: u.displayName ?? 'User',
@@ -79,10 +99,27 @@ export class AttendanceManagementComponent {
             picture: u.picture ?? '/assets/images/image.png',
           }))
         : [];
+      this.users = normalizedUsers;
+      this.usersForSelector = normalizedUsers.map((u: any) => ({
+        id: u.id,
+        name: u.name,
+        role: u.role,
+        picture: u.picture,
+      }));
+      const areasQ = this.apiQueries.getAllAreasQuery();
+      const areasData = areasQ.data?.() ?? {};
+      this.areasForSelector = Array.isArray(areasData.areas)
+        ? areasData.areas.map((a: any, idx: number) => ({
+            id: a.areaId ?? a.id ?? idx + 1,
+            name: a.name,
+          }))
+        : [];
       this._isFinished = true;
     } catch (err) {
       this._error = err;
       this.users = [];
+      this.usersForSelector = [];
+      this.areasForSelector = [];
     } finally {
       this._isLoading = false;
     }
@@ -103,8 +140,13 @@ export class AttendanceManagementComponent {
       } as any
     );
   }
-  ngOnInit() {
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
   }
   // Add this line so the template binding exists at runtime:
   attendanceCardComponent = AttendanceProfileCardComponent;

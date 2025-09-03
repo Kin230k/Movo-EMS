@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   selector: 'themed-button',
   imports: [CommonModule],
   templateUrl: './themed-button.html',
-  styleUrl: './themed-button.scss',
+  styleUrls: ['./themed-button.scss'],
   standalone: true,
 })
 export class ThemedButtonComponent {

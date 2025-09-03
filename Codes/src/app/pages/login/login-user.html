@@ -27,16 +27,14 @@
       </div>
 
       <themed-button
-        type="submit"
+        type="button"
         [text]="'LOGIN.BUTTON' | translate"
         (onClick)="onLogin()"
       >
       </themed-button>
 
       <div class="switch-login-type">
-        <a (click)="goToAdminLogin()">
-          {{ 'LOGIN.SWITCH_TO_ADMIN' | translate }}
-        </a>
+        <a (click)="goToSignUp()"> {{ 'LOGIN.SIGN_UP' | translate }} </a>
       </div>
     </form>
   </div>

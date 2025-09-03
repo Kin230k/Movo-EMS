@@ -3,12 +3,12 @@
     [projects]="projects"
     [selectedValue]="selectedProjectId"
     (projectSelected)="projectSelected.emit($event)"
-    [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT' | translate"
+    [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT'"
   ></app-combo-selector>
   <themed-button
     class="primary-btn add-btn"
-    (click)="openCreateModal()"
-    text="{{ 'ATTENDANCE_MANAGEMENT.ADD_ATTENDANCE' | translate }}"
+    (onClick)="openCreateModal()"
+    [text]="'ATTENDANCE_MANAGEMENT.ADD_ATTENDANCE' | translate"
   >
   </themed-button>
 

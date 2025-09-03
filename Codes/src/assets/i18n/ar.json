@@ -5,7 +5,7 @@
     "PASSWORD_PLACEHOLDER": "كلمة المرور",
     "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
     "BUTTON": "تسجيل الدخول",
-    "SWITCH_TO_ADMIN": "تسجيل دخول كمسؤول"
+    "SIGN_UP": "تسجيل الدخول"
   },
   "LOGIN_ADMIN": {
     "TITLE": "تسجيل دخول المسؤول",
@@ -14,7 +14,8 @@
     "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
     "BUTTON": "تسجيل الدخول",
     "REMEMBER_ME": "تذكرني",
-    "SWITCH_TO_USER": "تسجيل دخول المستخدم"
+    "SWITCH_TO_USER": "تسجيل دخول المستخدم",
+    "SIGN_UP": "تسجيل الدخول"
   },
   "SIDEBAR": {
     "USER_MANAGEMENT": "إدارة المستخدمين",
@@ -278,7 +279,10 @@
     "STATUS": {
       "PRESENT": "حضور",
       "ABSENT": "غياب"
-    }
+    },
+    "LOADING": "جار التحميل...",
+    "SIGN_UP": "تسجيل الدخول",
+    "SIGN_OUT": "تسجيل الخروج"
   },
   "ADD_ROLE_MODAL": {
     "TITLE": "إضافة دور",
@@ -438,7 +442,8 @@
   "NAV": {
     "MANUAL_SUBMISSIONS": "تقديمات يدوية",
     "MANUAL_QUESTIONS": "أسئلة يدوية",
-    "TAKE_ATTENDANCE": "إدارة الحضور"
+    "TAKE_ATTENDANCE": "إدارة الحضور",
+    "PROJECTS": "المشاريع"
   },
   "MANUAL_QUESTIONS": {
     "GO_BACK": "عد الى صفحة تقديمات يدوية",
@@ -456,5 +461,22 @@
     "OPEN_SELECTED_FORM": "فتح النموزج المختار",
     "SELECTED_LOCATION_HAS_NO_FORM_CONFIGURED": "الموقع المختار لا يحتوي على نموزج مكون.",
     "NO_FORM_IS_CONFIGURED_FOR_THIS_PROJECT": "لا يوجد نموزج مكون لهذا المشروع."
+  },
+  "CLIENT": {
+    "CREATE_TITLE": "إنشاء عميل",
+    "TITLE": "إنشاء عميل",
+    "NAME_EN": "أدخل الاسم (انجليزي) ...",
+    "NAME_AR": "أدخل الاسم (عربي) ...",
+    "CONTACT_EMAIL": "أدخل البريد الإلكتروني ...",
+    "CONTACT_PHONE": "أدخل رقم الهاتف ...",
+    "PASSWORD": "أدخل كلمة المرور ...",
+    "COMPANY_EN": "أدخل اسم الشركة (انجليزي) ...",
+    "COMPANY_AR": "أدخل اسم الشركة (عربي) ...",
+    "UPLOAD_LOGO": "رفع الشعار",
+    "CREATING": "جار إنشاء العميل...",
+    "CREATE_BUTTON": "إنشاع العميل",
+    "BACK_TO_LIST": "عد الى قائمة العملاء",
+    "BACK_TO_CLIENTS": "عد الى قائمة العملاء",
+    "GO_TO_LOGIN": "عد الى صفحة تسجيل الدخول"
   }
 }

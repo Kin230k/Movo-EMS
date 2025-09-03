@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable, of, filter, take, map, catchError } from 'rxjs';
 import { DynamicFormDto, FormQuestionDto } from '../../shared/types/form';
 import { ApiQueriesService } from './queries.service';
 
@@ -26,13 +27,30 @@ export class FormService {
         const data = iq?.data?.() ?? [];
         filtered = Array.isArray(data) ? data : [];
       } else {
-        const questionsQuery = this.apiQueries.getAllQuestionsQuery();
-        const allQuestions = questionsQuery?.data?.() ?? [];
-        filtered = Array.isArray(allQuestions)
-          ? allQuestions.filter(
-              (q: any) => String(q.formId ?? '') === String(formId)
-            )
+        console.log('formId', formId);
+        const questionsQuery = this.apiQueries.getAllFormQuestionsQuery({
+          formId,
+        });
+        console.log('questionsQuery', questionsQuery);
+        const raw = questionsQuery?.data?.() ?? {};
+        // Support multiple possible shapes from API:
+        // - Array<Question>
+        // - { questions: Question[] }
+        // - { items: Question[] }
+        // - { data: Question[] }
+        console.log('raw', raw);
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray((raw as any)?.questions)
+          ? (raw as any).questions
+          : Array.isArray((raw as any)?.items)
+          ? (raw as any).items
+          : Array.isArray((raw as any)?.data)
+          ? (raw as any).data
           : [];
+        console.log('list', list);
+        // The backend already receives formId; avoid over-filtering that can drop data
+        filtered = list;
       }
 
       const mapType = (t: any): FormQuestionDto['typeCode'] => {
@@ -60,9 +78,11 @@ export class FormService {
           questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
           typeCode: mapType(q.type ?? q.typeCode),
           questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
-          options: (q.options || []).map((opt: any, i: number) => ({
+          options: (
+            (q.options ?? q.answerOptions ?? q.choices ?? []) as any[]
+          ).map((opt: any, i: number) => ({
             optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
-            optionText: opt.optionText ?? opt.text ?? '',
+            optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
           })),
           required: !!q.required,
           min: q.min,
@@ -86,5 +106,83 @@ export class FormService {
       };
       return of(empty);
     }
+  }
+
+  // Separate: fetch only form meta (title, language)
+  getFormMeta(
+    formId: string
+  ): Observable<{ formId: string; formTitle: string; formLanguage: string }> {
+    const formQuery = this.apiQueries.getFormQuery({ formId });
+    return toObservable<any>(formQuery.data).pipe(
+      filter((v) => v != null),
+      take(1),
+      map((formData) => ({
+        formId: String(formId),
+        formTitle:
+          formData?.formTitle ?? formData?.title ?? formData?.name ?? 'Form',
+        formLanguage: formData?.formLanguage ?? 'en',
+      })),
+      catchError(() =>
+        of({ formId: String(formId), formTitle: 'Form', formLanguage: 'en' })
+      )
+    );
+  }
+
+  // Separate: fetch only questions (by form or interview)
+  getFormQuestions(options: {
+    formId?: string;
+    interviewId?: string;
+  }): Observable<FormQuestionDto[]> {
+    const { formId, interviewId } = options;
+    const query = interviewId
+      ? this.apiQueries.getInterviewQuestionsQuery({ interviewId })
+      : this.apiQueries.getAllFormQuestionsQuery({ formId: formId! });
+
+    const mapType = (t: any): FormQuestionDto['typeCode'] => {
+      const up = String(t || '').toUpperCase();
+      const allowed = [
+        'OPEN_ENDED',
+        'SHORT_ANSWER',
+        'NUMBER',
+        'RATE',
+        'DROPDOWN',
+        'RADIO',
+        'MULTIPLE_CHOICE',
+      ];
+      return (allowed as string[]).includes(up)
+        ? (up as FormQuestionDto['typeCode'])
+        : 'OPEN_ENDED';
+    };
+
+    return toObservable<any>(query.data).pipe(
+      filter((v) => v != null),
+      take(1),
+      map((raw) => {
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray((raw as any)?.questions)
+          ? (raw as any).questions
+          : Array.isArray((raw as any)?.items)
+          ? (raw as any).items
+          : Array.isArray((raw as any)?.data)
+          ? (raw as any).data
+          : [];
+        return (list as any[]).map((q: any, idx: number) => ({
+          questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+          typeCode: mapType(q.type ?? q.typeCode),
+          questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
+          options: (
+            (q.options ?? q.answerOptions ?? q.choices ?? []) as any[]
+          ).map((opt: any, i: number) => ({
+            optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
+            optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
+          })),
+          required: !!q.required,
+          min: q.min,
+          max: q.max,
+        }));
+      }),
+      catchError(() => of([]))
+    );
   }
 }

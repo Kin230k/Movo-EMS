@@ -4,6 +4,8 @@ import { InputComponent } from '../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service'; // <-- centralized service
+import { AuthService } from '../../core/services/auth.service';
+import { IdentityService } from '../../core/services/identity.service';
 
 @Component({
   selector: 'app-login-user',
@@ -16,15 +18,35 @@ export class LoginUser {
   email: string = '';
   password: string = '';
 
-  constructor(private router: Router, private langService: LanguageService) {}
+  constructor(
+    private router: Router,
+    private langService: LanguageService,
+    private auth: AuthService,
+    private identity: IdentityService
+  ) {}
 
   // Optional: switch language from this page
   switchLanguage(lang: 'en' | 'ar') {
     this.langService.use(lang);
   }
 
-  onLogin() {
-    console.log('User login attempted with:', this.email, this.password);
+  async onLogin() {
+    try {
+      await this.auth.login(this.email, this.password);
+      const who = await this.identity.getIdentity(true);
+      if (who.isAdmin || who.isClient) {
+        this.router.navigate(['/dashboard']);
+      } else if (who.isWorker) {
+        this.router.navigate(['/take-attendance']);
+      } else if (who.isUser) {
+        this.router.navigate(['/projects']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+      alert('Login failed. Please check your credentials.');
+    }
   }
 
   onEmailChange(value: string) {
@@ -35,11 +57,10 @@ export class LoginUser {
     this.password = value;
   }
 
-  goToAdminLogin() {
-    this.router.navigate(['/login/admin']);
-  }
-
   goToForgetPassword() {
     this.router.navigate(['/forget-password']);
+  }
+  goToSignUp() {
+    this.router.navigate(['/signup']);
   }
 }

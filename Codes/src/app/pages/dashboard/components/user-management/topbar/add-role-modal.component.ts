@@ -15,11 +15,11 @@ import { ApiQueriesService } from '../../../../../core/services/queries.service'
   standalone: true,
 })
 export class AddRoleModalComponent {
-  @Input() projects: { id: number; name: { en: string; ar: string } }[] = [];
+  @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
   @Input() roles: { id: string; name: { en: string; ar: string } }[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() assigned = new EventEmitter<{
-    projectId: number;
+    projectId: string;
     roleId: string;
   }>();
 
@@ -27,7 +27,7 @@ export class AddRoleModalComponent {
   checking = false;
   checkSucceeded = false;
   errorMessage = '';
-  selectedProjectId: number | null = null;
+  selectedProjectId: string | null = null;
   selectedRoleId: string | null = null;
 
   // Inject TranslateService and ApiQueriesService in the constructor
@@ -70,7 +70,7 @@ export class AddRoleModalComponent {
     }
   }
 
-  onProjectSelected(projectId: number) {
+  onProjectSelected(projectId: string) {
     this.selectedProjectId = projectId;
     this.errorMessage = '';
   }

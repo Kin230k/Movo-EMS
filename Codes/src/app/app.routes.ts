@@ -1,4 +1,81 @@
-import { Routes } from '@angular/router';
+import { Routes, CanMatchFn, CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { IdentityService } from './core/services/identity.service';
+
+// Guards
+const redirectIfAuthenticated: CanMatchFn = async () => {
+  const router = inject(Router);
+  const identityService = inject(IdentityService);
+  let identity = null as any;
+  try {
+    identity = await identityService.getIdentity();
+  } catch (_err) {
+    // treat as unauth
+    return true;
+  }
+  if (!identity) return true;
+  const isAuthenticated = !!(
+    identity.isAdmin ||
+    identity.isClient ||
+    identity.isUser ||
+    identity.isWorker
+  );
+  if (!isAuthenticated) return true; // unauth → allow public routes
+  // authenticated → send to landing
+  if (identity.isAdmin || identity.isClient)
+    return router.parseUrl('/dashboard');
+  if (identity.isWorker) return router.parseUrl('/take-attendance');
+  if (identity.isUser) return router.parseUrl('/projects');
+  return true;
+};
+
+const requireAdminOrClient: CanActivateFn = async () => {
+  const router = inject(Router);
+  const identityService = inject(IdentityService);
+  let identity = null as any;
+  try {
+    identity = await identityService.getIdentity();
+  } catch (_err) {
+    return router.parseUrl('/login');
+  }
+  if (identity?.isAdmin || identity?.isClient) return true;
+  // fallback by role
+  if (identity?.isWorker) return router.parseUrl('/take-attendance');
+  if (identity?.isUser) return router.parseUrl('/projects');
+  return router.parseUrl('/login');
+};
+
+const requireWorkerRoutes: CanActivateFn = async () => {
+  const router = inject(Router);
+  const identityService = inject(IdentityService);
+  let identity = null as any;
+  try {
+    identity = await identityService.getIdentity();
+  } catch (_err) {
+    return true;
+  }
+  if (identity?.isWorker) return true;
+  if (identity?.isAdmin || identity?.isClient)
+    return router.parseUrl('/dashboard');
+  if (identity?.isUser) return router.parseUrl('/projects');
+  return true;
+};
+
+const requireUserRoutes: CanActivateFn = async () => {
+  const router = inject(Router);
+  const identityService = inject(IdentityService);
+  let identity = null as any;
+  try {
+    identity = await identityService.getIdentity();
+  } catch (_err) {
+    return true; // treat as unauth, allow route if it's public; if this guard protects user-only route, fallback below will handle
+  }
+  if (identity?.isUser) return true;
+  if (identity?.isAdmin || identity?.isClient)
+    return router.parseUrl('/dashboard');
+  if (identity?.isWorker) return router.parseUrl('/take-attendance');
+  return true; // unauth users can still hit public routes; apply this guard only where needed
+};
 
 export const routes: Routes = [
   { path: '', redirectTo: 'signup', pathMatch: 'full' },
@@ -8,16 +85,22 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login-user').then((m) => m.LoginUser),
+    canMatch: [redirectIfAuthenticated],
   },
-  {
-    path: 'login/admin',
-    loadComponent: () =>
-      import('./pages/login/admin/login-admin').then((m) => m.LoginAdmin),
-  },
+
   {
     path: 'signup',
     loadComponent: () =>
       import('./pages/signup/user-signup').then((m) => m.SignUpUser),
+    canMatch: [redirectIfAuthenticated],
+  },
+  {
+    path: 'signup/client',
+    loadComponent: () =>
+      import('./pages/signup/client-signup').then(
+        (m) => m.CreateClientComponent
+      ),
+    canMatch: [redirectIfAuthenticated],
   },
 
   // forgot password route
@@ -27,6 +110,7 @@ export const routes: Routes = [
       import('./pages/login/forget-password/forget-password.component').then(
         (m) => m.ForgetPasswordComponent
       ),
+    canMatch: [redirectIfAuthenticated],
   },
   // isAdmin or isClient
   {
@@ -35,6 +119,7 @@ export const routes: Routes = [
       import('./pages/dashboard/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
+    canActivate: [requireAdminOrClient],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'user-management' },
 
@@ -139,6 +224,11 @@ export const routes: Routes = [
       import('./pages/projects/project-detail.component').then(
         (m) => m.ProjectDetailComponent
       ),
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./pages/about/about.component').then((m) => m.AboutComponent),
   },
   {
     path: 'form/:formId',

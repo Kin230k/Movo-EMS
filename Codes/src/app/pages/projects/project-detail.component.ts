@@ -3,16 +3,30 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { ProjectsNavbarComponent } from './projects-navbar.component';
+import { ProjectsFooterComponent } from './projects-footer.component';
 
 // ThemedButton path — adjust to match your repo
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
 
-import {
-  MockProjectsService,
-  ProjectSummary,
-  LocationSummary,
-  LocalizedString,
-} from '../../core/services/project.service';
+import { ApiQueriesService } from '../../core/services/queries.service';
+
+// Local types (formerly from project.service)
+type LocalizedString = { en: string; ar: string };
+interface LocationSummary {
+  locationId: string;
+  name?: LocalizedString | string;
+  formId?: string | null;
+}
+interface ProjectSummary {
+  projectId: string;
+  name: LocalizedString | string;
+  description?: LocalizedString | string | null;
+  startingDate?: string | null;
+  endingDate?: string | null;
+  formId?: string | null;
+  locations?: LocationSummary[] | null;
+}
 
 @Component({
   selector: 'app-project-detail',
@@ -22,9 +36,12 @@ import {
     RouterModule,
     FormsModule,
     TranslateModule,
+    ProjectsNavbarComponent,
     ThemedButtonComponent,
   ],
   template: `
+    <app-projects-navbar></app-projects-navbar>
+
     <div class="detail-container" *ngIf="!loading && project; else loadingTpl">
       <button class="back" (click)="goBack()">
         &larr; {{ 'COMMON.BUTTONS.CANCEL' | translate }}
@@ -116,6 +133,7 @@ import {
     <ng-template #loadingTpl>
       <div class="loading">{{ 'COMMON.LOADING' | translate }}</div>
     </ng-template>
+    <!-- <app-projects-footer></app-projects-footer> -->
   `,
   styles: [
     `
@@ -236,34 +254,33 @@ import {
   ],
 })
 export class ProjectDetailComponent implements OnInit {
-  private mockService = inject(MockProjectsService);
+  private apiQueries = inject(ApiQueriesService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   projectId!: string | null;
-  project: ProjectSummary | null = null;
-  loading = true;
+  projectQuery: any;
+  get project(): ProjectSummary | null {
+    const data = this.projectQuery?.data?.() ?? null;
+    return data.project;
+  }
+  get loading(): boolean {
+    return this.projectQuery?.isLoading?.() ?? false;
+  }
 
   selectedLocationId: string | null = null;
   selectedLocationFormId: string | null | undefined = undefined;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.projectId = this.route.snapshot.paramMap.get('projectId');
-    if (this.projectId) this.fetchProject(this.projectId);
+    if (this.projectId) await this.fetchProject(this.projectId);
   }
 
-  fetchProject(id: string) {
-    this.loading = true;
-    this.mockService.getProjectById(id).subscribe({
-      next: (res) => {
-        this.project = res;
-        this.loading = false;
-      },
-      error: () => {
-        this.project = null;
-        this.loading = false;
-      },
-    });
+  async fetchProject(id: string) {
+    this.projectQuery = this.apiQueries.getProjectInfoByIdQuery({
+      projectId: id,
+    } as any);
+    await this.projectQuery.refetch();
   }
 
   displayName(name: LocalizedString | string | undefined) {

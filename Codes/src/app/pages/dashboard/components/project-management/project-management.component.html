@@ -23,11 +23,11 @@
 
   <!-- Projects Tab Content -->
   <div *ngIf="activeTab === 'projects'" class="tab-content">
-    <app-topbar
+    <app-project-topbar
       [projects]="transformedProjects"
       (projectCreated)="onProjectCreated($event)"
       (scheduleCreated)="onScheduleCreated($event)"
-    ></app-topbar>
+    ></app-project-topbar>
 
     <!-- show error -->
     <div *ngIf="error" class="error" role="alert">

@@ -1,4 +1,4 @@
-// src/app/pages/auth/signup-user.component.ts
+// src/app/pages/clients/create-client.component.ts
 import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
@@ -13,18 +13,29 @@ import {
   FormControl,
   Validators,
 } from '@angular/forms';
+import { PhoneInputComponent } from '../../components/shared/phone-input/phone-input';
 import { Subscription } from 'rxjs';
 
 export type Multilingual = { en: string; ar: string };
 
+export interface CreateClientPayload {
+  name: Multilingual;
+  contactEmail: string;
+  contactPhone: string;
+  company: Multilingual;
+  logo?: string;
+  password?: string;
+}
+
 @Component({
-  selector: 'app-signup-user',
+  selector: 'app-create-client',
   standalone: true,
   imports: [
     CommonModule,
     ThemedButtonComponent,
     TranslateModule,
     ReactiveFormsModule,
+    PhoneInputComponent,
   ],
   template: `
     <div
@@ -49,46 +60,57 @@ export type Multilingual = { en: string; ar: string };
           aria-busy="true"
         >
           <div class="spinner" role="status" aria-hidden="true"></div>
-          <div class="overlay-msg">{{ 'SIGNUP.CREATING' | translate }}</div>
+          <div class="overlay-msg">{{ 'CLIENT.CREATING' | translate }}</div>
         </div>
 
-        <h2 class="login-title">{{ 'SIGNUP.TITLE' | translate }}</h2>
+        <h2 class="login-title">{{ 'CLIENT.CREATE_TITLE' | translate }}</h2>
 
-        <form [formGroup]="form" (ngSubmit)="onSignUp()">
+        <form [formGroup]="form" (ngSubmit)="onCreateClient()">
           <div class="grid two-col">
             <input
               type="text"
-              [placeholder]="'SIGNUP.NAME_EN' | translate"
+              [placeholder]="'CLIENT.NAME_EN' | translate"
               formControlName="nameEn"
             />
 
             <input
               type="text"
-              [placeholder]="'SIGNUP.NAME_AR' | translate"
+              [placeholder]="'CLIENT.NAME_AR' | translate"
               formControlName="nameAr"
             />
           </div>
 
           <input
             type="email"
-            [placeholder]="'SIGNUP.EMAIL_PLACEHOLDER' | translate"
-            formControlName="email"
-            class="email"
+            [placeholder]="'CLIENT.CONTACT_EMAIL' | translate"
+            formControlName="contactEmail"
           />
+          <div class="phone">
+            <app-phone-input
+              formControlName="contactPhone"
+              [placeholder]="'CLIENT.CONTACT_PHONE' | translate"
+            ></app-phone-input>
+          </div>
 
           <div class="grid two-col">
             <input
               type="password"
-              [placeholder]="'SIGNUP.PASSWORD_PLACEHOLDER' | translate"
+              [placeholder]="'CLIENT.PASSWORD' | translate"
               formControlName="password"
             />
 
             <input
-              type="password"
-              [placeholder]="'SIGNUP.CONFIRM_PASSWORD' | translate"
-              formControlName="confirmPassword"
+              type="text"
+              [placeholder]="'CLIENT.COMPANY_EN' | translate"
+              formControlName="companyEn"
             />
           </div>
+
+          <input
+            type="text"
+            [placeholder]="'CLIENT.COMPANY_AR' | translate"
+            formControlName="companyAr"
+          />
 
           <div class="file-upload dropzone">
             <input
@@ -100,7 +122,7 @@ export type Multilingual = { en: string; ar: string };
               #fileInput
             />
             <div class="btn-upload-logo" (click)="fileInput.click()">
-              {{ 'SIGNUP.UPLOAD_PICTURE' | translate }}
+              {{ 'CLIENT.UPLOAD_LOGO' | translate }}
             </div>
 
             <div class="upload-info" *ngIf="uploadProgress() >= 0">
@@ -108,39 +130,36 @@ export type Multilingual = { en: string; ar: string };
             </div>
 
             <img
-              *ngIf="pictureURL()"
-              [src]="pictureURL()"
+              *ngIf="logoURL()"
+              [src]="logoURL()"
               class="preview"
-              alt="profile picture preview"
+              alt="logo preview"
             />
           </div>
 
           <div class="forgot-password">
-            <a (click)="goToForgetPassword()">{{
-              'SIGNUP.FORGET_PASSWORD' | translate
-            }}</a>
+            <a (click)="goToLogin()">{{ 'CLIENT.GO_TO_LOGIN' | translate }}</a>
           </div>
 
           <themed-button
             type="submit"
-            [text]="'SIGNUP.BUTTON' | translate"
+            [text]="'CLIENT.CREATE_BUTTON' | translate"
           ></themed-button>
 
           <div class="switch-login-type">
-            <a (click)="goToLogin()">{{
-              'SIGNUP.SWITCH_TO_LOGIN' | translate
+            <a (click)="goToClients()">{{
+              'CLIENT.BACK_TO_LIST' | translate
             }}</a>
-            <a (click)="goToClient()">
-              {{ 'SIGNUP.SWITCH_TO_CLIENT' | translate }}
-            </a>
           </div>
         </form>
       </div>
     </div>
   `,
   styles: [
+    /* paste your existing styles here (omitted for brevity in this snippet) */
+    /* keep the same styles as you had in the original file */
     `
-      /* original styles (updated to match) */
+      /* original styles (unchanged) */
       * {
         box-sizing: border-box;
       }
@@ -211,7 +230,9 @@ export type Multilingual = { en: string; ar: string };
       .login-form.loading {
         opacity: 0.9;
       }
-
+      .phone {
+        margin-block: 1rem;
+      }
       .overlay {
         position: absolute;
         inset: 0;
@@ -271,18 +292,18 @@ export type Multilingual = { en: string; ar: string };
         font-weight: 400;
       }
 
-      .forgot-password {
+      .forget-password {
         text-align: right;
         margin: -0.5rem 0 1.5rem 0;
       }
 
-      .forgot-password a {
+      .forget-password a {
         color: var(--secondary);
         text-decoration: none;
         font-size: 0.9rem;
       }
 
-      .forgot-password a:hover {
+      .forget-password a:hover {
         text-decoration: underline;
         cursor: pointer;
       }
@@ -290,9 +311,6 @@ export type Multilingual = { en: string; ar: string };
       .switch-login-type {
         text-align: center;
         margin: 1.5rem 0 0 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
       }
 
       .switch-login-type a {
@@ -406,11 +424,11 @@ export type Multilingual = { en: string; ar: string };
           margin-bottom: 1.2rem;
         }
 
-        .forgot-password {
+        .forget-password {
           margin: -0.5rem 0 1.2rem 0;
         }
 
-        .forgot-password a {
+        .forget-password a {
           font-size: 0.85rem;
         }
 
@@ -437,7 +455,7 @@ export type Multilingual = { en: string; ar: string };
           margin-bottom: 1.2rem;
         }
 
-        .forgot-password {
+        .forget-password {
           margin: -0.3rem 0 1rem 0;
         }
 
@@ -445,13 +463,10 @@ export type Multilingual = { en: string; ar: string };
           margin: 1rem 0 0 0;
         }
       }
-      .email {
-        margin-bottom: 1rem;
-      }
     `,
   ],
 })
-export class SignUpUser implements OnDestroy {
+export class CreateClientComponent implements OnDestroy {
   // services via inject()
   private router = inject(Router);
   private langService = inject(LanguageService);
@@ -462,10 +477,12 @@ export class SignUpUser implements OnDestroy {
   form = new FormGroup({
     nameEn: new FormControl('', Validators.required),
     nameAr: new FormControl(''),
-    email: new FormControl('', [Validators.required, Validators.email]),
+    contactEmail: new FormControl('', [Validators.required, Validators.email]),
+    contactPhone: new FormControl(''), // bound to PhoneInputComponent (CVa)
     password: new FormControl('', Validators.required),
-    confirmPassword: new FormControl('', Validators.required),
-    picture: new FormControl(''),
+    companyEn: new FormControl(''),
+    companyAr: new FormControl(''),
+    logo: new FormControl(''),
   });
 
   // UI state as signals
@@ -475,7 +492,7 @@ export class SignUpUser implements OnDestroy {
   toastType = signal<'success' | 'error'>('success');
 
   uploadProgress = signal<number>(-1);
-  pictureURL = signal<string | undefined>(undefined);
+  logoURL = signal<string | undefined>(undefined);
 
   private subs: Subscription[] = [];
   private toastTimer?: ReturnType<typeof setTimeout>;
@@ -503,17 +520,17 @@ export class SignUpUser implements OnDestroy {
         // progress object assumed: { progress: number } and on completion { downloadURL: string }
         if ((progress as any).downloadURL) {
           const url = (progress as any).downloadURL as string;
-          this.pictureURL.set(url);
+          this.logoURL.set(url);
           this.uploadProgress.set(100);
           // write to the form value
-          this.form.patchValue({ picture: url });
+          this.form.patchValue({ logo: url });
         } else if (typeof (progress as any).progress === 'number') {
           this.uploadProgress.set((progress as any).progress);
         }
       },
       error: (err) => {
         console.error('Upload error', err);
-        this.triggerToast('Image upload failed', 'error');
+        this.triggerToast('Logo upload failed', 'error');
         this.uploadProgress.set(-1);
       },
       complete: () => {
@@ -524,43 +541,45 @@ export class SignUpUser implements OnDestroy {
     this.subs.push(uploadSub);
   }
 
-  async onSignUp() {
+  async onCreateClient() {
     if (this.isSubmitting()) return;
 
     // mark controls as touched to show validation state if used
     this.form.markAllAsTouched();
 
     // simple validation
-    if (!this.form.value.email || !this.form.value.password) {
-      this.triggerToast('Please fill email and password', 'error');
-      return;
-    }
-
-    if (this.form.value.password !== this.form.value.confirmPassword) {
-      this.triggerToast('Passwords do not match', 'error');
+    if (!this.form.value.contactEmail || !this.form.value.password) {
+      this.triggerToast('Please fill client email and password', 'error');
       return;
     }
 
     this.isSubmitting.set(true);
 
+    const payload: CreateClientPayload = {
+      name: {
+        en: this.form.value.nameEn ?? '',
+        ar: this.form.value.nameAr ?? '',
+      },
+      contactEmail: this.form.value.contactEmail ?? '',
+      contactPhone: this.form.value.contactPhone ?? '',
+      company: {
+        en: this.form.value.companyEn ?? '',
+        ar: this.form.value.companyAr ?? '',
+      },
+      logo: this.form.value.logo ?? '',
+      password: this.form.value.password ?? '',
+    };
+
     try {
-      const credential = await this.authService.register(
-        this.form.value.email ?? '',
-        this.form.value.password ?? '',
-        {
-          en: this.form.value.nameEn ?? '',
-          ar: this.form.value.nameAr ?? '',
-        },
-        this.form.value.picture ?? ''
-      );
-      console.log('Registered', credential);
-      this.triggerToast('Registered successfully', 'success');
+      const credential = await this.authService.createClient(payload as any);
+      console.log('Client created', credential);
+      this.triggerToast('Client created successfully', 'success');
       // navigate after success
-      this.router.navigate(['/projects']);
+      this.router.navigate(['/dashboard ']);
     } catch (error: any) {
-      console.error('Registration failed', error);
+      console.error('Create client failed', error);
       this.triggerToast(
-        'Registration failed: ' + (error?.message ?? String(error)),
+        'Create client failed: ' + (error?.message ?? String(error)),
         'error'
       );
     } finally {
@@ -572,12 +591,8 @@ export class SignUpUser implements OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  goToForgetPassword() {
-    this.router.navigate(['/forget-password']);
-  }
-
-  goToClient() {
-    this.router.navigate(['/signup/client']);
+  goToClients() {
+    this.router.navigate(['/clients']);
   }
 
   private triggerToast(message: string, type: 'success' | 'error' = 'success') {

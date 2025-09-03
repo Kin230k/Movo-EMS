@@ -1,8 +1,8 @@
 <div class="container">
   <!-- open the Add Project modal -->
   <themed-button
-    text="{{ 'PROJECT_MANAGEMENT.ADD_PROJECT' | translate }}"
-    (click)="openAddProject()"
+    [text]="'PROJECT_MANAGEMENT.ADD_PROJECT' | translate"
+    (onClick)="openAddProject()"
   ></themed-button>
 </div>
 

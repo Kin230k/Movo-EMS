@@ -1,22 +1,45 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // ThemedButton path — adjust to match your repo
-import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
 
-import {
-  MockProjectsService,
-  ProjectSummary,
-  LocalizedString,
-} from '../../core/services/project.service';
+import { ApiQueriesService } from '../../core/services/queries.service';
+import { ProjectsNavbarComponent } from './projects-navbar.component';
+import { ProjectsFooterComponent } from './projects-footer.component';
+import { ProjectsLandingComponent } from './projects-landing.component';
+
+// Local types (formerly from project.service)
+type LocalizedString = { en: string; ar: string };
+interface ProjectSummary {
+  projectId: string;
+  name: LocalizedString | string;
+  description?: LocalizedString | string | null;
+  startingDate?: string | null;
+  endingDate?: string | null;
+}
 
 @Component({
   selector: 'app-projects-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TranslateModule,
+    ProjectsNavbarComponent,
+    ProjectsLandingComponent,
+  ],
   template: `
+    <app-projects-navbar></app-projects-navbar>
+
+    <app-projects-landing
+      [title]="'PROJECTS.TITLE' | translate"
+      [subtitle]="
+        ('PROJECTS.SUBTITLE' | translate) || 'Explore available projects'
+      "
+    ></app-projects-landing>
+
     <div class="projects-container">
       <h1 class="title">{{ 'PROJECTS.TITLE' | translate }}</h1>
 
@@ -42,19 +65,21 @@ import {
             <h2 class="card-title">{{ displayName(p.name) }}</h2>
             <p class="card-desc">{{ displayDescription(p.description) }}</p>
             <div class="dates">
-              <div>
+              <div *ngIf="p.startingDate">
                 <strong>{{ 'PROJECTS.STARTING_DATE' | translate }}:</strong>
-                <span>{{ p.startingDate | date : 'mediumDate' }}</span>
+                <span>{{ displayDate(p.startingDate) }}</span>
               </div>
               <div *ngIf="p.endingDate">
                 <strong>{{ 'PROJECTS.ENDING_DATE' | translate }}:</strong>
-                <span>{{ p.endingDate | date : 'mediumDate' }}</span>
+                <span>{{ displayDate(p.endingDate) }}</span>
               </div>
             </div>
           </div>
         </article>
       </div>
     </div>
+
+    <!-- <app-projects-footer></app-projects-footer> -->
   `,
   styles: [
     `
@@ -201,40 +226,46 @@ import {
   ],
 })
 export class ProjectsPageComponent implements OnInit {
-  private mockService = inject(MockProjectsService);
+  private apiQueries = inject(ApiQueriesService);
   private router = inject(Router);
-
-  projects: ProjectSummary[] = [];
-  loading = true;
+  private translate = inject(TranslateService);
+  projectsQuery: any;
+  get projects(): ProjectSummary[] {
+    const data = this.projectsQuery?.data?.() ?? [];
+    return data?.success ? (data.projects as any) : [];
+  }
+  get loading(): boolean {
+    return this.projectsQuery?.isLoading?.() ?? false;
+  }
 
   ngOnInit(): void {
-    this.fetchProjects();
+    this.projectsQuery = this.apiQueries.getAllActiveProjectsQuery();
   }
 
   fetchProjects() {
-    this.loading = true;
-    this.mockService.getProjects().subscribe({
-      next: (res) => {
-        this.projects = res || [];
-        this.loading = false;
-      },
-      error: () => {
-        this.projects = [];
-        this.loading = false;
-      },
-    });
+    (this.projectsQuery as any)?.refetch?.();
   }
 
   displayName(name: LocalizedString | string | undefined) {
     if (!name) return '';
     if (typeof name === 'string') return name;
-    return name.en || name.ar || '';
+    // render the name in the current language
+    const lang =
+      this.translate.getCurrentLang() ||
+      (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
+    return name[lang as keyof LocalizedString] || name.en || name.ar || '';
   }
 
   displayDescription(d?: LocalizedString | string | null) {
     if (!d) return '';
     if (typeof d === 'string') return d;
     return d.en || d.ar || '';
+  }
+
+  displayDate(d?: string | null): string | null {
+    if (!d) return null;
+    if (typeof d === 'string') return new Date(d).toLocaleDateString();
+    return null;
   }
 
   openProject(p: ProjectSummary) {

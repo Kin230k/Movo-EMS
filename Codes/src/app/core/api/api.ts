@@ -1,59 +1,62 @@
 // app/core/api/api.ts
-// Auto-generated API client that always uses POST and sends Firebase Auth token in Authorization header when available.
+// Auto-generated API client that uses Firebase Functions SDK (httpsCallable) for all calls.
+// The old BASE_URL / REST approach has been removed in favor of the SDK.
+// You can change the functions region with setFunctionsRegion(region).
 
-import { getAuth } from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../../main';
 
 export type Multilingual = { en: string; ar: string };
 
-let BASE_URL = 'http://127.0.0.1:5001/local/us-central1';
+// Default region inferred from previous code's BASE_URL. Override with setFunctionsRegion.
+let FUNCTIONS_REGION = 'us-central1';
 
+/**
+ * Set the region used when calling Firebase Functions via the SDK.
+ * Example: setFunctionsRegion('europe-west1')
+ */
+export function setFunctionsRegion(region: string) {
+  FUNCTIONS_REGION = region;
+}
+
+/**
+ * Backwards-compatible stub. Original code exposed setBaseUrl. When using the Functions SDK
+ * there's no base URL to set; use setFunctionsRegion instead. If you pass a URL like
+ * "https://us-central1-project.cloudfunctions.net" this will attempt to extract the region
+ * and set it automatically.
+ */
 export function setBaseUrl(url: string) {
-  BASE_URL = url.replace(/\/$/, '');
-}
-
-async function getIdTokenIfAvailable(): Promise<string | undefined> {
-  const auth = getAuth();
-  const user = auth.currentUser;
-  if (!user) return undefined;
   try {
-    return await user.getIdToken();
-  } catch (e) {
-    return undefined;
-  }
-}
-
-async function post(fnName: string, payload: unknown): Promise<any> {
-  const url = `${BASE_URL}/${fnName}`;
-  const token = await getIdTokenIfAvailable();
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ data: payload }),
-  });
-
-  const text = await res.text();
-  let json: any = null;
-  try {
-    json = text ? JSON.parse(text) : null;
-  } catch (e) {
-    throw new Error(`Invalid JSON response from ${url}: ${text}`);
-  }
-
-  if (!res.ok) {
-    const err = new Error(
-      `API ${fnName} failed: ${res.status} ${res.statusText}`
+    const m = url.match(
+      /^https?:\/\/([a-z0-9-]+)-[a-z0-9-]+\.cloudfunctions\.net/i
     );
-    (err as any).body = json;
-    throw err;
+    if (m && m[1]) {
+      FUNCTIONS_REGION = m[1];
+    }
+  } catch (e) {
+    // ignore - keep default
   }
+}
 
-  return json;
+// Helper to call a named callable function and return its .data
+async function call<T = any>(fnName: string, payload: unknown): Promise<T> {
+  const callable = httpsCallable(functions, fnName);
+
+  try {
+    // If caller passes undefined, send empty object.
+    const param = payload === undefined ? {} : payload;
+    const res = await callable(param as any);
+    // For callable functions, the SDK returns { data: ... } where .data is the payload from server.
+    return res.data as T;
+  } catch (err: any) {
+    // Normalize and rethrow with useful info
+    const error: any = new Error(
+      `API ${fnName} failed: ${err?.message ?? err}`
+    );
+    error.code = err?.code;
+    error.details = err?.details ?? err?.customData ?? null;
+    throw error;
+  }
 }
 
 // --- Types ---
@@ -372,9 +375,7 @@ export interface UpdateProjectPayload {
   endingDate?: string;
   description?: Multilingual | null;
 }
-export interface GetProjectByClientPayload {
-  clientId: string;
-}
+export interface getProjectsByClientPayload {}
 
 export interface CreateLocationPayload {
   name: Multilingual;
@@ -507,357 +508,369 @@ export interface GetSchedulesByProjectOrLocationPayload {
   projectId?: string;
   locationId?: string;
 }
+export interface GetAllFormQuestionsPayload {
+  formId: string;
+}
 
 // --- Functions ---
-
+export interface getProjectInfoByIdPayload {
+  projectId: string;
+}
 // Admin functions
 export async function sendEmail(payload: SendEmailPayload) {
-  return post('sendEmail', payload);
+  return call('sendEmail', payload);
 }
 export async function createAdmin(payload: CreateAdminPayload) {
-  return post('createAdmin', payload);
+  return call('createAdmin', payload);
 }
 export async function getAdmin(payload?: GetAdminPayload) {
-  return post('getAdmin', payload ?? {});
+  return call('getAdmin', payload ?? {});
 }
 export async function getAllAdmins() {
-  return post('getAllAdmins', {});
+  return call('getAllAdmins', {});
 }
 export async function updateAdmin(payload: UpdateAdminPayload) {
-  return post('updateAdmin', payload);
+  return call('updateAdmin', payload);
 }
 
 // User functions
 
 export async function changeUserEmail(payload: ChangeUserEmailPayload) {
-  return post('changeUserEmail', payload);
+  return call('changeUserEmail', payload);
 }
 export async function changeUserPhone(payload: ChangeUserPhonePayload) {
-  return post('changeUserPhone', payload);
+  return call('changeUserPhone', payload);
 }
 export async function checkServiceStatus(payload: CheckServiceStatusPayload) {
-  return post('checkServiceStatus', payload);
+  return call('checkServiceStatus', payload);
 }
 export async function editUserInfo(payload: EditUserInfoPayload) {
-  return post('editUserInfo', payload);
+  return call('editUserInfo', payload);
 }
 export async function getUserInfo() {
-  return post('getUserInfo', {});
+  return call('getUserInfo', {});
 }
 export async function registerUser(payload: RegisterUserPayload) {
-  return post('registerUser', payload);
+  return call('registerUser', payload);
 }
 export async function sendLoginAlert(payload?: SendLoginAlertPayload) {
-  return post('sendLoginAlert', payload ?? {});
+  return call('sendLoginAlert', payload ?? {});
 }
 export async function sendPasswordReset(payload: SendPasswordResetPayload) {
-  return post('sendPasswordReset', payload);
+  return call('sendPasswordReset', payload);
 }
 export async function sendVerificationEmail(
   payload: SendVerificationEmailPayload
 ) {
-  return post('sendVerificationEmail', payload);
+  return call('sendVerificationEmail', payload);
 }
 export async function getProjectUsers(payload: GetProjectUsersPayload) {
-  return post('getProjectUsers', payload);
+  return call('getProjectUsers', payload);
 }
 export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
-  return post('getUserInfoByEmail', payload);
+  return call('getUserInfoByEmail', payload);
 }
 export async function getCallerIdentity() {
-  return post('getCallerIdentity', {});
+  return call('getCallerIdentity', {});
 }
 
 // Client functions
 export async function createClient(payload: CreateClientPayload) {
-  return post('createClient', payload);
+  return call('createClient', payload);
 }
 export async function adminCreateClient(payload: AdminCreateClientPayload) {
-  return post('adminCreateClient', payload);
+  return call('adminCreateClient', payload);
 }
 export async function approveRejectClient(payload: ApproveRejectClientPayload) {
-  return post('approveRejectClient', payload);
+  return call('approveRejectClient', payload);
 }
 export async function deleteClient(payload: DeleteClientPayload) {
-  return post('deleteClient', payload);
+  return call('deleteClient', payload);
 }
 export async function getAllClients() {
-  return post('getAllClients', {});
+  return call('getAllClients', {});
 }
 export async function getClient(payload: GetClientPayload) {
-  return post('getClient', payload);
+  return call('getClient', payload);
 }
 export async function updateClient(payload: UpdateClientPayload) {
-  return post('updateClient', payload);
+  return call('updateClient', payload);
 }
 
 // ProjectUserRole functions
 export async function createProjectUserRole(
   payload: CreateProjectUserRolePayload = {}
 ) {
-  return post('createProjectUserRole', payload);
+  return call('createProjectUserRole', payload);
 }
 export async function updateProjectUserRole(
   payload: UpdateProjectUserRolePayload = {}
 ) {
-  return post('updateProjectUserRole', payload);
+  return call('updateProjectUserRole', payload);
 }
 export async function deleteProjectUserRole(
   payload: DeleteProjectUserRolePayload = {}
 ) {
-  return post('deleteProjectUserRole', payload);
+  return call('deleteProjectUserRole', payload);
 }
 export async function getProjectUserRole(
   payload: GetProjectUserRolePayload = {}
 ) {
-  return post('getProjectUserRole', payload);
+  return call('getProjectUserRole', payload);
 }
 export async function getAllProjectUserRoles() {
-  return post('getAllProjectUserRoles', {});
+  return call('getAllProjectUserRoles', {});
 }
 export async function getProjectUserRolesByUserAndProject(
   payload: GetProjectUserRolesByUserAndProjectPayload = {}
 ) {
-  return post('getProjectUserRolesByUserAndProject', payload);
+  return call('getProjectUserRolesByUserAndProject', payload);
 }
 
 // Form / Question functions
+
+export async function getAllFormQuestions(payload: GetAllFormQuestionsPayload) {
+  return call('getAllFormQuestions', payload);
+}
 export async function createForm(payload: CreateFormPayload = {}) {
-  return post('createForm', payload);
+  return call('createForm', payload);
 }
 export async function createQuestions(payload: CreateQuestionsPayload) {
-  return post('createQuestions', payload);
+  return call('createQuestions', payload);
 }
 export async function deleteForm(payload: DeleteFormPayload = {}) {
-  return post('deleteForm', payload);
+  return call('deleteForm', payload);
 }
 export async function getForm(payload: GetFormPayload = {}) {
-  return post('getForm', payload);
+  return call('getForm', payload);
 }
 export async function updateForm(payload: UpdateFormPayload = {}) {
-  return post('updateForm', payload);
+  return call('updateForm', payload);
 }
 export async function getFormByUser(payload: GetFormByUserPayload = {}) {
-  return post('getFormByUser', payload);
+  return call('getFormByUser', payload);
 }
 
 export async function createQuestion(payload: CreateQuestionPayload) {
-  return post('createQuestion', payload);
+  return call('createQuestion', payload);
 }
 export async function deleteQuestion(payload: DeleteQuestionPayload) {
-  return post('deleteQuestion', payload);
+  return call('deleteQuestion', payload);
 }
 export async function getAllQuestions() {
-  return post('getAllQuestions', {});
+  return call('getAllQuestions', {});
 }
 export async function getQuestion(payload: GetQuestionPayload) {
-  return post('getQuestion', payload);
+  return call('getQuestion', payload);
 }
 export async function updateQuestion(payload: UpdateQuestionPayload) {
-  return post('updateQuestion', payload);
+  return call('updateQuestion', payload);
 }
 export async function getInterviewQuestions(
   payload: GetInterviewQuestionsPayload
 ) {
-  return post('getInterviewQuestions', payload);
+  return call('getInterviewQuestions', payload);
 }
 
 // Submission functions
 export async function createSubmission(payload: CreateSubmissionPayload = {}) {
-  return post('createSubmission', payload);
+  return call('createSubmission', payload);
 }
 export async function createSubmissionWithAnswer(
   payload: CreateSubmissionWithAnswerPayload
 ) {
-  return post('createSubmissionWithAnswer', payload);
+  return call('createSubmissionWithAnswer', payload);
 }
 export async function createSubmissionWithAnswers(
   payload: CreateSubmissionWithAnswersPayload
 ) {
-  return post('createSubmissionWithAnswers', payload);
+  return call('createSubmissionWithAnswers', payload);
 }
 export async function deleteSubmission(payload: DeleteSubmissionPayload = {}) {
-  return post('deleteSubmission', payload);
+  return call('deleteSubmission', payload);
 }
 export async function getSubmission(payload: GetSubmissionPayload = {}) {
-  return post('getSubmission', payload);
+  return call('getSubmission', payload);
 }
 export async function updateSubmission(payload: UpdateSubmissionPayload) {
-  return post('updateSubmission', payload);
+  return call('updateSubmission', payload);
 }
 export async function getManualByFormId(payload: GetManualByFormIdPayload) {
-  return post('getManualByFormId', payload);
+  return call('getManualByFormId', payload);
 }
 export async function getManualAnswersBySubmissionId(
   payload: GetManualAnswersBySubmissionIdPayload
 ) {
-  return post('getManualAnswersBySubmissionId', payload);
+  return call('getManualAnswersBySubmissionId', payload);
 }
 export async function getSubmissionsByForm(
   payload: GetSubmissionsByFormPayload
 ) {
-  return post('getSubmissionsByForm', payload);
+  return call('getSubmissionsByForm', payload);
 }
 export async function getAnswersBySubmissionId(
   payload: GetAnswersBySubmissionIdPayload
 ) {
-  return post('getAnswersBySubmissionId', payload);
+  return call('getAnswersBySubmissionId', payload);
 }
 export async function updateSubmissionStatus(
   payload: UpdateSubmissionStatusPayload
 ) {
-  return post('updateSubmissionStatus', payload);
+  return call('updateSubmissionStatus', payload);
 }
 export async function getQuestionAnswersBySubmission(
   payload: GetQuestionAnswersBySubmissionPayload
 ) {
-  return post('getQuestionAnswersBySubmission', payload);
+  return call('getQuestionAnswersBySubmission', payload);
 }
 
 // Interview functions
 export async function createInterview(payload: CreateInterviewPayload) {
-  return post('createInterview', payload);
+  return call('createInterview', payload);
 }
 export async function updateInterview(payload: UpdateInterviewPayload) {
-  return post('updateInterview', payload);
+  return call('updateInterview', payload);
 }
 export async function getInterview(payload: GetInterviewPayload) {
-  return post('getInterview', payload);
+  return call('getInterview', payload);
 }
 export async function getInterviewByProject(
   payload: GetInterviewByProjectPayload
 ) {
-  return post('getInterviewByProject', payload);
+  return call('getInterviewByProject', payload);
 }
 export async function deleteInterview(payload: DeleteInterviewPayload) {
-  return post('deleteInterview', payload);
+  return call('deleteInterview', payload);
 }
 
 // Project functions
 export async function createProject(payload: CreateProjectPayload) {
-  return post('createProject', payload);
+  return call('createProject', payload);
 }
 export async function deleteProject(payload: DeleteProjectPayload) {
-  return post('deleteProject', payload);
+  return call('deleteProject', payload);
 }
 export async function getProject(payload: GetProjectPayload) {
-  return post('getProject', payload);
+  return call('getProject', payload);
 }
 export async function updateProject(payload: UpdateProjectPayload) {
-  return post('updateProject', payload);
+  return call('updateProject', payload);
 }
-export async function getProjectByClient(payload: GetProjectByClientPayload) {
-  return post('getProjectByClient', payload);
+export async function getProjectsByClient(payload: getProjectsByClientPayload) {
+  return call('getProjectsByClient', payload);
 }
 export async function getAllProjects() {
-  return post('getAllProjects', {});
+  return call('getAllProjects', {});
 }
 export async function getAllActiveProjects() {
-  return post('getAllActiveProjects', {});
+  return call('getAllActiveProjects', {});
+}
+export async function getProjectInfoById(payload: getProjectInfoByIdPayload) {
+  return call('getProjectInfoById', payload);
 }
 
 // Location functions
 export async function createLocation(payload: CreateLocationPayload) {
-  return post('createLocation', payload);
+  return call('createLocation', payload);
 }
 export async function deleteLocation(payload: DeleteLocationPayload) {
-  return post('deleteLocation', payload);
+  return call('deleteLocation', payload);
 }
 export async function getLocation(payload: GetLocationPayload) {
-  return post('getLocation', payload);
+  return call('getLocation', payload);
 }
 export async function updateLocation(payload: UpdateLocationPayload) {
-  return post('updateLocation', payload);
+  return call('updateLocation', payload);
 }
 
 // UserProject functions
 export async function createUserProject(payload: CreateUserProjectPayload) {
-  return post('createUserProject', payload);
+  return call('createUserProject', payload);
 }
 export async function deleteUserProject(payload: DeleteUserProjectPayload) {
-  return post('deleteUserProject', payload);
+  return call('deleteUserProject', payload);
 }
 export async function getUserProject(payload: GetUserProjectPayload) {
-  return post('getUserProject', payload);
+  return call('getUserProject', payload);
 }
 export async function updateUserProject(payload: UpdateUserProjectPayload) {
-  return post('updateUserProject', payload);
+  return call('updateUserProject', payload);
 }
 
 // Schedule functions
 export async function createSchedule(payload: CreateSchedulePayload) {
-  return post('createSchedule', payload);
+  return call('createSchedule', payload);
 }
 export async function deleteSchedule(payload: DeleteSchedulePayload) {
-  return post('deleteSchedule', payload);
+  return call('deleteSchedule', payload);
 }
 export async function getSchedule(payload: GetSchedulePayload) {
-  return post('getSchedule', payload);
+  return call('getSchedule', payload);
 }
 export async function updateSchedule(payload: UpdateSchedulePayload) {
-  return post('updateSchedule', payload);
+  return call('updateSchedule', payload);
 }
 export async function getSchedulesByLocation(
   payload: GetSchedulesByLocationPayload
 ) {
-  return post('getSchedulesByLocation', payload);
+  return call('getSchedulesByLocation', payload);
 }
 export async function getSchedulesByProjectOrLocation(
   payload: GetSchedulesByProjectOrLocationPayload
 ) {
-  return post('getSchedulesByProjectOrLocation', payload);
+  return call('getSchedulesByProjectOrLocation', payload);
 }
 
 // UserSchedule functions
 export async function createUserSchedule(payload: CreateUserSchedulePayload) {
-  return post('createUserSchedule', payload);
+  return call('createUserSchedule', payload);
 }
 export async function updateUserSchedule(payload: UpdateUserSchedulePayload) {
-  return post('updateUserSchedule', payload);
+  return call('updateUserSchedule', payload);
 }
 
 // Attendance functions
 export async function createAttendance(payload: CreateAttendancePayload) {
-  return post('createAttendance', payload);
+  return call('createAttendance', payload);
 }
 export async function deleteAttendance(payload: DeleteAttendancePayload) {
-  return post('deleteAttendance', payload);
+  return call('deleteAttendance', payload);
 }
 export async function getAttendance(payload: GetAttendancePayload) {
-  return post('getAttendance', payload);
+  return call('getAttendance', payload);
 }
 export async function updateAttendance(payload: UpdateAttendancePayload) {
-  return post('updateAttendance', payload);
+  return call('updateAttendance', payload);
 }
 export async function getAttendancesByProject(
   payload: GetAttendancesByProjectPayload
 ) {
-  return post('getAttendancesByProject', payload);
+  return call('getAttendancesByProject', payload);
 }
 export async function getUserAttendancesByProject(
   payload: GetUserAttendancesByProjectPayload
 ) {
-  return post('getUserAttendancesByProject', payload);
+  return call('getUserAttendancesByProject', payload);
 }
 
 // Area functions
 export async function createArea(payload: CreateAreaPayload) {
-  return post('createArea', payload);
+  return call('createArea', payload);
 }
 export async function deleteArea(payload: DeleteAreaPayload) {
-  return post('deleteArea', payload);
+  return call('deleteArea', payload);
 }
 export async function getArea(payload: GetAreaPayload) {
-  return post('getArea', payload);
+  return call('getArea', payload);
 }
 export async function updateArea(payload: UpdateAreaPayload) {
-  return post('updateArea', payload);
+  return call('updateArea', payload);
 }
 export async function getAreasByLocation(payload: GetAreasByLocationPayload) {
-  return post('getAreasByLocation', payload);
+  return call('getAreasByLocation', payload);
 }
 export async function getAllAreas() {
-  return post('getAllAreas', {});
+  return call('getAllAreas', {});
 }
 
 const api = {
@@ -900,6 +913,7 @@ const api = {
   createQuestion,
   deleteQuestion,
   getAllQuestions,
+  getAllFormQuestions,
   getQuestion,
   updateQuestion,
   getInterviewQuestions,
@@ -924,9 +938,10 @@ const api = {
   deleteProject,
   getProject,
   updateProject,
-  getProjectByClient,
+  getProjectsByClient,
   getAllProjects,
   getAllActiveProjects,
+  getProjectInfoById,
   createLocation,
   deleteLocation,
   getLocation,

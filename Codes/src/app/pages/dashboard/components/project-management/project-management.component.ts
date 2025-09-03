@@ -10,6 +10,7 @@ import {
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 import { TopbarComponent } from './topbar/topbar.component';
 import { AddScheduleModalComponent } from './topbar/add-schedule-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
@@ -38,7 +39,8 @@ import { DeleteModalComponent } from '../../../../components/shared/delete-modal
 export class ProjectManagementComponent {
   constructor(
     private translate: TranslateService,
-    private apiQueries: ApiQueriesService
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
   ) {}
 
   activeTab: 'projects' | 'schedules' = 'projects';
@@ -47,12 +49,17 @@ export class ProjectManagementComponent {
   projectsQuery: any;
   schedulesQuery: any | null = null;
 
-  ngOnInit() {
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
   }
 
   get mockProjects() {
-    return this.projectsQuery.data() ?? [];
+    return this.projectsQuery.data?.().proej ?? [];
   }
 
   // Stable transformed projects array for combo selector

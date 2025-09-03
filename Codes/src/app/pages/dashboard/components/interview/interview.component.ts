@@ -12,6 +12,7 @@ import { CreateInterviewModalComponent } from './create-interview-modal/create-i
 import { Router } from '@angular/router';
 import { ThemedButtonComponent } from '../../../../components/shared/themed-button/themed-button';
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 export interface IProject {
   id: string;
   name: { en: string; ar: string };
@@ -43,7 +44,8 @@ export class InterviewerFormPageComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private apiQueries: ApiQueriesService
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
   ) {
     this.form = this.fb.group({
       projectId: ['', Validators.required],
@@ -88,8 +90,13 @@ export class InterviewerFormPageComponent {
       name: { en: interview.name, ar: interview.name }, // Use same name for both languages
     }));
   }
-  ngOnInit() {
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
   }
   // handlers for ComboSelector
   onProjectSelect(projectId: string | null) {

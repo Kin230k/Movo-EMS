@@ -5,11 +5,16 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './environments/firebase.config';
 import { connectAuthEmulator } from '@angular/fire/auth';
 import { getAuth } from '@angular/fire/auth';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 
-initializeApp(firebaseConfig);
+let FUNCTIONS_REGION = 'us-central1';
+
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
+export const functions = getFunctions(app, FUNCTIONS_REGION);
 if (typeof window !== 'undefined' && location.hostname === 'localhost') {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+  connectFunctionsEmulator(functions, '127.0.0.1', 5001);
 }
 
 bootstrapApplication(App, appConfig).catch((err) => console.error(err));

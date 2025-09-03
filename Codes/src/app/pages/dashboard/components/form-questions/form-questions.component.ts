@@ -25,6 +25,7 @@ import { ComboSelectorComponent } from '../../../../components/shared/combo-sele
 import { questionTypes } from '../../../../shared/types/questionTypes';
 import { conditionOptions } from '../../../../shared/types/conditionOptions';
 import { ApiQueriesService } from '../../../../core/services/queries.service';
+import { IdentityService } from '../../../../core/services/identity.service';
 
 @Component({
   selector: 'app-form-questions',
@@ -220,7 +221,8 @@ export class FormQuestionsComponent
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private apiQueries: ApiQueriesService
+    private apiQueries: ApiQueriesService,
+    private identity: IdentityService
   ) {
     this.form = this.fb.group({
       projectId: [''],
@@ -322,9 +324,14 @@ export class FormQuestionsComponent
     }
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     // Initialize queries
-    this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
+      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+    } else {
+      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    }
     this.formsQuery = this.apiQueries.getFormByUserQuery({});
     const initialProjectId = this.form.get('projectId')?.value;
     if (initialProjectId) {

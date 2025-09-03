@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormService } from '../../core/services/form.service';
+import { ApiQueriesService } from '../../core/services/queries.service';
 import {
   DynamicFormDto,
   FormAnswersMap,
@@ -175,7 +175,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class FormPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly formService = inject(FormService);
+  private readonly apiQueries = inject(ApiQueriesService);
   private readonly fb = inject(FormBuilder);
 
   loading = signal(true);
@@ -190,22 +190,89 @@ export class FormPageComponent implements OnInit {
     return `form_answers_${formId}`;
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const formId = this.route.snapshot.paramMap.get('formId')!;
-    const locationId =
-      this.route.snapshot.queryParamMap.get('locationId') || undefined;
-    const projectId =
-      this.route.snapshot.queryParamMap.get('projectId') || undefined;
 
-    this.formService
-      .getFormById(formId, { locationId, projectId })
-      .subscribe((dto) => {
-        this.title.set(dto.formTitle);
-        this.questions.set(dto.questions);
-        this.buildForm(dto);
-        this.restoreDraft();
-        this.loading.set(false);
-      });
+    // Load form meta: wait until query has data
+    const formQuery = this.apiQueries.getFormQuery({ formId });
+    const formData = (await this.waitForQueryData<any>(formQuery)) ?? {};
+    this.title.set(
+      formData?.formTitle ?? formData?.title ?? formData?.name ?? 'Form'
+    );
+
+    // After meta is ready, fetch questions and wait for data
+    const questionsQuery = this.apiQueries.getAllFormQuestionsQuery({ formId });
+    const raw = (await this.waitForQueryData<any>(questionsQuery)) ?? {};
+    const list = Array.isArray(raw)
+      ? raw
+      : Array.isArray((raw as any)?.questions)
+      ? (raw as any).questions
+      : Array.isArray((raw as any)?.items)
+      ? (raw as any).items
+      : Array.isArray((raw as any)?.data)
+      ? (raw as any).data
+      : [];
+
+    const mapType = (t: any): FormQuestionDto['typeCode'] => {
+      const up = String(t || '').toUpperCase();
+      const allowed = [
+        'OPEN_ENDED',
+        'SHORT_ANSWER',
+        'NUMBER',
+        'RATE',
+        'DROPDOWN',
+        'RADIO',
+        'MULTIPLE_CHOICE',
+      ];
+      return (allowed as string[]).includes(up)
+        ? (up as FormQuestionDto['typeCode'])
+        : 'OPEN_ENDED';
+    };
+
+    const questions = (list as any[]).map((q: any, idx: number) => ({
+      questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+      typeCode: mapType(q.type ?? q.typeCode),
+      questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
+      options: ((q.options ?? q.answerOptions ?? q.choices ?? []) as any[]).map(
+        (opt: any, i: number) => ({
+          optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
+          optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
+        })
+      ),
+      required: !!q.required,
+      min: q.min,
+      max: q.max,
+    }));
+
+    const dto: DynamicFormDto = {
+      formId,
+      formTitle: this.title(),
+      formLanguage: formData?.formLanguage ?? 'en',
+      questions,
+    };
+
+    this.questions.set(questions);
+    this.buildForm(dto);
+    this.restoreDraft();
+    this.loading.set(false);
+  }
+
+  private async waitForQueryData<T = any>(
+    query: any,
+    timeoutMs = 10000
+  ): Promise<T | null> {
+    const start = Date.now();
+    return new Promise<T | null>((resolve) => {
+      const tick = () => {
+        try {
+          const v = query?.data?.();
+          if (v != null) return resolve(v as T);
+        } catch {}
+        if (Date.now() - start >= timeoutMs) return resolve(null);
+        setTimeout(tick, 50);
+      };
+      tick();
+    });
   }
 
   buildForm(dto: DynamicFormDto): void {

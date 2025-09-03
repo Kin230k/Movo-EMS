@@ -40,6 +40,7 @@ import {
   injectCreateQuestionMutation,
   injectDeleteQuestionMutation,
   injectGetAllQuestionsQuery,
+  injectGetAllFormQuestionsQuery,
   injectGetQuestionQuery,
   injectUpdateQuestionMutation,
   injectGetInterviewQuestionsQuery,
@@ -64,7 +65,7 @@ import {
   injectDeleteProjectMutation,
   injectGetProjectQuery,
   injectUpdateProjectMutation,
-  injectGetProjectByClientQuery,
+  injectgetProjectsByClientQuery,
   injectGetAllProjectsQuery,
   injectGetAllActiveProjectsQuery,
   injectCreateLocationMutation,
@@ -96,7 +97,9 @@ import {
   injectGetAreasByLocationQuery,
   injectGetAllAreasQuery,
   injectGetAllAreasQuery as injectGetAllAreasQueryAlias,
+  injectGetProjectInfoByIdQuery,
 } from '../api/api-queries';
+import { GetAllFormQuestionsPayload } from '../api/api';
 
 @Injectable({ providedIn: 'root' })
 export class ApiQueriesService {
@@ -244,6 +247,10 @@ export class ApiQueriesService {
   getAllQuestionsQuery() {
     return this.run(() => injectGetAllQuestionsQuery());
   }
+  getAllFormQuestionsQuery(payload: GetAllFormQuestionsPayload) {
+    return this.run(() => injectGetAllFormQuestionsQuery(payload));
+  }
+
   getQuestionQuery(payload: any) {
     return this.run1(injectGetQuestionQuery, payload);
   }
@@ -322,8 +329,11 @@ export class ApiQueriesService {
   updateProjectMutation() {
     return this.run(() => injectUpdateProjectMutation());
   }
-  getProjectByClientQuery(payload: any) {
-    return this.run1(injectGetProjectByClientQuery, payload);
+  getProjectsByClientQuery(payload: any) {
+    return this.run1(injectgetProjectsByClientQuery, payload);
+  }
+  getProjectInfoByIdQuery(payload: any) {
+    return this.run1(injectGetProjectInfoByIdQuery, payload);
   }
   getAllProjectsQuery() {
     return this.run(() => injectGetAllProjectsQuery());

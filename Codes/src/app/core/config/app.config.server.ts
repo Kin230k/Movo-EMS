@@ -13,7 +13,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { firebaseConfig } from '../../../environments/firebase.config';
-import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import {
   provideHttpClient,
@@ -49,7 +49,7 @@ const queryClientFactory = (platformId: Object) => {
     persistQueryClient({
       queryClient,
       persister,
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 60 * 2,
     });
   }
 
