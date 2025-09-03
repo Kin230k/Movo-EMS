@@ -8,7 +8,7 @@ import { deleteProjectUserRoleHandler } from '../../handlers/auth/project_user_r
 import { getProjectUserRoleHandler } from '../../handlers/auth/project_user_role/getProjectUserRoleHandler';
 import { getAllProjectUserRolesHandler } from '../../handlers/auth/project_user_role/getAllProjectUserRolesHandler';
 import { getProjectUserRolesByUserAndProjectHandler } from '../../handlers/auth/project_user_role/getProjectUserRolesByUserAndProjectHandler';
-
+import { deleteProjectUserRolesByUserAndProjectHandler } from '../../handlers/auth/project_user_role/deleteProjectUserRolesByUserAndProjectHandler';
 // Project User Role Callables
 export const createProjectUserRole = onCall(createProjectUserRoleHandler);
 export const updateProjectUserRole = onCall(updateProjectUserRoleHandler);
@@ -16,3 +16,4 @@ export const deleteProjectUserRole = onCall(deleteProjectUserRoleHandler);
 export const getProjectUserRole = onCall(getProjectUserRoleHandler);
 export const getAllProjectUserRoles = onCall(getAllProjectUserRolesHandler);
 export const getProjectUserRolesByUserAndProject = onCall(getProjectUserRolesByUserAndProjectHandler);
+export const deleteProjectUserRolesByUserAndProject=onCall(deleteProjectUserRolesByUserAndProjectHandler);

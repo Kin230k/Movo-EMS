@@ -89,6 +89,18 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
       id,
     ]);
   }
+  async deleteByUserAndProject(
+    projectId: string,
+    userId: string
+  ): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    await pool.query(
+      'CALL delete_project_user_role_by_user_project($1, $2,$3)',
+      [currentUserId, projectId, userId]
+    );
+  }
 
   private mapRowToEntity = (row: any): ProjectUserRole => {
     return new ProjectUserRole(
