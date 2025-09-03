@@ -107,7 +107,7 @@ import {
 // Import ProjectUserRole callables
 import {
   createProjectUserRole,
-  updateProjectUserRole,
+  updateProjectUserRoleByUserAndProject,
   deleteProjectUserRole,
   getProjectUserRole,
   getAllProjectUserRoles,
@@ -235,7 +235,7 @@ export {
 
   // Project User Roles
   createProjectUserRole,
-  updateProjectUserRole,
+  updateProjectUserRoleByUserAndProject,
   deleteProjectUserRole,
   getProjectUserRole,
   getAllProjectUserRoles,

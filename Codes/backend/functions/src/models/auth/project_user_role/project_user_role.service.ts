@@ -58,4 +58,12 @@ export class ProjectUserRoleService {
   ): Promise<void> {
     await projectUserRoleMapper.deleteByUserAndProject(projectId, userId);
   }
+    static async updateProjectUserRoleByUserProject(
+    userId: string,
+    projectId: string,
+    roleId:string
+  ): Promise<void> {
+    await projectUserRoleMapper.updateByUserAndProject(userId,projectId,roleId);
+  }
+
 }

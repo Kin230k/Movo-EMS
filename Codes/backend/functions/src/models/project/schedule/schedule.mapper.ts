@@ -102,12 +102,31 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
   }
 
   private mapRowToEntity = (row: any): Schedule => {
+        const starTime =
+      row.starttime instanceof Date
+        ? row.starttime.toISOString()
+        : row.starttime !== null && row.starttime !== undefined
+        ? String(row.starttime)
+        : null;
+
+    const endTime =
+      row.endtime instanceof Date
+        ? row.endtime.toISOString()
+        : row.endtime !== null && row.endtime !== undefined
+        ? String(row.endtime)
+        : null;
+        const createAt =
+      row.createdat instanceof Date
+        ? row.createdat.toISOString()
+        : row.createdat !== null && row.createdat !== undefined
+        ? String(row.createdat)
+        : null;
     return new Schedule(
-      row.starttime,
-      row.endtime,
+      starTime,
+      endTime,
       row.projectid,
       row.locationid,
-      row.createdat,
+      createAt as string,
       row.scheduleid
     );
   };

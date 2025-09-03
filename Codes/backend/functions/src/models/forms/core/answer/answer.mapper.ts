@@ -183,8 +183,7 @@ private mapRowToAnswer = (row: any): Answer => {
     const answerId = row.answerid;
     const submissionId = row.submissionid;
     const questionId = row.questionid;
-    const answeredAt = row.answeredat ? new Date(row.answeredat) : new Date();
-    console.log(row);
+    const answeredAt = row.answeredat ? new Date(row.answeredat).toISOString() : new Date().toISOString();
     const withUpdateOp = (ans: Answer): Answer => {
       ans.operation = Operation.UPDATE;
       return ans;
@@ -198,7 +197,7 @@ private mapRowToAnswer = (row: any): Answer => {
           submissionId,
           questionId,
           row.textresponse,
-          answeredAt
+          answeredAt as string
         )
       );
     }
@@ -211,7 +210,7 @@ private mapRowToAnswer = (row: any): Answer => {
           submissionId,
           questionId,
           Number(row.ratingvalue),
-          answeredAt
+          answeredAt as string
         )
       );
     }
@@ -224,7 +223,7 @@ private mapRowToAnswer = (row: any): Answer => {
           submissionId,
           questionId,
           Number(row.numericresponse),
-          answeredAt
+          answeredAt as string
         )
       );
     }
@@ -240,7 +239,7 @@ private mapRowToAnswer = (row: any): Answer => {
           questionId,
           optionIds,
           optionTexts,
-          answeredAt
+          answeredAt as string
         )
       );
     }

@@ -17,7 +17,7 @@ export class AnswerService {
     submissionId: string,
     questionId: string,
     response: string,
-    answeredAt?: Date
+    answeredAt?: string
   ): Promise<string> {
     // pass a placeholder for answerId; mapper/DB will generate and set it back on the entity
     const answer = new TextAnswer(
@@ -38,7 +38,7 @@ export class AnswerService {
     submissionId: string,
     questionId: string,
     rating: number,
-    answeredAt?: Date
+    answeredAt?: string
   ): Promise<string> {
     const answer = new RatingAnswer(
       null as any,
@@ -58,7 +58,7 @@ export class AnswerService {
     submissionId: string,
     questionId: string,
     response: number,
-    answeredAt?: Date
+    answeredAt?: string
   ): Promise<string> {
     const answer = new NumericAnswer(
       null as any,
@@ -79,7 +79,7 @@ export class AnswerService {
     questionId: string,
     optionIds: string[],
     optionTexts?: any[],
-    answeredAt?: Date
+    answeredAt?: string
   ): Promise<string> {
     const answer = new OptionsAnswer(
       null as any,
@@ -162,7 +162,7 @@ export class AnswerService {
     submissionId: string,
     questionId: string,
     data: any,
-    answeredAt?: Date
+    answeredAt?: string
   ): Promise<string> {
     switch (type) {
       case 'text':

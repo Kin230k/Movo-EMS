@@ -6,7 +6,7 @@ export class Submission {
     public formId: string,
     public userId: string,
     public interviewId: string | undefined,
-    public dateSubmitted: Date,
+    public dateSubmitted: string,
     public decisionNotes?: string,
      public outcome?: SubmissionOutcome,
     public submissionId?: string,

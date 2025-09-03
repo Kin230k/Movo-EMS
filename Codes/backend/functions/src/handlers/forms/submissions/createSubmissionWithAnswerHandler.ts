@@ -98,7 +98,7 @@ export async function createSubmissionWithAnswerHandler(
       formId!,
       auth.callerUuid,
       interviewId!,
-      new Date(Date.now()),
+      new Date(Date.now()).toISOString(),
       decisionNotes
     );
 
@@ -111,7 +111,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           textResponse!,
-          new Date(Date.now())
+          new Date(Date.now()).toISOString()
         );
         console.log(answerId);
         break;
@@ -120,7 +120,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           rating!,
-          new Date(Date.now())
+          new Date(Date.now()).toISOString()
         );
         break;
       case 'numeric':
@@ -128,7 +128,7 @@ export async function createSubmissionWithAnswerHandler(
           submissionId,
           questionId!,
           numericResponse!,
-          new Date(Date.now())
+          new Date(Date.now()).toISOString()
         );
         break;
       case 'options':
@@ -137,7 +137,7 @@ export async function createSubmissionWithAnswerHandler(
           questionId!,
           optionIds!,
           undefined, // optionTexts can be populated later if needed
-          new Date(Date.now())
+          new Date(Date.now()).toISOString()
         );
         break;
       default:

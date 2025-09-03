@@ -127,7 +127,7 @@ export async function createSubmissionWithAnswersHandler(
       formId!,
       auth.callerUuid,
       interviewId!,
-      new Date(Date.now()),
+      new Date(Date.now()).toISOString(),
       decisionNotes
     );
 

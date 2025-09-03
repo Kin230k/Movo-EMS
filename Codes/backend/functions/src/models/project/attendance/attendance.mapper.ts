@@ -116,8 +116,15 @@ async getByProject(projectId: string): Promise<Attendance[]> {
 
 
   private mapRowToEntity = (row: any): Attendance => {
+        const attendanceTimeStamp =
+      row.attendancetimestamp instanceof Date
+        ? row.attendancetimestamp.toISOString()
+        : row.attendancetimestamp !== null && row.attendancetimestamp !== undefined
+        ? String(row.attendancetimestamp)
+        : null;
+
     return new Attendance(
-      row.attendancetimestamp,
+      attendanceTimeStamp as string,
       row.signedwith,
       row.signedby,
       row.userid,
@@ -126,13 +133,19 @@ async getByProject(projectId: string): Promise<Attendance[]> {
     );
   };
    private mapRowToUserAttendance = (row: any): UserAttendance => {
+         const attendanceTimeStamp =
+      row.attendancetimestamp instanceof Date
+        ? row.attendancetimestamp.toISOString()
+        : row.attendancetimestamp !== null && row.attendancetimestamp !== undefined
+        ? String(row.attendancetimestamp)
+        : null;
     return {
       userId: row.userId,
       name: row.name,
       role: row.role,
       userStatus: row.userStatus,
       picture: row.picture,
-      attendanceTimestamp: row.attendanceTimestamp,
+      attendanceTimestamp: attendanceTimeStamp as string,
       attendanceStatus: row.attendanceStatus as enAttendanceStatus
     };
   };

@@ -10,7 +10,7 @@ export abstract class Answer {
     public answerId: string,
     public submissionId: string,
     public questionId: string,
-    public answeredAt: Date = new Date()
+    public answeredAt: string = new Date().toISOString()
   ) {}
 
   abstract getType(): AnswerType;
@@ -22,9 +22,9 @@ export class TextAnswer extends Answer {
     submissionId: string,
     questionId: string,
     public response: string,
-    answeredAt?: Date
+    answeredAt?: string
   ) {
-    super(answerId, submissionId, questionId, answeredAt ?? new Date());
+    super(answerId, submissionId, questionId, answeredAt ?? new Date().toISOString());
   }
   getType(): AnswerType {
     return 'text';
@@ -37,9 +37,9 @@ export class RatingAnswer extends Answer {
     submissionId: string,
     questionId: string,
     public rating: number,
-    answeredAt?: Date
+    answeredAt?: string
   ) {
-    super(answerId, submissionId, questionId, answeredAt ?? new Date());
+    super(answerId, submissionId, questionId, answeredAt ?? new Date().toISOString());
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
       throw new Error('rating must be integer between 1 and 5');
     }
@@ -55,9 +55,9 @@ export class NumericAnswer extends Answer {
     submissionId: string,
     questionId: string,
     public response: number,
-    answeredAt?: Date
+    answeredAt?: string
   ) {
-    super(answerId, submissionId, questionId, answeredAt ?? new Date());
+    super(answerId, submissionId, questionId, answeredAt ?? new Date().toISOString());
     if (Number.isNaN(response))
       throw new Error('numeric response must be a number');
   }
@@ -73,9 +73,9 @@ export class OptionsAnswer extends Answer {
     questionId: string,
     public optionIds: string[],
     public optionTexts?: any[],
-    answeredAt?: Date
+    answeredAt?: string
   ) {
-    super(answerId, submissionId, questionId, answeredAt ?? new Date());
+    super(answerId, submissionId, questionId, answeredAt ?? new Date().toISOString());
     if (!Array.isArray(optionIds))
       throw new Error('optionIds must be an array of UUIDs');
   }

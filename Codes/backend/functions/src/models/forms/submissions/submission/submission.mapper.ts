@@ -163,11 +163,20 @@ export class SubmissionMapper extends BaseMapper<Submission> {
   }
 
   private mapRowToSubmission = (row: any): Submission => {
+      const rawDateSubmitted = 
+        row.dateSubmitted ?? row.datesubmitted ?? row.date_submitted;
+      const dateSubmitted =
+      rawDateSubmitted instanceof Date
+        ? rawDateSubmitted.toISOString()
+        : rawDateSubmitted !== null && rawDateSubmitted !== undefined
+        ? String(rawDateSubmitted)
+        : null;
+
     return new Submission(
       row.formId ?? row.formid ?? row.form_id,
       row.userId ?? row.userid ?? row.user_id,
       row.interviewId ?? row.interviewid ?? row.interview_id,
-      row.datesubmitted ?? row.datesubmitted ?? row.date_submitted,
+      dateSubmitted as string,
       // returned objects are update-ready
 
       row.decisionNotes ?? row.decisionnotes ?? row.decision_notes,
