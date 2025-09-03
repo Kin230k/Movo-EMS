@@ -4,25 +4,28 @@ import { FieldIssue } from '../../utils/types';
 import { parseDbError } from '../../utils/dbErrorParser';
 import { ProjectService } from '../../models/project/project/project.service';
 import { authenticateUser } from '../../utils/authUtils';
-export interface GetProjectInfoByFormRequestData {
-  fromId?: string | null;
+export interface GetProjectInfoByIdRequestData {
+  projectId?: string | null;
 }
-export async function getProjectInfoByFormHandler(
-  request: CallableRequest<GetProjectInfoByFormRequestData>
+export async function getProjectInfoByIdHandler(
+  request: CallableRequest<GetProjectInfoByIdRequestData>
 ) {
   const issues: FieldIssue[] = [];
 
   const auth = await authenticateUser(request);
   if (!auth.success) return auth;
 
-  const { fromId } = request.data || {};
-  if (!fromId) {
-    issues.push({ field: 'input', message: 'Missing required field: fromId' });
+  const { projectId } = request.data || {};
+  if (!projectId) {
+    issues.push({
+      field: 'input',
+      message: 'Missing required field: projectId',
+    });
     return { success: false, issues };
   }
 
   try {
-    const project = await ProjectService.getProjectInfoByForm(fromId);
+    const project = await ProjectService.getProjectInfoById(projectId);
     if (!project) {
       return {
         success: false,

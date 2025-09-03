@@ -93,15 +93,84 @@ export class ProjectMapper extends BaseMapper<Project> {
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
-  async getByForm(formId: string): Promise<Project | null> {
+  async getInfoWithFormsById(projectId: string): Promise<any | null> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    if (!formId) throw new Error('Form ID is required');
+    if (!projectId) throw new Error('Project ID is required');
+
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_project_by_form_id($1,$2)',
-      [currentUserId, formId]
+      'SELECT * FROM get_project_info_with_forms($1, $2)',
+      [currentUserId, projectId]
     );
-    return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
+
+    if (!result.rows.length) return null;
+
+    const firstRow = result.rows[0];
+
+    const startingDate =
+      firstRow.startingdate instanceof Date
+        ? firstRow.startingdate.toISOString()
+        : firstRow.startingdate !== null && firstRow.startingdate !== undefined
+        ? String(firstRow.startingdate)
+        : null;
+
+    const endingDate =
+      firstRow.endingdate instanceof Date
+        ? firstRow.endingdate.toISOString()
+        : firstRow.endingdate !== null && firstRow.endingdate !== undefined
+        ? String(firstRow.endingdate)
+        : null;
+
+    // project-level formId (first seen where locationId is null)
+    let projectFormId: string | null = null;
+
+    // collect unique locations; do NOT modify name (keep DB value as-is)
+    const locationMap = new Map<
+      string,
+      { locationId: string; name?: any; formId?: string | null }
+    >();
+
+    for (const row of result.rows) {
+      // project-level form (no location)
+      if (!row.locationid) {
+        if (!projectFormId && row.formid) {
+          projectFormId = String(row.formid);
+        }
+        continue;
+      }
+
+      const locId = String(row.locationid);
+      if (!locationMap.has(locId)) {
+        locationMap.set(locId, {
+          locationId: locId,
+          name: row.locationname === undefined ? undefined : row.locationname, // leave language object/string untouched
+          formId: row.formid ? String(row.formid) : null,
+        });
+      } else {
+        // prefer first seen formId for that location
+        const existing = locationMap.get(locId)!;
+        if (
+          (existing.formId === null || existing.formId === undefined) &&
+          row.formid
+        ) {
+          existing.formId = String(row.formid);
+        }
+      }
+    }
+
+    const locationsArray = locationMap.size
+      ? Array.from(locationMap.values())
+      : null;
+
+    return {
+      projectId: String(firstRow.projectid),
+      name: firstRow.name, // multilingual object or string returned as-is
+      description: firstRow.description ?? null,
+      startingDate: startingDate ?? null,
+      endingDate: endingDate ?? null,
+      formId: projectFormId ?? null, // project-level form id (or null)
+      locations: locationsArray, // array of { locationId, name, formId } or null
+    };
   }
 
   async getAll(): Promise<Project[]> {
@@ -179,9 +248,6 @@ export class ProjectMapper extends BaseMapper<Project> {
     };
   };
 }
-
-  
-
 
 const projectMapper = new ProjectMapper();
 export default projectMapper;

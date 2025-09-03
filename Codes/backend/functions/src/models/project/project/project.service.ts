@@ -67,25 +67,26 @@ export class ProjectService {
   static async getProjectById(id: string): Promise<Project | null> {
     return await projectMapper.getById(id);
   }
-  static async getProjectInfoByForm(formId: string): Promise<Project | null> {
-    return await projectMapper.getByForm(formId);
+  static async getProjectInfoById(projectId: string): Promise<Project | null> {
+    return await projectMapper.getInfoWithFormsById(projectId);
   }
-   static async getProjectsByClient(clientId: string): Promise<Project[] | null> {
+  static async getProjectsByClient(
+    clientId: string
+  ): Promise<Project[] | null> {
     return await projectMapper.getByClient(clientId);
   }
 
   static async getAllProjects(): Promise<Project[]> {
     return await projectMapper.getAll();
   }
-  
+
   static async getAllActiveProjects(): Promise<ProjectWithClient[]> {
     return await projectMapper.getAllActive();
   }
-   
+
   static async getAllProjectsWithClientName(): Promise<ProjectWithClient[]> {
     return await projectMapper.getAllProjectWithClientName();
   }
-
 
   static async deleteProject(id: string): Promise<void> {
     await projectMapper.delete(id);

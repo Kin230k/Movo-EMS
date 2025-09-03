@@ -73,7 +73,7 @@ import {
   getAllProjects,
   getAllActiveProjects,
   updateProject,
-  getProjectInfoByForm,
+  getProjectInfoById,
   createLocation,
   deleteLocation,
   getLocation,
@@ -189,7 +189,7 @@ export {
   getProjectsByClient,
   getAllProjects,
   getAllActiveProjects,
-  getProjectInfoByForm,
+  getProjectInfoById,
 
   // Locations
   createLocation,
