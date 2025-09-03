@@ -70,7 +70,7 @@ export class ProjectService {
   static async getProjectInfoByForm(formId: string): Promise<Project | null> {
     return await projectMapper.getByForm(formId);
   }
-   static async getProjectByClient(clientId: string): Promise<Project[] | null> {
+   static async getProjectsByClient(clientId: string): Promise<Project[] | null> {
     return await projectMapper.getByClient(clientId);
   }
 

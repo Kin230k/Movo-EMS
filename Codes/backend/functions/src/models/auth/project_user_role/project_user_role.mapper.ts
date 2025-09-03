@@ -9,12 +9,13 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
   async save(entity: ProjectUserRole): Promise<void> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
+
     const op = entity.operation;
     const { projectUserRoleId, userId, projectId, roleId } = entity;
 
     if (op === Operation.UPDATE) {
-      if (!entity.projectUserRoleId) throw new Error('ProjectUserRole ID is required for update');
+      if (!entity.projectUserRoleId)
+        throw new Error('ProjectUserRole ID is required for update');
       await pool.query('CALL update_project_user_role($1, $2, $3, $4, $5)', [
         currentUserId,
         projectUserRoleId,
@@ -35,7 +36,7 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
   async getById(id: string): Promise<ProjectUserRole | null> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
+
     const result: QueryResult = await pool.query(
       'SELECT * FROM get_project_user_role_by_id($1, $2)',
       [currentUserId, id]
@@ -46,33 +47,48 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
   async getAll(): Promise<ProjectUserRole[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
+
     const result = await pool.query(
       'SELECT * FROM get_all_project_user_roles($1)',
       [currentUserId]
     );
     return result.rows.map(this.mapRowToEntity);
   }
-  
-  async getByUserAndProject(userId: string, projectId: string): Promise<ProjectUserRole[]> {
-  const currentUserId = CurrentUser.uuid;
-  if (!currentUserId) throw new Error('Current user UUID is not set');
 
-  const result: QueryResult = await pool.query(
-    'SELECT * FROM get_project_user_roles_by_user_and_project($1, $2, $3)',
-    [currentUserId, userId, projectId]
-  );
+  async getByUserAndProject(
+    userId: string,
+    projectId: string
+  ): Promise<ProjectUserRole[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
 
-  return result.rows.map(this.mapRowToEntity);
-}
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_project_user_roles_by_user_and_project($1, $2, $3)',
+      [currentUserId, userId, projectId]
+    );
+
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getProjectUserRoleByUser(
+    userId: string
+  ): Promise<ProjectUserRole | null> {
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_project_user_role_by_user($1)',
+      [userId]
+    );
+    return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
+  }
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
-    await pool.query('CALL delete_project_user_role($1, $2)', [currentUserId, id]);
+
+    await pool.query('CALL delete_project_user_role($1, $2)', [
+      currentUserId,
+      id,
+    ]);
   }
-  
 
   private mapRowToEntity = (row: any): ProjectUserRole => {
     return new ProjectUserRole(
@@ -82,7 +98,6 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
       row.projectuserroleid
     );
   };
-  
 }
 const projectUserRoleMapper = new ProjectUserRoleMapper();
 export default projectUserRoleMapper;

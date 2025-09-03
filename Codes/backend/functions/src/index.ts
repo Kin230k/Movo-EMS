@@ -69,7 +69,7 @@ import {
   createProject,
   deleteProject,
   getProject,
-  getProjectByClient,
+  getProjectsByClient,
   getAllProjects,
   getAllActiveProjects,
   updateProject,
@@ -165,7 +165,6 @@ export {
   getInterviewQuestions,
   getAllFormQuestions,
   getFormQuestionsByProjectOrLocation,
-  
 
   // Forms - submissions
   createSubmission,
@@ -186,7 +185,7 @@ export {
   deleteProject,
   getProject,
   updateProject,
-  getProjectByClient,
+  getProjectsByClient,
   getAllProjects,
   getAllActiveProjects,
   getProjectInfoByForm,

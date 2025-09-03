@@ -15,7 +15,9 @@ export interface CallerIdentity {
   role: string | null;
 }
 
-export async function getCallerIdentityHandler(request: CallableRequest): Promise<CallerIdentity> {
+export async function getCallerIdentityHandler(
+  request: CallableRequest
+): Promise<CallerIdentity> {
   // First authenticate the caller
   const authResult = await authenticateCaller(request);
   if (!authResult.success) {
@@ -25,7 +27,7 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
       isUserWorker: false,
       isUser: false,
       isCaller: false,
-      role: null
+      role: null,
     };
   }
 
@@ -37,13 +39,13 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
       AdminService.getAdminById(callerUuid),
       ClientService.getClientById(callerUuid),
       UserService.getUserById(callerUuid),
-      ProjectUserRoleService.getProjectUserRolesByUserAndProject(callerUuid, '%') // Check for any project
+      ProjectUserRoleService.getProjectUserRoleByUser(callerUuid), // Check for any project
     ]);
 
     const isAdmin = !!admin;
     const isClient = !!client;
     const isUser = !!user;
-    const isUserWorker = isUser && projectRoles.length > 0;
+    const isUserWorker = isUser && projectRoles !== null;
 
     return {
       isAdmin,
@@ -51,7 +53,7 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
       isUserWorker,
       isUser: isUser && !isUserWorker, // User without project assignments
       isCaller: !isAdmin && !isClient && !isUser,
-      role: user?.role || null
+      role: user?.role || null,
     };
   } catch (error) {
     console.error('Error getting caller identity:', error);
@@ -61,7 +63,7 @@ export async function getCallerIdentityHandler(request: CallableRequest): Promis
       isUserWorker: false,
       isUser: false,
       isCaller: true, // Fallback to basic caller if error occurs
-      role: null
+      role: null,
     };
   }
 }

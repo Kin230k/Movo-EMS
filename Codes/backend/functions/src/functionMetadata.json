@@ -1266,7 +1266,7 @@
     ]
   },
   {
-    "name": "getProjectByClient",
+    "name": "getProjectsByClient",
     "description": "",
     "parameters": [
       {

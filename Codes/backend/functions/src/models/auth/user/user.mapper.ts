@@ -157,32 +157,29 @@ export class UserMapper extends BaseMapper<User> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!projectId) throw new Error('projectId is required');
-
     const result = await pool.query('SELECT * FROM get_project_users($1, $2)', [
       currentUserId,
       projectId,
     ]);
-    
 
     return result.rows.map((row: any) => this.mapRowToProjectUser(row));
   }
   async getUsersSalary(year?: number, month?: number): Promise<number> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
-    
+
     // Default to current month/year if not provided
     const currentDate = new Date();
     const calculationYear = year || currentDate.getFullYear();
     const calculationMonth = month || currentDate.getMonth() + 1;
-    
+
     const result: QueryResult = await pool.query(
       'SELECT calculate_monthly_salary($1, $2) AS salary',
       [calculationYear, calculationMonth]
     );
-    
+
     if (!result.rows.length) throw new Error('Failed to calculate salary');
-    
+
     return parseInt(result.rows[0].salary);
   }
   private mapRowToUser = (row: any): User => {

@@ -99,7 +99,7 @@ export class ProjectMapper extends BaseMapper<Project> {
     if (!formId) throw new Error('Form ID is required');
     const result: QueryResult = await pool.query(
       'SELECT * FROM get_project_by_form_id($1,$2)',
-      [currentUserId,formId]
+      [currentUserId, formId]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
@@ -113,9 +113,8 @@ export class ProjectMapper extends BaseMapper<Project> {
     ]);
     return result.rows.map(this.mapRowToEntity);
   }
-  async getAllProjectWithClientName():Promise<ProjectWithClient[]>
-  {
-       const currentUserId = CurrentUser.uuid;
+  async getAllProjectWithClientName(): Promise<ProjectWithClient[]> {
+    const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const result = await pool.query('SELECT * FROM get_all_projects($1)', [
@@ -147,27 +146,38 @@ export class ProjectMapper extends BaseMapper<Project> {
     await pool.query('CALL delete_project($1, $2)', [currentUserId, id]);
   }
 
-  
   private mapRowToEntity = (row: any): Project => {
+    const startingDate =
+      row.startingdate instanceof Date
+        ? row.startingdate.toISOString()
+        : row.startingdate !== null && row.startingdate !== undefined
+        ? String(row.startingdate)
+        : undefined;
+
+    const endingDate =
+      row.endingdate instanceof Date
+        ? row.endingdate.toISOString()
+        : row.endingdate !== null && row.endingdate !== undefined
+        ? String(row.endingdate)
+        : undefined;
+
     return new Project(
       row.clientid,
       row.name,
-      row.startingdate,
+      startingDate as string,
       row.projectid,
       row.badgebackground,
-      row.endingdate,
+      endingDate as string | undefined,
       row.description
     );
   };
-  
-    private mapRowToEntityWithClient = (row: any): ProjectWithClient => {
+
+  private mapRowToEntityWithClient = (row: any): ProjectWithClient => {
     return {
-      
-       ...this.mapRowToEntity(row),
-      clientName: row.clientname
-      
-    }};
-  
+      ...this.mapRowToEntity(row),
+      clientName: row.clientname,
+    };
+  };
 }
 
   
