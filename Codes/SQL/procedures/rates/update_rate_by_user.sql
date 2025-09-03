@@ -10,7 +10,7 @@ BEGIN
 
 UPDATE RATES
  SET
- hourlyRate = COALESCE(p_hourly_rate, hourlyRate),
+ hourlyRate = COALESCE(p_hourly_rate, hourlyRate)
  WHERE userId = p_user_id and projectId=p_project_id;
 END;
 $$;
