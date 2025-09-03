@@ -8,6 +8,7 @@ LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 DECLARE
     role_name VARCHAR(20);
+    new_updated_at TIMESTAMP := CURRENT_TIMESTAMP;
 BEGIN
  CALL check_user_permission(p_auth_user_id, 'update_project_user_role');
 
@@ -19,7 +20,8 @@ UPDATE PROJECT_USER_ROLES
  SET
  userId = COALESCE(p_user_id, userId),
  projectId = COALESCE(p_project_id, projectId),
- roleId = COALESCE(p_role_id, roleId)
+ roleId = COALESCE(p_role_id, roleId),
+ updatedAt=new_updated_at
  WHERE projectUserRoleId = p_project_user_role_id;
 
  UPDATE USERS

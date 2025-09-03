@@ -34,4 +34,8 @@ export class RateService {
   static async deleteRate(id: string): Promise<void> {
     await rateMapper.delete(id);
   }
+  static async updateRateByUser(hourlyRate :number,userId:string,projectId:string):Promise<void>
+  {
+    await rateMapper.updateByUserAndProject(hourlyRate,userId,projectId);
+  }
 }

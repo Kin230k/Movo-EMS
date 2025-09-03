@@ -139,6 +139,17 @@ export class UserMapper extends BaseMapper<User> {
 
     return result.rows.length ? this.mapRowToUser(result.rows[0]) : null;
   }
+    async getByForm(formId: string): Promise<User | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_user_by_form($1, $2)',
+      [currentUserId, formId]
+    );
+
+    return result.rows.length ? this.mapRowToUser(result.rows[0]) : null;
+  }
   async getUserRoleById(userId: string): Promise<string | null> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');

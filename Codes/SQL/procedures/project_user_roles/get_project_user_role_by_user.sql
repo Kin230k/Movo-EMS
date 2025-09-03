@@ -5,7 +5,9 @@ RETURNS TABLE (
     projectuserroleid UUID,
     userid            UUID,
     projectid         UUID,
-    roleid            UUID
+    roleid            UUID,
+    createdAt         TIMESTAMP,
+    updatedAt         TIMESTAMP
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -18,7 +20,9 @@ BEGIN
     SELECT pur.projectuserroleid,
            pur.userid,
            pur.projectid,
-           pur.roleid
+           pur.roleid,
+           pur.createdAt, 
+           pur.updatedAt
     FROM project_user_roles pur
     WHERE pur.userid = p_user_id
     ORDER BY pur.createdat DESC

@@ -88,6 +88,9 @@ export class UserService {
   static async getUserByEmail(email: string): Promise<User | null> {
     return await userMapper.getByEmail(email);
   }
+   static async getUserByForm(formId: string): Promise<User | null> {
+    return await userMapper.getByForm(formId);
+  }
 
   static async getUserRoleById(userId: string): Promise<string | null> {
     return await userMapper.getUserRoleById(userId);

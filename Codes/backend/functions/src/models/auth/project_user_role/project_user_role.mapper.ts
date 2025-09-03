@@ -103,11 +103,28 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
   }
 
   private mapRowToEntity = (row: any): ProjectUserRole => {
+      const createdAt =
+      row.createdat instanceof Date
+        ? row.createdat.toISOString()
+        : row.createdat !== null && row.createdat !== undefined
+        ? String(row.createdat)
+        : undefined;
+
+    const updatedAt =
+      row.updatedat instanceof Date
+        ? row.updatedat.toISOString()
+        : row.updatedat !== null && row.updatedat !== undefined
+        ? String(row.updatedat)
+        : undefined;
+
     return new ProjectUserRole(
       row.userid,
       row.projectid,
       row.roleid,
-      row.projectuserroleid
+      row.projectuserroleid,
+      createdAt as string,
+      updatedAt as string
+      
     );
   };
 }

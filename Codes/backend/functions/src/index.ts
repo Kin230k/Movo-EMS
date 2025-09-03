@@ -27,6 +27,7 @@ import {
   getProjectUsers,
   getUserInfoByEmail,
   getCallerIdentity,
+  getUserByForm,
 } from './callables/auth/auth.callable';
 
 // Import forms callables
@@ -134,6 +135,7 @@ export {
   getProjectUsers,
   getUserInfoByEmail,
   getCallerIdentity,
+  getUserByForm,
   // Auth admin
   createAdmin,
   getAdmin,

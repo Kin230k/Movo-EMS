@@ -5,7 +5,9 @@ export class ProjectUserRole {
     public userId: string,
     public projectId: string,
     public roleId: string,
-    public projectUserRoleId?: string
+    public projectUserRoleId?: string,
+    public createdAt?: string,
+    public updatedAt?: string
   ) {}
 
   get operation(): Operation {

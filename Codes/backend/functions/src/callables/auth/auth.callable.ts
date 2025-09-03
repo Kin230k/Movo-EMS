@@ -12,6 +12,7 @@ import { sendPasswordResetHandler } from '../../handlers/auth/sendPasswordResetH
 import { getProjectUsersHandler } from '../../handlers/auth/getProjectUsersHandler';
 import { getUserInfoByEmailHandler } from '../../handlers/auth/getUserInfoByEmailHandler';
 import { getCallerIdentityHandler } from '../../handlers/auth/getCallerIdentityHandler';
+import { getUserInfoByFormHandler } from '../../handlers/auth/getUserInfoByFormHandler';
 
 export const changeUserEmail = onCall(changeUserEmailHandler);
 
@@ -36,3 +37,5 @@ export const getProjectUsers=onCall(getProjectUsersHandler);
 export const getUserInfoByEmail=onCall(getUserInfoByEmailHandler);
 
 export const getCallerIdentity=onCall(getCallerIdentityHandler);
+
+export const getUserByForm=onCall(getUserInfoByFormHandler);

@@ -7,7 +7,9 @@ RETURNS TABLE (
     projectUserRoleId UUID,
     userId UUID,
     projectId UUID,
-    roleId UUID
+    roleId UUID,
+    createdAt TIMESTAMP,
+    updatedAt TIMESTAMP
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -18,7 +20,7 @@ BEGIN
 
     -- Return roles for the given user and project
     RETURN QUERY
-    SELECT pur.projectUserRoleId, pur.userId, pur.projectId, pur.roleId
+    SELECT pur.projectUserRoleId, pur.userId, pur.projectId, pur.roleId,pur.createdAt, pur.updatedAt
     FROM PROJECT_USER_ROLES pur
     WHERE pur.userId = p_user_id
       AND pur.projectId = p_project_id;

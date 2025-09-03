@@ -10,6 +10,7 @@ import { UserService } from '../../../models/auth/user/user.service';
 import { EmailService } from '../../../models/forms/core/email/email.service';
 export interface CreateSubmissionWithAnswersRequestData {
   // Submission fields
+  userId?: string;
   formId?: string;
   interviewId?: string;
   outcome?: string;
@@ -39,11 +40,18 @@ export async function createSubmissionWithAnswersHandler(
   const {
     formId,
     interviewId,
+    userId,
     decisionNotes,
     answers,
     outcome,
   } = request.data || {};
-
+  
+  if (interviewId && !userId) {
+    issues.push({
+      field: 'userId',
+      message: 'User ID is required when an interview ID is provided',
+    });
+  }
   // Validate answers array
   if (!answers || !Array.isArray(answers) || answers.length === 0) {
     issues.push({

@@ -48,6 +48,16 @@ export class RateMapper extends BaseMapper<Rate> {
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
+  async updateByUserAndProject(hourlyRate : number,userId:string,projectId:string):Promise<void>
+  {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+      await pool.query(
+      'CALL update_rate_by_user($1, $2,$3,$4)',
+      [currentUserId, hourlyRate,userId,projectId]
+    );
+
+  }
 
   async getAll(): Promise<Rate[]> {
     const currentUserId = CurrentUser.uuid;
