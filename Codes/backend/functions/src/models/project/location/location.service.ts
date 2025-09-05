@@ -26,7 +26,7 @@ export class LocationService {
   static async updateLocation(
     locationId: string,
     name: Multilingual,
-    projectId: string|undefined,
+    projectId: string | undefined,
     siteMap?: string,
     longitude?: number,
     latitude?: number
@@ -52,6 +52,10 @@ export class LocationService {
 
   static async getLocationsByProject(projectId: string): Promise<Location[]> {
     return await locationMapper.getByProject(projectId);
+  }
+
+  static async getLocationsByClient(clientId: string): Promise<Location[]> {
+    return await locationMapper.getByClient(clientId);
   }
 
   static async deleteLocation(id: string): Promise<void> {

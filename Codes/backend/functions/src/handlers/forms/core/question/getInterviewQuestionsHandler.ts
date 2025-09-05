@@ -64,7 +64,7 @@ export async function getQuestionsByInterviewHandler(
       })
     );
 
-    return { success: true, data: questionsWithOptions };
+    return { success: true, questions: questionsWithOptions };
 
   } catch (err: any) {
     logger.error('Fetching interview questions failed', err);

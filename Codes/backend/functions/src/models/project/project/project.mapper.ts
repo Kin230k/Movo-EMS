@@ -30,7 +30,7 @@ export class ProjectMapper extends BaseMapper<Project> {
 
     if (op === Operation.UPDATE) {
       if (!projectId) throw new Error('Project ID is required for update');
-
+      console.log('currentUserId', currentUserId);
       // Normal user update (must be owner)
       await pool.query(
         'CALL update_project_if_owner($1, $2, $3, $4, $5, $6, $7)',
@@ -46,6 +46,7 @@ export class ProjectMapper extends BaseMapper<Project> {
       );
     } else {
       if (!clientId) throw new Error('Client ID is required');
+      console.log('currentUserId', currentUserId);
       await pool.query('CALL create_project($1, $2, $3, $4, $5, $6, $7)', [
         currentUserId,
         clientId,

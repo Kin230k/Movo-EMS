@@ -43,19 +43,14 @@ export async function updateScheduleHandler(
     });
 
   // Date/time parse checks and in the future or present
-  if (
-    (startTime && isNaN(Date.parse(startTime))) ||
-    (startTime && new Date(startTime) < new Date())
-  ) {
+
+  if (startTime && isNaN(Date.parse(startTime))) {
     issues.push({
       field: 'startTime',
       message: 'startTime must be a valid date/time string',
     });
   }
-  if (
-    (endTime && isNaN(Date.parse(endTime))) ||
-    (endTime && new Date(startTime!) < new Date(endTime))
-  ) {
+  if (endTime && isNaN(Date.parse(endTime))) {
     issues.push({
       field: 'endTime',
       message: 'endTime must be a valid date/time string',

@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE delete_project_user_role_by_user_project(p_auth_user_id UUID, p_project_id UUID,p_user_id)
+CREATE OR REPLACE PROCEDURE delete_project_user_role_by_user_project(p_auth_user_id UUID, p_project_id UUID,p_user_id UUID)
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 BEGIN
@@ -6,9 +6,9 @@ BEGIN
  
  UPDATE USERS
     SET role = 'User'::user_role
-    WHERE userId = p_user_id;
+    WHERE userId =  UUID;
 
 DELETE FROM PROJECT_USER_ROLES
- WHERE projectId = p_project_id and userId=p_user_id;
+ WHERE projectId = p_project_id and userId= UUID;
 END;
 $$;

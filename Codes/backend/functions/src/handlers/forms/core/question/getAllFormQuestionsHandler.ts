@@ -25,6 +25,8 @@ export async function getAllFormQuestionsHandler(
   }
   try {
     const questions = await QuestionService.getAllQuestionsByFormId(formId);
+    console.log({ success: true, questions });
+
     return { success: true, questions };
   } catch (err: any) {
     logger.error('Fetching all questions failed', err);

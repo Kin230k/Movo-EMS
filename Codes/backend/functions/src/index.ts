@@ -63,6 +63,7 @@ import {
   getInterview,
   getInterviewByProject,
   deleteInterview,
+  getFormsByProject,
 } from './callables/forms/forms.callable';
 
 // Import project-related callables
@@ -89,6 +90,7 @@ import {
   updateSchedule,
   getSchedulesByLocation,
   getSchedulesByProjectOrLocation,
+  getLocationsForClient,
   createUserSchedule,
   updateUserSchedule,
   createAttendance,
@@ -158,7 +160,7 @@ export {
   getForm,
   updateForm,
   getFormByUser,
-
+  getFormsByProject,
   // Forms - questions
   createQuestion,
   deleteQuestion,
@@ -198,6 +200,7 @@ export {
   deleteLocation,
   getLocation,
   updateLocation,
+  getLocationsForClient,
 
   // User Projects
   createUserProject,

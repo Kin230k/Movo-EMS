@@ -43,17 +43,18 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
-  async updateByUserAndProject(userId:string,projectId:string,roleId:string):Promise<void>
-  {
-     const currentUserId = CurrentUser.uuid;
-     if (!currentUserId) throw new Error('Current user UUID is not set');
-     await pool.query(
-      'CALL update_project_user_role_by_user_and_project($1, $2, $3, $4, $5)',
-      [currentUserId, userId,projectId,roleId]
+  async updateByUserAndProject(
+    userId: string,
+    projectId: string,
+    roleId: string
+  ): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    await pool.query(
+      'CALL update_project_user_role_by_user_and_project($1, $2, $3, $4)',
+      [currentUserId, userId, projectId, roleId]
     );
-
   }
-
 
   async getAll(): Promise<ProjectUserRole[]> {
     const currentUserId = CurrentUser.uuid;
@@ -114,7 +115,7 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
   }
 
   private mapRowToEntity = (row: any): ProjectUserRole => {
-      const createdAt =
+    const createdAt =
       row.createdat instanceof Date
         ? row.createdat.toISOString()
         : row.createdat !== null && row.createdat !== undefined
@@ -135,7 +136,6 @@ export class ProjectUserRoleMapper extends BaseMapper<ProjectUserRole> {
       row.projectuserroleid,
       createdAt as string,
       updatedAt as string
-      
     );
   };
 }

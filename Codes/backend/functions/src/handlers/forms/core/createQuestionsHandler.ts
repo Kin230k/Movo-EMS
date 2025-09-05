@@ -47,7 +47,6 @@ function isNonEmptyString(v: unknown): v is string {
   );
 }
 
-
 function isValidCriteriaOperator(v: unknown): v is CriteriaOperator {
   return Object.values(CriteriaOperator).includes(v as any);
 }
@@ -68,6 +67,17 @@ export async function createQuestionsHandler(
   }
 
   const questions = data.questions;
+  const normalizedFormId = isNonEmptyString(data.formId) ? data.formId : null;
+  const normalizedInterviewId = isNonEmptyString(data.interviewId)
+    ? data.interviewId
+    : null;
+
+  if (!normalizedFormId && !normalizedInterviewId) {
+    issues.push({
+      field: 'formId',
+      message: 'Either formId or interviewId must be provided',
+    });
+  }
   if (!Array.isArray(questions) || questions.length === 0) {
     issues.push({
       field: 'questions',
@@ -173,8 +183,8 @@ export async function createQuestionsHandler(
       const questionEntity = await QuestionService.createQuestion(
         q.typeCode,
         q.questionText,
-        data.formId!,
-        data.interviewId!
+        normalizedFormId,
+        normalizedInterviewId
       );
 
       const questionId = (questionEntity as any)?.questionId;

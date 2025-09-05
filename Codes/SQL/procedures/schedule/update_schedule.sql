@@ -1,7 +1,8 @@
+
 CREATE OR REPLACE PROCEDURE update_schedule(p_auth_user_id UUID,
  p_schedule_id UUID,
- p_start_time TIME DEFAULT NULL,
- p_end_time TIME DEFAULT NULL,
+ p_start_time TIMESTAMP DEFAULT NULL,
+ p_end_time TIMESTAMP DEFAULT NULL,
  p_project_id UUID DEFAULT NULL,
  p_location_id UUID DEFAULT NULL
 )

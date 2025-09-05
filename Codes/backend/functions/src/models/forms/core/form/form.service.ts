@@ -21,7 +21,13 @@ export class FormService {
     formLanguage: string,
     formTitle: string
   ): Promise<void> {
-    const entity = new Form(projectId, locationId, formLanguage, formTitle, formId);
+    const entity = new Form(
+      projectId,
+      locationId,
+      formLanguage,
+      formTitle,
+      formId
+    );
     await formMapper.save(entity);
   }
 
@@ -36,15 +42,14 @@ export class FormService {
   static async deleteForm(id: string): Promise<void> {
     await formMapper.delete(id);
   }
-    static async getFormsByLocation(locationId: string): Promise<Form[]> {
+  static async getFormsByLocation(locationId: string): Promise<Form[]> {
     return await formMapper.getFormsByLocation(locationId);
   }
 
-  static async getFormsByProject(projectId: string): Promise<Form[]> {
+  static async getFormsByProject(projectId: string) {
     return await formMapper.getFormsByProject(projectId);
   }
   static async getFormsByUser(userId: string): Promise<Form[]> {
     return await formMapper.getFormsByUser(userId);
   }
-
 }

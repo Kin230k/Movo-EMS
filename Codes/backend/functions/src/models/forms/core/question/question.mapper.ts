@@ -23,8 +23,8 @@ export class QuestionMapper extends BaseMapper<Question> {
         questionId,
         typeCode,
         questionText, // Now passes string directly
-        formId,
-        interviewId,
+        formId || null,
+        interviewId || null,
       ]);
     } else {
       const result: QueryResult = await pool.query(
@@ -33,8 +33,8 @@ export class QuestionMapper extends BaseMapper<Question> {
           currentUserId,
           typeCode,
           questionText, // Now passes string directly
-          formId,
-          interviewId,
+          formId || null,
+          interviewId || null,
         ]
       );
       // Set the questionId on the entity object
@@ -64,20 +64,92 @@ export class QuestionMapper extends BaseMapper<Question> {
     return result.rows.map(this.mapRowToQuestion);
   }
 
-  async getAllByFormId(formId: string): Promise<Question[]> {
+  private parseCriteriaInPlace = (raw: any): any[] => {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    // if it's a single object or jsonb that's not array, return empty array
+    return [];
+  };
+
+  // normalize keys of each criterion object in-place (no new objects created)
+  private normalizeCriteriaKeysInPlace = (criteria: any[]): void => {
+    for (let i = 0; i < criteria.length; i++) {
+      const c = criteria[i];
+      if (!c || typeof c !== 'object') continue;
+
+      // prefer camelCase keys for JS side; assign to existing object properties
+      if (c.criterionid !== undefined && c.criterionId === undefined) {
+        // assign new key on same object and delete old one
+        c.criterionId = c.criterionid;
+        delete c.criterionid;
+      } else if (c.criterion_id !== undefined && c.criterionId === undefined) {
+        c.criterionId = c.criterion_id;
+        delete c.criterion_id;
+      }
+
+      if (c.type === undefined && c.operator !== undefined) {
+        c.type = c.operator;
+        delete c.operator;
+      }
+
+      if (c.value === undefined && c.val !== undefined) {
+        c.value = c.val;
+        delete c.val;
+      }
+
+      if (c.effect === undefined && c.effects !== undefined) {
+        c.effect = c.effects;
+        delete c.effects;
+      }
+
+      // ensure minimal shape so Question consumers don't see undefined keys
+      if (c.criterionId === undefined) c.criterionId = '';
+      if (c.type === undefined) c.type = '';
+      if (c.value === undefined) c.value = '';
+      if (c.effect === undefined) c.effect = '';
+    }
+  };
+
+  private mapRowToQuestionPlain = (row: any): any => {
+    const criteria = this.parseCriteriaInPlace(row.criteria);
+    this.normalizeCriteriaKeysInPlace(criteria);
+
+    // return a plain object shaped like a Question
+    return {
+      questionId: row.questionid,
+      typeCode: row.typecode,
+      questionText: row.questiontext,
+      formId: row.formid,
+      interviewId: row.interviewid,
+      criteria: criteria,
+    };
+  };
+
+  async getAllByFormId(formId: string) {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
+
     const result = await pool.query(
       'SELECT * FROM get_questions_by_form($1, $2)',
       [currentUserId, formId]
     );
-    return result.rows.map(this.mapRowToQuestion);
+
+    return result.rows.map(this.mapRowToQuestionPlain);
   }
-    async getAllByInterviewId(interviewId: string): Promise<Question[]> {
+
+  async getAllByInterviewId(interviewId: string): Promise<Question[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     const result = await pool.query(
-      'SELECT * FROM get_questions_by_interview_id($1, $2)',
+      'SELECT * FROM get_questions_by_interview_id($1::uuid, $2::uuid)',
       [currentUserId, interviewId]
     );
     return result.rows.map(this.mapRowToQuestion);

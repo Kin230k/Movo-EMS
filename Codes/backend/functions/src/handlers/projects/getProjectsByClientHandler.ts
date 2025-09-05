@@ -11,7 +11,7 @@ export interface GetProjectByClientData {}
 
 export interface GetProjectByClientResult {
   success: boolean;
-  data?: Project[] | null;
+  projects?: Project[] | null;
   issues?: FieldIssue[];
 }
 
@@ -46,8 +46,8 @@ export async function getProjectsByClientHandler(
     //   };
     // }
 
-    const project = await ProjectService.getProjectsByClient(auth.callerUuid);
-    return { success: true, data: project };
+    const projects = await ProjectService.getProjectsByClient(auth.callerUuid);
+    return { success: true, projects };
   } catch (dbErr: any) {
     logger.error('getProjectsByClient failed:', dbErr);
     return { success: false, issues: parseDbError(dbErr) };

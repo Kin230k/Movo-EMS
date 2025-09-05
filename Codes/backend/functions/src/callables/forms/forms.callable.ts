@@ -18,6 +18,7 @@ import { updateQuestionHandler } from '../../handlers/forms/core/question/update
 import { getQuestionsByInterviewHandler } from '../../handlers/forms/core/question/getInterviewQuestionsHandler';
 import { getAllFormQuestionsHandler } from '../../handlers/forms/core/question/getAllFormQuestionsHandler';
 import { getFormQuestionsByProjectOrLocationHandler } from '../../handlers/forms/core/getFormQuestionsByProjectOrLocationHandler';
+import { getFormsByProjectHandler } from '../../handlers/forms/core/getFormsByProject';
 
 // Submission handlers
 import { createSubmissionHandler } from '../../handlers/forms/submissions/createSubmissionHandler';
@@ -47,16 +48,19 @@ export const createQuestions = onCall(createQuestionsHandler);
 export const deleteForm = onCall(deleteFormHandler);
 export const getForm = onCall(getFormHandler);
 export const updateForm = onCall(updateFormHandler);
-export const getFormByUser=onCall(getFormByUserHandler);
+export const getFormByUser = onCall(getFormByUserHandler);
+export const getFormsByProject = onCall(getFormsByProjectHandler);
 // Question
 export const createQuestion = onCall(createQuestionHandler);
 export const deleteQuestion = onCall(deleteQuestionHandler);
 export const getAllQuestions = onCall(getAllQuestionsHandler);
 export const getQuestion = onCall(getQuestionHandler);
 export const updateQuestion = onCall(updateQuestionHandler);
-export const getInterviewQuestions=onCall(getQuestionsByInterviewHandler);
-export const getAllFormQuestions=onCall(getAllFormQuestionsHandler);
-export const getFormQuestionsByProjectOrLocation=onCall(getFormQuestionsByProjectOrLocationHandler);
+export const getInterviewQuestions = onCall(getQuestionsByInterviewHandler);
+export const getAllFormQuestions = onCall(getAllFormQuestionsHandler);
+export const getFormQuestionsByProjectOrLocation = onCall(
+  getFormQuestionsByProjectOrLocationHandler
+);
 // Submission
 export const createSubmission = onCall(createSubmissionHandler);
 export const deleteSubmission = onCall(deleteSubmissionHandler);
@@ -74,10 +78,10 @@ export const getManualAnswersBySubmissionId = onCall(
 );
 export const getSubmissionsByForm = onCall(getSubmissionsByFormHandler);
 export const getAnswersBySubmissionId = onCall(getAnswersBySubmissionIdHandler);
-export const updateSubmissionStatus = onCall(
-  updateSubmissionStatusHandler
+export const updateSubmissionStatus = onCall(updateSubmissionStatusHandler);
+export const getQuestionAnswersBySubmission = onCall(
+  getQuestionAnswersBySubmissionIdHandler
 );
-export const getQuestionAnswersBySubmission=onCall(getQuestionAnswersBySubmissionIdHandler);
 //Interview
 export const createInterview = onCall(createInterviewHandler);
 export const updateInterview = onCall(updateInterviewHandler);

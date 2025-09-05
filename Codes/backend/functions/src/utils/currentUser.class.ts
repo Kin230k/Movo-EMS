@@ -1,8 +1,6 @@
-import { firebaseUidToUuid } from "./firebaseUidToUuid"
-
 export class CurrentUser {
-    public static uuid :string 
-    public static setUuid(uid:string) {
-        this.uuid = firebaseUidToUuid(uid)
-    }
+  public static uuid: string;
+  public static setUuid(uuid: string) {
+    this.uuid = uuid;
+  }
 }

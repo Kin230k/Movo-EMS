@@ -3,14 +3,21 @@ import { Question } from './question.class';
 
 export class QuestionService {
   static async createQuestion(
-    typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
-    questionText: string,  // Changed from Multilingual to string
-    formId: string,
-    interviewId: string
+    typeCode:
+      | 'OPEN_ENDED'
+      | 'SHORT_ANSWER'
+      | 'NUMBER'
+      | 'RATE'
+      | 'DROPDOWN'
+      | 'RADIO'
+      | 'MULTIPLE_CHOICE',
+    questionText: string, // Changed from Multilingual to string
+    formId: string | null,
+    interviewId: string | null
   ): Promise<Question> {
     const entity = new Question(
       typeCode,
-      questionText,  // Now passes string directly
+      questionText, // Now passes string directly
       formId,
       interviewId
     );
@@ -20,14 +27,21 @@ export class QuestionService {
 
   static async updateQuestion(
     questionId: string,
-    typeCode: 'OPEN_ENDED'|'SHORT_ANSWER'|'NUMBER'|'RATE'|'DROPDOWN'|'RADIO'|'MULTIPLE_CHOICE',
-    questionText: string,  // Changed from Multilingual to string
-    formId: string,
-    interviewId: string
+    typeCode:
+      | 'OPEN_ENDED'
+      | 'SHORT_ANSWER'
+      | 'NUMBER'
+      | 'RATE'
+      | 'DROPDOWN'
+      | 'RADIO'
+      | 'MULTIPLE_CHOICE',
+    questionText: string, // Changed from Multilingual to string
+    formId: string | null,
+    interviewId: string | null
   ): Promise<void> {
     const entity = new Question(
       typeCode,
-      questionText,  // Now passes string directly
+      questionText, // Now passes string directly
       formId,
       interviewId,
       questionId
@@ -42,12 +56,13 @@ export class QuestionService {
   static async getAllQuestions(): Promise<Question[]> {
     return await questionMapper.getAll();
   }
-  
+
   static async getAllQuestionsByFormId(formId: string): Promise<Question[]> {
     return await questionMapper.getAllByFormId(formId);
   }
-  static async getAllQuestionsByInterviewId(interviewId:string):Promise<Question[]>
-  {
+  static async getAllQuestionsByInterviewId(
+    interviewId: string
+  ): Promise<Question[]> {
     return await questionMapper.getAllByInterviewId(interviewId);
   }
 

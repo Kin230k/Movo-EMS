@@ -21,10 +21,9 @@ export async function createSubmissionHandler(
   if (!auth.success) return auth;
 
   // 2) Extract and validate input
-  const { formId, interviewId, decisionNotes } =
-    request.data || {};
-  
-  if (!formId ) {
+  const { formId, interviewId, decisionNotes } = request.data || {};
+
+  if (!formId) {
     issues.push({
       field: 'input',
       message: 'Missing required fields: formId,  dateSubmitted',
@@ -45,7 +44,7 @@ export async function createSubmissionHandler(
       formId,
       userId,
       interviewId,
-      new Date(Date.now()),
+      new Date(Date.now()).toISOString(),
       decisionNotes
     );
     return { success: true };

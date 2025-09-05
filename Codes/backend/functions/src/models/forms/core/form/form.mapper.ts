@@ -7,8 +7,6 @@ import { CurrentUser } from '../../../../utils/currentUser.class';
 import { Question } from '../question/question.class';
 // types/forms.ts (or inside form.class.ts)
 
-
-
 export interface OptionDTO {
   optionId: string;
   optionText: string;
@@ -31,12 +29,12 @@ export interface FormWithQuestions {
 export class FormMapper extends BaseMapper<Form> {
   async save(entity: Form): Promise<void> {
     const currentUserId = CurrentUser.uuid;
-      
+
     if (!currentUserId) throw new Error('Current user UUID is not set');
-    
+
     const op = entity.operation;
     const { formId, projectId, locationId, formLanguage, formTitle } = entity;
-    
+
     if (op === Operation.UPDATE) {
       if (!formId) throw new Error('Form ID is required for update');
       await pool.query('CALL update_form($1, $2, $3, $4, $5, $6)', [
@@ -87,7 +85,7 @@ export class FormMapper extends BaseMapper<Form> {
 
     await pool.query('CALL delete_form($1, $2)', [currentUserId, id]);
   }
-    async getFormsByLocation(locationId: string): Promise<Form[]> {
+  async getFormsByLocation(locationId: string): Promise<Form[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!locationId) throw new Error('Location ID is required');
@@ -99,7 +97,7 @@ export class FormMapper extends BaseMapper<Form> {
 
     return result.rows.map(this.mapRowToForm);
   }
-    async getFormsByProject(projectId: string): Promise<Form[]> {
+  async getFormsByProject(projectId: string) {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!projectId) throw new Error('Project ID is required');
@@ -108,10 +106,25 @@ export class FormMapper extends BaseMapper<Form> {
       'SELECT * FROM get_forms_by_project($1, $2)',
       [currentUserId, projectId]
     );
+    // convert them  formId UUID,
+    // projectId UUID,
+    // locationId UUID,
+    // projectName JSONB,
+    // locationName JSONB,
+    // form_language TEXT,
+    // form_title TEXT
+    const forms = result.rows.map((row) => ({
+      formId: row.formid,
+      formTitle: row.form_title,
+      projectId: row.projectid,
+      locationId: row.locationid,
+      projectName: row.projectname,
+      locationName: row.locationname,
+    }));
 
-    return result.rows.map(this.mapRowToForm);
+    return forms;
   }
-    async getFormsByUser(userId: string): Promise<Form[]> {
+  async getFormsByUser(userId: string): Promise<Form[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!userId) throw new Error('Project ID is required');

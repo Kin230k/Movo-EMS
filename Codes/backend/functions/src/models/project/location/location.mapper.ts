@@ -31,14 +31,11 @@ export class LocationMapper extends BaseMapper<Location> {
         latitude,
       ]);
     } else {
-    if (!projectId) throw new Error('Project ID is required');
+      if (!projectId) throw new Error('Project ID is required');
       const { rows } = await pool.query(
         'SELECT * FROM create_location($1, $2, $3, $4, $5, $6)',
         [currentUserId, name, projectId, siteMap, longitude, latitude]
       );
-      
-      
-      
 
       if (rows.length === 0) throw new Error('Failed to create location');
       entity.locationId = rows[0].locationId;
@@ -73,6 +70,18 @@ export class LocationMapper extends BaseMapper<Location> {
     const result = await pool.query(
       'SELECT * FROM get_locations_by_project($1, $2)',
       [currentUserId, projectId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getByClient(clientId: string): Promise<Location[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!clientId) throw new Error('Client ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_locations_by_client($1, $2)',
+      [currentUserId, clientId]
     );
     return result.rows.map(this.mapRowToEntity);
   }

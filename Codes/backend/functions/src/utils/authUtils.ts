@@ -67,6 +67,9 @@ export type AuthenticateResult =
 /**
  * Ensure the request is from an authenticated admin.
  */
+/**
+ * Ensure the request is from an authenticated admin.
+ */
 export async function authenticateAdmin(
   request: CallableRequest
 ): Promise<AuthenticateResult> {
@@ -120,6 +123,7 @@ export async function authenticateAdmin(
     return { success: false, issues: parseDbError(err) };
   }
 }
+
 export async function authenticateClient(
   request: CallableRequest
 ): Promise<AuthenticateResult> {
@@ -141,23 +145,38 @@ export async function authenticateClient(
   CurrentUser.setUuid(callerUuid);
 
   try {
+    // First, try to find a client record (preferred).
     const callerClient = await ClientService.getClientById(callerUuid);
-    if (!callerClient) {
-      logger.warn('authenticateClient: caller does not have a client record', {
-        callerUuid,
-      });
+    if (callerClient) {
       return {
-        success: false,
-        issues: [
-          { field: 'auth', message: 'Forbidden: client record required' },
-        ],
+        success: true,
+        callerUid,
+        callerUuid,
+        callerAdmin: callerClient,
       };
     }
 
-    return { success: true, callerUid, callerUuid, callerAdmin: callerClient };
+    // If no client found, allow admins to call client methods (backwards compatibility).
+    const callerAdmin = await AdminService.getAdminById(callerUuid);
+    if (callerAdmin) {
+      logger.info(
+        'authenticateClient: admin caller allowed to access client method',
+        { callerUuid }
+      );
+      return { success: true, callerUid, callerUuid, callerAdmin };
+    }
+
+    // Neither client nor admin found -> forbidden.
+    logger.warn('authenticateClient: caller does not have a client record', {
+      callerUuid,
+    });
+    return {
+      success: false,
+      issues: [{ field: 'auth', message: 'Forbidden: client record required' }],
+    };
   } catch (err: any) {
     logger.error(
-      'authenticateClient: failed to fetch caller client record',
+      'authenticateClient: failed to fetch caller client/admin record',
       err
     );
     return { success: false, issues: parseDbError(err) };
@@ -185,20 +204,50 @@ export async function authenticateUser(
   CurrentUser.setUuid(callerUuid);
 
   try {
+    // First try to find a user record (preferred).
     const callerUser = await UserService.getUserById(callerUuid);
-    if (!callerUser) {
-      logger.warn('authenticateUser: caller does not have a user record', {
-        callerUuid,
-      });
+    if (callerUser) {
+      return { success: true, callerUid, callerUuid, callerAdmin: callerUser };
+    }
+
+    // If not a user, allow a client to call user methods.
+    const callerClient = await ClientService.getClientById(callerUuid);
+    if (callerClient) {
+      logger.info(
+        'authenticateUser: client caller allowed to access user method',
+        { callerUuid }
+      );
       return {
-        success: false,
-        issues: [{ field: 'auth', message: 'Forbidden: user record required' }],
+        success: true,
+        callerUid,
+        callerUuid,
+        callerAdmin: callerClient,
       };
     }
 
-    return { success: true, callerUid, callerUuid, callerAdmin: callerUser };
+    // If not a client, allow an admin to call user methods.
+    const callerAdmin = await AdminService.getAdminById(callerUuid);
+    if (callerAdmin) {
+      logger.info(
+        'authenticateUser: admin caller allowed to access user method',
+        { callerUuid }
+      );
+      return { success: true, callerUid, callerUuid, callerAdmin };
+    }
+
+    // Not found at any level -> forbidden.
+    logger.warn(
+      'authenticateUser: caller does not have a user/client/admin record',
+      {
+        callerUuid,
+      }
+    );
+    return {
+      success: false,
+      issues: [{ field: 'auth', message: 'Forbidden: user record required' }],
+    };
   } catch (err: any) {
-    logger.error('authenticateUser: failed to fetch caller user record', err);
+    logger.error('authenticateUser: failed to fetch caller record', err);
     return { success: false, issues: parseDbError(err) };
   }
 }
