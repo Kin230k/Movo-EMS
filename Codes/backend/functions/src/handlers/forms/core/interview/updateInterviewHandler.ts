@@ -8,6 +8,7 @@ import { InterviewService } from '../../../../models/forms/core/interview/interv
 export interface UpdateInterviewData {
   interviewId: string;
   projectId: string;
+  title: string; // Added title field
 }
 
 export interface UpdateInterviewResult {
@@ -19,7 +20,7 @@ export async function updateInterviewHandler(
   request: CallableRequest<UpdateInterviewData>
 ): Promise<UpdateInterviewResult> {
   try {
-    const { interviewId, projectId } = request.data || {};
+    const { interviewId, projectId,title} = request.data || {};
     
     if (!interviewId) {
       return {
@@ -32,6 +33,12 @@ export async function updateInterviewHandler(
       return {
         success: false,
         issues: [{ field: 'projectId', message: 'Project ID is required' }]
+      };
+    }
+      if (!title) { // Added title validation
+      return {
+        success: false,
+        issues: [{ field: 'title', message: 'Title is required' }]
       };
     }
 
@@ -58,7 +65,7 @@ export async function updateInterviewHandler(
       }
     }
 
-    await InterviewService.updateInterview(interviewId, projectId);
+    await InterviewService.updateInterview(interviewId, projectId,title);
     return { success: true };
   } catch (error: any) {
     logger.error('Update interview error:', error);

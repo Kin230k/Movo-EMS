@@ -18,16 +18,23 @@ interface QuestionResponse {
   options: OptionResponse[];
 }
 
-
 interface GetQuestionsByInterviewData {
   interviewId: string;
-
 }
+
+interface GetQuestionsByInterviewResponse {
+  interviewTitle: string | null;
+  questions: QuestionResponse[];
+}
+
 export async function getQuestionsByInterviewHandler(
   request: CallableRequest<GetQuestionsByInterviewData>
-) {
+): Promise<
+  | { success: false; issues: FieldIssue[] }
+  | ({ success: true } & GetQuestionsByInterviewResponse)
+> {
   const auth = await authenticateUser(request);
-  if (!auth.success) return auth;
+  if (!auth.success) return auth as { success: false; issues: FieldIssue[] };
 
   const { interviewId } = request.data;
   const issues: FieldIssue[] = [];
@@ -41,14 +48,8 @@ export async function getQuestionsByInterviewHandler(
   }
 
   try {
+    const { interviewTitle, questions } = await QuestionService.getAllQuestionsByInterviewId(interviewId!);
     
-
-    // For simplicity, let's use the first form
-
-    // Get questions for this form
-    const questions = await QuestionService.getAllQuestionsByInterviewId(interviewId!);
-    
-    // For each question, get its options
     const questionsWithOptions: QuestionResponse[] = await Promise.all(
       questions.map(async (question) => {
         const options = await OptionService.getOptionsByQuestion(question.questionId!);
@@ -64,12 +65,10 @@ export async function getQuestionsByInterviewHandler(
       })
     );
 
-    return { success: true, questions: questionsWithOptions };
+    return { success: true, interviewTitle, questions: questionsWithOptions };
 
   } catch (err: any) {
     logger.error('Fetching interview questions failed', err);
     return { success: false, issues: parseDbError(err) };
   }
 }
-
-

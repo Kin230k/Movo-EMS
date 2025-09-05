@@ -7,6 +7,7 @@ import { InterviewService } from '../../../../models/forms/core/interview/interv
 
 export interface CreateInterviewData {
   projectId: string;
+  title: string;
 }
 
 export interface CreateInterviewResult {
@@ -19,12 +20,18 @@ export async function createInterviewHandler(
   request: CallableRequest<CreateInterviewData>
 ): Promise<CreateInterviewResult> {
   try {
-    const { projectId } = request.data || {};
+    const { projectId,title } = request.data || {};
     
     if (!projectId) {
       return {
         success: false,
         issues: [{ field: 'projectId', message: 'Project ID is required' }]
+      };
+    }
+     if (!title) { // Added title validation
+      return {
+        success: false,
+        issues: [{ field: 'title', message: 'Title is required' }]
       };
     }
 
@@ -34,7 +41,7 @@ export async function createInterviewHandler(
       return { success: false, issues: auth.issues };
     }
 
-    await InterviewService.createInterview(projectId);
+    await InterviewService.createInterview(projectId,title);
     return { success: true };
   } catch (error: any) {
     logger.error('Create interview error:', error);

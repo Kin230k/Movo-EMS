@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION get_all_interviews(p_auth_user_id UUID)
-RETURNS TABLE (interviewId UUID, projectId UUID)
+RETURNS TABLE (interviewId UUID, projectId UUID,title TEXT)
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 BEGIN
@@ -8,7 +8,8 @@ BEGIN
 RETURN QUERY
  SELECT
  i.interviewId,
- i.projectId
+ i.projectId,
+ i.title
  FROM INTERVIEWS i;
 END;
 $$;

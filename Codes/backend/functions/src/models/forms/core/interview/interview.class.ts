@@ -3,6 +3,7 @@ import { Operation } from '../../../operation.enum';
 export class Interview {
   constructor(
     public projectId: string,
+    public title: string,
     public interviewId?: string
   ) {}
 

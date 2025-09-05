@@ -11,21 +11,23 @@ export class InterviewMapper extends BaseMapper<Interview> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { interviewId, projectId } = entity;
+    const { interviewId, projectId, title } = entity;
 
     if (!projectId) throw new Error('Project ID is required');
-
+    if (!title) throw new Error('Title is required');
     if (op === Operation.UPDATE) {
       if (!interviewId) throw new Error('Interview ID is required for update');
-      await pool.query('CALL update_interview($1, $2, $3)', [
+      await pool.query('CALL update_interview($1, $2, $3, $4)', [
         currentUserId,
         interviewId,
         projectId,
+        title,
       ]);
     } else {
-      await pool.query('CALL create_interview($1, $2)', [
+      await pool.query('CALL create_interview($1, $2, $3)', [
         currentUserId,
         projectId,
+        title,
       ]);
     }
   }
@@ -74,7 +76,7 @@ export class InterviewMapper extends BaseMapper<Interview> {
 
 
   private mapRowToInterview = (row: any): Interview => {
-    return new Interview(row.projectid, row.interviewid);
+    return new Interview(row.projectid,row.title, row.interviewid);
   };
 }
 

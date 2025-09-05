@@ -5,6 +5,7 @@ import type { QueryResult } from 'pg';
 import pool from '../../../../utils/pool';
 import { CurrentUser } from '../../../../utils/currentUser.class';
 
+
 export class QuestionMapper extends BaseMapper<Question> {
   async save(entity: Question): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -145,15 +146,25 @@ export class QuestionMapper extends BaseMapper<Question> {
     return result.rows.map(this.mapRowToQuestionPlain);
   }
 
-  async getAllByInterviewId(interviewId: string): Promise<Question[]> {
-    const currentUserId = CurrentUser.uuid;
-    if (!currentUserId) throw new Error('Current user UUID is not set');
-    const result = await pool.query(
-      'SELECT * FROM get_questions_by_interview_id($1::uuid, $2::uuid)',
-      [currentUserId, interviewId]
-    );
-    return result.rows.map(this.mapRowToQuestion);
+async getAllByInterviewId(interviewId: string): Promise<{ interviewTitle: string | null, questions: Question[] }> {
+  const currentUserId = CurrentUser.uuid;
+  if (!currentUserId) throw new Error('Current user UUID is not set');
+  
+  const result = await pool.query(
+    'SELECT * FROM get_questions_by_interview_id($1::uuid, $2::uuid)',
+    [currentUserId, interviewId]
+  );
+  
+  if (result.rows.length === 0) {
+    return { interviewTitle: null, questions: [] };
   }
+  
+  // Assume all rows have the same interviewtitle; pluck from first row
+  const interviewTitle = result.rows[0].interviewtitle || null;
+  const questions = result.rows.map(this.mapRowToQuestion);
+  
+  return { interviewTitle, questions };
+}
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -172,7 +183,10 @@ export class QuestionMapper extends BaseMapper<Question> {
       row.questionid
     );
   };
-}
+
+};
+
+
 
 const questionMapper = new QuestionMapper();
 export default questionMapper;
