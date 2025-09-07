@@ -9,12 +9,19 @@ import { ButtonComponent } from '../../../../components/shared/button/button';
 import { ResponsiveService } from '../../../../core/services/responsive.service';
 import { IdentityService } from '../../../../core/services/identity.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LanguageSwitcherComponent } from '../../../../components/shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [CommonModule, RouterModule, ButtonComponent, TranslateModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ButtonComponent,
+    TranslateModule,
+    LanguageSwitcherComponent,
+  ],
   standalone: true,
 })
 export class SidebarComponent implements OnInit, OnDestroy {

@@ -8,6 +8,7 @@ import { ProjectsFooterComponent } from './projects-footer.component';
 
 // ThemedButton path — adjust to match your repo
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
+import { LoadingSpinnerComponent } from '../../components/shared/loading-spinner/loading-spinner.component';
 
 import api from '../../core/api/api';
 
@@ -38,6 +39,7 @@ interface ProjectSummary {
     TranslateModule,
     ProjectsNavbarComponent,
     ThemedButtonComponent,
+    LoadingSpinnerComponent,
   ],
   template: `
     <app-projects-navbar></app-projects-navbar>
@@ -131,7 +133,9 @@ interface ProjectSummary {
     </div>
 
     <ng-template #loadingTpl>
-      <div class="loading">{{ 'COMMON.LOADING' | translate }}</div>
+      <app-loading-spinner
+        [label]="'COMMON.LOADING' | translate"
+      ></app-loading-spinner>
     </ng-template>
     <!-- <app-projects-footer></app-projects-footer> -->
   `,

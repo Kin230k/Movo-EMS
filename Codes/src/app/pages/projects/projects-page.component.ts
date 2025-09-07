@@ -6,10 +6,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 // ThemedButton path — adjust to match your repo
 
 import api from '../../core/api/api';
+import { LoadingSpinnerComponent } from '../../components/shared/loading-spinner/loading-spinner.component';
 import { ProjectsNavbarComponent } from './projects-navbar.component';
 // import { ProjectsFooterComponent } from './projects-footer.component';
-import { ProjectsLandingComponent } from './projects-landing.component';
-import { LanguageService } from '../../core/services/language.service';
 
 // Local types (formerly from project.service)
 type LocalizedString = { en: string; ar: string };
@@ -28,23 +27,26 @@ interface ProjectSummary {
     RouterModule,
     TranslateModule,
     ProjectsNavbarComponent,
-    ProjectsLandingComponent,
+    LoadingSpinnerComponent,
+    // ProjectsLandingComponent,
   ],
   template: `
     <app-projects-navbar></app-projects-navbar>
 
-    <app-projects-landing
+    <!-- <app-projects-landing
       [title]="'PROJECTS.TITLE' | translate"
       [subtitle]="
         ('PROJECTS.SUBTITLE' | translate) || 'Explore available projects'
       "
-    ></app-projects-landing>
+    ></app-projects-landing> -->
 
     <div class="projects-container">
       <h1 class="title">{{ 'PROJECTS.TITLE' | translate }}</h1>
 
-      <div *ngIf="loading" class="loading">
-        {{ 'COMMON.LOADING' | translate }}
+      <div *ngIf="loading">
+        <app-loading-spinner
+          [label]="'COMMON.LOADING' | translate"
+        ></app-loading-spinner>
       </div>
 
       <div *ngIf="!loading && projects.length === 0" class="empty">

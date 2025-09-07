@@ -123,7 +123,7 @@ import { TranslateModule } from '@ngx-translate/core';
       .form-page {
         position: relative;
         padding: var(--padding-section);
-        min-height: 70vh;
+        min-height: 100vh;
       }
       .overlay {
         position: absolute;

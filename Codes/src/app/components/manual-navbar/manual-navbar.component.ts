@@ -5,16 +5,23 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { IdentityService } from '../../core/services/identity.service';
+import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-manual-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TranslateModule,
+    LanguageSwitcherComponent,
+  ],
   template: `
     <nav class="manual-navbar">
       <div class="navbar-container">
         <img src="assets/images/logo.png" alt="logo" class="logo" />
         <div class="navbar-links">
+          <app-language-switcher></app-language-switcher>
           <a
             routerLink="/manual-submissions"
             routerLinkActive="active"
@@ -67,6 +74,7 @@ import { IdentityService } from '../../core/services/identity.service';
       .navbar-links {
         display: flex;
         gap: 1rem;
+        align-items: center;
       }
 
       .logo {

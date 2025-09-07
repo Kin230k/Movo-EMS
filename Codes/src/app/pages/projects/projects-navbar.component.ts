@@ -5,19 +5,27 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { IdentityService } from '../../core/services/identity.service';
+import { LanguageSwitcherComponent } from '../../components/shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-projects-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TranslateModule,
+    LanguageSwitcherComponent,
+  ],
   template: `
     <nav class="proj-navbar">
       <img src="assets/images/logo.png" alt="logo" class="logo" />
       <div class="container">
+        <app-language-switcher></app-language-switcher>
+        <span class="spacer"></span>
+
         <a routerLink="/projects" routerLinkActive="active" class="link">
           {{ 'NAV.PROJECTS' | translate : { default: 'Projects' } }}
         </a>
-        <span class="spacer"></span>
         <a (click)="signOut()" class="link" role="button" tabindex="0">
           {{ 'COMMON.SIGN_OUT' | translate : { default: 'Sign out' } }}
         </a>
