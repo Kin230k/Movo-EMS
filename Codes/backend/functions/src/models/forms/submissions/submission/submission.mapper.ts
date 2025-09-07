@@ -21,8 +21,6 @@ export class SubmissionMapper extends BaseMapper<Submission> {
       decisionNotes,
     } = entity;
 
-    if (!userId) throw new Error('User ID is required');
-
     if (op === Operation.UPDATE) {
       if (!submissionId)
         throw new Error('Submission ID is required for update');
@@ -40,7 +38,10 @@ export class SubmissionMapper extends BaseMapper<Submission> {
         ]
       );
     } else {
+      if (!userId) throw new Error('User ID is required');
+
       // CREATE: call the DB function that RETURNS TABLE(...) and read the returned row
+
       const result: QueryResult = await pool.query(
         `SELECT * FROM create_submission($1, $2, $3, $4, $5, $6)`,
         [
@@ -163,9 +164,9 @@ export class SubmissionMapper extends BaseMapper<Submission> {
   }
 
   private mapRowToSubmission = (row: any): Submission => {
-      const rawDateSubmitted = 
-        row.dateSubmitted ?? row.datesubmitted ?? row.date_submitted;
-      const dateSubmitted =
+    const rawDateSubmitted =
+      row.dateSubmitted ?? row.datesubmitted ?? row.date_submitted;
+    const dateSubmitted =
       rawDateSubmitted instanceof Date
         ? rawDateSubmitted.toISOString()
         : rawDateSubmitted !== null && rawDateSubmitted !== undefined

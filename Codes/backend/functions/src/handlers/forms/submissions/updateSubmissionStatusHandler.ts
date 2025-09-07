@@ -3,7 +3,7 @@ import * as logger from 'firebase-functions/logger';
 
 import { FieldIssue } from '../../../utils/types';
 import { parseDbError } from '../../../utils/dbErrorParser';
-import { authorizeUserProjectAccessWorkerFirst } from '../../../utils/authUtils';
+import { authenticateUser } from '../../../utils/authUtils';
 import { SubmissionService } from '../../../models/forms/submissions/submission/submission.service';
 import { SubmissionOutcome } from '../../../models/submission_outcome.enum';
 
@@ -23,24 +23,23 @@ export async function updateSubmissionStatusHandler(
   request: CallableRequest<UpdateSubmissionStatusData>
 ): Promise<UpdateSubmissionStatusResult> {
   const issues: FieldIssue[] = [];
- const { submissionId, outcome, decisionNotes, projectId } = request.data || {};
-
+  const { submissionId, outcome, decisionNotes } = request.data || {};
 
   if (!submissionId) {
     issues.push({ field: 'submissionId', message: 'submissionId is required' });
   }
-  
+
   if (!outcome) {
     issues.push({ field: 'outcome', message: 'outcome is required' });
-  } else if (!Object.values(SubmissionOutcome).includes(outcome.toLowerCase() as SubmissionOutcome)) {
-    issues.push({ 
-      field: 'outcome', 
-      message: `outcome must be one of: ${Object.values(SubmissionOutcome).join(', ')}` 
+  } else if (
+    !Object.values(SubmissionOutcome).includes(outcome as SubmissionOutcome)
+  ) {
+    issues.push({
+      field: 'outcome',
+      message: `outcome must be one of: ${Object.values(SubmissionOutcome).join(
+        ', '
+      )}`,
     });
-  }
-  
-  if (!projectId) {
-    issues.push({ field: 'projectId', message: 'projectId is required' });
   }
 
   if (issues.length > 0) {
@@ -49,13 +48,17 @@ export async function updateSubmissionStatusHandler(
 
   try {
     // Authorize user access to the project
-    const auth = await authorizeUserProjectAccessWorkerFirst(request, projectId);
+    const auth = await authenticateUser(request);
     if (!auth.success) {
       return { success: false, issues: auth.issues };
     }
 
     // Update submission status
-    await SubmissionService.updateSubmissionStatus(submissionId, outcome,decisionNotes);
+    await SubmissionService.updateSubmissionStatus(
+      submissionId,
+      outcome,
+      decisionNotes
+    );
 
     return { success: true };
   } catch (dbErr: any) {

@@ -35,15 +35,15 @@ export class SubmissionService {
   static async updateSubmission(
     submissionId: string,
     formId: string,
-    userId: string,
+    userId: string | undefined,
     interviewId: string,
-    dateSubmitted?: string|null,
+    dateSubmitted?: string | null,
     outcome?: SubmissionOutcome,
     decisionNotes?: string
   ): Promise<void> {
     const entity = new Submission(
       formId,
-      userId,
+      userId!,
       interviewId,
       dateSubmitted!,
       decisionNotes,

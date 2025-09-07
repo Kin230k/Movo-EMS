@@ -137,6 +137,31 @@ export class FormMapper extends BaseMapper<Form> {
     return result.rows.map(this.mapRowToForm);
   }
 
+  async getFormsByClient(clientId: string) {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!clientId) throw new Error('Client ID is required');
+
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_forms_by_client($1, $2)',
+      [currentUserId, clientId]
+    );
+
+    // Convert to the expected format matching the SQL function return
+    const forms = result.rows.map((row) => ({
+      formId: row.formid,
+      formTitle: row.form_title,
+      formLanguage: row.form_language,
+      projectId: row.projectid,
+      locationId: row.locationid,
+      projectName: row.projectname,
+      locationName: row.locationname,
+      clientName: row.clientname,
+    }));
+
+    return forms;
+  }
+
   private mapRowToForm = (row: any): Form => {
     return new Form(
       row.projectid,

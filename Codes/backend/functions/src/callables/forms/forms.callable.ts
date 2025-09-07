@@ -8,6 +8,7 @@ import { deleteFormHandler } from '../../handlers/forms/core/deleteFormHandler';
 import { getFormHandler } from '../../handlers/forms/core/getFormHandler';
 import { updateFormHandler } from '../../handlers/forms/core/updateFormHandler';
 import { getFormByUserHandler } from '../../handlers/forms/core/getFormsByUserHandler';
+import { getFormsByClientHandler } from '../../handlers/forms/core/getFormsByClientHandler';
 
 // Question handlers
 import { createQuestionHandler } from '../../handlers/forms/core/question/createQuestionHandler';
@@ -39,6 +40,7 @@ import { deleteInterviewHandler } from '../../handlers/forms/core/interview/dele
 import { getInterviewsByProjectHandler } from '../../handlers/forms/core/interview/getInterviewsByProjectHandler';
 import { updateInterviewHandler } from '../../handlers/forms/core/interview/updateInterviewHandler';
 import { getInterviewHandler } from '../../handlers/forms/core/interview/getInterviewHandler';
+import { getEmailsByFormHandler } from '../../handlers/forms/core/email/getEmailsByFormHandler';
 
 // Export callable functions
 
@@ -50,6 +52,7 @@ export const getForm = onCall(getFormHandler);
 export const updateForm = onCall(updateFormHandler);
 export const getFormByUser = onCall(getFormByUserHandler);
 export const getFormsByProject = onCall(getFormsByProjectHandler);
+export const getFormsByClient = onCall(getFormsByClientHandler);
 // Question
 export const createQuestion = onCall(createQuestionHandler);
 export const deleteQuestion = onCall(deleteQuestionHandler);
@@ -88,3 +91,6 @@ export const updateInterview = onCall(updateInterviewHandler);
 export const getInterview = onCall(getInterviewHandler);
 export const getInterviewByProject = onCall(getInterviewsByProjectHandler);
 export const deleteInterview = onCall(deleteInterviewHandler);
+
+// Email
+export const getEmailsByForm = onCall(getEmailsByFormHandler);

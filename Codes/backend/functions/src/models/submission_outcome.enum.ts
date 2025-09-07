@@ -1,5 +1,5 @@
 export enum SubmissionOutcome {
-  PASS = 'pass',
-  FAIL = 'fail',
-  MANUAL_REVIEW = 'manual_review'
+  PASS = 'ACCEPTED',
+  FAIL = 'REJECTED',
+  MANUAL_REVIEW = 'MANUAL_REVIEW',
 }

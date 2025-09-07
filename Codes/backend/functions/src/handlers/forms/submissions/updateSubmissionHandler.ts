@@ -9,7 +9,7 @@ import { authenticateUser } from '../../../utils/authUtils';
 interface UpdateSubmissionRequestData {
   submissionId: string;
   formId?: string;
-  userId: string;
+  userId?: string;
   interviewId?: string;
   outcome?: SubmissionOutcome;
   decisionNotes?: string;
@@ -28,22 +28,16 @@ export async function updateSubmissionHandler(
     interviewId,
     outcome,
     decisionNotes,
+    userId: user,
   } = request.data || {};
-  if (!submissionId ) {
+  if (!submissionId) {
     issues.push({
       field: 'input',
-      message:
-        'Missing required fields: submissionId, formId, interviewId',
+      message: 'Missing required fields: submissionId, formId, interviewId',
     });
     return { success: false, issues };
   }
-
-  const userId = firebaseUidToUuid(request.auth!.uid);
-  if (!userId) {
-    issues.push({ field: 'userId', message: 'Invalid user ID' });
-    return { success: false, issues };
-  }
-  
+  let userId = user ? firebaseUidToUuid(user) : undefined;
 
   try {
     await SubmissionService.updateSubmission(

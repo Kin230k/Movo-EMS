@@ -52,4 +52,8 @@ export class FormService {
   static async getFormsByUser(userId: string): Promise<Form[]> {
     return await formMapper.getFormsByUser(userId);
   }
+
+  static async getFormsByClient(clientId: string) {
+    return await formMapper.getFormsByClient(clientId);
+  }
 }

@@ -6,9 +6,9 @@ BEGIN
  
  UPDATE USERS
     SET role = 'User'::user_role
-    WHERE userId =  UUID;
+    WHERE userId = p_user_id ;
 
 DELETE FROM PROJECT_USER_ROLES
- WHERE projectId = p_project_id and userId= UUID;
+ WHERE projectId = p_project_id and userId= p_user_id;
 END;
 $$;

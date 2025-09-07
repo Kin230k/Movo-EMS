@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION get_emails_by_form(p_auth_user_id UUID, p_form_id UUID)
 RETURNS TABLE (
     emailId UUID,

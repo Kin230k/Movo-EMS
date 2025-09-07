@@ -37,15 +37,9 @@ export async function createSubmissionWithAnswersHandler(
   if (!auth.success) return auth;
 
   // 2. Extract and validate input
-  const {
-    formId,
-    interviewId,
-    userId,
-    decisionNotes,
-    answers,
-    outcome,
-  } = request.data || {};
-  
+  const { formId, interviewId, userId, decisionNotes, answers, outcome } =
+    request.data || {};
+
   if (interviewId && !userId) {
     issues.push({
       field: 'userId',
@@ -122,15 +116,29 @@ export async function createSubmissionWithAnswersHandler(
   }
 
   try {
-    // 3. Create submission and capture generated submissionId
-    const submissionId: string = await SubmissionService.createSubmission(
-      formId!,
-      auth.callerUuid,
-      interviewId!,
-      new Date(Date.now()).toISOString(),
-      decisionNotes
-    );
-
+    let submissionId;
+    if (interviewId) {
+      submissionId = await SubmissionService.createSubmission(
+        formId!,
+        userId!,
+        interviewId!,
+        new Date(Date.now()).toISOString(),
+        decisionNotes
+      );
+    } else {
+      // 3. Create submission and capture generated submissionId
+      submissionId = await SubmissionService.createSubmission(
+        formId!,
+        auth.callerUuid,
+        undefined,
+        new Date(Date.now()).toISOString(),
+        undefined
+      );
+    }
+    if (!submissionId) {
+      issues.push({ field: 'interviewId', message: 'Interview not found' });
+      return { success: false, issues };
+    }
     // 4. Create answers in bulk
     const answerIds = await AnswerService.createAnswers(submissionId, answers);
 
@@ -139,10 +147,7 @@ export async function createSubmissionWithAnswersHandler(
       answerIds,
     });
     if (interviewId) {
-      await SubmissionService.updateSubmissionStatus(
-        submissionId,
-        outcome!
-      );
+      await SubmissionService.updateSubmissionStatus(submissionId, outcome!);
     }
     try {
       // 5. Gather email data
@@ -163,7 +168,7 @@ export async function createSubmissionWithAnswersHandler(
       const confirmLink = status === 'ACCEPTED' ? undefined : undefined;
 
       if (to) {
-       const html= await sendSubmissionEmail(
+        const html = await sendSubmissionEmail(
           to,
           displayName,
           status,
@@ -172,22 +177,18 @@ export async function createSubmissionWithAnswersHandler(
           confirmLink,
           auth.callerUuid
         );
-        try
-        {
-         await EmailService.createEmail(to,html!,formId!)
-        }
-        catch(err:any)
-        {
+        try {
+          await EmailService.createEmail(to, html!, formId!);
+        } catch (err: any) {
           logger.error('Email Cannot be Created to Database', err);
           return { success: false, issues: parseDbError(err) };
         }
-        
       }
     } catch (err: any) {
       logger.error('Error sending email', err);
       return { success: false, issues: parseDbError(err) };
     }
-   
+
     return {
       success: true,
       submissionId,
