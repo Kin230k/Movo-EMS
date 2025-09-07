@@ -81,22 +81,28 @@ export class LocationManagementComponent {
     const who = await this.identity.getIdentity().catch(() => null);
     try {
       this._loading = true;
-      const data: any = await api.getLocationsForClient();
-      const payload = (data as any)?.result ?? data ?? [];
-      this._locations = Array.isArray(payload.locations)
-        ? payload.locations
-        : [];
+
       if (who?.isClient) {
         const data: any = await api.getProjectsByClient({});
         const payload = (data as any)?.result ?? data ?? {};
         this._projects = Array.isArray(payload.projects)
           ? payload.projects
           : [];
+        const locations: any = await api.getLocationsForClient();
+        const locationsPayload = (locations as any)?.result ?? locations ?? [];
+        this._locations = Array.isArray(locationsPayload.locations)
+          ? locationsPayload.locations
+          : [];
       } else {
         const data: any = await api.getAllProjects();
         const payload = (data as any)?.result ?? data ?? {};
         this._projects = Array.isArray(payload.projects)
           ? payload.projects
+          : [];
+        const locations: any = await api.getAllLocations();
+        const locationsPayload = (locations as any)?.result ?? locations ?? [];
+        this._locations = Array.isArray(locationsPayload.locations)
+          ? locationsPayload.locations
           : [];
       }
     } catch (error) {
@@ -171,7 +177,6 @@ export class LocationManagementComponent {
       this.refetch.emit();
     } catch (error) {
       console.error('Error deleting location:', error);
-      alert('Error deleting location. Please try again.');
     }
   }
 
@@ -214,7 +219,6 @@ export class LocationManagementComponent {
       this.refetch.emit();
     } catch (error) {
       console.error('Error updating location:', error);
-      alert('Error updating location. Please try again.');
     }
   }
 
@@ -263,7 +267,6 @@ export class LocationManagementComponent {
       this.refetch.emit();
     } catch (error) {
       console.error('Error creating zone:', error);
-      alert('Error creating zone. Please try again.');
     }
   }
 

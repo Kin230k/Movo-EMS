@@ -60,7 +60,6 @@ export class FormQuestionsComponent
         interviewId: this.form.get('interviewId')?.value,
       });
       if (!(result as any).success) {
-        alert((result as any).issues);
         return;
       }
       newItems.forEach((item) => {
@@ -96,7 +95,6 @@ export class FormQuestionsComponent
       this.createModalVisible = false;
     } catch (error) {
       console.error('Error creating questions:', error);
-      alert('Error creating questions. Please try again.');
     }
   }
   private destroy$ = new Subject<void>();
@@ -935,20 +933,14 @@ export class FormQuestionsComponent
             questions: payload.questions || [],
           });
           this.saveQuestionsToLocalStorage();
-          alert('Questions saved successfully!');
         } catch (error) {
           console.error('Error saving questions:', error);
-          alert('Error saving questions. Please try again.');
         }
       } else {
-        alert(
-          'Saving interview questions via API is not yet supported. Draft saved locally.'
-        );
         this.saveQuestionsToLocalStorage();
       }
     } catch (error) {
       console.error('Error saving questions:', error);
-      alert('Error saving questions. Please try again.');
     } finally {
       this.isLoading = false;
     }
@@ -1027,10 +1019,8 @@ export class FormQuestionsComponent
       try {
         await api.deleteQuestion({ questionId });
         this.removeQuestion(index);
-        alert('Question deleted successfully!');
       } catch (error) {
         console.error('Error deleting question:', error);
-        alert('Error deleting question. Please try again.');
       }
     }
   }
@@ -1104,10 +1094,8 @@ export class FormQuestionsComponent
           payload.interviewId = this.form.get('interviewId')?.value;
         }
         await api.updateQuestion(payload);
-        alert('Question updated successfully!');
       } catch (error) {
         console.error('Error updating question:', error);
-        alert('Error updating question. Please try again.');
       }
     }
 

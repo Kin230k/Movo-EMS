@@ -351,7 +351,6 @@ export class FormPageComponent implements OnInit {
       this.router.navigate(['/form-success']);
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Error submitting form. Please try again.');
     } finally {
       this.loading.set(false);
     }

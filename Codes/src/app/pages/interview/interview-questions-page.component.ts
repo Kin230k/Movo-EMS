@@ -483,11 +483,9 @@ export class InterviewQuestionsPageComponent implements OnInit {
 
       // Clear draft and navigate back
       localStorage.removeItem(this.storageKey);
-      alert('Interview answers submitted successfully!');
       this.router.navigate(['/dashboard/interview']);
     } catch (error) {
       console.error('Error submitting interview answers:', error);
-      alert('Error submitting answers. Please try again.');
     } finally {
       this.loading.set(false);
     }

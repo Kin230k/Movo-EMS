@@ -423,14 +423,11 @@ export class TakeAttendanceComponent implements AfterViewInit, OnDestroy {
           ...this.records,
         ];
         this.userId = '';
-        alert('Attendance recorded successfully!');
       } else {
         console.error('Error recording attendance:', (result as any).error);
-        alert('Error recording attendance. Please try again.');
       }
     } catch (error) {
       console.error('Error recording attendance:', error);
-      alert('Error recording attendance. Please try again.');
     }
   }
 

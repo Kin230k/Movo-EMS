@@ -46,13 +46,8 @@ export class ClientTopbarComponent {
     logo?: string;
     company?: { en: string; ar: string } | null;
   }) {
-    try {
-      await api.adminCreateClient(payload as any);
-      this.clientCreated.emit(payload);
-      this.showAddClient = false;
-    } catch (error) {
-      console.error('Error creating client:', error);
-      alert('Error creating client. Please try again.');
-    }
+    // Let parent perform the API call and handle errors / refetch
+    this.clientCreated.emit(payload);
+    this.showAddClient = false;
   }
 }

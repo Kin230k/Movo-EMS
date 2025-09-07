@@ -1040,6 +1040,9 @@ export async function getLocation(payload: GetLocationPayload) {
 export async function getLocationsForClient() {
   return call('getLocationsForClient', {});
 }
+export async function getAllLocations() {
+  return call('getAllLocations', {});
+}
 export async function updateLocation(payload: UpdateLocationPayload) {
   return call('updateLocation', payload);
 }
@@ -1212,6 +1215,7 @@ const api = {
   deleteLocation,
   getLocation,
   updateLocation,
+  getAllLocations,
   createUserProject,
   deleteUserProject,
   getUserProject,

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ImageUploadService } from '../../../../../core/services/image-upload.service';
+import api from '../../../../../core/api/api';
 
 @Component({
   selector: 'app-edit-client-modal',
@@ -95,7 +96,8 @@ export class EditClientModalComponent {
 
     this.isSubmitting.set(true);
 
-    this.save.emit({
+    const payload = {
+      clientId: this.data?.clientId || this.data?.id,
       name: { en: this.nameEn.trim(), ar: this.nameAr.trim() },
       contactEmail: this.contactEmail.trim(),
       contactPhone: this.contactPhone.trim(),
@@ -104,14 +106,26 @@ export class EditClientModalComponent {
         this.companyEn.trim() || this.companyAr.trim()
           ? { en: this.companyEn.trim(), ar: this.companyAr.trim() }
           : null,
-    });
+    } as const;
 
-    this.refetch.emit();
-
-    // Simulate async operation - in real implementation, this would be handled by the parent component
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-    }, 1000);
+    (async () => {
+      try {
+        await api.updateClient(payload as any);
+        this.save.emit(payload);
+        this.refetch.emit();
+        this.onClose();
+      } catch (error: any) {
+        console.error('Error updating client:', error);
+        this.errorMessage.set(
+          error?.message ||
+            this.translate.instant(
+              'CLIENT_DATA_MANAGEMENT.ERRORS.UPDATE_FAILED'
+            )
+        );
+      } finally {
+        this.isSubmitting.set(false);
+      }
+    })();
   }
 
   onFileSelected(event: any) {

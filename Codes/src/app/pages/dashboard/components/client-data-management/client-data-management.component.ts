@@ -54,8 +54,8 @@ export class ClientDataManagementComponent {
     try {
       const data: any = await api.getAllClients();
       const payload = (data as any)?.result ?? data ?? [];
-      this._clients = Array.isArray(payload)
-        ? payload.map((c: any, idx: number) => ({
+      this._clients = Array.isArray(payload.clients)
+        ? payload.clients.map((c: any, idx: number) => ({
             clientId: c.clientId ?? c.id ?? idx + 1,
             name: c.name,
             phone: c.contactPhone ?? c.phone ?? '',
@@ -82,13 +82,16 @@ export class ClientDataManagementComponent {
     logo?: string;
     company?: { en: string; ar: string } | null;
   }) {
+    this._isLoading = true;
+    this._error = null;
     try {
       await api.adminCreateClient(payload as any);
-      // Refresh the client list after creation
       await this.onClientSelected();
     } catch (error) {
+      this._error = error;
       console.error('Error creating client:', error);
-      alert('Error creating client. Please try again.');
+    } finally {
+      this._isLoading = false;
     }
   }
 

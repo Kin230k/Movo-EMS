@@ -86,8 +86,6 @@ export class FormManagementTopbarComponent {
         console.log('created', result);
       }
     } catch (error) {
-      console.error('Error creating form:', error);
-      alert('Error creating form. Please try again.');
     }
   }
 }

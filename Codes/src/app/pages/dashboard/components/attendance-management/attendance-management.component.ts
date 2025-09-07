@@ -133,7 +133,6 @@ export class AttendanceManagementComponent {
       this.users = [...this.users, payload];
     } catch (error) {
       console.error('Error recording attendance:', error);
-      alert('Error recording attendance. Please try again.');
     }
   }
   async ngOnInit() {

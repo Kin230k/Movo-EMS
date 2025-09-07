@@ -421,7 +421,6 @@ export class ManualQuestionsComponent implements OnInit {
   }
   async submitReview() {
     if (!this.overallReview) {
-      alert('Please select an overall review decision.');
       return;
     }
 
@@ -437,15 +436,12 @@ export class ManualQuestionsComponent implements OnInit {
       });
 
       if ((result as any).success) {
-        alert('Review submitted successfully!');
         this.router.navigate(['/manual-submissions']);
       } else {
         console.error('Error submitting review:', (result as any).error);
-        alert('Error submitting review. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert('Error submitting review. Please try again.');
     }
   }
   goBack() {

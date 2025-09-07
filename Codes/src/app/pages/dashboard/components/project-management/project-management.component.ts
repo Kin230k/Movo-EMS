@@ -337,7 +337,6 @@ export class ProjectManagementComponent {
       await this.refetchProjects();
     } catch (error) {
       console.error('Error updating project:', error);
-      alert('Error updating project. Please try again.');
     }
   }
 
