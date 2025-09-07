@@ -4,41 +4,56 @@ import { CardListComponent } from '../../../../components/shared/card-list/card-
 import { TopbarComponent } from './topbar/topbar.component';
 import { ProfileCardComponent } from './profile-card/profile-card.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { QueryStatusComponent } from '../../../../components/shared/query-status/query-status.component';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
+import api from '../../../../core/api/api';
 import { IdentityService } from '../../../../core/services/identity.service';
+import { CardListSkeletionComponent } from "../../../../components/shared/card-list-skeletion/card-list-skeletion.component";
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [
-    CommonModule,
-    CardListComponent,
-    TopbarComponent,
-    TranslateModule,
-    QueryStatusComponent,
-  ],
+  imports: [CommonModule, CardListComponent, TopbarComponent, TranslateModule, CardListSkeletionComponent],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
 export class UserManagementComponent {
-  constructor(
-    private apiQueries: ApiQueriesService,
-    private identity: IdentityService
-  ) {}
+  constructor(private identity: IdentityService) {}
 
-  projectsQuery: any;
+  private _projects: any[] = [];
+
   get projects() {
-    const data = this.projectsQuery?.data?.() ?? [];
-    return data?.projects?.map((p: any) => ({ id: p.projectId, name: p.name }));
+    return this._projects.map((p: any) => ({ id: p.projectId, name: p.name }));
   }
 
   async ngOnInit() {
     const who = await this.identity.getIdentity().catch(() => null);
-    if (who?.isClient) {
-      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
-    } else {
-      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    try {
+      this._isLoading = true;
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        if (data.success) {
+          this._projects = Array.isArray(payload.projects)
+            ? payload.projects
+            : [];
+        } else {
+          this._error = data.issues[0].message;
+        }
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        if (data.success) {
+          this._projects = Array.isArray(payload.projects)
+            ? payload.projects
+            : [];
+        } else {
+          this._error = data.issues[0].message;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
+    } finally {
+      this._isLoading = false;
     }
   }
 
@@ -76,6 +91,7 @@ export class UserManagementComponent {
 
     try {
       const users = await this.fetchUsers(projectId);
+      console.log(users);
       this.users = users;
       this._isFinished = true;
     } catch (err) {
@@ -87,10 +103,20 @@ export class UserManagementComponent {
   }
 
   private async fetchUsers(projectId: string | number): Promise<any[]> {
-    const query = this.apiQueries.getProjectUsersQuery({
-      projectId: String(projectId),
-    });
-    const data = query.data?.() ?? {};
-    return Array.isArray(data.users) ? data.users : [];
+    try {
+      const data: any = await api.getProjectUsers({
+        projectId: String(projectId),
+      });
+      const payload = (data as any)?.result ?? data ?? {};
+      return Array.isArray(payload.users)
+        ? payload.users.map((u: any) => ({
+            ...u,
+            projectId: projectId,
+          }))
+        : [];
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
   }
 }

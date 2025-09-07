@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -23,8 +30,10 @@ export class EditAttendanceModalComponent implements OnInit {
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
 
   form: ReturnType<FormBuilder['group']>;
+  isSubmitting = signal(false);
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -73,6 +82,9 @@ export class EditAttendanceModalComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting.set(true);
+
     const val = this.form.value;
     const payload = {
       ...this.data,
@@ -80,5 +92,6 @@ export class EditAttendanceModalComponent implements OnInit {
       attendanceTimestamp: this.fromInputDateTime(val.attendanceTimestamp),
     };
     this.save.emit(payload);
+    this.refetch.emit();
   }
 }

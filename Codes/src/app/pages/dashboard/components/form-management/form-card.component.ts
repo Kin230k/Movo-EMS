@@ -1,6 +1,8 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
@@ -12,9 +14,11 @@ import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../../core/services/language.service';
 import { ButtonComponent } from '../../../../components/shared/button/button';
+import { DeleteModalComponent } from '../../../../components/shared/delete-modal/delete-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { deleteForm } from '../../../../core/api/api';
 
 export interface FormData {
   formId: string;
@@ -30,14 +34,23 @@ export interface FormData {
   selector: 'app-form-card',
   templateUrl: './form-card.component.html',
   styleUrls: ['./form-card.component.scss'],
-  imports: [CommonModule, ButtonComponent, TranslateModule],
+  imports: [
+    CommonModule,
+    ButtonComponent,
+    DeleteModalComponent,
+    TranslateModule,
+  ],
   standalone: true,
 })
 export class FormCardComponent implements OnInit, OnDestroy {
   @Input() data: FormData | null = null;
+  @Input() onRefreshData?: () => Promise<void>;
+  @Output() formDeleted = new EventEmitter<string>();
 
   modalOpen = false;
   isMenuOpen = false;
+  showDeleteModal = false;
+  isDeleting = false;
   private destroy$ = new Subject<void>();
 
   @ViewChild('menuWrapper') menuWrapper!: ElementRef;
@@ -112,14 +125,14 @@ export class FormCardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/create-questions'], {
       queryParams: {
         projectId: this.data?.projectId,
-        locationId: this.data?.locationId,
+        formId: this.data?.formId,
       },
     });
   }
 
   onDeleteForm(evt?: MouseEvent) {
     evt?.stopPropagation();
-    console.log('Delete form', this.data);
+    this.showDeleteModal = true;
   }
 
   onDuplicateForm(evt?: MouseEvent) {
@@ -132,6 +145,32 @@ export class FormCardComponent implements OnInit, OnDestroy {
     console.log('Form updated:', this.data);
     this.closeModal();
   };
+
+  async onConfirmDelete() {
+    if (!this.data?.formId) return;
+
+    this.isDeleting = true;
+    try {
+      await deleteForm({ formId: this.data.formId });
+      console.log('Form deleted successfully');
+      this.formDeleted.emit(this.data!.formId);
+
+      // Refresh data after successful deletion
+      if (this.onRefreshData) {
+        await this.onRefreshData();
+      }
+    } catch (error) {
+      console.error('Error deleting form:', error);
+      // Handle error - maybe show a toast notification
+    } finally {
+      this.isDeleting = false;
+      this.closeDeleteModal();
+    }
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {

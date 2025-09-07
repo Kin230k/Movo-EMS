@@ -7,6 +7,7 @@
     [projects]="projects"
     [locations]="locations"
     (projectSelected)="onProjectSelected($event)"
+    (refetch)="refetchForms()"
   ></app-form-management-topbar>
 
   <div class="content-section">
@@ -17,6 +18,9 @@
 
     <!-- show skeleton placeholders when loading -->
     <div *ngIf="isLoading" class="card-list-skeleton">
+      <div class="loading-message">
+        <p>{{ "FORM_MANAGEMENT.LOADING_FORMS" | translate }}</p>
+      </div>
       <app-form-list-skeleton></app-form-list-skeleton>
     </div>
 
@@ -33,6 +37,7 @@
       <app-card-list
         [items]="forms"
         [cardComponent]="formCardComponent"
+        (cardEvent)="onCardEvent($event)"
       ></app-card-list>
     </div>
 

@@ -4,7 +4,6 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { TranslateModule } from '@ngx-translate/core';
 import { CreateAttendanceModalComponent } from './create-attendance-modal.component';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
-import { ApiQueriesService } from '../../../../../core/services/queries.service';
 
 @Component({
   selector: 'app-attendance-topbar',
@@ -35,6 +34,7 @@ export class TopbarComponent {
 
   @Output() projectSelected = new EventEmitter<string>();
   @Output() createAttendance = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
 
   showCreateModal = false;
 
@@ -49,5 +49,9 @@ export class TopbarComponent {
   handleCreateAttendance(payload: any) {
     this.createAttendance.emit(payload);
     this.showCreateModal = false;
+  }
+
+  handleModalRefetch() {
+    this.refetch.emit();
   }
 }

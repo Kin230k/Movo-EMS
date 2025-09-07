@@ -574,8 +574,9 @@ export class CreateClientComponent implements OnDestroy {
       const credential = await this.authService.createClient(payload as any);
       console.log('Client created', credential);
       this.triggerToast('Client created successfully', 'success');
+      
       // navigate after success
-      this.router.navigate(['/dashboard ']);
+      this.router.navigate(['/dashboard']);
     } catch (error: any) {
       console.error('Create client failed', error);
       this.triggerToast(

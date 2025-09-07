@@ -1,17 +1,17 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
 // Import TranslateModule and TranslateService
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ApiQueriesService } from '../../../../../core/services/queries.service';
+import api from '../../../../../core/api/api';
+import { LanguageService } from '../../../../../core/services/language.service';
 
 @Component({
   selector: 'app-add-role-modal',
   templateUrl: './add-role-modal.component.html',
   styleUrls: ['./add-role-modal.component.scss'],
   // Add TranslateModule to imports for the pipe to work in the template
-  imports: [CommonModule, FormsModule, ComboSelectorComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   standalone: true,
 })
 export class AddRoleModalComponent {
@@ -19,87 +19,99 @@ export class AddRoleModalComponent {
   @Input() roles: { id: string; name: { en: string; ar: string } }[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() assigned = new EventEmitter<{
+    userId: string;
     projectId: string;
     roleId: string;
   }>();
 
   email = '';
-  checking = false;
+  checking = signal(false);
   checkSucceeded = false;
-  errorMessage = '';
-  selectedProjectId: string | null = null;
-  selectedRoleId: string | null = null;
+  errorMessage = signal('');
+  selectedProjectId = signal('');
+  selectedRoleId = signal('');
+  isSubmitting = signal(false);
+  userId = signal('');
 
-  // Inject TranslateService and ApiQueriesService in the constructor
+  // Inject TranslateService in the constructor
   constructor(
     private translate: TranslateService,
-    private apiQueries: ApiQueriesService
+    private language: LanguageService
   ) {}
 
-  // Verify email via queries service
+  get currentLang() {
+    return this.language.currentLang;
+  }
+
+  // Verify email via direct API calls
   async checkEmailAsync(email: string): Promise<boolean> {
-    this.checking = true;
-    this.errorMessage = '';
+    this.checking.set(true);
+    this.errorMessage.set('');
     try {
-      const q = this.apiQueries.getUserInfoByEmailQuery({ email });
-      const user = q?.data?.();
-      return !!user;
+      const data: any = await api.getUserInfoByEmail({ email });
+      const payload = (data as any)?.result ?? data ?? {};
+      console.log(this.roles);
+
+      if (payload.success) {
+        this.userId.set(payload.user.userId);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
     } finally {
-      this.checking = false;
+      this.checking.set(false);
     }
   }
 
   async onVerifyEmail() {
     if (!this.email) {
       // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.EMAIL_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('ADD_ROLE_MODAL.ERRORS.EMAIL_REQUIRED')
       );
       return;
     }
-    this.errorMessage = '';
+    this.errorMessage.set('');
     const result = await this.checkEmailAsync(this.email);
     if (result) {
       this.checkSucceeded = true;
     } else {
       this.checkSucceeded = false;
       // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.VERIFICATION_FAILED'
+      this.errorMessage.set(
+        this.translate.instant('ADD_ROLE_MODAL.ERRORS.VERIFICATION_FAILED')
       );
     }
-  }
-
-  onProjectSelected(projectId: string) {
-    this.selectedProjectId = projectId;
-    this.errorMessage = '';
-  }
-
-  onRoleSelected(event: Event) {
-    const t = event.target as HTMLSelectElement;
-    this.selectedRoleId = t.value ? t.value : null;
-    this.errorMessage = '';
   }
 
   assignRole() {
-    if (this.selectedProjectId == null) {
+    if (this.selectedProjectId() == null) {
       // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.PROJECT_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('ADD_ROLE_MODAL.ERRORS.PROJECT_REQUIRED')
       );
       return;
     }
-    if (this.selectedRoleId == null) {
+    if (this.selectedRoleId() == null) {
       // Use translate service for error messages
-      this.errorMessage = this.translate.instant(
-        'ADD_ROLE_MODAL.ERRORS.ROLE_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('ADD_ROLE_MODAL.ERRORS.ROLE_REQUIRED')
       );
       return;
     }
+    this.isSubmitting.set(true);
     this.assigned.emit({
-      projectId: this.selectedProjectId,
-      roleId: this.selectedRoleId,
+      userId: this.userId(),
+      projectId: this.selectedProjectId() ?? '',
+      roleId: this.selectedRoleId() ?? '',
     });
+    // Simulate async operation - parent component should handle loading state
+    setTimeout(() => {
+      this.isSubmitting.set(false);
+    }, 1000);
   }
 
   onClose() {

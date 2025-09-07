@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +19,7 @@ export interface Submission {
   userId: string;
   interviewId: string;
   dateSubmitted: string;
-  outcome?: string;
+  outcome: 'ACCEPTED' | 'REJECTED' | 'MANUAL_REVIEW' | null;
   decisionNotes?: string;
 }
 
@@ -29,22 +36,26 @@ export interface Submission {
   templateUrl: './submission-card.component.html',
   styleUrls: ['./submission-card.component.scss'],
 })
-export class SubmissionCardComponent {
+export class SubmissionCardComponent implements OnChanges {
   @Input() submission!: Submission;
   @Input() onlyManual: boolean = false;
+  @Input() resetTrigger: boolean = false;
   @Output() goToManualQuestions = new EventEmitter<string>();
   @Output() statusUpdated = new EventEmitter<{
     submissionId: string;
     outcome: string;
     decisionNotes?: string;
   }>();
+  @Output() statusUpdateComplete = new EventEmitter<string>();
 
   showStatusModal = false;
   statusDecisionNotes: string = '';
+  isUpdatingStatus = false;
+  private lastResetTrigger: boolean = false;
 
   // Provide strongly-typed values for bindings to the status modal
   private mapOutcomeToStatus(
-    outcome?: string
+    outcome: string | null
   ): 'accepted' | 'rejected' | 'manual_review' | null {
     if (!outcome) return null;
     const o = outcome.toLowerCase();
@@ -133,14 +144,35 @@ export class SubmissionCardComponent {
     this.showStatusModal = true;
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (
+      changes['resetTrigger'] &&
+      changes['resetTrigger'].currentValue !== this.lastResetTrigger
+    ) {
+      this.lastResetTrigger = changes['resetTrigger'].currentValue;
+      if (this.isUpdatingStatus) {
+        this.resetLoadingState();
+      }
+    }
+  }
+
   closeStatusModal() {
     this.showStatusModal = false;
   }
 
+  resetLoadingState() {
+    this.isUpdatingStatus = false;
+    this.showStatusModal = false; // Close modal when loading completes
+    this.statusUpdateComplete.emit(this.submission.submissionId);
+  }
+
   onStatusSaved(event: {
-    outcome: 'approved' | 'rejected' | 'pending';
+    outcome: 'ACCEPTED' | 'REJECTED' | 'MANUAL_REVIEW';
     decisionNotes?: string;
   }) {
+    this.isUpdatingStatus = true;
+
+    // Update local state immediately for optimistic UI
     this.submission.outcome = event.outcome;
     this.submission.decisionNotes = event.decisionNotes;
 
@@ -150,6 +182,6 @@ export class SubmissionCardComponent {
       decisionNotes: event.decisionNotes,
     });
 
-    this.showStatusModal = false;
+    // Note: Modal will remain open with loading state until parent triggers reset
   }
 }

@@ -5,6 +5,7 @@
 
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../../main';
+import { ToastService } from '../../core/services/toast.service';
 
 export type Multilingual = { en: string; ar: string };
 
@@ -38,23 +39,252 @@ export function setBaseUrl(url: string) {
   }
 }
 
+// --- Simple in-memory caching layer for callable results ---
+type CacheEntry = { value: unknown; expiresAt: number };
+
+interface ApiCacheConfig {
+  enabled: boolean;
+  defaultTtlMs: number;
+  maxEntries: number;
+  isCacheable: (fnName: string) => boolean;
+}
+
+const apiCacheConfig: ApiCacheConfig = {
+  enabled: true,
+  defaultTtlMs: 60_000,
+  maxEntries: 200,
+  isCacheable: (fnName: string) => /^(get|list|fetch)/i.test(fnName),
+};
+
+const responseCache = new Map<string, CacheEntry>();
+const inflightRequests = new Map<string, Promise<unknown>>();
+const functionTtlOverride = new Map<string, number>();
+
+// Toast handling
+let globalToastService: ToastService | null = null;
+export function setApiToastService(toastService: ToastService) {
+  globalToastService = toastService;
+}
+
+type FieldIssue = { field: string; message: string };
+
+function toSpacedWords(camel: string): string {
+  return camel
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .toLowerCase();
+}
+
+function successMutationMessage(fnName: string): string {
+  const action = fnName.startsWith('create')
+    ? 'created'
+    : fnName.startsWith('update')
+    ? 'updated'
+    : fnName.startsWith('delete')
+    ? 'deleted'
+    : 'processed';
+  const entity = toSpacedWords(fnName.replace(/^(create|update|delete)/i, ''));
+  return `${entity} ${action} successfully`;
+}
+
+function extractIssuesMessage(issues?: FieldIssue[] | unknown): string | null {
+  if (!Array.isArray(issues)) return null;
+  if (issues.length === 0) return null;
+  const lines = issues.map((i) =>
+    [(i as FieldIssue)?.field, (i as FieldIssue)?.message ?? 'Invalid value']
+      .filter(Boolean)
+      .join(': ')
+  );
+  return lines.join('\n');
+}
+
+function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) {
+    return '[' + value.map((v) => stableStringify(v)).join(',') + ']';
+  }
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+  const entries = keys.map(
+    (k) => JSON.stringify(k) + ':' + stableStringify(obj[k])
+  );
+  return '{' + entries.join(',') + '}';
+}
+
+function makeCacheKey(fnName: string, payload: unknown): string {
+  const param = payload === undefined ? {} : payload;
+  return `${FUNCTIONS_REGION}:${fnName}:${stableStringify(param)}`;
+}
+
+function pruneCacheIfNeeded() {
+  while (responseCache.size > apiCacheConfig.maxEntries) {
+    const oldestKey = responseCache.keys().next().value as string | undefined;
+    if (!oldestKey) break;
+    responseCache.delete(oldestKey);
+  }
+}
+
+export function setApiCacheConfig(
+  options: Partial<
+    Pick<ApiCacheConfig, 'enabled' | 'defaultTtlMs' | 'maxEntries'>
+  > & { isCacheable?: ApiCacheConfig['isCacheable'] }
+) {
+  if (typeof options.enabled === 'boolean')
+    apiCacheConfig.enabled = options.enabled;
+  if (typeof options.defaultTtlMs === 'number' && options.defaultTtlMs > 0) {
+    apiCacheConfig.defaultTtlMs = options.defaultTtlMs;
+  }
+  if (typeof options.maxEntries === 'number' && options.maxEntries > 0) {
+    apiCacheConfig.maxEntries = options.maxEntries;
+  }
+  if (typeof options.isCacheable === 'function') {
+    apiCacheConfig.isCacheable = options.isCacheable;
+  }
+}
+
+export function clearApiCache() {
+  responseCache.clear();
+  inflightRequests.clear();
+}
+
+export function invalidateApiCacheByFnPrefix(prefix: string) {
+  const lookFor = `:${prefix}`;
+  for (const key of Array.from(responseCache.keys())) {
+    if (key.includes(lookFor)) {
+      responseCache.delete(key);
+    }
+  }
+}
+
+export function setFunctionCacheTtl(fnName: string, ttlMs: number) {
+  if (typeof ttlMs === 'number' && ttlMs > 0) {
+    functionTtlOverride.set(fnName, ttlMs);
+  } else {
+    functionTtlOverride.delete(fnName);
+  }
+}
+
+function invalidateRelatedCaches(fnName: string) {
+  if (/^(create|update|delete)/i.test(fnName)) {
+    clearApiCache();
+  }
+}
+
 // Helper to call a named callable function and return its .data
 async function call<T = any>(fnName: string, payload: unknown): Promise<T> {
   const callable = httpsCallable(functions, fnName);
+  const param = payload === undefined ? {} : payload;
+  const cacheable =
+    apiCacheConfig.enabled && apiCacheConfig.isCacheable(fnName);
 
+  // Cacheable read path with request de-duplication
+  if (cacheable) {
+    const key = makeCacheKey(fnName, param);
+    const now = Date.now();
+    const cached = responseCache.get(key);
+    if (cached && cached.expiresAt > now) {
+      // LRU touch
+      responseCache.delete(key);
+      responseCache.set(key, cached);
+      return cached.value as T;
+    }
+
+    const existing = inflightRequests.get(key);
+    if (existing) {
+      return existing as Promise<T>;
+    }
+
+    const requestPromise = (async () => {
+      try {
+        const res = await callable(param as any);
+        const value = res.data as T;
+        const maybeObj = value as unknown as Record<string, unknown> | null;
+        const hasSuccess = maybeObj && typeof maybeObj['success'] === 'boolean';
+        const issuesMsg = extractIssuesMessage(
+          (maybeObj?.['issues'] as FieldIssue[] | undefined) ?? undefined
+        );
+        if (
+          hasSuccess &&
+          maybeObj &&
+          (maybeObj['success'] as boolean) === false
+        ) {
+          const message = issuesMsg ?? `Failed to ${toSpacedWords(fnName)}`;
+          if (globalToastService) globalToastService.error(message);
+          const error: any = new Error(message);
+          (error as any).issues = maybeObj?.['issues'];
+          throw error;
+        }
+        if (issuesMsg) {
+          if (globalToastService) globalToastService.error(issuesMsg);
+          const error: any = new Error(issuesMsg);
+          (error as any).issues = maybeObj?.['issues'];
+          throw error;
+        }
+        const ttl =
+          functionTtlOverride.get(fnName) ?? apiCacheConfig.defaultTtlMs;
+        responseCache.set(key, { value, expiresAt: now + ttl });
+        pruneCacheIfNeeded();
+        return value;
+      } catch (err: any) {
+        const error: any = new Error(
+          `API ${fnName} failed: ${err?.message ?? err}`
+        );
+        error.code = err?.code;
+        error.details = err?.details ?? err?.customData ?? null;
+        if (globalToastService) {
+          const base = toSpacedWords(fnName);
+          const msg = err?.message ?? 'Unknown error';
+          globalToastService.error(`Failed to ${base}: ${msg}`);
+        }
+        throw error;
+      } finally {
+        inflightRequests.delete(key);
+      }
+    })();
+
+    inflightRequests.set(key, requestPromise);
+    return requestPromise as Promise<T>;
+  }
+
+  // Non-cacheable (likely mutations). Execute, validate result, toast, and invalidate related caches.
   try {
-    // If caller passes undefined, send empty object.
-    const param = payload === undefined ? {} : payload;
     const res = await callable(param as any);
-    // For callable functions, the SDK returns { data: ... } where .data is the payload from server.
-    return res.data as T;
+    const data = res.data as any;
+    const hasSuccess = data && typeof data.success === 'boolean';
+    const issuesMsg = extractIssuesMessage(
+      data?.issues as FieldIssue[] | undefined
+    );
+    if (hasSuccess && data.success === false) {
+      const message = issuesMsg ?? `Failed to ${toSpacedWords(fnName)}`;
+      if (globalToastService) globalToastService.error(message);
+      const error: any = new Error(message);
+      (error as any).issues = data?.issues;
+      throw error;
+    }
+    if (issuesMsg) {
+      if (globalToastService) globalToastService.error(issuesMsg);
+      const error: any = new Error(issuesMsg);
+      (error as any).issues = data?.issues;
+      throw error;
+    }
+    // Success mutation toast
+    if (globalToastService && /^(create|update|delete)/i.test(fnName)) {
+      globalToastService.success(successMutationMessage(fnName));
+    }
+    // Targeted invalidation for related read endpoints
+    invalidateRelatedCaches(fnName);
+    return data as T;
   } catch (err: any) {
-    // Normalize and rethrow with useful info
     const error: any = new Error(
       `API ${fnName} failed: ${err?.message ?? err}`
     );
     error.code = err?.code;
     error.details = err?.details ?? err?.customData ?? null;
+    if (globalToastService) {
+      const base = toSpacedWords(fnName);
+      const msg = err?.message ?? 'Unknown error';
+      globalToastService.error(`Failed to ${base}: ${msg}`);
+    }
     throw error;
   }
 }
@@ -64,9 +294,6 @@ export interface SendEmailPayload {
   email: string;
   subject: string;
   body: string;
-}
-export interface GetUserInfoByEmailPayload {
-  email: string;
 }
 export interface GetCallerIdentityPayload {}
 export interface CreateAdminPayload {
@@ -113,11 +340,14 @@ export interface SendPasswordResetPayload {
 export interface SendVerificationEmailPayload {
   email: string;
 }
+export interface GetUserInfoByEmailPayload {
+  email: string;
+}
 export interface GetProjectUsersPayload {
   projectId: string;
 }
-export interface GetUserInfoByEmailPayload {
-  email: string;
+export interface getFormsByProjectPayload {
+  projectId: string;
 }
 export interface CreateClientPayload {
   name: Multilingual;
@@ -166,8 +396,17 @@ export interface UpdateProjectUserRolePayload {
   projectId?: string | null;
   roleId?: string | null;
 }
+export interface UpdateProjectUserRoleByUserAndProjectPayload {
+  userId?: string | null;
+  projectId?: string | null;
+  roleId?: string | null;
+}
 export interface DeleteProjectUserRolePayload {
   projectUserRoleId?: string | null;
+}
+export interface DeleteProjectUserRoleByUserAndProjectPayload {
+  userId?: string | null;
+  projectId?: string | null;
 }
 export interface GetProjectUserRolePayload {
   projectUserRoleId?: string | null;
@@ -228,6 +467,7 @@ export interface UpdateFormPayload {
 export interface GetFormByUserPayload {
   userId?: string | null;
 }
+export interface GetFormsByClientPayload {}
 export interface CreateQuestionPayload {
   typeCode:
     | 'OPEN_ENDED'
@@ -262,9 +502,6 @@ export interface UpdateQuestionPayload {
 export interface GetInterviewQuestionsPayload {
   interviewId: string;
 }
-export interface GetInterviewQuestionsPayload {
-  interviewId: string;
-}
 export interface CreateSubmissionPayload {
   formId?: string;
   interviewId?: string;
@@ -280,9 +517,9 @@ export interface GetSubmissionPayload {
 export interface UpdateSubmissionPayload {
   submissionId: string;
   formId?: string;
-  userId: string;
+  userId?: string;
   interviewId?: string;
-  outcome?: 'pass' | 'fail' | 'manual_review';
+  outcome?: 'ACCEPTED' | 'REJECTED' | 'MANUAL_REVIEW';
   decisionNotes?: string | undefined;
 }
 export interface GetManualByFormIdPayload {
@@ -304,6 +541,7 @@ export interface CreateSubmissionWithAnswerPayload {
 export interface CreateSubmissionWithAnswersPayload {
   formId?: string;
   interviewId?: string;
+  userId?: string;
   outcome?: string;
   decisionNotes?: string;
   answers: {
@@ -339,6 +577,7 @@ export interface GetQuestionAnswersBySubmissionPayload {
 }
 export interface CreateInterviewPayload {
   projectId: string;
+  title: string;
 }
 export interface UpdateInterviewPayload {
   interviewId: string;
@@ -504,11 +743,11 @@ export interface GetAreasByLocationPayload {
 export interface GetSchedulesByLocationPayload {
   locationId: string;
 }
-export interface GetSchedulesByProjectOrLocationPayload {
-  projectId?: string;
-  locationId?: string;
-}
+// (duplicate removed) GetSchedulesByProjectOrLocationPayload is declared above
 export interface GetAllFormQuestionsPayload {
+  formId: string;
+}
+export interface GetEmailsByFormPayload {
   formId: string;
 }
 
@@ -567,6 +806,12 @@ export async function sendVerificationEmail(
 export async function getProjectUsers(payload: GetProjectUsersPayload) {
   return call('getProjectUsers', payload);
 }
+export async function getFormsByProject(payload: getFormsByProjectPayload) {
+  return call('getFormsByProject', payload);
+}
+export async function getFormsByClient(payload: GetFormsByClientPayload) {
+  return call('getFormsByClient', payload);
+}
 export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
   return call('getUserInfoByEmail', payload);
 }
@@ -608,10 +853,20 @@ export async function updateProjectUserRole(
 ) {
   return call('updateProjectUserRole', payload);
 }
+export async function updateProjectUserRoleByUserAndProject(
+  payload: UpdateProjectUserRoleByUserAndProjectPayload = {}
+) {
+  return call('updateProjectUserRoleByUserAndProject', payload);
+}
 export async function deleteProjectUserRole(
   payload: DeleteProjectUserRolePayload = {}
 ) {
   return call('deleteProjectUserRole', payload);
+}
+export async function deleteProjectUserRoleByUserAndProject(
+  payload: DeleteProjectUserRoleByUserAndProjectPayload = {}
+) {
+  return call('deleteProjectUserRolesByUserAndProject', payload);
 }
 export async function getProjectUserRole(
   payload: GetProjectUserRolePayload = {}
@@ -631,6 +886,9 @@ export async function getProjectUserRolesByUserAndProject(
 
 export async function getAllFormQuestions(payload: GetAllFormQuestionsPayload) {
   return call('getAllFormQuestions', payload);
+}
+export async function getEmailsByForm(payload: GetEmailsByFormPayload) {
+  return call('getEmailsByForm', payload);
 }
 export async function createForm(payload: CreateFormPayload = {}) {
   return call('createForm', payload);
@@ -779,6 +1037,9 @@ export async function deleteLocation(payload: DeleteLocationPayload) {
 export async function getLocation(payload: GetLocationPayload) {
   return call('getLocation', payload);
 }
+export async function getLocationsForClient() {
+  return call('getLocationsForClient', {});
+}
 export async function updateLocation(payload: UpdateLocationPayload) {
   return call('updateLocation', payload);
 }
@@ -891,6 +1152,8 @@ const api = {
   sendPasswordReset,
   sendVerificationEmail,
   getProjectUsers,
+  getFormsByProject,
+  getFormsByClient,
   createClient,
   adminCreateClient,
   approveRejectClient,
@@ -900,7 +1163,9 @@ const api = {
   updateClient,
   createProjectUserRole,
   updateProjectUserRole,
+  updateProjectUserRoleByUserAndProject,
   deleteProjectUserRole,
+  deleteProjectUserRoleByUserAndProject,
   getProjectUserRole,
   getAllProjectUserRoles,
   getProjectUserRolesByUserAndProject,
@@ -914,6 +1179,7 @@ const api = {
   deleteQuestion,
   getAllQuestions,
   getAllFormQuestions,
+  getEmailsByForm,
   getQuestion,
   updateQuestion,
   getInterviewQuestions,
@@ -970,6 +1236,13 @@ const api = {
   updateArea,
   getAreasByLocation,
   getAllAreas,
+  getLocationsForClient,
+  // cache controls
+  setApiCacheConfig,
+  clearApiCache,
+  invalidateApiCacheByFnPrefix,
+  setFunctionCacheTtl,
+  setApiToastService,
 };
 
 export default api;

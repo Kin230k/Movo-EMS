@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormService } from '../../core/services/form.service';
+import api from '../../core/api/api';
 import {
   DynamicFormDto,
   FormAnswersMap,
@@ -103,11 +103,34 @@ import { MultipleChoiceQuestionComponent } from '../../components/form/questions
               ></app-multiple-choice-question>
             </ng-container>
           </ng-container>
-
+          <!-- TODO: radio inputs for accept or reject that will be submitted to the backend -->
+          <div class="accept-reject">
+            <label for="accept">Accept</label>
+            <input
+              type="radio"
+              [formControl]="control('outcome')"
+              id="outcome"
+              name="outcome"
+              value="ACCEPTED"
+            />
+            <label for="reject">Reject</label>
+            <input
+              type="radio"
+              [formControl]="control('outcome')"
+              id="outcome"
+              name="outcome"
+              value="REJECTED"
+            />
+          </div>
+          <div class="decision-notes">
+            <label for="decisionNotes">Decision Notes</label>
+            <textarea
+              id="decisionNotes"
+              name="decisionNotes"
+              [formControl]="control('decisionNotes')"
+            ></textarea>
+          </div>
           <div class="actions">
-            <button type="button" class="btn secondary" (click)="saveDraft()">
-              Save Draft
-            </button>
             <button type="submit" class="btn primary">Submit</button>
           </div>
         </form>
@@ -187,13 +210,58 @@ import { MultipleChoiceQuestionComponent } from '../../components/form/questions
         color: var(--secondary);
         border-color: rgba(var(--secondary-rgb), 0.25);
       }
+
+      /* === New styles for outcome & decision notes === */
+      .accept-reject {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba(var(--shadow-dark), 0.15);
+        border-radius: var(--radius-btn);
+        background: rgba(var(--secondary-rgb), 0.05);
+      }
+      .accept-reject label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--color-dark-text);
+      }
+      .accept-reject input[type='radio'] {
+        margin-right: 0.5rem;
+        cursor: pointer;
+      }
+
+      .decision-notes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .decision-notes label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--color-dark-text);
+      }
+      .decision-notes textarea {
+        resize: vertical;
+        min-height: 100px;
+        padding: 0.75rem;
+        border-radius: var(--radius-btn);
+        border: 1px solid rgba(var(--shadow-dark), 0.2);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        color: var(--color-dark-text);
+      }
+      .decision-notes textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
+      }
     `,
   ],
 })
 export class InterviewQuestionsPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly formService = inject(FormService);
   private readonly fb = inject(FormBuilder);
 
   loading = signal(true);
@@ -202,6 +270,7 @@ export class InterviewQuestionsPageComponent implements OnInit {
   questions = signal<FormQuestionDto[]>([]);
   formGroup!: FormGroup;
   showErrors = signal(false);
+  userId = signal<string>('');
 
   // storage key uses formId OR interviewId (prefer route param formId if present)
   private get storageKey(): string {
@@ -211,35 +280,113 @@ export class InterviewQuestionsPageComponent implements OnInit {
     return `interview_form_answers_${keyId}`;
   }
 
-  ngOnInit(): void {
-    // allow either formId or interviewId — if interviewId you may want to fetch mapping
-    const formId = this.route.snapshot.paramMap.get('formId');
-    const interviewId = this.route.snapshot.paramMap.get('interviewId');
-    const locationId =
-      this.route.snapshot.queryParamMap.get('locationId') || undefined;
-    const projectId =
-      this.route.snapshot.queryParamMap.get('projectId') || undefined;
+  async ngOnInit(): Promise<void> {
+    try {
+      // allow either formId or interviewId — if interviewId you may want to fetch mapping
+      const formId = this.route.snapshot.paramMap.get('formId');
+      const interviewId = this.route.snapshot.paramMap.get('interviewId');
+      const userId = this.route.snapshot.queryParams['userId'];
 
-    const idToLoad = (formId ?? interviewId ?? 'default-form') as string;
+      // Set userId if provided
+      if (userId) {
+        this.userId.set(userId);
+      }
 
-    this.formService
-      .getFormById(idToLoad, {
-        locationId: locationId ?? undefined,
-        projectId: projectId ?? undefined,
-        interviewId: interviewId ?? undefined,
-      })
-      .subscribe((dto: DynamicFormDto) => {
-        this.title.set(dto.formTitle);
-        this.meta.set(
-          `${dto.formLanguage?.toUpperCase() ?? 'EN'} • ${
-            dto.questions.length
-          } questions`
-        );
-        this.questions.set(dto.questions);
-        this.buildForm(dto);
-        this.restoreDraft();
-        this.loading.set(false);
-      });
+      let questions: any[] = [];
+      let formTitle = 'Interview Questions';
+      let formLanguage = 'en';
+
+      if (interviewId) {
+        // Load interview questions
+        const interviewData: any = await api.getInterviewQuestions({
+          interviewId,
+        });
+        const payload = (interviewData as any)?.result ?? interviewData ?? {};
+        questions = Array.isArray(payload.questions) ? payload.questions : [];
+
+        // Try to get interview title
+        try {
+          const interviewInfo: any = await api.getInterview({ interviewId });
+          const infoPayload =
+            (interviewInfo as any)?.result ?? interviewInfo ?? {};
+          formTitle = infoPayload.name ?? 'Interview Questions';
+        } catch (error) {
+          console.warn('Could not load interview info:', error);
+        }
+      } else if (formId) {
+        // Load form questions
+        const formData: any = await api.getAllFormQuestions({ formId });
+        const payload = (formData as any)?.result ?? formData ?? {};
+        questions = Array.isArray(payload.questions) ? payload.questions : [];
+
+        // Try to get form title
+        try {
+          const formInfo: any = await api.getForm({ formId });
+          const infoPayload = (formInfo as any)?.result ?? formInfo ?? {};
+          formTitle =
+            infoPayload.formTitle ?? infoPayload.title ?? 'Form Questions';
+          formLanguage = infoPayload.formLanguage ?? 'en';
+        } catch (error) {
+          console.warn('Could not load form info:', error);
+        }
+      }
+
+      // Map questions to FormQuestionDto format
+      const mapType = (t: any): FormQuestionDto['typeCode'] => {
+        const up = String(t || '').toUpperCase();
+        const allowed = [
+          'OPEN_ENDED',
+          'SHORT_ANSWER',
+          'NUMBER',
+          'RATE',
+          'DROPDOWN',
+          'RADIO',
+          'MULTIPLE_CHOICE',
+        ];
+        return (allowed as string[]).includes(up)
+          ? (up as FormQuestionDto['typeCode'])
+          : 'OPEN_ENDED';
+      };
+
+      const mappedQuestions = questions.map((q: any, idx: number) => ({
+        questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+        typeCode: mapType(q.type ?? q.typeCode),
+        questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
+        options: (
+          (q.options ?? q.answerOptions ?? q.choices ?? []) as any[]
+        ).map((opt: any, i: number) => ({
+          optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
+          optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
+        })),
+        required: !!q.required,
+        min: q.min,
+        max: q.max,
+      }));
+
+      const dto: DynamicFormDto = {
+        formId: formId ?? interviewId ?? 'interview-form',
+        formTitle,
+        formLanguage,
+        questions: mappedQuestions,
+      };
+
+      this.title.set(dto.formTitle);
+      this.meta.set(
+        `${dto.formLanguage?.toUpperCase() ?? 'EN'} • ${
+          dto.questions.length
+        } questions`
+      );
+      this.questions.set(dto.questions);
+      this.buildForm(dto);
+      this.restoreDraft();
+    } catch (error) {
+      console.error('Error loading interview questions:', error);
+      this.title.set('Error loading questions');
+      this.meta.set('');
+      this.questions.set([]);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   buildForm(dto: DynamicFormDto): void {
@@ -254,6 +401,9 @@ export class InterviewQuestionsPageComponent implements OnInit {
       const initial = q.typeCode === 'MULTIPLE_CHOICE' ? [] : '';
       controls[q.questionId] = new FormControl(initial, validators);
     }
+    // Add outcome and decisionNotes controls
+    controls['outcome'] = new FormControl('');
+    controls['decisionNotes'] = new FormControl('');
     this.formGroup = this.fb.group(controls);
     // persist draft on changes
     this.formGroup.valueChanges.subscribe(() => this.persistDraft());
@@ -283,17 +433,64 @@ export class InterviewQuestionsPageComponent implements OnInit {
     this.persistDraft();
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.formGroup.invalid) {
       this.showErrors.set(true);
       this.formGroup.markAllAsTouched();
       return;
     }
-    this.persistDraft();
-    // Optionally navigate after submit
-    alert('Interview answers submitted successfully!');
-    // example navigation:
-    // this.router.navigate(['/interviews']);
+
+    try {
+      this.loading.set(true);
+      const formId = this.route.snapshot.paramMap.get('formId');
+      const interviewId = this.route.snapshot.paramMap.get('interviewId');
+      const payload = this.formGroup.getRawValue();
+
+      // Transform answers to API format (exclude outcome and decisionNotes)
+      const answers = Object.entries(payload)
+        .filter(
+          ([questionId]) =>
+            questionId !== 'outcome' && questionId !== 'decisionNotes'
+        )
+        .map(([questionId, answer]) => ({
+          questionId,
+          answerType: (Array.isArray(answer)
+            ? 'options'
+            : typeof answer === 'number'
+            ? 'numeric'
+            : 'text') as 'text' | 'rating' | 'numeric' | 'options',
+          textResponse: typeof answer === 'string' ? answer : undefined,
+          rating: typeof answer === 'number' ? answer : undefined,
+          optionIds: Array.isArray(answer) ? answer : undefined,
+        }));
+
+      // Submit form
+      if (interviewId) {
+        await api.createSubmissionWithAnswers({
+          interviewId,
+          answers,
+          userId: this.userId(),
+          outcome: this.control('outcome').value,
+          decisionNotes: this.control('decisionNotes').value || '',
+        });
+      } else if (formId) {
+        await api.createSubmissionWithAnswers({
+          formId,
+          answers,
+          userId: this.userId(),
+        });
+      }
+
+      // Clear draft and navigate back
+      localStorage.removeItem(this.storageKey);
+      alert('Interview answers submitted successfully!');
+      this.router.navigate(['/dashboard/interview']);
+    } catch (error) {
+      console.error('Error submitting interview answers:', error);
+      alert('Error submitting answers. Please try again.');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   onBack() {

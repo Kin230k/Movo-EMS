@@ -18,7 +18,7 @@
 .logo {
   display: flex;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
   flex-direction: column;
   margin-bottom: 1.5rem;
 }
@@ -40,18 +40,15 @@ h1 {
   font-weight: 400;
 }
 
-.forget-password {
+.forgot-password {
   text-align: right;
   margin: -0.5rem 0 1.5rem 0;
-}
-
-.forget-password a {
   color: var(--secondary);
   text-decoration: none;
   font-size: 0.9rem;
 }
 
-.forget-password a:hover {
+.forgot-password:hover {
   text-decoration: underline;
   cursor: pointer;
 }
@@ -91,11 +88,11 @@ themed-button {
     padding: 2.5rem;
     max-width: 24rem;
   }
-  
+
   h1 {
     font-size: 2rem;
   }
-  
+
   .login-title {
     font-size: 1.4rem;
     margin-bottom: 2rem;
@@ -108,11 +105,11 @@ themed-button {
     padding: 2rem;
     max-width: 22rem;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   .login-title {
     font-size: 1.3rem;
     margin-bottom: 1.8rem;
@@ -123,41 +120,41 @@ themed-button {
   .login-container {
     padding: 0.5rem;
   }
-  
+
   .login-form {
     padding: 1.5rem;
     margin: 0 0.5rem;
   }
-  
+
   h1 {
     font-size: 1.6rem;
   }
-  
+
   .login-title {
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .logo {
     margin-bottom: 1.2rem;
   }
-  
+
   .logo img {
     max-width: 100px;
   }
-  
-  .forget-password {
+
+  .forgot-password {
     margin: -0.5rem 0 1.2rem 0;
   }
-  
-  .forget-password a {
+
+  .forgot-password a {
     font-size: 0.85rem;
   }
-  
+
   .switch-login-type {
     margin: 1.2rem 0 0 0;
   }
-  
+
   .switch-login-type a {
     font-size: 0.85rem;
   }
@@ -167,20 +164,20 @@ themed-button {
   .login-form {
     padding: 1.2rem;
   }
-  
+
   h1 {
     font-size: 1.4rem;
   }
-  
+
   .login-title {
     font-size: 1.1rem;
     margin-bottom: 1.2rem;
   }
-  
-  .forget-password {
+
+  .forgot-password {
     margin: -0.3rem 0 1rem 0;
   }
-  
+
   .switch-login-type {
     margin: 1rem 0 0 0;
   }

@@ -90,14 +90,13 @@
   flex-direction: row;
   gap: 1rem;
   .action {
+    border: none;
+    cursor: pointer;
     background-color: var(--btn-color);
+    color: var(--color-font);
     padding: 0.6rem 1.5rem;
     border-radius: 2rem;
   }
-}
-
-.actions.open {
-  /* No specific styles needed here for desktop */
 }
 
 @media (max-width: 768px) {

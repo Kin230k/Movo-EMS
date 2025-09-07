@@ -6,6 +6,8 @@ import { firebaseConfig } from './environments/firebase.config';
 import { connectAuthEmulator } from '@angular/fire/auth';
 import { getAuth } from '@angular/fire/auth';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
+import api from './app/core/api/api';
+import { ToastService } from './app/core/services/toast.service';
 
 let FUNCTIONS_REGION = 'us-central1';
 
@@ -17,4 +19,11 @@ if (typeof window !== 'undefined' && location.hostname === 'localhost') {
   connectFunctionsEmulator(functions, '127.0.0.1', 5001);
 }
 
-bootstrapApplication(App, appConfig).catch((err) => console.error(err));
+bootstrapApplication(App, appConfig)
+  .then((ref) => {
+    const toast = ref.injector.get(ToastService);
+    if (toast) {
+      api.setApiToastService?.(toast);
+    }
+  })
+  .catch((err) => console.error(err));

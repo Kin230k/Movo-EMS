@@ -47,8 +47,9 @@
 
   <app-status-modal
     *ngIf="showStatusModal"
-    [currentStatus]="modalCurrentStatus"
+    [currentStatus]="submission.outcome"
     [decisionNotes]="modalDecisionNotes"
+    [isLoading]="isUpdatingStatus"
     (close)="closeStatusModal()"
     (save)="onStatusSaved($event)"
   ></app-status-modal>

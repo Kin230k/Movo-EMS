@@ -4,7 +4,7 @@ import { ComboSelectorComponent } from '../../../../components/shared/combo-sele
 import { TranslateModule } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { SkeletonFormCardComponent } from '../../../../components/shared/skeleton-form-card/skeleton-form-card.component';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
+import api from '../../../../core/api/api';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -27,22 +27,18 @@ export interface Form {
     SkeletonFormCardComponent,
   ],
   templateUrl: './emails.component.html',
-  styleUrl: './emails.component.scss',
+  styleUrls: ['./emails.component.scss'],
 })
 export class EmailsComponent implements OnInit {
   // Tab management (two tabs only: Send and History)
   activeTab: 'compose' | 'history' = 'compose';
 
-  // Forms loaded via queries.service.ts
-  formsQuery: any;
+  // Forms loaded directly from API
+  private _forms: Form[] = [];
+  private _isFormsLoading = false;
+
   get forms(): Form[] {
-    const resp = this.formsQuery?.data?.() ?? [];
-    return Array.isArray(resp)
-      ? resp.map((f: any) => ({
-          id: String(f.formId ?? f.id),
-          title: f.formTitle ?? f.title ?? 'Form',
-        }))
-      : [];
+    return this._forms;
   }
   get formsForSelector() {
     return (this.forms || []).map((form) => ({
@@ -69,34 +65,73 @@ export class EmailsComponent implements OnInit {
   isLoading = false;
 
   // Compose form
-  composeForm!: FormGroup;
+  composeForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private apiQueries: ApiQueriesService) {}
-
-  ngOnInit() {
-    // Load forms for selectors via query
-    this.formsQuery = this.apiQueries.getFormByUserQuery({});
-    this.initializeComposeForm({
-      recipientType: 'users',
-      customRecipients: '',
-      templateId: '',
-      subject: '',
-      body: '',
+  constructor(private fb: FormBuilder) {
+    // Initialize form immediately so template bindings are safe and the
+    // disabled state works predictably even while async data loads.
+    this.composeForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      subject: ['', Validators.required],
+      body: ['', Validators.required],
+      // If you later re-enable recipientType/customer fields, add them here
+      // recipientType: ['users', Validators.required],
+      // customRecipients: ['']
     });
   }
 
-  onFormSelected(formId: string | undefined) {
+  async ngOnInit() {
+    // Load forms for selectors directly from API
+    try {
+      this._isFormsLoading = true;
+      const data: any = await api.getFormsByClient({});
+      const payload = (data as any)?.result ?? data ?? {};
+      this._forms = Array.isArray(payload.forms)
+        ? payload.forms.map((f: any) => ({
+            id: String(f.formId ?? f.id),
+            title: f.formTitle ?? f.title ?? 'Form',
+          }))
+        : [];
+    } catch (error) {
+      console.error('Error loading forms:', error);
+      this._forms = [];
+    } finally {
+      this._isFormsLoading = false;
+    }
+
+    // Reset form to default values after initial load (keeps FormGroup instance)
+    this.resetComposeForm();
+  }
+
+  async onHistoryFormSelected(formId: string | undefined) {
     this.selectedFormId = formId;
+    this.emailHistory = [];
 
     if (formId) {
-      this.loadEmailsForForm(formId).subscribe({
-        next: (emails) => this.onEmailsLoaded(emails),
-        error: (error) => this.onEmailsLoadError(error),
+      // Load email templates
+      try {
+        const emails = await this.loadEmailsForForm(formId);
+        this.onEmailsLoaded(emails);
+      } catch (error) {
+        this.onEmailsLoadError(error);
+      }
+
+      // Load email history
+      this.loadEmailHistoryForForm(formId).subscribe({
+        next: (items) => {
+          this.emailHistory = items as any;
+          this.isHistoryLoading = false;
+        },
+        error: () => {
+          this.emailHistory = [];
+          this.isHistoryLoading = false;
+        },
       });
     } else {
-      // Reset emails when no form is selected
+      // Reset emails and history when no form is selected
       this.resetEmails();
       this.isLoading = false;
+      this.isHistoryLoading = false;
     }
   }
 
@@ -112,17 +147,22 @@ export class EmailsComponent implements OnInit {
       emailId: email.id,
       title: { en: email.title, ar: email.title }, // Simple mock for multilingual
       body: { en: email.body, ar: email.body }, // Simple mock for multilingual
-      formId: email.formId,
-      formTitle: this.getFormTitle(email.formId),
       createdAt: new Date().toISOString(), // Mock created date
     };
   }
 
-  // Placeholder until email templates endpoint exists
-  private loadEmailsForForm(formId: string): Observable<any[]> {
+  // Load email templates for the selected form
+  private async loadEmailsForForm(formId: string): Promise<any[]> {
     this.isLoading = true;
-    // No backend yet → return empty array without artificial delay
-    return of([]);
+    try {
+      const response = await api.getEmailsByForm({ formId });
+      return response?.emails || [];
+    } catch (error) {
+      console.error('Error loading emails for form:', error);
+      return [];
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   // Placeholder until email history endpoint exists
@@ -161,30 +201,10 @@ export class EmailsComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  // Compose form methods
-  initializeComposeForm(initialValue: any) {
-    this.composeForm = this.fb.group({
-      email: [
-        initialValue?.email || '',
-        [Validators.required, Validators.email],
-      ], // <-- ADDED
-      formId: [initialValue?.formId || null],
-      recipientType: [
-        initialValue?.recipientType || 'users',
-        Validators.required,
-      ],
-      customRecipients: [initialValue?.customRecipients || ''],
-      templateId: [initialValue?.templateId || ''],
-      subject: [initialValue?.subject || '', Validators.required],
-      body: [initialValue?.body || '', Validators.required],
-    });
-  }
-
   onRecipientTypeChange() {
     // Reset form fields when recipient type changes
     this.composeForm.patchValue({
-      customRecipients: '',
-      templateId: '',
+      email: '',
     });
   }
 
@@ -194,7 +214,6 @@ export class EmailsComponent implements OnInit {
       if (template) {
         // Patch the template id so the form control exists and UI updates
         this.composeForm.patchValue({
-          templateId: templateId,
           subject: template.title,
           body: template.body,
         });
@@ -206,31 +225,28 @@ export class EmailsComponent implements OnInit {
     }
   }
 
-  sendEmail() {
+  async sendEmail() {
     if (this.composeForm.valid) {
-      const formData = this.composeForm.value;
-      const mutate = this.apiQueries.sendEmailMutation();
-      mutate.mutate(
-        {
+      try {
+        const formData = this.composeForm.value;
+        await api.sendEmail({
           email: formData.email,
           subject: formData.subject,
           body: formData.body,
-        },
-        {
-          onSuccess: () => {
-            const newHistoryItem = {
-              id: Date.now().toString(),
-              subject: formData.subject,
-              sentAt: new Date(),
-              body: formData.body,
-            };
-            this.emailHistory.unshift(newHistoryItem);
-            this.resetComposeForm();
-            this.setActiveTab('history');
-            alert('Email sent successfully!');
-          },
-        } as any
-      );
+        });
+
+        const newHistoryItem = {
+          id: Date.now().toString(),
+          subject: formData.subject,
+          sentAt: new Date(),
+          body: formData.body,
+        };
+        this.emailHistory.unshift(newHistoryItem);
+        this.resetComposeForm();
+        this.setActiveTab('history');
+      } catch (error) {
+        console.error('Error sending email:', error);
+      }
     }
   }
 
@@ -241,20 +257,23 @@ export class EmailsComponent implements OnInit {
       case 'form':
         return 25; // Mock: form recipients
       case 'custom':
-        return formData.customRecipients.split(',').length;
+        return formData.email.split(',').length;
       default:
         return 0;
     }
   }
 
   resetComposeForm() {
+    // Keep the same FormGroup instance to avoid template race conditions.
     this.composeForm.reset({
-      recipientType: 'users',
-      customRecipients: '',
-      templateId: '',
+      email: '',
       subject: '',
       body: '',
     });
+
+    // mark as pristine/touched states if needed
+    this.composeForm.markAsPristine();
+    this.composeForm.markAsUntouched();
   }
 
   openComposeModal() {
@@ -264,43 +283,22 @@ export class EmailsComponent implements OnInit {
   // Email card actions
   onEditEmail(emailData: any) {
     console.log('Edit email:', emailData);
-    // Navigate to edit modal or page
   }
 
   onDuplicateEmail(emailData: any) {
     console.log('Duplicate email:', emailData);
-    // Create duplicate template
   }
 
   onDeleteEmail(emailData: any) {
     console.log('Delete email:', emailData);
-    // Show delete confirmation
   }
 
   onSendEmail(emailData: any) {
     console.log('Send email template:', emailData);
-    // Pre-populate compose form with template data
     this.setActiveTab('compose');
     this.onTemplateSelected(emailData.emailId);
   }
 
-  // History methods
-  onHistoryFormSelected(formId: string | undefined) {
-    this.selectedFormId = formId;
-    this.emailHistory = [];
-    if (!formId) {
-      this.isHistoryLoading = false;
-      return;
-    }
-    this.loadEmailHistoryForForm(formId).subscribe({
-      next: (items) => {
-        this.emailHistory = items as any;
-        this.isHistoryLoading = false;
-      },
-      error: () => {
-        this.emailHistory = [];
-        this.isHistoryLoading = false;
-      },
-    });
-  }
+  // History methods - now also loads email templates
+  // The email history loading logic has been moved to the new onHistoryFormSelected method above
 }

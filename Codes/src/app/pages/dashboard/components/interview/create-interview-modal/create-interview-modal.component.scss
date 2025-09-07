@@ -205,6 +205,52 @@ select {
   font-weight: 500;
 }
 
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--white);
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error message in footer */
+.error-message {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: var(--radius-input);
+}
+
+/* Disabled button styles */
+.secondary-btn:disabled,
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+
+  &:hover {
+    background: initial;
+    border-color: initial;
+    transform: none !important;
+  }
+}
+
+.primary-btn:disabled {
+  background: rgba(var(--secondary-rgb), 0.6);
+}
+
 .criteria-section {
   margin-top: 1rem;
   border-top: 1px solid rgba(var(--white-rgb), 0.15);

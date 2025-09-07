@@ -33,7 +33,10 @@
           *ngFor="let submission of filteredSubmissions"
           [submission]="submission"
           [onlyManual]="onlyManual"
+          [resetTrigger]="submissionCardResetTriggers[submission.submissionId]"
           (goToManualQuestions)="onGoToManualQuestions($event)"
+          (statusUpdated)="onStatusUpdated($event)"
+          (statusUpdateComplete)="onStatusUpdateComplete($event)"
         >
         </app-submission-card>
       </ng-container>

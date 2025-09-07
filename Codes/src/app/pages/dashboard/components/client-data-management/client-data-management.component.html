@@ -27,7 +27,11 @@
 
   <!-- show real list when loaded -->
   <div *ngIf="!isLoading && clients && clients.length > 0">
-    <app-card-list [items]="clients" [cardComponent]="profileCardComponent">
+    <app-card-list
+      [items]="clients"
+      [cardComponent]="profileCardComponent"
+      (refetch)="refetchClients()"
+    >
     </app-card-list>
   </div>
 </div>

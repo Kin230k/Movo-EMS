@@ -97,13 +97,19 @@ import type {
   GetAreasByLocationPayload,
   getProjectInfoByIdPayload,
   GetAllFormQuestionsPayload,
+  getFormsByProjectPayload,
 } from './api';
 
-// Helper to generate unique query keys based on payloads
+// Helper to generate stable query keys
 function queryKeyFor(payload: any, base: string | string[]): any[] {
   const key = Array.isArray(base) ? [...base] : [base];
   if (payload && Object.keys(payload).length > 0) {
-    key.push(payload);
+    // Serialize to ensure stable key across object identity changes
+    try {
+      key.push(JSON.stringify(payload, Object.keys(payload).sort()));
+    } catch {
+      key.push(payload);
+    }
   }
   return key;
 }
@@ -237,6 +243,15 @@ export function injectGetProjectUsersQuery(payload: GetProjectUsersPayload) {
   return injectQuery(() => ({
     queryKey: queryKeyFor(payload, ['projectUsers', payload.projectId]),
     queryFn: () => api.getProjectUsers(payload),
+  }));
+}
+
+export function injectgetFormsByProjectQuery(
+  payload: getFormsByProjectPayload
+) {
+  return injectQuery(() => ({
+    queryKey: queryKeyFor(payload, ['formByProject', payload.projectId]),
+    queryFn: () => api.getFormsByProject(payload),
   }));
 }
 

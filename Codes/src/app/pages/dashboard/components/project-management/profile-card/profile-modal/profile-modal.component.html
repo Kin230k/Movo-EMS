@@ -7,15 +7,31 @@
   aria-modal="true"
   (click)="$event.stopPropagation()"
 >
-  <form
-    [formGroup]="form"
-    class="modal-form"
-    (submit)="$event.preventDefault(); onSave()"
-  >
+  <form [formGroup]="form" class="modal-form">
     <div class="modal-inner compact">
       <!-- Modal header with title + close button -->
       <header class="modal-header">
         <h2 class="modal-title">{{ "USER.EDIT" | translate }}</h2>
+        <button
+          type="button"
+          class="close"
+          (click)="onClose($event)"
+          aria-label="Close modal"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </header>
 
       <div class="fields">
@@ -32,11 +48,6 @@
           }}</span>
           <input type="text" formControlName="nameEn" />
         </label>
-        <!-- 
-          <label class="field">
-            <span class="label">{{ "PROJECT_MANAGEMENT.BADGE_BACKGROUND" | translate }}</span>
-            <input type="color" formControlName="badgeBackground" />
-          </label> -->
 
         <label class="field">
           <span class="label">{{

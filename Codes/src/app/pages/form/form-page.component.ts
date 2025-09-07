@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
   FormControl,
@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ApiQueriesService } from '../../core/services/queries.service';
+import api from '../../core/api/api';
 import {
   DynamicFormDto,
   FormAnswersMap,
@@ -175,7 +175,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class FormPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly apiQueries = inject(ApiQueriesService);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   loading = signal(true);
@@ -189,30 +189,31 @@ export class FormPageComponent implements OnInit {
     const formId = this.route.snapshot.paramMap.get('formId') || 'form';
     return `form_answers_${formId}`;
   }
-
-  async ngOnInit() {
-    const formId = this.route.snapshot.paramMap.get('formId')!;
-
-    // Load form meta: wait until query has data
-    const formQuery = this.apiQueries.getFormQuery({ formId });
-    const formData = (await this.waitForQueryData<any>(formQuery)) ?? {};
+  async getForm(formId: string) {
+    const data: any = await api.getForm({ formId });
+    const formData = (data as any)?.result ?? data ?? {};
+    const formPayload = formData?.form ?? formData;
     this.title.set(
-      formData?.formTitle ?? formData?.title ?? formData?.name ?? 'Form'
+      formPayload?.formTitle ??
+        formPayload?.title ??
+        formPayload?.name ??
+        'Form'
     );
-
-    // After meta is ready, fetch questions and wait for data
-    const questionsQuery = this.apiQueries.getAllFormQuestionsQuery({ formId });
-    const raw = (await this.waitForQueryData<any>(questionsQuery)) ?? {};
-    const list = Array.isArray(raw)
-      ? raw
-      : Array.isArray((raw as any)?.questions)
-      ? (raw as any).questions
-      : Array.isArray((raw as any)?.items)
-      ? (raw as any).items
-      : Array.isArray((raw as any)?.data)
-      ? (raw as any).data
+    return formData;
+  }
+  async getAllFormQuestions(formId: string) {
+    const questionsData: any = await api.getAllFormQuestions({ formId });
+    const questionsPayload =
+      (questionsData as any)?.result ?? questionsData ?? {};
+    const list = Array.isArray(questionsPayload)
+      ? questionsPayload
+      : Array.isArray((questionsPayload as any)?.questions)
+      ? (questionsPayload as any).questions
+      : Array.isArray((questionsPayload as any)?.items)
+      ? (questionsPayload as any).items
+      : Array.isArray((questionsPayload as any)?.data)
+      ? (questionsPayload as any).data
       : [];
-
     const mapType = (t: any): FormQuestionDto['typeCode'] => {
       const up = String(t || '').toUpperCase();
       const allowed = [
@@ -244,35 +245,33 @@ export class FormPageComponent implements OnInit {
       max: q.max,
     }));
 
-    const dto: DynamicFormDto = {
-      formId,
-      formTitle: this.title(),
-      formLanguage: formData?.formLanguage ?? 'en',
-      questions,
-    };
-
     this.questions.set(questions);
-    this.buildForm(dto);
-    this.restoreDraft();
-    this.loading.set(false);
+    return questions;
   }
+  async ngOnInit() {
+    const formId = this.route.snapshot.paramMap.get('formId')!;
 
-  private async waitForQueryData<T = any>(
-    query: any,
-    timeoutMs = 10000
-  ): Promise<T | null> {
-    const start = Date.now();
-    return new Promise<T | null>((resolve) => {
-      const tick = () => {
-        try {
-          const v = query?.data?.();
-          if (v != null) return resolve(v as T);
-        } catch {}
-        if (Date.now() - start >= timeoutMs) return resolve(null);
-        setTimeout(tick, 50);
+    try {
+      // Load form meta directly
+      const [formPayload, questions] = await Promise.all([
+        this.getForm(formId),
+        this.getAllFormQuestions(formId),
+      ]);
+      // Load questions directly
+      const dto: DynamicFormDto = {
+        formId,
+        formTitle: this.title(),
+        formLanguage: formPayload?.formLanguage ?? 'en',
+        questions,
       };
-      tick();
-    });
+      this.buildForm(dto);
+      this.restoreDraft();
+    } catch (error) {
+      this.title.set('Error loading form');
+      this.questions.set([]);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   buildForm(dto: DynamicFormDto): void {
@@ -316,17 +315,46 @@ export class FormPageComponent implements OnInit {
     this.persistDraft();
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.formGroup.invalid) {
       this.showErrors.set(true);
       this.formGroup.markAllAsTouched();
       return;
     }
-    const payload = this.formGroup.getRawValue();
-    // TODO: integrate with submission API later
-    // For now, keep in storage and potentially navigate/notify
-    this.persistDraft();
-    alert('Form submitted successfully!');
+
+    try {
+      this.loading.set(true);
+      const formId = this.route.snapshot.paramMap.get('formId')!;
+      const payload = this.formGroup.getRawValue();
+
+      // Transform answers to API format
+      const answers = Object.entries(payload).map(([questionId, answer]) => ({
+        questionId,
+        answerType: (Array.isArray(answer)
+          ? 'options'
+          : typeof answer === 'number'
+          ? 'numeric'
+          : 'text') as 'text' | 'rating' | 'numeric' | 'options',
+        textResponse: typeof answer === 'string' ? answer : undefined,
+        rating: typeof answer === 'number' ? answer : undefined,
+        optionIds: Array.isArray(answer) ? answer : undefined,
+      }));
+
+      // Submit form
+      await api.createSubmissionWithAnswers({
+        formId,
+        answers,
+      });
+
+      // Clear draft and navigate to success page
+      localStorage.removeItem(this.storageKey);
+      this.router.navigate(['/form-success']);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error submitting form. Please try again.');
+    } finally {
+      this.loading.set(false);
+    }
   }
   goBack() {
     this.location.back();

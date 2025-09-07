@@ -1,58 +1,106 @@
 <div class="page-container">
-  <h2 class="page-title">{{ "INTERVIEWS.PAGE_TITLE" | translate }}</h2>
+  <h1 class="page-title">{{ "INTERVIEWS.PAGE_TITLE" | translate }}</h1>
 
   <form [formGroup]="form" class="form-grid">
-    <div class="field">
-      <label class="label">{{ "INTERVIEWS.LABEL.PROJECT" | translate }}</label>
-      <app-combo-selector
-        [projects]="projects"
-        [selectedValue]="form.get('projectId')?.value"
-        [hasError]="
-          !!(
+    <div class="field-group">
+      <div class="field">
+        <label class="label">{{
+          "INTERVIEWS.LABEL.PROJECT" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="projects"
+          [selectedValue]="form.get('projectId')?.value"
+          [hasError]="
+            !!(
+              form.get('projectId')?.invalid &&
+              (form.get('projectId')?.touched || form.get('projectId')?.dirty)
+            )
+          "
+          (projectSelected)="onProjectSelect($event)"
+          placeholder="{{
+            'INTERVIEWS.PLACEHOLDER.SELECT_PROJECT' | translate
+          }}"
+        ></app-combo-selector>
+        <div
+          class="field-error"
+          *ngIf="
             form.get('projectId')?.invalid &&
             (form.get('projectId')?.touched || form.get('projectId')?.dirty)
-          )
-        "
-        (projectSelected)="onProjectSelect($event)"
-        placeholder="{{ 'INTERVIEWS.PLACEHOLDER.SELECT_PROJECT' | translate }}"
-      ></app-combo-selector>
-      <div
-        class="field-error"
-        *ngIf="
-          form.get('projectId')?.invalid &&
-          (form.get('projectId')?.touched || form.get('projectId')?.dirty)
-        "
-      >
-        <small class="error-text">{{
-          "COMMON.ERRORS.REQUIRED" | translate
-        }}</small>
+          "
+        >
+          <small class="error-text">{{
+            "COMMON.ERRORS.REQUIRED" | translate
+          }}</small>
+        </div>
       </div>
-    </div>
 
-    <div class="field">
-      <label class="label">{{
-        "INTERVIEWS.LABEL.INTERVIEW" | translate
-      }}</label>
-      <app-combo-selector
-        [projects]="transformedFilteredInterviews"
-        [selectedValue]="form.get('interviewId')?.value"
-        [hasError]="
-          !!(
+      <div class="field">
+        <label class="label">{{
+          "INTERVIEWS.LABEL.INTERVIEW" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="transformedFilteredInterviews"
+          [selectedValue]="form.get('interviewId')?.value"
+          [hasError]="
+            !!(
+              form.get('interviewId')?.invalid &&
+              (form.get('interviewId')?.touched ||
+                form.get('interviewId')?.dirty)
+            )
+          "
+          (projectSelected)="onInterviewSelect($event)"
+          placeholder="{{
+            'INTERVIEWS.PLACEHOLDER.SELECT_INTERVIEW' | translate
+          }}"
+        ></app-combo-selector>
+
+        <div
+          class="field-error"
+          *ngIf="
             form.get('interviewId')?.invalid &&
             (form.get('interviewId')?.touched || form.get('interviewId')?.dirty)
-          )
-        "
-        (projectSelected)="onInterviewSelect($event)"
-        placeholder="{{
-          'INTERVIEWS.PLACEHOLDER.SELECT_INTERVIEW' | translate
-        }}"
-      ></app-combo-selector>
+          "
+        >
+          <small class="error-text">{{
+            "COMMON.ERRORS.REQUIRED" | translate
+          }}</small>
+        </div>
+      </div>
+    </div>
+    <!-- User Email Selection Section -->
+    <label class="label">{{ "ADD_ROLE_MODAL.EMAIL_LABEL" | translate }}</label>
+    <input
+      class="email"
+      type="email"
+      [(ngModel)]="userEmail"
+      [ngModelOptions]="{ standalone: true }"
+      [placeholder]="'ADD_ROLE_MODAL.EMAIL_PLACEHOLDER' | translate"
+      [disabled]="checkingEmail() || checkSucceeded"
+    />
+    <div class="actions">
+      <button
+        class="verify-btn"
+        (click)="onVerifyEmail()"
+        [disabled]="checkingEmail() || checkSucceeded"
+      >
+        {{
+          checkingEmail()
+            ? ("ADD_ROLE_MODAL.CHECKING_BTN" | translate)
+            : checkSucceeded
+            ? ("ADD_ROLE_MODAL.VERIFIED_BTN" | translate)
+            : ("ADD_ROLE_MODAL.VERIFY_EMAIL_BTN" | translate)
+        }}
+      </button>
+
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
 
       <div
         class="field-error"
         *ngIf="
-          form.get('interviewId')?.invalid &&
-          (form.get('interviewId')?.touched || form.get('interviewId')?.dirty)
+          form.get('userId')?.invalid &&
+          (form.get('userId')?.touched || form.get('userId')?.dirty)
         "
       >
         <small class="error-text">{{
@@ -85,5 +133,6 @@
     [projects]="projects"
     (close)="onCancelCreateInterview()"
     (create)="onCreateInterview($event)"
+    (refetch)="refetchInterviews()"
   ></app-create-interview-modal>
 </div>

@@ -5,10 +5,11 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // ThemedButton path — adjust to match your repo
 
-import { ApiQueriesService } from '../../core/services/queries.service';
+import api from '../../core/api/api';
 import { ProjectsNavbarComponent } from './projects-navbar.component';
-import { ProjectsFooterComponent } from './projects-footer.component';
+// import { ProjectsFooterComponent } from './projects-footer.component';
 import { ProjectsLandingComponent } from './projects-landing.component';
+import { LanguageService } from '../../core/services/language.service';
 
 // Local types (formerly from project.service)
 type LocalizedString = { en: string; ar: string };
@@ -19,7 +20,6 @@ interface ProjectSummary {
   startingDate?: string | null;
   endingDate?: string | null;
 }
-
 @Component({
   selector: 'app-projects-page',
   standalone: true,
@@ -52,13 +52,15 @@ interface ProjectSummary {
       </div>
 
       <div class="cards">
+        <!-- bind index as --i so CSS can stagger animations per-card -->
         <article
           class="card"
-          *ngFor="let p of projects"
+          *ngFor="let p of projects; let i = index"
           (click)="openProject(p)"
           role="button"
           tabindex="0"
           (keydown.enter)="openProject(p)"
+          [style.--i]="i"
         >
           <div class="card-body">
             <div class="card-accent" aria-hidden></div>
@@ -89,7 +91,7 @@ interface ProjectSummary {
         padding: 2rem;
       }
       .title {
-        text-align: left;
+        text-align: start;
         margin: 0 0 1rem 0;
         font-size: 1.75rem;
         color: var(--bg-dark);
@@ -107,6 +109,7 @@ interface ProjectSummary {
         }
       }
 
+      /* Entrance animation: staggered by --i */
       .card {
         position: relative;
         border-radius: 12px;
@@ -132,61 +135,77 @@ interface ProjectSummary {
         height: 30rem;
         transform: rotate(30deg);
         border-radius: 6px;
-        background: linear-gradient(180deg, var(--accent), var(--secondary));
+        // animate the gradient from bottom to top
+        background: linear-gradient(0deg, var(--accent), var(--secondary));
         opacity: 0.95;
         box-shadow: 0 6px 12px rgba(var(--shadow-dark), 0.08);
         transition: transform 0.18s ease;
       }
-      // animate the  .card::after gradient background keyframes
-      @keyframes gradientBackground {
-        from {
-          background: linear-gradient(
-            to right,
-            var(--accent),
-            var(--secondary)
-          );
-        }
-        to {
-          background: linear-gradient(
-            to right,
-            var(--secondary),
-            var(--accent)
-          );
-        }
-      }
+
+      /* improved animated gradient background behind each card */
       .card::after {
         content: '';
         position: absolute;
-        top: -1px;
-        left: -1px;
-        width: calc(100% + 2px);
-        height: calc(100% + 2px);
+        top: -0.5px;
+        left: -0.5px;
+        width: calc(100% + 1px);
+        height: calc(100% + 1px);
         border-radius: 12px;
-        background: linear-gradient(to right, var(--accent), var(--secondary));
         z-index: -1;
-        animation: gradientBackground 10s ease infinite backwards;
+
+        /* richer multi-stop gradient (uses fallbacks for new CSS vars) */
+        background: linear-gradient(
+          90deg,
+          var(--accent),
+          var(--secondary) 50%,
+          var(--accent)
+        );
+
+        /* make the gradient much wider than the element so animation moves smoothly */
+        background-size: 300% 100%;
+        background-position: 0% 50%;
+
+        /* smooth continuous animation: moves gradient left → right → left */
+        animation: gradientMove 10s ease-in-out infinite alternate;
+        /* subtle soft blur for depth, keep low so text contrast is unaffected */
+        filter: blur(3px) saturate(1.05);
+        opacity: 0.95;
       }
+
+      /* gentler, smoother movement with an ease curve and back-and-forth (alternate-like effect) */
+      @keyframes gradientMove {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
       .card:hover .card-accent {
-        transform: translateY(-30px) rotate(30deg);
+        transform: translateY(-30px) rotate(-30deg);
       }
+
       .card-body {
         position: relative;
-        color: var(--bg-dark);
         padding: 1.25rem;
         z-index: 1;
         overflow: hidden;
         border-radius: 12px;
         height: 6rem;
+        background: var(--bg-dark);
+        color: var(--white);
       }
       .card-title {
         margin: 0 0 0.25rem 0;
         font-weight: 700;
         font-size: 1.05rem;
-        color: var(--bg-dark);
       }
       .card-desc {
         margin: 0 0 0.5rem 0;
-        color: rgba(var(--bg-dark-rgb), 0.65);
         font-size: 0.95rem;
         line-height: 1.35;
         max-height: 3.2em;
@@ -194,7 +213,6 @@ interface ProjectSummary {
       }
       .dates {
         font-size: 0.85rem;
-        color: rgba(var(--bg-dark-rgb), 0.75);
       }
 
       .card-actions {
@@ -208,42 +226,73 @@ interface ProjectSummary {
       .empty {
         text-align: center;
         padding: 1rem;
-        color: rgba(var(--bg-dark-rgb), 0.6);
       }
 
       @media (max-width: 640px) {
-        .card {
-          padding: 1rem;
-        }
         .card-accent {
-          top: 10px;
-          right: 10px;
-          width: 54px;
-          height: 54px;
+          display: none;
+        }
+      }
+      :host-context(html[dir='rtl']) .card-accent {
+        right: calc(80% + 1px);
+        transform: rotate(-30deg);
+      }
+      :host-context(html[dir='rtl']) .card:hover .card-accent {
+        transform: translateY(-30px) rotate(30deg);
+      }
+
+      /* Respect users' reduced motion preference */
+      @media (prefers-reduced-motion: reduce) {
+        .card,
+        .card::after,
+        .card-accent {
+          transition: none !important;
+          animation: none !important;
         }
       }
     `,
   ],
 })
 export class ProjectsPageComponent implements OnInit {
-  private apiQueries = inject(ApiQueriesService);
   private router = inject(Router);
   private translate = inject(TranslateService);
-  projectsQuery: any;
+  private _projects: ProjectSummary[] = [];
+  private _loading = true;
+
   get projects(): ProjectSummary[] {
-    const data = this.projectsQuery?.data?.() ?? [];
-    return data?.success ? (data.projects as any) : [];
+    return this._projects;
   }
+
   get loading(): boolean {
-    return this.projectsQuery?.isLoading?.() ?? false;
+    return this._loading;
   }
 
-  ngOnInit(): void {
-    this.projectsQuery = this.apiQueries.getAllActiveProjectsQuery();
+  async ngOnInit(): Promise<void> {
+    try {
+      this._loading = true;
+      const data: any = await api.getAllActiveProjects();
+      const payload = (data as any)?.result ?? data ?? {};
+      this._projects = Array.isArray(payload.projects) ? payload.projects : [];
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
+    } finally {
+      this._loading = false;
+    }
   }
 
-  fetchProjects() {
-    (this.projectsQuery as any)?.refetch?.();
+  async fetchProjects() {
+    try {
+      this._loading = true;
+      const data: any = await api.getAllActiveProjects();
+      const payload = (data as any)?.result ?? data ?? {};
+      this._projects = Array.isArray(payload.projects) ? payload.projects : [];
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      this._projects = [];
+    } finally {
+      this._loading = false;
+    }
   }
 
   displayName(name: LocalizedString | string | undefined) {

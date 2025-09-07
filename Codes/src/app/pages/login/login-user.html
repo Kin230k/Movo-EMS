@@ -22,8 +22,8 @@
       >
       </app-input>
 
-      <div class="forgot-password">
-        <a href="">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+      <div class="forgot-password" (click)="goToForgetPassword()">
+        {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
       </div>
 
       <themed-button

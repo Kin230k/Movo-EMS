@@ -1,4 +1,12 @@
 <div class="overlay" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "ADD_ROLE_MODAL.ASSIGNING_ROLE" | translate }}
+    </div>
+  </div>
+
   <div class="modal" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <h3>{{ "ADD_ROLE_MODAL.TITLE" | translate }}</h3>
@@ -15,17 +23,17 @@
         type="email"
         [(ngModel)]="email"
         [placeholder]="'ADD_ROLE_MODAL.EMAIL_PLACEHOLDER' | translate"
-        [disabled]="checking || checkSucceeded"
+        [disabled]="checking() || checkSucceeded"
       />
 
       <div class="actions">
         <button
           class="verify-btn"
           (click)="onVerifyEmail()"
-          [disabled]="checking || checkSucceeded"
+          [disabled]="checking() || checkSucceeded"
         >
           {{
-            checking
+            checking()
               ? ("ADD_ROLE_MODAL.CHECKING_BTN" | translate)
               : checkSucceeded
               ? ("ADD_ROLE_MODAL.VERIFIED_BTN" | translate)
@@ -34,29 +42,30 @@
         </button>
       </div>
 
-      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
 
       <div *ngIf="checkSucceeded" class="project-select">
         <label class="label">{{
           "ADD_ROLE_MODAL.SELECT_PROJECT_LABEL" | translate
         }}</label>
-        <app-combo-selector
-          [projects]="projects"
-          (projectSelected)="onProjectSelected($event)"
-        ></app-combo-selector>
-
-        <label class="label" style="margin-top: 0.75rem">{{
-          "ADD_ROLE_MODAL.SELECT_ROLE_LABEL" | translate
-        }}</label>
-        <select
-          class="role-select"
-          (change)="onRoleSelected($event)"
-          [value]="selectedRoleId ?? ''"
-        >
+        <!-- use the selection dropdwon instead of app-combo-selector-->
+        <select class="project-select" [(ngModel)]="selectedProjectId">
+          <option value="">
+            {{ "ADD_ROLE_MODAL.CHOOSE_PROJECT_OPTION" | translate }}
+          </option>
+          <option *ngFor="let p of projects" [value]="p.id">
+            {{ p.name[currentLang] }}
+          </option>
+        </select>
+        <select class="role-select" [(ngModel)]="selectedRoleId">
           <option value="">
             {{ "ADD_ROLE_MODAL.CHOOSE_ROLE_OPTION" | translate }}
           </option>
-          <option *ngFor="let r of roles" [value]="r.id">{{ ('ROLES.' + r.name) | translate }}</option>
+          <option *ngFor="let r of roles" [value]="r.id">
+            {{ r.name[currentLang] }}
+          </option>
         </select>
 
         <div class="assign-actions">

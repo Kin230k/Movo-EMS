@@ -6,6 +6,7 @@ import {
   HostListener,
   OnInit,
   OnDestroy,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,9 +23,16 @@ export class DeleteModalComponent implements OnInit, OnDestroy {
   @Input() message = '';
   @Input() confirmLabel = 'COMMON.BUTTONS.DELETE';
   @Input() cancelLabel = 'COMMON.BUTTONS.CANCEL';
+  @Input() set loading(value: boolean) {
+    this.isSubmitting.set(value);
+    this.hasLoadingInput = true;
+  }
+
+  private hasLoadingInput = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<void>();
+  isSubmitting = signal(false);
 
   ngOnInit() {
     // lock background scroll while modal exists
@@ -51,6 +59,10 @@ export class DeleteModalComponent implements OnInit, OnDestroy {
 
   onConfirm(evt?: MouseEvent) {
     evt?.stopPropagation();
+    // Only set loading state if parent is not controlling it
+    if (!this.hasLoadingInput) {
+      this.isSubmitting.set(true);
+    }
     this.confirm.emit();
   }
 }

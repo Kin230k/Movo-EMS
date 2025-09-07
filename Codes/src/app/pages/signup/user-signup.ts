@@ -5,7 +5,7 @@ import { ThemedButtonComponent } from '../../components/shared/themed-button/the
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service';
 import { ImageUploadService } from '../../core/services/image-upload.service';
-import { AuthService } from '../../core/services/auth.service';
+import api from '../../core/api/api';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -14,6 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 
 export type Multilingual = { en: string; ar: string };
 
@@ -457,7 +458,6 @@ export class SignUpUser implements OnDestroy {
   private langService = inject(LanguageService);
   private imageUpload = inject(ImageUploadService);
   private authService = inject(AuthService);
-
   // Reactive form
   form = new FormGroup({
     nameEn: new FormControl('', Validators.required),
@@ -544,16 +544,22 @@ export class SignUpUser implements OnDestroy {
     this.isSubmitting.set(true);
 
     try {
-      const credential = await this.authService.register(
-        this.form.value.email ?? '',
-        this.form.value.password ?? '',
-        {
+      // Create user data in the format expected by the API
+      const userData = {
+        name: {
           en: this.form.value.nameEn ?? '',
           ar: this.form.value.nameAr ?? '',
         },
-        this.form.value.picture ?? ''
+        picture: this.form.value.picture ?? '',
+      };
+
+      const result = await this.authService.register(
+        this.form.value.email ?? '',
+        this.form.value.password ?? '',
+        userData.name,
+        userData.picture
       );
-      console.log('Registered', credential);
+      console.log('Registered', result);
       this.triggerToast('Registered successfully', 'success');
       // navigate after success
       this.router.navigate(['/projects']);

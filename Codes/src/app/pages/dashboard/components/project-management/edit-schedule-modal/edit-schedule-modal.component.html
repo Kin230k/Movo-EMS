@@ -1,5 +1,12 @@
 <!-- edit-schedule-modal.component.html -->
 <div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Loading overlay for form submission -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "PROJECT_MANAGEMENT.UPDATING_SCHEDULE" | translate }}
+  </div>
+</div>
 
 <aside
   class="modal"

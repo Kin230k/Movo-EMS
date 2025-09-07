@@ -16,7 +16,7 @@
     <div class="meta-body">
       <p class="phone">{{ data.phone }}</p>
       <p class="email">{{ data.email }}</p>
-      <div class="rate">{{ data.rate }}</div>
+      <!-- <div class="rate">{{ data.rate }}</div> -->
     </div>
   </div>
 
@@ -76,6 +76,7 @@
   message="USER.ACTIONS.CONFIRM_DISABLE_MESSAGE"
   confirmLabel="USER.ACTIONS.DISABLE"
   cancelLabel="COMMON.BUTTONS.CANCEL"
+  [loading]="isDeleting"
   (close)="closeDeleteModal()"
   (confirm)="confirmDisable()"
 ></app-delete-modal>

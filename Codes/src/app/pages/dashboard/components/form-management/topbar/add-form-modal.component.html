@@ -1,4 +1,11 @@
 <div class="overlay" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "FORM_MANAGEMENT.CREATING_FORM" | translate }}
+    </div>
+  </div>
   <div class="modal" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <h3>{{ "FORM_MANAGEMENT.ADD_NEW_FORM" | translate }}</h3>
@@ -8,13 +15,28 @@
     </header>
 
     <section class="modal-body">
+      <!-- Language Selection -->
+      <div class="language-section">
+        <label class="label">{{
+          "LANGUAGE.SELECT_LANGUAGE" | translate
+        }}</label>
+        <select
+          class="language-select"
+          [value]="currentLang"
+          (change)="onLanguageChange($event)"
+        >
+          <option value="en">{{ "LANGUAGE.ENGLISH" | translate }}</option>
+          <option value="ar">{{ "LANGUAGE.ARABIC" | translate }}</option>
+        </select>
+      </div>
+
       <!-- Selected Project Display -->
       <div class="selected-info" *ngIf="selectedProject">
         <label class="label">{{
           "FORM_MANAGEMENT.SELECT_PROJECT" | translate
         }}</label>
         <div class="selected-item">
-          {{ selectedProject.name[currentLang] }}
+          {{ selectedProject.name[currentLang()] }}
         </div>
       </div>
 
@@ -28,7 +50,7 @@
             >{{ "FORM_MANAGEMENT.SELECTED_LOCATION" | translate }}:</span
           >
           <div class="selected-item">
-            {{ selectedLocation.name[currentLang] }}
+            {{ selectedLocation.name[currentLang()] }}
           </div>
         </div>
       </div>
@@ -104,11 +126,11 @@
           <!-- TODO: translate the project and location names in en ar based on the language -->
           <li>
             <strong>{{ "FORM_MANAGEMENT.PROJECT" | translate }}:</strong>
-            {{ selectedProject.name[currentLang] }}
+            {{ selectedProject.name[currentLang()] }}
           </li>
           <li *ngIf="selectedLocation">
             <strong>{{ "FORM_MANAGEMENT.LOCATION" | translate }}:</strong>
-            {{ selectedLocation.name[currentLang] }}
+            {{ selectedLocation.name[currentLang()] }}
           </li>
           <li>
             <strong>{{ "FORM_MANAGEMENT.FORM_TYPE" | translate }}:</strong>

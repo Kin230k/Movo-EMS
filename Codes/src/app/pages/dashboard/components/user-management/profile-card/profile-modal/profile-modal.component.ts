@@ -8,6 +8,7 @@ import {
   OnChanges,
   SimpleChanges,
   OnDestroy,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -33,6 +34,7 @@ export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
 
   form!: FormGroup;
   dataLoaded = false;
+  isSubmitting = signal(false);
 
   // roles list: value is the DB value, key is the translation key suffix (ROLES.KEY)
   roles = rolesLable;
@@ -65,7 +67,7 @@ export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
     this.form = this.fb.group({
       userId: [null],
       role: ['', Validators.required],
-      rate: ['', Validators.required],
+      rate: [''],
     });
   }
 
@@ -94,6 +96,8 @@ export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
       this.form.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting.set(true);
     this.edit.emit(this.form.value);
   }
 

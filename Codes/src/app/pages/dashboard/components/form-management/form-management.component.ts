@@ -9,8 +9,8 @@ import { CardListComponent } from '../../../../components/shared/card-list/card-
 import { FormCardComponent, FormData } from './form-card.component';
 import { FormListSkeletonComponent } from '../../../../components/shared/form-list-skeleton/form-list-skeleton.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
 import { IdentityService } from '../../../../core/services/identity.service';
+import api from '../../../../core/api/api';
 
 @Component({
   selector: 'app-form-management',
@@ -25,15 +25,12 @@ import { IdentityService } from '../../../../core/services/identity.service';
   styleUrl: './form-management.component.scss',
 })
 export class FormManagementComponent {
-  constructor(
-    private apiQueries: ApiQueriesService,
-    private identity: IdentityService
-  ) {}
+  constructor(private identity: IdentityService) {}
 
-  projectsQuery: any;
+  private _projects: Project[] = [];
+
   get projects(): Project[] {
-    const data = this.projectsQuery?.data() ?? [];
-    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+    return this._projects;
   }
 
   locations: Location[] = [];
@@ -60,22 +57,47 @@ export class FormManagementComponent {
 
   async ngOnInit() {
     const who = await this.identity.getIdentity().catch(() => null);
-    if (who?.isClient) {
-      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
-    } else {
-      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    try {
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects.map((p: any) => ({
+              id: p.projectId,
+              name: p.name,
+            }))
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects.map((p: any) => ({
+              id: p.projectId,
+              name: p.name,
+            }))
+          : [];
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
     }
   }
 
   onProjectSelected(projectId: string | null) {
     this.selectedProjectId = projectId;
     if (projectId) {
-      this.loadForms(projectId);
-    } else {
+      // Reset states when starting to load
       this.forms = [];
       this._isFinished = false;
+      this._error = null;
+      this.loadForms(projectId);
+    } else {
+      // Clear forms and states when no project selected
+      this.forms = [];
+      this._isFinished = false;
+      this._error = null;
+      this._isLoading = false;
     }
-    console.log('Project selected:', projectId);
   }
 
   async loadForms(projectId: string) {
@@ -97,26 +119,81 @@ export class FormManagementComponent {
   }
 
   private async fetchForms(projectId: string): Promise<FormData[]> {
-    const q = this.apiQueries.getFormByUserQuery({});
-    const resp = q.data?.() ?? [];
-    const list: FormData[] = Array.isArray(resp)
-      ? resp
-          .filter((f: any) => f.projectId === projectId || f.locationId)
-          .map((f: any) => ({
-            formId: f.formId ?? f.id,
+    try {
+      const data: any = await api.getFormsByProject({ projectId });
+      const payload = (data as any)?.result ?? data ?? {};
+      console.log('resp.forms', payload.forms);
+      const list: FormData[] = Array.isArray(payload.forms)
+        ? payload.forms.map((f: any) => ({
+            formId: f.formId ?? f.formId ?? f.id,
             projectId: f.projectId,
             projectName: f.projectName,
             locationId: f.locationId,
             locationName: f.locationName,
             createdAt: f.createdAt ?? new Date().toISOString(),
           }))
-      : [];
-    return list;
+        : [];
+      console.log('list', list);
+      return list;
+    } catch (error) {
+      console.error('Error fetching forms:', error);
+      return [];
+    }
   }
 
   getProjectName(projectId?: string): string {
     if (!projectId) return '';
     const project = this.projects?.find((p) => p.id === projectId);
     return project?.name?.en ?? '';
+  }
+
+  // Refetch methods for modals to call after operations
+  async refetchProjects(): Promise<void> {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      this._isLoading = true;
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects.map((p: any) => ({
+              id: p.projectId,
+              name: p.name,
+            }))
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects.map((p: any) => ({
+              id: p.projectId,
+              name: p.name,
+            }))
+          : [];
+      }
+    } catch (error) {
+      console.error('Error refetching projects:', error);
+      this._error = error;
+    } finally {
+      this._isLoading = false;
+    }
+  }
+
+  async refetchForms(): Promise<void> {
+    if (this.selectedProjectId) {
+      await this.loadForms(this.selectedProjectId);
+    }
+  }
+
+  async refetchAll(): Promise<void> {
+    await this.refetchProjects();
+    await this.refetchForms();
+  }
+
+  async onCardEvent(event: { event: string; data: any; item: any }) {
+    if (event.event === 'formDeleted') {
+      // Refresh forms data after deletion
+      await this.refetchForms();
+    }
   }
 }

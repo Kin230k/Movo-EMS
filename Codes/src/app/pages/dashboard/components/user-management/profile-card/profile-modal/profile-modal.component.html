@@ -1,5 +1,10 @@
 <!-- profile-modal.component.html -->
 <div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Loading overlay for form submission -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">{{ "USER.UPDATING_PROFILE" | translate }}</div>
+</div>
 
 <aside
   class="modal"
@@ -29,13 +34,13 @@
           </select>
         </label>
 
-        <label class="field">
+        <!-- <label class="field">
           <span class="label">{{ "COMMON.LABELS.RATE" | translate }}</span>
           <input
             formControlName="rate"
             placeholder="{{ 'COMMON.PLACEHOLDERS.RATE' | translate }}"
           />
-        </label>
+        </label> -->
       </div>
 
       <div class="actions">

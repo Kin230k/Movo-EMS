@@ -24,8 +24,8 @@ import { QuestionCreateModalComponent } from './question-create-modal.component'
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
 import { questionTypes } from '../../../../shared/types/questionTypes';
 import { conditionOptions } from '../../../../shared/types/conditionOptions';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
 import { IdentityService } from '../../../../core/services/identity.service';
+import api from '../../../../core/api/api';
 
 @Component({
   selector: 'app-form-questions',
@@ -51,39 +51,53 @@ export class FormQuestionsComponent
   onCreateModalClose() {
     this.createModalVisible = false;
   }
-  onCreateModalSave(newItems: any[]) {
+  async onCreateModalSave(newItems: any[]) {
     if (!Array.isArray(newItems)) return;
-    newItems.forEach((item) => {
-      const group = this.createQuestionGroup();
-      group.patchValue({
-        text: item.text,
-        description: item.description || '',
-        type: item.type,
+    try {
+      const result = await api.createQuestions({
+        questions: newItems,
+        formId: this.form.get('formId')?.value,
+        interviewId: this.form.get('interviewId')?.value,
       });
-      group.get('source')?.setValue('local');
-      const optionsArray = group.get('options') as FormArray<FormGroup>;
-      (item.options || []).forEach((opt: any) =>
-        optionsArray.push(
-          this.fb.group({
-            optionText: [opt.optionText || ''],
-            isCorrect: [!!opt.isCorrect],
-          })
-        )
-      );
-      // Restore criteria from modal items
-      const criteriaArray = group.get('criteria') as FormArray<FormGroup>;
-      (item.criteria || []).forEach((crit: any) => {
-        const critGroup = this.createCriteriaGroup(crit.effect || 'pass');
-        critGroup.patchValue({
-          condition: crit.condition ?? '=',
-          value: crit.value ?? '',
-          valueTo: crit.valueTo ?? '',
+      if (!(result as any).success) {
+        alert((result as any).issues);
+        return;
+      }
+      newItems.forEach((item) => {
+        const group = this.createQuestionGroup();
+        group.patchValue({
+          text: item.text,
+          description: item.description || '',
+          type: item.type,
         });
-        criteriaArray.push(critGroup);
+        group.get('source')?.setValue('local');
+        const optionsArray = group.get('options') as FormArray<FormGroup>;
+        (item.options || []).forEach((opt: any) =>
+          optionsArray.push(
+            this.fb.group({
+              optionText: [opt.optionText || ''],
+              isCorrect: [!!opt.isCorrect],
+            })
+          )
+        );
+        // Restore criteria from modal items
+        const criteriaArray = group.get('criteria') as FormArray<FormGroup>;
+        (item.criteria || []).forEach((crit: any) => {
+          const critGroup = this.createCriteriaGroup(crit.effect || 'pass');
+          critGroup.patchValue({
+            type: crit.type ?? '=',
+            value: crit.value ?? '',
+            valueTo: crit.valueTo ?? '',
+          });
+          criteriaArray.push(critGroup);
+        });
+        this.questions.push(group);
       });
-      this.questions.push(group);
-    });
-    this.createModalVisible = false;
+      this.createModalVisible = false;
+    } catch (error) {
+      console.error('Error creating questions:', error);
+      alert('Error creating questions. Please try again.');
+    }
   }
   private destroy$ = new Subject<void>();
 
@@ -156,7 +170,6 @@ export class FormQuestionsComponent
       this.form.get('interviewId')?.setValue('');
     } else {
       this.form.get('formId')?.setValue('');
-      this.form.get('language')?.setValue('');
     }
 
     // Clear questions
@@ -168,39 +181,36 @@ export class FormQuestionsComponent
     this.isApiData = false;
   }
 
-  projectsQuery: any;
+  private _projects: any[] = [];
   get projects() {
-    const data = this.projectsQuery?.data?.() ?? [];
-    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+    return this._projects.map((p: any) => ({ id: p.projectId, name: p.name }));
   }
-  formsQuery: any;
+
+  private _forms: any[] = [];
   get forms() {
-    const data = this.formsQuery?.data?.() ?? [];
     const projectId = this.form.get('projectId')?.value;
-    const list = Array.isArray(data)
-      ? data
-          .filter(
-            (f: any) => !projectId || f.projectId === projectId || f.locationId
-          )
-          .map((f: any, idx: number) => ({
-            id: String(f.formId ?? f.id ?? idx + 1),
-            name: {
-              en: f.formTitle ?? f.title ?? 'Form',
-              ar: f.formTitle ?? f.title ?? 'Form',
-            },
-          }))
-      : [];
-    return list;
+    return this._forms
+      .filter(
+        (f: any) => !projectId || f.projectId === projectId || f.locationId
+      )
+      .map((f: any, idx: number) => ({
+        id: String(f.formId ?? f.id ?? idx + 1),
+        name: {
+          en: f.formTitle ?? f.title ?? 'Form',
+          ar: f.formTitle ?? f.title ?? 'Form',
+        },
+      }));
   }
-  interviewsQuery: any;
+
+  private _interviews: any[] = [];
   get interviews() {
-    const data = this.interviewsQuery?.data?.() ?? [];
-    return Array.isArray(data)
-      ? data.map((i: any, idx: number) => ({
-          id: String(i.interviewId ?? i.id ?? idx + 1),
-          name: { en: i.name ?? 'Interview', ar: i.name ?? 'Interview' },
-        }))
-      : [];
+    return this._interviews.map((i: any, idx: number) => ({
+      id: String(i.interviewId ?? i.id ?? idx + 1),
+      name: {
+        en: i.name ?? 'Interview ' + idx + 1,
+        ar: i.name ?? 'مقابلة ' + idx + 1,
+      },
+    }));
   }
   // do not remove this languages array
   languages = [
@@ -221,7 +231,6 @@ export class FormQuestionsComponent
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private apiQueries: ApiQueriesService,
     private identity: IdentityService
   ) {
     this.form = this.fb.group({
@@ -241,8 +250,7 @@ export class FormQuestionsComponent
 
     if (this.selectedQuestionType === 'form') {
       const formId = this.form.get('formId')?.value;
-      const language = this.form.get('language')?.value;
-      return !!(projectId && formId && language);
+      return !!(projectId && formId);
     } else {
       const interviewId = this.form.get('interviewId')?.value;
       return !!(projectId && interviewId);
@@ -250,6 +258,29 @@ export class FormQuestionsComponent
   }
 
   // Load questions via queries instead of mocks
+
+  // Load forms and interviews for a project
+  private async loadFormsAndInterviews(projectId: string): Promise<void> {
+    try {
+      const [formsData, interviewsData] = await Promise.all([
+        api.getFormsByProject({ projectId }),
+        api.getInterviewByProject({ projectId }),
+      ]);
+
+      const formsPayload = (formsData as any)?.result ?? formsData ?? {};
+      this._forms = Array.isArray(formsPayload.forms) ? formsPayload.forms : [];
+
+      const interviewsPayload =
+        (interviewsData as any)?.result ?? interviewsData ?? {};
+      this._interviews = Array.isArray(interviewsPayload.interviews)
+        ? interviewsPayload.interviews
+        : [];
+    } catch (error) {
+      console.error('Error loading forms and interviews:', error);
+      this._forms = [];
+      this._interviews = [];
+    }
+  }
 
   // Load data when all dropdowns are selected
   async loadDataWhenReady(): Promise<void> {
@@ -274,19 +305,20 @@ export class FormQuestionsComponent
       const projectId = this.form.get('projectId')?.value;
       const formId = this.form.get('formId')?.value;
       const interviewId = this.form.get('interviewId')?.value;
-      const language = this.form.get('language')?.value;
 
       let apiQuestions: any[] = [];
       if (this.selectedQuestionType === 'form' && formId) {
-        const q = this.apiQueries.getAllQuestionsQuery();
-        const data = q.data?.() ?? [];
-        apiQuestions = Array.isArray(data)
-          ? data.filter((x: any) => String(x.formId ?? '') === String(formId))
+        const data: any = await api.getAllFormQuestions({ formId });
+        const payload = (data as any)?.result ?? data ?? {};
+        apiQuestions = Array.isArray((payload as any).questions)
+          ? (payload as any).questions
           : [];
       } else if (this.selectedQuestionType === 'interview' && interviewId) {
-        const iq = this.apiQueries.getInterviewQuestionsQuery({ interviewId });
-        const data = iq.data?.() ?? [];
-        apiQuestions = Array.isArray(data) ? data : [];
+        const data: any = await api.getInterviewQuestions({ interviewId });
+        const payload = (data as any)?.result ?? data ?? {};
+        apiQuestions = Array.isArray((payload as any).questions)
+          ? (payload as any).questions
+          : [];
       }
 
       if (apiQuestions.length > 0) {
@@ -296,12 +328,11 @@ export class FormQuestionsComponent
           questionType: this.selectedQuestionType,
           formId,
           interviewId,
-          language,
           questions: apiQuestions.map((q: any, idx: number) => ({
             id: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
-            text: q.text ?? q.title ?? '',
+            questionText: q.questionText ?? q.title ?? '',
             description: q.description ?? '',
-            type: q.type ?? 'SHORT_ANSWER',
+            typeCode: q.typeCode ?? 'SHORT_ANSWER',
             order: q.order ?? idx + 1,
             criteria: q.criteria ?? [],
             options: (q.options || []).map((opt: any) => ({
@@ -325,34 +356,59 @@ export class FormQuestionsComponent
   }
 
   async ngOnInit() {
-    // Initialize queries
+    // Initialize data
     const who = await this.identity.getIdentity().catch(() => null);
     if (who?.isClient) {
-      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
+      const data: any = await api.getProjectsByClient({});
+      const payload = (data as any)?.result ?? data ?? {};
+      this._projects = Array.isArray(payload.projects) ? payload.projects : [];
     } else {
-      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+      const data: any = await api.getAllProjects();
+      const payload = (data as any)?.result ?? data ?? {};
+      this._projects = Array.isArray(payload.projects) ? payload.projects : [];
     }
-    this.formsQuery = this.apiQueries.getFormByUserQuery({});
-    const initialProjectId = this.form.get('projectId')?.value;
-    if (initialProjectId) {
-      this.interviewsQuery = this.apiQueries.getInterviewByProjectQuery({
-        projectId: initialProjectId,
-      });
-    }
+
+    // Initialize forms and interviews as empty - will be set after reading URL params
+    this._forms = [];
+    this._interviews = [];
+
     // First, set initial values from URL query parameters synchronously
     this.setInitialValuesFromUrl();
 
+    // Initialize forms and interviews based on initial values
+    const initialProjectId = this.form.get('projectId')?.value;
+    if (initialProjectId) {
+      await this.loadFormsAndInterviews(initialProjectId);
+    }
+
     // Handle query parameters from navigation (for subsequent changes)
     this.route.queryParams.subscribe((params) => {
+      let hasProjectChanged = false;
+
       if (params['projectId']) {
-        this.form.get('projectId')?.setValue(params['projectId']);
+        const newProjectId = params['projectId'];
+        const currentProjectId = this.form.get('projectId')?.value;
+
+        // Only update if projectId has actually changed
+        if (newProjectId !== currentProjectId) {
+          this.form.get('projectId')?.setValue(newProjectId);
+          hasProjectChanged = true;
+
+          // Update forms and interviews for the new project
+          if (newProjectId) {
+            this.loadFormsAndInterviews(newProjectId).catch((error) => {
+              console.error('Error loading forms and interviews:', error);
+            });
+          } else {
+            this._forms = [];
+            this._interviews = [];
+          }
+        }
       }
       if (params['formId']) {
         this.form.get('formId')?.setValue(params['formId']);
       }
-      if (params['language']) {
-        this.form.get('language')?.setValue(params['language']);
-      }
+      // Language is no longer used
       if (params['locationId']) {
         // Handle locationId if needed for form creation
         console.log('Location ID from navigation:', params['locationId']);
@@ -411,10 +467,7 @@ export class FormQuestionsComponent
         this.form.get('formId')?.setValue(params['formId']);
         hasChanges = true;
       }
-      if (params['language']) {
-        this.form.get('language')?.setValue(params['language']);
-        hasChanges = true;
-      }
+      // Language is no longer needed
     } else {
       if (params['interviewId']) {
         this.form.get('interviewId')?.setValue(params['interviewId']);
@@ -475,7 +528,7 @@ export class FormQuestionsComponent
     if (data.formId) this.form.get('formId')?.setValue(data.formId);
     if (data.interviewId)
       this.form.get('interviewId')?.setValue(data.interviewId);
-    if (data.language) this.form.get('language')?.setValue(data.language);
+    // Language is no longer used
 
     // Restore questions
     if (data.questions && data.questions.length > 0) {
@@ -483,9 +536,9 @@ export class FormQuestionsComponent
         const questionGroup = this.createQuestionGroup();
         questionGroup.patchValue({
           id: question.id,
-          text: question.text,
+          questionText: question.questionText,
           description: question.description,
-          type: question.type,
+          typeCode: question.typeCode,
           order: question.order,
         });
         (questionGroup.get('source') as any)?.setValue(source);
@@ -521,9 +574,9 @@ export class FormQuestionsComponent
   }
 
   // Factory helpers
-  private createCriteriaGroup(effect: 'pass' | 'fail' = 'pass') {
+  private createCriteriaGroup(effect: 'PASS' | 'FAIL' = 'PASS') {
     return this.fb.group({
-      condition: ['equals', Validators.required],
+      type: ['=', Validators.required],
       value: [''],
       valueTo: [''],
       effect: [effect, Validators.required],
@@ -533,9 +586,9 @@ export class FormQuestionsComponent
   private createQuestionGroup(): FormGroup {
     return this.fb.group({
       id: [this.generateId()],
-      text: ['', Validators.required],
+      questionText: ['', Validators.required],
       description: [''],
-      type: ['SHORT_ANSWER', Validators.required],
+      typeCode: ['SHORT_ANSWER', Validators.required],
       order: [this.questions.length + 1],
       source: ['local'],
       criteria: this.fb.array([]),
@@ -562,7 +615,7 @@ export class FormQuestionsComponent
 
   // These helpers operate on nested arrays. They are used by the template but also
   // passed to the child component so the child can call them with the question index.
-  addCriteria(questionIndex: number, effect: 'pass' | 'fail' = 'pass') {
+  addCriteria(questionIndex: number, effect: 'PASS' | 'FAIL' = 'PASS') {
     const criteriaArray = this.getCriteriaArray(questionIndex);
     criteriaArray.push(this.createCriteriaGroup(effect));
   }
@@ -620,14 +673,14 @@ export class FormQuestionsComponent
   getPassCriteria(questionIndex: number): FormGroup[] {
     const criteriaArray = this.getCriteriaArray(questionIndex);
     return criteriaArray.controls.filter(
-      (c) => c.get('effect')?.value === 'pass'
+      (c) => c.get('effect')?.value === 'PASS'
     ) as FormGroup[];
   }
 
   getFailCriteria(questionIndex: number): FormGroup[] {
     const criteriaArray = this.getCriteriaArray(questionIndex);
     return criteriaArray.controls.filter(
-      (c) => c.get('effect')?.value === 'fail'
+      (c) => c.get('effect')?.value === 'FAIL'
     ) as FormGroup[];
   }
 
@@ -639,13 +692,14 @@ export class FormQuestionsComponent
     }
     console.log('Project selected:', value);
 
-    // Update interviews query for selected project
+    // Update forms and interviews for selected project
     if (value) {
-      this.interviewsQuery = this.apiQueries.getInterviewByProjectQuery({
-        projectId: value,
+      this.loadFormsAndInterviews(value).catch((error) => {
+        console.error('Error loading forms and interviews:', error);
       });
     } else {
-      this.interviewsQuery = null;
+      this._forms = [];
+      this._interviews = [];
     }
 
     // Update URL with query parameters
@@ -661,17 +715,6 @@ export class FormQuestionsComponent
     } else {
       this.form.get('formId')?.setValue(value);
     }
-
-    // Update URL with query parameters
-    this.updateUrlQueryParams();
-
-    // Load data when all dropdowns are selected
-    setTimeout(() => this.loadDataWhenReady(), 0);
-  }
-
-  onLanguageSelect(value: string) {
-    this.form.get('language')?.setValue(value);
-    console.log('form', this.form.value);
 
     // Update URL with query parameters
     this.updateUrlQueryParams();
@@ -699,7 +742,6 @@ export class FormQuestionsComponent
     const projectId = this.form.get('projectId')?.value;
     const formId = this.form.get('formId')?.value;
     const interviewId = this.form.get('interviewId')?.value;
-    const language = this.form.get('language')?.value;
 
     // Get current query parameters
     const currentParams = { ...this.route.snapshot.queryParams };
@@ -722,11 +764,6 @@ export class FormQuestionsComponent
       } else {
         delete newParams.formId;
       }
-      if (language) {
-        newParams.language = language;
-      } else {
-        delete newParams.language;
-      }
       // Remove interview-specific params
       delete newParams.interviewId;
     } else {
@@ -737,7 +774,6 @@ export class FormQuestionsComponent
       }
       // Remove form-specific params
       delete newParams.formId;
-      delete newParams.language;
     }
 
     // Navigate with new query parameters
@@ -871,55 +907,6 @@ export class FormQuestionsComponent
     console.log('Draft cleared from localStorage');
   }
 
-  // Mock API methods for CRUD operations
-  private async createQuestionsAPI(payload: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate API success
-        const response = {
-          success: true,
-          message: 'Questions created successfully',
-          data: {
-            id: `created-${Date.now()}`,
-            ...payload,
-          },
-        };
-        resolve(response);
-      }, 1000);
-    });
-  }
-
-  private async updateQuestionsAPI(payload: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate API success
-        const response = {
-          success: true,
-          message: 'Questions updated successfully',
-          data: {
-            id: payload.id || `updated-${Date.now()}`,
-            ...payload,
-          },
-        };
-        resolve(response);
-      }, 1000);
-    });
-  }
-
-  private async deleteQuestionsAPI(id: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate API success
-        const response = {
-          success: true,
-          message: 'Questions deleted successfully',
-          data: { id },
-        };
-        resolve(response);
-      }, 1000);
-    });
-  }
-
   // Save will validate and then send the payload to your API
   async saveAll() {
     if (this.form.invalid) {
@@ -942,20 +929,17 @@ export class FormQuestionsComponent
 
       // Call appropriate API based on question type
       if (this.selectedQuestionType === 'form') {
-        const mutate = this.apiQueries.createQuestionsMutation();
-        mutate.mutate(
-          {
+        try {
+          await api.createQuestions({
             formId: payload.formId,
-            language: payload.language,
             questions: payload.questions || [],
-          } as any,
-          {
-            onSuccess: () => {
-              this.saveQuestionsToLocalStorage();
-              alert('Questions saved successfully!');
-            },
-          } as any
-        );
+          });
+          this.saveQuestionsToLocalStorage();
+          alert('Questions saved successfully!');
+        } catch (error) {
+          console.error('Error saving questions:', error);
+          alert('Error saving questions. Please try again.');
+        }
       } else {
         alert(
           'Saving interview questions via API is not yet supported. Draft saved locally.'
@@ -1040,13 +1024,14 @@ export class FormQuestionsComponent
       this.removeQuestion(index);
     } else {
       // API question, call delete API
-      const mutate = this.apiQueries.deleteQuestionMutation();
-      mutate.mutate({ questionId }, {
-        onSuccess: () => {
-          this.removeQuestion(index);
-          alert('Question deleted successfully!');
-        },
-      } as any);
+      try {
+        await api.deleteQuestion({ questionId });
+        this.removeQuestion(index);
+        alert('Question deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting question:', error);
+        alert('Error deleting question. Please try again.');
+      }
     }
   }
 
@@ -1092,7 +1077,7 @@ export class FormQuestionsComponent
       updated.criteria.forEach((crit: any) => {
         const critGroup = this.createCriteriaGroup(crit.effect || 'pass');
         critGroup.patchValue({
-          condition: crit.condition ?? '=',
+          type: crit.type ?? '=',
           value: crit.value ?? '',
           valueTo: crit.valueTo ?? '',
         });
@@ -1102,30 +1087,28 @@ export class FormQuestionsComponent
 
     // If it's an API question, call update mutation
     if (questionId && !questionId.startsWith('q-')) {
-      const mutate = this.apiQueries.updateQuestionMutation();
-      const payload: any = {
-        questionId,
-        text: qGroup.get('text')?.value,
-        description: qGroup.get('description')?.value,
-        type: qGroup.get('type')?.value,
-        order: qGroup.get('order')?.value,
-        options: (qGroup.get('options') as FormArray<FormGroup>).value,
-        criteria: (qGroup.get('criteria') as FormArray<FormGroup>).value,
-      };
-      if (this.selectedQuestionType === 'form') {
-        payload.formId = this.form.get('formId')?.value;
-        payload.language = this.form.get('language')?.value;
-      } else {
-        payload.interviewId = this.form.get('interviewId')?.value;
+      try {
+        const payload: any = {
+          questionId,
+          questionText: qGroup.get('questionText')?.value,
+          description: qGroup.get('description')?.value,
+          typeCode: qGroup.get('typeCode')?.value,
+          order: qGroup.get('order')?.value,
+          options: (qGroup.get('options') as FormArray<FormGroup>).value,
+          criteria: (qGroup.get('criteria') as FormArray<FormGroup>).value,
+        };
+        if (this.selectedQuestionType === 'form') {
+          payload.formId = this.form.get('formId')?.value;
+          payload.language = this.form.get('language')?.value;
+        } else {
+          payload.interviewId = this.form.get('interviewId')?.value;
+        }
+        await api.updateQuestion(payload);
+        alert('Question updated successfully!');
+      } catch (error) {
+        console.error('Error updating question:', error);
+        alert('Error updating question. Please try again.');
       }
-      mutate.mutate(
-        payload as any,
-        {
-          onSuccess: () => {
-            alert('Question updated successfully!');
-          },
-        } as any
-      );
     }
 
     this.onModalClose();
@@ -1144,5 +1127,14 @@ export class FormQuestionsComponent
 
   getQuestionIndex(group: FormGroup): number {
     return (this.questions.controls as FormGroup[]).indexOf(group);
+  }
+
+  // Refetch methods for modals
+  async refetchQuestions(): Promise<void> {
+    await this.loadDataWhenReady();
+  }
+
+  async refetchAll(): Promise<void> {
+    await this.refetchQuestions();
   }
 }

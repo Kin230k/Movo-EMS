@@ -13,30 +13,33 @@ import { IdentityService } from '../../core/services/identity.service';
   template: `
     <nav class="manual-navbar">
       <div class="navbar-container">
-        <a
-          routerLink="/manual-submissions"
-          routerLinkActive="active"
-          class="nav-link"
-        >
-          {{
-            'NAV.MANUAL_SUBMISSIONS'
-              | translate : { default: 'Manual Submissions' }
-          }}
-        </a>
+        <img src="assets/images/logo.png" alt="logo" class="logo" />
+        <div class="navbar-links">
+          <a
+            routerLink="/manual-submissions"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            {{
+              'NAV.MANUAL_SUBMISSIONS'
+                | translate : { default: 'Manual Submissions' }
+            }}
+          </a>
 
-        <a
-          routerLink="/take-attendance"
-          routerLinkActive="active"
-          class="nav-link"
-        >
-          {{
-            'NAV.TAKE_ATTENDANCE' | translate : { default: 'Take Attendance' }
-          }}
-        </a>
+          <a
+            routerLink="/take-attendance"
+            routerLinkActive="active"
+            class="nav-link"
+          >
+            {{
+              'NAV.TAKE_ATTENDANCE' | translate : { default: 'Take Attendance' }
+            }}
+          </a>
 
-        <a (click)="signOut()" class="nav-link" role="button" tabindex="0">
-          {{ 'COMMON.SIGN_OUT' | translate : { default: 'Sign out' } }}
-        </a>
+          <a (click)="signOut()" class="nav-link" role="button" tabindex="0">
+            {{ 'COMMON.SIGN_OUT' | translate : { default: 'Sign out' } }}
+          </a>
+        </div>
       </div>
     </nav>
   `,
@@ -57,6 +60,18 @@ import { IdentityService } from '../../core/services/identity.service';
         padding: 1rem 2rem;
         display: flex;
         gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .navbar-links {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .logo {
+        height: 5rem;
+        width: min-content;
       }
 
       .nav-link {
@@ -73,7 +88,6 @@ import { IdentityService } from '../../core/services/identity.service';
         }
 
         &.active {
-          background: rgba(var(--accent-rgb), 0.1);
           color: var(--accent);
           font-weight: 600;
         }

@@ -35,7 +35,10 @@
       </themed-button>
     </header>
 
-    <div class="card-list">
+    <div class="loading" *ngIf="loading">
+      <app-card-list-skeletion></app-card-list-skeletion>
+    </div>
+    <div class="card-list" *ngIf="!loading">
       <app-location-card
         *ngFor="let loc of locations"
         [data]="loc"
@@ -94,7 +97,7 @@
         <div class="zone-info">
           <!-- display localized name if it's an object, fallback to string -->
           <div class="zone-name">
-            {{ z.name }}
+            {{ z.name[currentLanguage] }}
           </div>
           <div class="meta">
             {{ getLocationNameById(z.locationId) }}

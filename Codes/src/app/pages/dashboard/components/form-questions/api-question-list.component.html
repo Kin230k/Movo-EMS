@@ -5,7 +5,7 @@
     [formGroup]="q"
   >
     <div class="api-question-card__header">
-      <h4>{{ q.get("text")?.value }}</h4>
+      <h4>{{ q.get("questionText")?.value }}</h4>
       <div class="actions">
         <themed-button
           type="button"
@@ -26,7 +26,7 @@
     <div class="api-question-card__meta">
       <span
         >{{ "CREATE_FORM_QUESTIONS.QUESTION_TYPE" | translate }}:
-        {{ q.get("type")?.value }}</span
+        {{ q.get("typeCode")?.value }}</span
       >
       <span *ngIf="q.get('description')?.value">
         — {{ q.get("description")?.value }}</span

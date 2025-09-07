@@ -40,19 +40,13 @@
         placeholder="{{ 'CREATE_FORM_QUESTIONS.PROJECT_NAME' | translate }}"
       ></app-combo-selector>
 
-      <!-- Form Questions: Show form and language dropdowns -->
+      <!-- Form Questions: Show form dropdown only -->
       <ng-container *ngIf="selectedQuestionType === 'form'">
         <app-combo-selector
           [projects]="forms"
           [selectedValue]="form.get('formId')?.value"
           (projectSelected)="onFormSelect($event)"
           placeholder="{{ 'CREATE_FORM_QUESTIONS.FORM_NAME' | translate }}"
-        ></app-combo-selector>
-        <app-combo-selector
-          [projects]="languages"
-          [selectedValue]="form.get('language')?.value"
-          (projectSelected)="onLanguageSelect($event)"
-          placeholder="{{ 'CREATE_FORM_QUESTIONS.LANGUAGE' | translate }}"
         ></app-combo-selector>
       </ng-container>
 
@@ -137,6 +131,7 @@
       [conditionOptions]="conditionOptions"
       (close)="onModalClose()"
       (save)="onModalSave($event)"
+      (refetch)="refetchQuestions()"
     ></app-question-edit-modal>
 
     <!-- Create Modal -->
@@ -147,6 +142,7 @@
       [conditionOptions]="conditionOptions"
       (close)="onCreateModalClose()"
       (save)="onCreateModalSave($event)"
+      (refetch)="refetchQuestions()"
     />
   </div>
 </div>

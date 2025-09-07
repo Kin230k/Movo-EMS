@@ -1,4 +1,9 @@
 <div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Loading overlay for delete operation -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">{{ "COMMON.DELETING" | translate }}</div>
+</div>
 
 <aside
   class="modal"

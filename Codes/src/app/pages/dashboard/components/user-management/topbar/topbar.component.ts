@@ -4,8 +4,8 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 import { AddRoleModalComponent } from './add-role-modal.component'; // adjust path as needed
 import { rolesDropDown } from '../../../../../shared/types/roles';
-import { ApiQueriesService } from '../../../../../core/services/queries.service';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../../core/api/api';
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
@@ -27,8 +27,6 @@ export class TopbarComponent {
 
   roles = rolesDropDown;
 
-  constructor(private apiQueries: ApiQueriesService) {}
-
   openAddRole() {
     this.showAddRole = true;
   }
@@ -42,19 +40,18 @@ export class TopbarComponent {
     this.projectSelected.emit(projectId);
     this.showAddRole = false;
   }
-  onAssigned(payload: { projectId: string; roleId: string }) {
-    const mutate = this.apiQueries.createUserProjectMutation();
-    mutate.mutate(
-      {
-        projectId: String(payload.projectId),
-        roleId: String(payload.roleId),
-      } as any,
-      {
-        onSuccess: () => {
-          this.projectSelected.emit(payload.projectId);
-          this.showAddRole = false;
-        },
-      } as any
-    );
+  async onAssigned(payload: {
+    projectId: string;
+    roleId: string;
+    userId: string;
+  }) {
+    const mutate = await api.createProjectUserRole({
+      projectId: payload.projectId,
+      roleId: payload.roleId,
+      userId: payload.userId,
+    });
+    if (mutate.success) {
+      this.onModalClose();
+    }
   }
 }

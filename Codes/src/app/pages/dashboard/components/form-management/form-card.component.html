@@ -85,3 +85,12 @@
     </div>
   </div>
 </article>
+<!-- Delete Confirmation Modal -->
+<app-delete-modal
+  *ngIf="showDeleteModal"
+  [title]="'FORM_MANAGEMENT.DELETE_FORM' | translate"
+  [message]="'FORM_MANAGEMENT.DELETE_FORM_CONFIRMATION' | translate"
+  [loading]="isDeleting"
+  (close)="closeDeleteModal()"
+  (confirm)="onConfirmDelete()"
+></app-delete-modal>

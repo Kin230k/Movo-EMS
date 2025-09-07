@@ -237,6 +237,13 @@ export const routes: Routes = [
         (m) => m.FormPageComponent
       ),
   },
+  {
+    path: 'form-success',
+    loadComponent: () =>
+      import('./pages/form-success/form-success.component').then(
+        (m) => m.FormSuccessComponent
+      ),
+  },
   // IsWorker
   {
     path: 'manual-submissions',

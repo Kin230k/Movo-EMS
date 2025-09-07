@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { signal } from '@angular/core';
 
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
 export interface IProject {
@@ -17,7 +18,7 @@ export interface IProject {
 export interface IInterview {
   id: string;
   projectId: string;
-  name: string;
+  title: string;
   createdAt?: string;
   // later: questions, createdBy, status, etc.
 }
@@ -38,13 +39,18 @@ export class CreateInterviewModalComponent {
   @Input() projects: IProject[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<IInterview>();
+  @Output() refetch = new EventEmitter<void>();
 
   form: FormGroup;
+
+  // Loading and error states
+  isCreating = signal(false);
+  createError = signal('');
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       projectId: ['', Validators.required],
-      name: ['', [Validators.required, Validators.maxLength(120)]],
+      name: ['', [Validators.maxLength(120)]],
     });
   }
 
@@ -56,6 +62,8 @@ export class CreateInterviewModalComponent {
 
   onCancel() {
     this.form.reset();
+    this.isCreating.set(false);
+    this.createError.set('');
     this.close.emit();
   }
 
@@ -64,13 +72,21 @@ export class CreateInterviewModalComponent {
       this.form.markAllAsTouched();
       return;
     }
+
+    // Clear any previous error
+    this.createError.set('');
+
     const payload: IInterview = {
       id: Date.now().toString(),
       projectId: this.form.get('projectId')?.value,
-      name: this.form.get('name')?.value,
+      title: this.form.get('name')?.value ?? 'Interview',
       createdAt: new Date().toISOString(),
     };
+
+    // Set loading state
+    this.isCreating.set(true);
+
+    // Emit the payload for the parent to handle
     this.create.emit(payload);
-    this.form.reset();
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service'; // <-- centralized service
 import { AuthService } from '../../core/services/auth.service';
 import { IdentityService } from '../../core/services/identity.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-login-user',
@@ -14,7 +15,7 @@ import { IdentityService } from '../../core/services/identity.service';
   templateUrl: './login-user.html',
   styleUrls: ['./login-user.scss'],
 })
-export class LoginUser {
+export class LoginUser implements OnInit {
   email: string = '';
   password: string = '';
 
@@ -22,8 +23,22 @@ export class LoginUser {
     private router: Router,
     private langService: LanguageService,
     private auth: AuthService,
-    private identity: IdentityService
+    private identity: IdentityService,
+    private toast: ToastService
   ) {}
+
+  async ngOnInit(): Promise<void> {
+    const who = await this.identity.getIdentity(true);
+    if (who.isAdmin || who.isClient) {
+      this.router.navigate(['/dashboard']);
+    } else if (who.isWorker) {
+      this.router.navigate(['/take-attendance']);
+    } else if (who.isUser) {
+      this.router.navigate(['/projects']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
 
   // Optional: switch language from this page
   switchLanguage(lang: 'en' | 'ar') {
@@ -45,7 +60,7 @@ export class LoginUser {
       }
     } catch (err) {
       console.error('Login failed:', err);
-      alert('Login failed. Please check your credentials.');
+      this.toast.error('Login failed. Please check your credentials.');
     }
   }
 
@@ -55,7 +70,7 @@ export class LoginUser {
 
   onPasswordChange(value: string) {
     this.password = value;
-  }
+  } 
 
   goToForgetPassword() {
     this.router.navigate(['/forget-password']);

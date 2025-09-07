@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
-import { ApiQueriesService } from '../../../../../core/services/queries.service';
+import api from '../../../../../core/api/api';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-role-modal',
   templateUrl: './add-role-modal.component.html',
   styleUrls: ['./add-role-modal.component.scss'],
-  imports: [CommonModule, FormsModule, ComboSelectorComponent],
+  imports: [CommonModule, FormsModule, ComboSelectorComponent, TranslateModule],
   standalone: true,
 })
 export class AddRoleModalComponent {
@@ -22,66 +23,75 @@ export class AddRoleModalComponent {
   }>();
 
   email = '';
-  checking = false;
+  checking = signal(false);
   checkSucceeded = false;
-  errorMessage = '';
+  errorMessage = signal('');
   selectedProjectId: string | null = null;
   selectedRoleId: string | null = null; // new
+  isSubmitting = signal(false);
 
-  constructor(private apiQueries: ApiQueriesService) {}
+  constructor() {}
 
-  // Verify email via queries
+  // Verify email via direct API calls
   async checkEmailAsync(email: string): Promise<boolean> {
-    this.checking = true;
-    this.errorMessage = '';
+    this.checking.set(true);
+    this.errorMessage.set('');
     try {
-      const q = this.apiQueries.getUserInfoByEmailQuery({ email });
-      const user = q?.data?.();
-      return !!user;
+      const data: any = await api.getUserInfoByEmail({ email });
+      const payload = (data as any)?.result ?? data ?? {};
+      return payload?.success ?? false;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
     } finally {
-      this.checking = false;
+      this.checking.set(false);
     }
   }
 
   async onVerifyEmail() {
     if (!this.email) {
-      this.errorMessage = 'Please enter an email.';
+      this.errorMessage.set('Please enter an email.');
       return;
     }
-    this.errorMessage = '';
+    this.errorMessage.set('');
     const result = await this.checkEmailAsync(this.email);
     if (result) {
       this.checkSucceeded = true;
     } else {
       this.checkSucceeded = false;
-      this.errorMessage = 'Email not found.';
+      this.errorMessage.set('Email not found.');
     }
   }
 
   onProjectSelected(projectId: string) {
     this.selectedProjectId = projectId;
-    this.errorMessage = '';
+    this.errorMessage.set('');
   }
 
   onRoleSelected(event: Event) {
     const t = event.target as HTMLSelectElement;
     this.selectedRoleId = t.value ? t.value : null;
-    this.errorMessage = '';
+    this.errorMessage.set('');
   }
 
   assignRole() {
     if (this.selectedProjectId == null) {
-      this.errorMessage = 'Please select a project.';
+      this.errorMessage.set('Please select a project.');
       return;
     }
     if (this.selectedRoleId == null) {
-      this.errorMessage = 'Please select a role.';
+      this.errorMessage.set('Please select a role.');
       return;
     }
+    this.isSubmitting.set(true);
     this.assigned.emit({
       projectId: this.selectedProjectId,
       roleId: this.selectedRoleId,
     });
+    // Simulate async operation - parent component should handle loading state
+    setTimeout(() => {
+      this.isSubmitting.set(false);
+    }, 1000);
   }
 
   onClose() {

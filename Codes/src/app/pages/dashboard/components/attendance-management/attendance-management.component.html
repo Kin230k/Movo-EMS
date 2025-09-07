@@ -10,6 +10,7 @@
     [areasForSelector]="areasForSelector"
     (projectSelected)="onProjectSelected($event)"
     (createAttendance)="onAddAttendance($event)"
+    (refetch)="refetchUsers()"
   ></app-attendance-topbar>
   <div *ngIf="isLoading" class="card-list-skeleton">
     <app-card-list-skeletion></app-card-list-skeletion>
@@ -28,6 +29,7 @@
     <app-card-list
       [items]="users"
       [cardComponent]="attendanceCardComponent"
+      (refetch)="refetchUsers()"
     ></app-card-list>
   </div>
 </div>

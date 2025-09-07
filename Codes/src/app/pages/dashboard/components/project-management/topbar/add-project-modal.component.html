@@ -1,6 +1,12 @@
 <!-- add-project-modal.component.html -->
 <div class="modal-backdrop" (click)="onBackdropClick()"></div>
-
+<!-- Add this inside the form, at the beginning of modal-inner -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "PROJECT_MANAGEMENT.CREATING_PROJECT" | translate }}
+  </div>
+</div>
 <aside
   class="modal"
   role="dialog"
@@ -64,8 +70,11 @@
         </label>
       </div>
 
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
       <div class="actions">
-        
         <button type="button" class="btn neutral" (click)="onClose($event)">
           {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
         </button>

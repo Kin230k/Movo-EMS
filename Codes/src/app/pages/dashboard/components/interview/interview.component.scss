@@ -5,7 +5,9 @@
 }
 
 .page-title {
-  font-size: 1.25rem;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 600;
   margin-bottom: 1rem;
   color: var(--bg-dark);
 }
@@ -15,9 +17,19 @@
   gap: 1rem;
 }
 
+.field-group {
+  display: flex;
+  gap: 1rem;
+}
+
 .field {
   display: flex;
-  flex-direction: column;
+  gap: 1rem;
+  label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .actions {
@@ -25,6 +37,42 @@
   gap: 0.75rem;
   margin-top: 0.5rem;
   justify-content: flex-start;
+}
+
+.verify-btn {
+  padding: 1rem;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--btn-hover-color);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+.email {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-input);
+  border-style: solid;
+  width: min-content;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.field-error {
+  margin-top: 0.25rem;
 }
 
 /* reuse primary-btn and secondary-btn classes from your modal styles */

@@ -32,7 +32,6 @@ import { IdentityService } from '../../core/services/identity.service';
       .proj-navbar {
         max-width: 1200px;
         margin: 0 auto;
-
         background: #fff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         display: flex;
@@ -54,6 +53,11 @@ import { IdentityService } from '../../core/services/identity.service';
       .active {
         font-weight: 600;
         color: var(--accent);
+      }
+      @media (max-width: 500px) {
+        .proj-navbar {
+          flex-direction: column;
+        }
       }
     `,
   ],

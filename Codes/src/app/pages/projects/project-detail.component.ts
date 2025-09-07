@@ -9,7 +9,7 @@ import { ProjectsFooterComponent } from './projects-footer.component';
 // ThemedButton path — adjust to match your repo
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
 
-import { ApiQueriesService } from '../../core/services/queries.service';
+import api from '../../core/api/api';
 
 // Local types (formerly from project.service)
 type LocalizedString = { en: string; ar: string };
@@ -254,18 +254,18 @@ interface ProjectSummary {
   ],
 })
 export class ProjectDetailComponent implements OnInit {
-  private apiQueries = inject(ApiQueriesService);
+  private _project: ProjectSummary | null = null;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   projectId!: string | null;
-  projectQuery: any;
+  private _loading = false;
+
   get project(): ProjectSummary | null {
-    const data = this.projectQuery?.data?.() ?? null;
-    return data.project;
+    return this._project;
   }
   get loading(): boolean {
-    return this.projectQuery?.isLoading?.() ?? false;
+    return this._loading;
   }
 
   selectedLocationId: string | null = null;
@@ -277,10 +277,19 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   async fetchProject(id: string) {
-    this.projectQuery = this.apiQueries.getProjectInfoByIdQuery({
-      projectId: id,
-    } as any);
-    await this.projectQuery.refetch();
+    this._loading = true;
+    try {
+      const data: any = await api.getProjectInfoById({
+        projectId: id,
+      });
+      const payload = (data as any)?.result ?? data ?? {};
+      this._project = payload.project || payload;
+    } catch (error) {
+      console.error('Error loading project:', error);
+      this._project = null;
+    } finally {
+      this._loading = false;
+    }
   }
 
   displayName(name: LocalizedString | string | undefined) {

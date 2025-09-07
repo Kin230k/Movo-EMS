@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { LocationCardComponent } from './location-card.component';
@@ -8,12 +8,15 @@ import { ThemedButtonComponent } from '../../../../components/shared/themed-butt
 import { AddZoneModalComponent } from './add-zone-modal.component';
 import { DeleteModalComponent } from '../../../../components/shared/delete-modal/delete-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component'; // adjust path if needed
-import { ApiQueriesService } from '../../../../core/services/queries.service';
+import api from '../../../../core/api/api';
 import { IdentityService } from '../../../../core/services/identity.service';
+import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
+import { LanguageService } from '../../../../core/services/language.service';
 
 @Component({
   selector: 'app-location-management',
   standalone: true,
+  outputs: ['refetch'],
   imports: [
     CommonModule,
     TranslateModule,
@@ -24,6 +27,7 @@ import { IdentityService } from '../../../../core/services/identity.service';
     AddZoneModalComponent,
     DeleteModalComponent,
     ComboSelectorComponent,
+    CardListSkeletionComponent,
   ],
   templateUrl: './location-management.component.html',
   styleUrls: ['./location-management.component.scss'],
@@ -31,36 +35,26 @@ import { IdentityService } from '../../../../core/services/identity.service';
 export class LocationManagementComponent {
   // tabs: 'locations' | 'zones'
   activeTab: 'locations' | 'zones' = 'locations';
+  refetch = new EventEmitter<void>();
+  private _loading = false;
 
   constructor(
-    private apiQueries: ApiQueriesService,
-    private identity: IdentityService
+    private identity: IdentityService,
+    private languageService: LanguageService
   ) {}
 
-  projectsQuery: any;
+  private _projects: any[] = [];
+  private _locations: any[] = [];
   get projects(): Array<{ id: string; name: { en: string; ar: string } }> {
-    const data = this.projectsQuery?.data?.() ?? [];
-    return (data || []).map((p: any) => ({ id: p.projectId, name: p.name }));
+    return (this._projects || []).map((p: any) => ({
+      id: p.projectId,
+      name: p.name,
+    }));
   }
 
-  locations: Array<{
-    locationId: string;
-    name: { en: string; ar: string } | string;
-    projectId?: string;
-    latitude?: number;
-    longitude?: number;
-  }> = [
-    {
-      locationId: 'loc-1',
-      name: { en: 'Headquarters', ar: 'المقر الرئيسي' },
-      projectId: 'proj-1',
-    },
-    {
-      locationId: 'loc-2',
-      name: { en: 'Warehouse', ar: 'المستودع' },
-      projectId: 'proj-2',
-    },
-  ];
+  get locations() {
+    return this._locations;
+  }
 
   zones: Array<{
     zoneId: string;
@@ -68,7 +62,7 @@ export class LocationManagementComponent {
     locationId?: string;
   }> = [];
 
-  areasQuery: any | null = null;
+  private _areas: any[] = [];
 
   // Location modals
   isAddModalOpen = false;
@@ -85,21 +79,51 @@ export class LocationManagementComponent {
 
   async ngOnInit() {
     const who = await this.identity.getIdentity().catch(() => null);
-    if (who?.isClient) {
-      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
-    } else {
-      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    try {
+      this._loading = true;
+      const data: any = await api.getLocationsForClient();
+      const payload = (data as any)?.result ?? data ?? [];
+      this._locations = Array.isArray(payload.locations)
+        ? payload.locations
+        : [];
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
+    } finally {
+      this._loading = false;
     }
   }
 
   // Handle location selection for zones
-  onLocationForZonesSelected(locationId: string | null) {
+  async onLocationForZonesSelected(locationId: string | null) {
     this.selectedLocationForZones = locationId || '';
-    this.areasQuery = this.selectedLocationForZones
-      ? this.apiQueries.getAreasByLocationQuery({
+    if (this.selectedLocationForZones) {
+      try {
+        const data: any = await api.getAreasByLocation({
           locationId: this.selectedLocationForZones,
-        })
-      : null;
+        });
+        const payload = (data as any)?.result ?? data ?? [];
+        this._areas = Array.isArray(payload.areas) ? payload.areas : [];
+      } catch (error) {
+        console.error('Error loading areas:', error);
+        this._areas = [];
+      }
+    } else {
+      this._areas = [];
+    }
   }
 
   // --- location handlers (unchanged except small improvements) ---
@@ -113,51 +137,42 @@ export class LocationManagementComponent {
     document.body.style.overflow = '';
   }
 
-  handleCreateLocation(payload: {
+  async handleCreateLocation(payload: {
     nameEn: string;
     nameAr: string;
     projectId?: string;
     latitude?: number;
     longitude?: number;
   }) {
-    const mutate = this.apiQueries.createLocationMutation();
-    mutate.mutate(
-      {
+    try {
+      const newLocation = await api.createLocation({
         name: { en: payload.nameEn, ar: payload.nameAr },
         projectId: payload.projectId,
         latitude: payload.latitude,
         longitude: payload.longitude,
-      } as any,
-      {
-        onSuccess: (created: any) => {
-          const newLocation = {
-            locationId: String(created?.locationId ?? `loc-${Date.now()}`),
-            name: { en: payload.nameEn, ar: payload.nameAr },
-            projectId: payload.projectId,
-            latitude: payload.latitude,
-            longitude: payload.longitude,
-          };
-          this.locations = [newLocation, ...this.locations];
-          this.closeAddModal();
-        },
-      } as any
-    );
+      } as any);
+
+      this._locations = [newLocation, ...this._locations];
+      this.closeAddModal();
+      // Emit refetch event to notify parent components
+      this.refetch.emit();
+    } catch (error) {}
   }
 
-  handleDeleteLocation(locationId: string) {
+  async handleDeleteLocation(locationId: string) {
     if (!confirm('Are you sure you want to delete this location?')) return;
-    const mutate = this.apiQueries.deleteLocationMutation();
-    mutate.mutate(
-      { locationId: String(locationId) } as any,
-      {
-        onSuccess: () => {
-          this.locations = this.locations.filter(
-            (loc) => loc.locationId !== locationId
-          );
-          this.zones = this.zones.filter((z) => z.locationId !== locationId);
-        },
-      } as any
-    );
+    try {
+      await api.deleteLocation({ locationId: String(locationId) } as any);
+      this._locations = this._locations.filter(
+        (loc) => loc.locationId !== locationId
+      );
+      this.zones = this.zones.filter((z) => z.locationId !== locationId);
+      // Emit refetch event to notify parent components
+      this.refetch.emit();
+    } catch (error) {
+      console.error('Error deleting location:', error);
+      alert('Error deleting location. Please try again.');
+    }
   }
 
   handleUpdateLocation(location: any) {
@@ -166,7 +181,7 @@ export class LocationManagementComponent {
     document.body.style.overflow = 'hidden';
   }
 
-  handleLocationUpdate(payload: {
+  async handleLocationUpdate(payload: {
     locationId: string;
     nameEn: string;
     nameAr: string;
@@ -174,33 +189,33 @@ export class LocationManagementComponent {
     latitude?: number;
     longitude?: number;
   }) {
-    const mutate = this.apiQueries.updateLocationMutation();
-    mutate.mutate(
-      {
+    try {
+      await api.updateLocation({
         locationId: String(payload.locationId),
         name: { en: payload.nameEn, ar: payload.nameAr },
         projectId: payload.projectId,
         latitude: payload.latitude,
         longitude: payload.longitude,
-      } as any,
-      {
-        onSuccess: () => {
-          const index = this.locations.findIndex(
-            (loc) => loc.locationId === payload.locationId
-          );
-          if (index !== -1) {
-            this.locations[index] = {
-              ...this.locations[index],
-              name: { en: payload.nameEn, ar: payload.nameAr },
-              projectId: payload.projectId,
-              latitude: payload.latitude,
-              longitude: payload.longitude,
-            };
-          }
-          this.closeUpdateModal();
-        },
-      } as any
-    );
+      } as any);
+      const index = this.locations.findIndex(
+        (loc) => loc.locationId === payload.locationId
+      );
+      if (index !== -1) {
+        this.locations[index] = {
+          ...this.locations[index],
+          name: { en: payload.nameEn, ar: payload.nameAr },
+          projectId: payload.projectId,
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+        };
+      }
+      this.closeUpdateModal();
+      // Emit refetch event to notify parent components
+      this.refetch.emit();
+    } catch (error) {
+      console.error('Error updating location:', error);
+      alert('Error updating location. Please try again.');
+    }
   }
 
   closeUpdateModal() {
@@ -231,24 +246,25 @@ export class LocationManagementComponent {
   }
 
   // when add zone modal emits create
-  handleCreateZone(payload: {
-    name: string;
+  async handleCreateZone(payload: {
+    name: { en: string; ar: string };
     projectId?: string;
     locationId?: string;
   }) {
-    const mutate = this.apiQueries.createAreaMutation();
-    mutate.mutate(
-      {
+    try {
+      await api.createArea({
         name: payload.name,
         locationId: String(payload.locationId || this.selectedLocationForZones),
-      } as any,
-      {
-        onSuccess: () => {
-          this.areasQuery?.refetch?.();
-          this.closeAddZoneModal();
-        },
-      } as any
-    );
+      } as any);
+      // Refresh areas list
+      await this.onLocationForZonesSelected(this.selectedLocationForZones);
+      this.closeAddZoneModal();
+      // Emit refetch event to notify parent components
+      this.refetch.emit();
+    } catch (error) {
+      console.error('Error creating zone:', error);
+      alert('Error creating zone. Please try again.');
+    }
   }
 
   // open delete confirmation modal
@@ -259,18 +275,18 @@ export class LocationManagementComponent {
   }
 
   // called by DeleteModal confirm
-  handleConfirmDeleteZone() {
+  async handleConfirmDeleteZone() {
     if (this.zoneToDelete) {
-      const mutate = this.apiQueries.deleteAreaMutation();
-      mutate.mutate(
-        { areaId: String(this.zoneToDelete.zoneId) } as any,
-        {
-          onSuccess: () => {
-            this.areasQuery?.refetch?.();
-            this.zoneToDelete = null;
-          },
-        } as any
-      );
+      try {
+        await api.deleteArea({
+          areaId: String(this.zoneToDelete.zoneId),
+        } as any);
+        // Refresh areas list
+        await this.onLocationForZonesSelected(this.selectedLocationForZones);
+        this.zoneToDelete = null;
+        // Emit refetch event to notify parent components
+        this.refetch.emit();
+      } catch (error) {}
     }
     this.isDeleteModalOpen = false;
     document.body.style.overflow = '';
@@ -286,9 +302,8 @@ export class LocationManagementComponent {
   // helpers for UI
   get zonesForSelectedLocation() {
     if (!this.selectedLocationForZones) return [];
-    const data = this.areasQuery?.data?.() ?? [];
-    return Array.isArray(data)
-      ? data.map((a: any, idx: number) => ({
+    return Array.isArray(this._areas)
+      ? this._areas.map((a: any, idx: number) => ({
           zoneId: String(a.areaId ?? a.id ?? idx + 1),
           name: a.name ?? '',
           locationId: String(a.locationId ?? this.selectedLocationForZones),
@@ -319,5 +334,53 @@ export class LocationManagementComponent {
           ? location.name
           : { en: location.name || '', ar: '' },
     }));
+  }
+
+  // Refetch methods for modals to call after operations
+  async refetchProjects(): Promise<void> {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error refetching projects:', error);
+    }
+  }
+
+  async refetchAreas(): Promise<void> {
+    if (this.selectedLocationForZones) {
+      try {
+        const data: any = await api.getAreasByLocation({
+          locationId: this.selectedLocationForZones,
+        });
+        const payload = (data as any)?.result ?? data ?? [];
+        this._areas = Array.isArray(payload) ? payload : [];
+      } catch (error) {
+        console.error('Error refetching areas:', error);
+        this._areas = [];
+      }
+    }
+  }
+
+  async refetchAll(): Promise<void> {
+    await this.refetchProjects();
+    await this.refetchAreas();
+  }
+  get currentLanguage() {
+    return this.languageService.currentLang;
+  }
+  get loading() {
+    return this._loading;
   }
 }

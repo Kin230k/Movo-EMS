@@ -6,8 +6,8 @@ import { TopbarComponent } from '../attendance-management/topbar/topbar.componen
 import { AttendanceProfileCardComponent } from '../attendance-management/attendance-profile-card/attendance-profile-card.component'; // adjust path if needed
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
 import { IdentityService } from '../../../../core/services/identity.service';
+import api from '../../../../core/api/api';
 
 @Component({
   selector: 'app-attendance-management',
@@ -23,15 +23,12 @@ import { IdentityService } from '../../../../core/services/identity.service';
   styleUrls: ['./attendance-management.component.scss'],
 })
 export class AttendanceManagementComponent {
-  constructor(
-    private apiQueries: ApiQueriesService,
-    private identity: IdentityService
-  ) {}
+  constructor(private identity: IdentityService) {}
 
-  projectsQuery: any;
+  private _projects: any[] = [];
+
   get projects() {
-    const data = this.projectsQuery?.data?.() ?? [];
-    return data?.projects?.map((p: any) => ({ id: p.projectId, name: p.name }));
+    return this._projects.map((p: any) => ({ id: p.projectId, name: p.name }));
   }
 
   users: any[] = []; // Initially no users
@@ -81,12 +78,12 @@ export class AttendanceManagementComponent {
     this.users = [];
 
     try {
-      const q = this.apiQueries.getProjectUsersQuery({
+      const data: any = await api.getProjectUsers({
         projectId: String(projectId),
       });
-      const data = q.data?.() ?? {};
-      const normalizedUsers = Array.isArray(data.users)
-        ? data.users.map((u: any, idx: number) => ({
+      const payload = (data as any)?.result ?? data ?? {};
+      const normalizedUsers = Array.isArray(payload.users)
+        ? payload.users.map((u: any, idx: number) => ({
             id: u.userId ?? u.id ?? idx + 1,
             userId: String(u.userId ?? u.id ?? idx + 1),
             name: u.name ?? {
@@ -106,10 +103,11 @@ export class AttendanceManagementComponent {
         role: u.role,
         picture: u.picture,
       }));
-      const areasQ = this.apiQueries.getAllAreasQuery();
-      const areasData = areasQ.data?.() ?? {};
-      this.areasForSelector = Array.isArray(areasData.areas)
-        ? areasData.areas.map((a: any, idx: number) => ({
+
+      const areasData: any = await api.getAllAreas();
+      const areasPayload = (areasData as any)?.result ?? areasData ?? {};
+      this.areasForSelector = Array.isArray(areasPayload.areas)
+        ? areasPayload.areas.map((a: any, idx: number) => ({
             id: a.areaId ?? a.id ?? idx + 1,
             name: a.name,
           }))
@@ -124,30 +122,74 @@ export class AttendanceManagementComponent {
       this._isLoading = false;
     }
   }
-  onAddAttendance(payload: any) {
+  async onAddAttendance(payload: any) {
     // payload has userId, name, projectId, role, isPresent, attendanceTimestamp, picture
-    const mutate = this.apiQueries.createAttendanceMutation();
-    mutate.mutate(
-      {
+    try {
+      await api.createAttendance({
         signedWith: payload.signedWith ?? 'MANUAL',
         userId: String(payload.userId),
         areaId: String(payload.areaId),
-      },
-      {
-        onSuccess: () => {
-          this.users = [...this.users, payload];
-        },
-      } as any
-    );
+      });
+      this.users = [...this.users, payload];
+    } catch (error) {
+      console.error('Error recording attendance:', error);
+      alert('Error recording attendance. Please try again.');
+    }
   }
   async ngOnInit() {
     const who = await this.identity.getIdentity().catch(() => null);
-    if (who?.isClient) {
-      this.projectsQuery = this.apiQueries.getProjectsByClientQuery({});
-    } else {
-      this.projectsQuery = this.apiQueries.getAllProjectsQuery();
+    try {
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
     }
   }
   // Add this line so the template binding exists at runtime:
   attendanceCardComponent = AttendanceProfileCardComponent;
+
+  // Refetch methods for modals
+  async refetchProjects(): Promise<void> {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error refetching projects:', error);
+    }
+  }
+
+  async refetchUsers(): Promise<void> {
+    if (this.selectedProjectId) {
+      await this.onProjectSelected(this.selectedProjectId);
+    }
+  }
+
+  async refetchAll(): Promise<void> {
+    await this.refetchProjects();
+    await this.refetchUsers();
+  }
 }

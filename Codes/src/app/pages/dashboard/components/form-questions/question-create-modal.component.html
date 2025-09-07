@@ -1,3 +1,10 @@
+<!-- Loading overlay for form submission -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "CREATE_FORM_QUESTIONS.MODAL.CREATING_QUESTIONS" | translate }}
+  </div>
+</div>
 <div class="overlay" *ngIf="visible" (click)="onClose()">
   <div class="modal" (click)="$event.stopPropagation()">
     <header class="modal-header">
@@ -22,7 +29,7 @@
           <label class="label">{{
             "CREATE_FORM_QUESTIONS.MODAL.TEXT_LABEL" | translate
           }}</label>
-          <input class="text-input" formControlName="text" />
+          <input class="text-input" formControlName="questionText" />
 
           <label class="label">{{
             "CREATE_FORM_QUESTIONS.MODAL.DESCRIPTION_LABEL" | translate
@@ -34,12 +41,12 @@
           }}</label>
           <app-combo-selector
             [projects]="questionTypes"
-            [selectedValue]="item.get('type')?.value"
+            [selectedValue]="item.get('typeCode')?.value"
             [hasError]="
               !!(
-                items.at(i).get('type')?.invalid &&
-                (items.at(i).get('type')?.touched ||
-                  items.at(i).get('type')?.dirty)
+                items.at(i).get('typeCode')?.invalid &&
+                (items.at(i).get('typeCode')?.touched ||
+                  items.at(i).get('typeCode')?.dirty)
               )
             "
             (projectSelected)="onQuestionTypeSelect($event, i)"
@@ -50,9 +57,9 @@
           <div
             class="field-error"
             *ngIf="
-              items.at(i).get('type')?.invalid &&
-              (items.at(i).get('type')?.touched ||
-                items.at(i).get('type')?.dirty)
+              items.at(i).get('typeCode')?.invalid &&
+              (items.at(i).get('typeCode')?.touched ||
+                items.at(i).get('typeCode')?.dirty)
             "
           >
             <small class="error-text">{{
@@ -61,7 +68,7 @@
           </div>
 
           <!-- Multiple Choice Options -->
-          <div *ngIf="item.get('type')?.value === 'MULTIPLE_CHOICE'">
+          <div *ngIf="item.get('typeCode')?.value === 'MULTIPLE_CHOICE'">
             <label class="label">{{
               "CREATE_FORM_QUESTIONS.MULTIPLE_CHOICE_OPTIONS" | translate
             }}</label>
@@ -107,7 +114,7 @@
           </div>
 
           <!-- Radio Options -->
-          <div *ngIf="item.get('type')?.value === 'RADIO'">
+          <div *ngIf="item.get('typeCode')?.value === 'RADIO'">
             <label class="label">{{
               "CREATE_FORM_QUESTIONS.RADIO_OPTIONS" | translate
             }}</label>
@@ -163,7 +170,7 @@
         <!-- Criteria sections for text/number types -->
         <div
           *ngIf="
-            !['RADIO', 'MULTIPLE_CHOICE'].includes(item.get('type')?.value)
+            !['RADIO', 'MULTIPLE_CHOICE'].includes(item.get('typeCode')?.value)
           "
         >
           <div class="criteria-section">
@@ -179,13 +186,13 @@
             >
               <app-combo-selector
                 [projects]="
-                  getFilteredConditionOptions(item.get('type')?.value)
+                  getFilteredConditionOptions(item.get('typeCode')?.value)
                 "
-                [selectedValue]="c.get('condition')?.value"
+                [selectedValue]="c.get('type')?.value"
                 [hasError]="
                   !!(
-                    c.get('condition')?.invalid &&
-                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                    c.get('type')?.invalid &&
+                    (c.get('type')?.touched || c.get('type')?.dirty)
                   )
                 "
                 (projectSelected)="onConditionSelect($event, i, c)"
@@ -197,8 +204,8 @@
               <div
                 class="field-error"
                 *ngIf="
-                  c.get('condition')?.invalid &&
-                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  c.get('type')?.invalid &&
+                  (c.get('type')?.touched || c.get('type')?.dirty)
                 "
               >
                 <small class="error-text">{{
@@ -214,7 +221,7 @@
               />
               <input
                 class="text-input"
-                *ngIf="c.get('condition')?.value === 'between'"
+                *ngIf="c.get('type')?.value === 'between'"
                 formControlName="valueTo"
                 [placeholder]="
                   'CREATE_FORM_QUESTIONS.MODAL.VALUE_TO_PLACEHOLDER' | translate
@@ -232,7 +239,7 @@
               <button
                 type="button"
                 class="primary-btn"
-                (click)="addCriteria(i, 'fail')"
+                (click)="addCriteria(i, 'FAIL')"
               >
                 {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_FAILED" | translate }}
               </button>
@@ -252,13 +259,13 @@
             >
               <app-combo-selector
                 [projects]="
-                  getFilteredConditionOptions(item.get('type')?.value)
+                  getFilteredConditionOptions(item.get('typeCode')?.value)
                 "
-                [selectedValue]="c.get('condition')?.value"
+                [selectedValue]="c.get('type')?.value"
                 [hasError]="
                   !!(
-                    c.get('condition')?.invalid &&
-                    (c.get('condition')?.touched || c.get('condition')?.dirty)
+                    c.get('type')?.invalid &&
+                    (c.get('type')?.touched || c.get('type')?.dirty)
                   )
                 "
                 (projectSelected)="onConditionSelect($event, i, c)"
@@ -270,8 +277,8 @@
               <div
                 class="field-error"
                 *ngIf="
-                  c.get('condition')?.invalid &&
-                  (c.get('condition')?.touched || c.get('condition')?.dirty)
+                  c.get('type')?.invalid &&
+                  (c.get('type')?.touched || c.get('type')?.dirty)
                 "
               >
                 <small class="error-text">{{
@@ -287,7 +294,7 @@
               />
               <input
                 class="text-input"
-                *ngIf="c.get('condition')?.value === 'between'"
+                *ngIf="c.get('type')?.value === 'between'"
                 formControlName="valueTo"
                 [placeholder]="
                   'CREATE_FORM_QUESTIONS.MODAL.VALUE_TO_PLACEHOLDER' | translate
@@ -305,7 +312,7 @@
               <button
                 type="button"
                 class="primary-btn"
-                (click)="addCriteria(i, 'pass')"
+                (click)="addCriteria(i, 'PASS')"
               >
                 {{ "CREATE_FORM_QUESTIONS.MODAL.ADD_PASS" | translate }}
               </button>

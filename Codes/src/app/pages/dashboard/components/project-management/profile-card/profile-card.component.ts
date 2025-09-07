@@ -1,6 +1,8 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
@@ -11,8 +13,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../../../core/services/language.service';
-import { ButtonComponent } from '../../../../../components/shared/button/button';
-import { ProfileModalComponent } from './profile-modal/profile-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { rolesDropDown } from '../../../../../shared/types/roles';
@@ -21,32 +21,30 @@ import { rolesDropDown } from '../../../../../shared/types/roles';
   selector: 'app-profile-card',
   templateUrl: './profile-card.component.html',
   styleUrls: ['./profile-card.component.scss'],
-  imports: [
-    CommonModule,
-    ButtonComponent,
-    ProfileModalComponent,
-    TranslateModule,
-  ],
+  imports: [CommonModule, TranslateModule],
   standalone: true,
 })
 export class ProfileCardComponent implements OnInit, OnDestroy {
   @Input() data: any;
+  @Output() refetch = new EventEmitter<void>();
+  @Output() editProject = new EventEmitter<any>();
 
-  modalOpen = false;
   isMenuOpen = false; // To toggle the visibility of the menu
   private destroy$ = new Subject<void>();
 
   @ViewChild('menuWrapper') menuWrapper!: ElementRef;
-get displayClientName () {
-  if (!this.data) return '';
-  const clientName = this.data.clientName;
-  if (!clientName) return '';
-  if (typeof clientName === 'string') return clientName;
-  const lang =
+  get displayClientName() {
+    if (!this.data) return '';
+    const clientName = this.data.clientName;
+    if (!clientName) return '';
+    if (typeof clientName === 'string') return clientName;
+    const lang =
       (this.language.currentLang as string) ||
       (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
-  return clientName[lang] || clientName['en'] || Object.values(clientName)[0] || '';
-}
+    return (
+      clientName[lang] || clientName['en'] || Object.values(clientName)[0] || ''
+    );
+  }
 
   constructor(
     public language: LanguageService,
@@ -60,7 +58,7 @@ get displayClientName () {
     });
   }
 
-  roles: any = rolesDropDown
+  roles: any = rolesDropDown;
 
   getRole() {
     return this.roles[this.data.role];
@@ -73,19 +71,13 @@ get displayClientName () {
 
   openModal(evt?: MouseEvent) {
     evt?.stopPropagation();
-    this.modalOpen = true;
-    document.body.style.overflow = 'hidden';
+    this.editProject.emit(this.data);
   }
 
   toggleMenu(evt?: MouseEvent) {
     evt?.stopPropagation();
     this.isMenuOpen = !this.isMenuOpen; // Toggle state to show/hide menu
     this.cd.detectChanges(); // Manually trigger change detection if needed
-  }
-
-  closeModal() {
-    this.modalOpen = false;
-    document.body.style.overflow = '';
   }
 
   onDisableUser(evt?: MouseEvent) {
@@ -98,19 +90,6 @@ get displayClientName () {
     console.log('Edit user', this.data);
   }
 
-  handleModalEdit = (payload: any) => {
-    this.data = { ...this.data, ...payload,name: { ar: payload.nameAr, en: payload.nameEn }, description: { ar: payload.descriptionAr, en: payload.descriptionEn } };
-    console.log('payload', payload);
-    console.log('this.data', this.data);
-    console.log('User updated:', this.data);
-    this.closeModal();
-  };
-
-  handleModalDisable = (payload: any) => {
-    this.onDisableUser();
-    this.closeModal();
-  };
-
   get displayName(): string {
     if (!this.data) return '';
     const name = this.data.name;
@@ -122,16 +101,21 @@ get displayClientName () {
       (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
     return name[lang] || name['en'] || Object.values(name)[0] || '';
   }
- get displayDescription(): string {
-  if (!this.data) return '';
-  const description = this.data.description;
-  if (!description) return '';
-  if (typeof description === 'string') return description;
-  const lang =
+  get displayDescription(): string {
+    if (!this.data) return '';
+    const description = this.data.description;
+    if (!description) return '';
+    if (typeof description === 'string') return description;
+    const lang =
       (this.language.currentLang as string) ||
       (document.documentElement.dir === 'rtl' ? 'ar' : 'en');
-  return description[lang] || description['en'] || Object.values(description)[0] || '';
-}
+    return (
+      description[lang] ||
+      description['en'] ||
+      Object.values(description)[0] ||
+      ''
+    );
+  }
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (

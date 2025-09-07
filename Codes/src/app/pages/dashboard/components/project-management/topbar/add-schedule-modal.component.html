@@ -1,5 +1,11 @@
 <!-- add-schedule-modal.component.html -->
 <div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "PROJECT_MANAGEMENT.CREATING_SCHEDULE" | translate }}
+  </div>
+</div>
 
 <aside
   class="modal"
@@ -50,6 +56,10 @@
         </label>
       </div>
 
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
       <div class="actions">
         <button type="button" class="btn neutral" (click)="onClose($event)">
           {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
@@ -58,7 +68,7 @@
           type="button"
           class="btn primary"
           (click)="onSave($event)"
-          [disabled]="form.invalid"
+          [disabled]="form.invalid || isSubmitting()"
         >
           {{ "PROJECT_MANAGEMENT.CREATE_SCHEDULE" | translate }}
         </button>

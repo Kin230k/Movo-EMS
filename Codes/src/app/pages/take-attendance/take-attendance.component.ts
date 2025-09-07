@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ManualNavbarComponent } from '../../components/manual-navbar/manual-navbar.component';
 import { ComboSelectorComponent } from '../../components/shared/combo-selector/combo-selector.component';
 import jsQR from 'jsqr';
+import api from '../../core/api/api';
 
 type AttendanceRecord = {
   userId: string;
@@ -348,22 +349,21 @@ type AttendanceRecord = {
 export class TakeAttendanceComponent implements AfterViewInit, OnDestroy {
   records: AttendanceRecord[] = [];
   userId = '';
+  private _zones: any[] = [];
+  private _loading = false;
 
   // Zone selection
   selectedZoneId: string | undefined = undefined;
 
-  // Mock zones data
-  zones = [
-    { zoneId: 'zone-1', name: 'Main Entrance' },
-    { zoneId: 'zone-2', name: 'Warehouse A' },
-    { zoneId: 'zone-3', name: 'Office Building' },
-    { zoneId: 'zone-4', name: 'Parking Lot' },
-  ];
-
-  zonesForSelector = this.zones.map((zone) => ({
-    id: zone.zoneId,
-    name: { en: zone.name, ar: zone.name }, // Add Arabic translations if needed
-  }));
+  get zonesForSelector() {
+    return this._zones.map((zone) => ({
+      id: zone.areaId || zone.id,
+      name: {
+        en: zone.name?.en || zone.name || 'Zone',
+        ar: zone.name?.ar || zone.name || 'Zone',
+      },
+    }));
+  }
 
   @ViewChild('video', { static: false })
   videoRef!: ElementRef<HTMLVideoElement>;
@@ -374,6 +374,21 @@ export class TakeAttendanceComponent implements AfterViewInit, OnDestroy {
   private animationFrameId = 0;
   private mediaStream: MediaStream | null = null;
   lastScanned = '';
+
+  async ngOnInit(): Promise<void> {
+    try {
+      this._loading = true;
+      // Load all areas/zones from API
+      const data: any = await api.getAllAreas();
+      const payload = (data as any)?.result ?? data ?? {};
+      this._zones = Array.isArray(payload.areas) ? payload.areas : [];
+    } catch (error) {
+      console.error('Error loading zones:', error);
+      this._zones = [];
+    } finally {
+      this._loading = false;
+    }
+  }
 
   ngAfterViewInit(): void {
     // nothing automatic — user must press start to allow camera permissions
@@ -387,18 +402,36 @@ export class TakeAttendanceComponent implements AfterViewInit, OnDestroy {
     this.stopScanner();
   }
 
-  addAttendance() {
+  async addAttendance(signedWith: 'BARCODE' | 'MANUAL' = 'MANUAL') {
     if (!this.userId || !this.selectedZoneId) return;
 
-    this.records = [
-      {
+    try {
+      const result = await api.createAttendance({
         userId: this.userId,
         areaId: this.selectedZoneId,
-        signedWith: 'BARCODE',
-      },
-      ...this.records,
-    ];
-    this.userId = '';
+        signedWith,
+      });
+
+      if ((result as any).success) {
+        // Add to local records for display
+        this.records = [
+          {
+            userId: this.userId,
+            areaId: this.selectedZoneId,
+            signedWith,
+          },
+          ...this.records,
+        ];
+        this.userId = '';
+        alert('Attendance recorded successfully!');
+      } else {
+        console.error('Error recording attendance:', (result as any).error);
+        alert('Error recording attendance. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error recording attendance:', error);
+      alert('Error recording attendance. Please try again.');
+    }
   }
 
   async startScanner() {
@@ -471,17 +504,16 @@ export class TakeAttendanceComponent implements AfterViewInit, OnDestroy {
           if (parsed && parsed.userId) {
             this.userId = String(parsed.userId);
 
-            this.addAttendance();
+            this.addAttendance('BARCODE');
           } else {
             // not JSON or doesn't have userId — use raw text as userId
             this.userId = code.data;
-            // Generate default name
-            this.addAttendance();
+            this.addAttendance('BARCODE');
           }
         } catch (e) {
           // not JSON — raw string
           this.userId = code.data;
-          this.addAttendance();
+          this.addAttendance('BARCODE');
         }
 
         // stop after a successful scan (optional). Remove this line to keep scanning.

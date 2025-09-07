@@ -34,8 +34,14 @@ const queryClientFactory = (platformId: Object) => {
     defaultOptions: {
       queries: {
         retry: 2,
+        retryDelay: (attempt) => Math.min(1000 * 2 ** (attempt - 1), 30_000),
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
         staleTime: 5 * 60 * 1000,
-        gcTime: Infinity,
+        gcTime: 60 * 60 * 1000,
+      },
+      mutations: {
+        retry: 0,
       },
     },
   });
@@ -49,7 +55,7 @@ const queryClientFactory = (platformId: Object) => {
     persistQueryClient({
       queryClient,
       persister,
-      maxAge: 60 * 2,
+      maxAge: 60 * 10,
     });
   }
 

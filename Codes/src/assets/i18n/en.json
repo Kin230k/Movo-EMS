@@ -35,6 +35,8 @@
     "TAB_ZONES": "Zones",
     "LOCATION": "Location",
     "ZONE_NAME": "Zone Name",
+    "ZONE_NAME_EN": "Zone Name (English)",
+    "ZONE_NAME_AR": "Zone Name (Arabic)",
     "SELECT_LOCATION": "Select Location",
     "ADD_LOCATION": "Add Location",
     "ADD_ZONE": "Add Zone",
@@ -49,7 +51,11 @@
     "USE_MY_LOCATION": "Use my location",
     "CONFIRM_LOCATION": "Confirm location",
     "SELECT_PROJECT": "Select Project",
-    "PROJECT": "Project"
+    "PROJECT": "Project",
+    "DELETE_ZONE_TITLE": "Delete Zone",
+    "DELETE_ZONE_MESSAGE": "Are you sure you want to delete this zone?",
+    "NO_ZONES_FOUND_FOR_LOCATION": "No zones found for this location.",
+    "CHOOSE_LOCATION_TO_VIEW_ZONES": "Choose a location to view zones"
   },
   "EMAILS": {
     "TITLE": "Email Management",
@@ -89,7 +95,8 @@
     "REFRESH": "Refresh",
     "NO_EMAIL_HISTORY": "No email history available.",
     "SENT_TO": "Sent to",
-    "RECIPIENTS": "recipients"
+    "RECIPIENTS": "recipients",
+    "EMAIL_USE_TEMPLATE": "Use Template"
   },
   "CLIENT_DATA_MANAGEMENT": {
     "TITLE": "Client Data Management",
@@ -105,7 +112,10 @@
       "NAME_REQUIRED": "Please enter client name in both languages.",
       "EMAIL_REQUIRED": "Please enter a valid email address.",
       "PHONE_REQUIRED": "Please enter a phone number.",
-      "PASSWORD_REQUIRED": "Please enter a password."
+      "PASSWORD_REQUIRED": "Please enter a password.",
+      "FILE_TOO_LARGE": "File size is too large.",
+      "FILE_READ_ERROR": "Error reading file.",
+      "UPLOAD_FAILED": "Upload failed."
     }
   },
   "PERMISSIONS_MANAGEMENT": {
@@ -154,7 +164,6 @@
     "PRESENT": "Present",
     "ABSENCE": "Absence",
     "DATE": "Date",
-    "OPEN_USER": "Open User",
     "NO_USERS_FOUND": "No users found for this project.",
     "SELECT_PROJECT": "Select Project",
     "SELECT_USER": "Select User",
@@ -176,11 +185,12 @@
       "PICTURE_URL": "Picture URL",
       "USER": "User",
       "AREA": "Area"
-    }
+    },
+    "OPEN_USER": "Open User"
   },
   "USER_MANGEMENT": {
     "TITLE": "User Management",
-    "NO_PROJECTS_FOUND": "No projects found.",
+    "NO_PROJECTS_FOUND": "No users found.",
     "ERROR_LOADING_PROJECTS": "Error loading projects."
   },
   "PROJECT_MANAGEMENT": {
@@ -225,7 +235,13 @@
     "EDIT_SCHEDULE": "Edit Schedule",
     "UPDATE_SCHEDULE": "Update Schedule",
     "DELETE_SCHEDULE_TITLE": "Delete Schedule",
-    "DELETE_SCHEDULE_MESSAGE": "Are you sure you want to delete this schedule? This action cannot be undone."
+    "DELETE_SCHEDULE_MESSAGE": "Are you sure you want to delete this schedule? This action cannot be undone.",
+    "SCHEDULE_UPDATED": "Schedule updated successfully",
+    "SCHEDULE_DELETED": "Schedule deleted successfully",
+    "CREATING_SCHEDULE": "Creating Schedule...",
+    "PLACEHOLDER": "Select Project",
+    "CREATING_PROJECT": "Creating Project...",
+    "UPDATING_PROJECT": "Updating Project..."
   },
   "USER": {
     "ACTIONS": {
@@ -235,7 +251,13 @@
       "DISABLE_CONFIRM_TITLE": "Confirm Disable",
       "DISABLE_CONFIRM_MESSAGE": "Are you sure you want to disable the user?"
     },
-    "EDIT": "Edit User"
+    "EDIT": "Edit User",
+    "UPDATING_PROFILE": "Updating Profile..."
+  },
+  "LANGUAGE": {
+    "SELECT_LANGUAGE": "Select Language",
+    "ENGLISH": "English",
+    "ARABIC": "Arabic"
   },
   "COMMON": {
     "BUTTONS": {
@@ -244,7 +266,8 @@
       "DELETE": "Delete",
       "CANCEL": "Cancel",
       "CREATE": "Create",
-      "UPDATE": "Update"
+      "UPDATE": "Update",
+      "REMOVE": "Remove"
     },
     "LABELS": {
       "ROLE": "Role",
@@ -260,7 +283,8 @@
       "ABSENT": "Absent"
     },
     "ERRORS": {
-      "REQUIRED": "Required"
+      "REQUIRED": "Required",
+      "TOO_LONG": "Too long"
     },
     "LOADING": "Loading...",
     "SIGN_UP": "Sign Up",
@@ -278,6 +302,8 @@
     "CHOOSE_ROLE_OPTION": "-- choose role --",
     "ASSIGN_ROLE_BTN": "Assign Role",
     "CANCEL_BTN": "Cancel",
+    "ASSIGNING_ROLE": "Assigning Role...",
+    "ASSIGNING_ROLE_DESCRIPTION": "Assigning Role...",
     "ERRORS": {
       "EMAIL_REQUIRED": "Please enter an email.",
       "VERIFICATION_FAILED": "Email verification failed (mock).",
@@ -332,6 +358,7 @@
     "MODAL": {
       "ADD_QUESTIONS_TITLE": "Add Questions",
       "EDIT_QUESTION_TITLE": "Edit Question",
+      "UPDATING_QUESTION": "Updating Question...",
       "TEXT_LABEL": "Text",
       "DESCRIPTION_LABEL": "Description",
       "TYPE_LABEL": "Type",
@@ -366,6 +393,7 @@
     "SELECT_LOCATION_TO_CREATE_LOCATION_BASED_FORM": "Please select a location in the top bar to create a location-based form.",
     "SELECTED_LOCATION": "Selected Location",
     "FORM_NAME": "Form Name",
+    "FORM_NAME_PLACEHOLDER": "Enter form name",
     "ENTER_FORM_NAME": "Enter form name",
     "FORM_DETAILS": "Form Details",
     "FORM_TYPE": "Form Type",
@@ -377,11 +405,20 @@
     "PLEASE_SELECT_A_PROJECT": "Please select a project",
     "EDIT_FORM": "Edit Form",
     "DELETE_FORM": "Delete Form",
+    "DELETE_FORM_CONFIRMATION": "Are you sure you want to delete this form? This action cannot be undone.",
     "LOCATION_BASED_FORM_TITLE": "Location-based Form",
     "PROJECT_BASED_FORM_TITLE": "Project-based Form",
     "FORM_ID": "Form ID",
     "CREATED": "Created At",
-    "UPDATED_AT": "Updated At"
+    "UPDATED_AT": "Updated At",
+    "ERROR_LOADING_FORMS": "Error loading forms. Please try again.",
+    "NO_FORMS_FOUND": "No forms found for this project.",
+    "SELECTED_PROJECT": "Selected Project",
+    "PROJECT_ID": "Project ID",
+    "PROJECT_NAME": "Project Name",
+    "LOADING_FORMS": "Loading forms...",
+    "CREATING_FORM": "Creating form...",
+    "PLEASE_ENTER_FORM_NAME": "Please enter form name"
   },
   "INTERVIEWS": {
     "CREATE_TITLE": "Create Interview",
@@ -413,7 +450,8 @@
     "UPLOAD_PICTURE": "Upload picture",
     "FORGET_PASSWORD": "Forgot password?",
     "SWITCH_TO_LOGIN": "Back to login",
-    "SWITCH_TO_CLIENT": "Sign up as Client"
+    "SWITCH_TO_CLIENT": "Sign up as Client",
+    "CREATING": "Creating account..."
   },
   "FORGET_PASSWORD": {
     "TITLE": "Forget password",
@@ -477,5 +515,11 @@
     "BACK_TO_LIST": "Back to List",
     "BACK_TO_CLIENTS": "Back to Clients",
     "GO_TO_LOGIN": "Go to Login"
+  },
+  "FORM_SUCCESS": {
+    "TITLE": "Application Submitted Successfully!",
+    "MESSAGE": "Thank you for submitting your application. Your responses have been recorded.",
+    "EMAIL_NOTICE": "Please check your email for updates on your application status.",
+    "BUTTON_HOME": "Return to Projects"
   }
 }

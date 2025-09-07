@@ -26,7 +26,7 @@ export class QuestionCriteriaComponent {
   @Input() showInputs: boolean = true;
   @Input() addCriteria!: (
     questionIndex: number,
-    effect: 'pass' | 'fail'
+    effect: 'PASS' | 'FAIL'
   ) => void;
   @Input() removeCriteria!: (questionIndex: number, idx: number) => void;
 
@@ -39,14 +39,14 @@ export class QuestionCriteriaComponent {
   getPassCriteria(): FormGroup[] {
     console.log('getPassCriteria', this.criteria.value);
     return this.criteria.controls.filter(
-      (c) => c.get('effect')?.value === 'pass'
+      (c) => c.get('effect')?.value === 'PASS'
     ) as FormGroup[];
   }
 
   getFailCriteria(): FormGroup[] {
     console.log('getPassCriteria', this.criteria.value);
     return this.criteria.controls.filter(
-      (c) => c.get('effect')?.value === 'fail'
+      (c) => c.get('effect')?.value === 'FAIL'
     ) as FormGroup[];
   }
 

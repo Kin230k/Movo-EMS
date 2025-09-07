@@ -3,16 +3,19 @@
     <h1>{{ "USER_MANGEMENT.TITLE" | translate }}</h1>
   </div>
 
-  <app-query-status [query]="projectsQuery">
-    <app-topbar
-      [projects]="projects"
-      (projectSelected)="onProjectSelected($event)"
-    ></app-topbar>
-  </app-query-status>
+  <app-topbar
+    [projects]="projects"
+    (projectSelected)="onProjectSelected($event)"
+  ></app-topbar>
+
+  <div *ngIf="isLoading" class="card-list-skeleton">
+    <app-card-list-skeletion></app-card-list-skeletion>
+  </div>
 
   <!-- legacy local loading/errors below can remain for users list -->
-
+  <div *ngIf="error" class="error" role="alert">{{ error.message }}</div>
   <!-- show empty state if finished and no users -->
+
   <div
     *ngIf="!isLoading && isFinished && users && users.length === 0"
     class="empty-state"

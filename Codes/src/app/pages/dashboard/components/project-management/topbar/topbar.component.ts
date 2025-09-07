@@ -20,8 +20,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class TopbarComponent {
   @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
-  @Output() projectCreated = new EventEmitter<any>();
-  @Output() scheduleCreated = new EventEmitter<any>();
+  @Output() addProject = new EventEmitter<void>();
 
   showAddProject = false;
   showAddSchedule = false;
@@ -43,17 +42,8 @@ export class TopbarComponent {
     this.showAddSchedule = false;
   }
 
-  onProjectCreated(projectData: any) {
-    // Handle project creation
-    this.projectCreated.emit(projectData);
-
+  onProjectCreated() {
     this.showAddProject = false;
-  }
-
-  onScheduleCreated(scheduleData: any) {
-    // Handle schedule creation
-    this.scheduleCreated.emit(scheduleData);
-    console.log('New schedule created:', scheduleData);
-    this.showAddSchedule = false;
+    this.addProject.emit(); // Emit to parent for refetch
   }
 }

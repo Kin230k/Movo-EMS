@@ -8,11 +8,12 @@ import {
   createUserWithEmailAndPassword,
   UserCredential,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from '@angular/fire/auth';
 import { auth as Auth } from '../../../main';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ApiQueriesService } from '../../core/services/queries.service';
+import api from '../../core/api/api';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
   currentUser$: Observable<User | null> =
     this.currentUserSubject.asObservable();
 
-  constructor(private apiQueries: ApiQueriesService) {
+  constructor() {
     // Keep track of Firebase auth state
     onAuthStateChanged(this.auth, (user) => {
       this.currentUserSubject.next(user);
@@ -49,14 +50,14 @@ export class AuthService {
     }
 
     try {
-      const results = await this.apiQueries.registerUserMutation().mutateAsync({
+      const result = await api.registerUser({
         name,
         picture,
       });
-      if (!results.success) {
-        throw results.issues;
-      }
+      // The API call succeeded if no exception was thrown
+      console.log('User registered successfully:', result);
     } catch (error) {
+      console.error('Failed to register user in API:', error);
       throw error;
     }
     try {
@@ -109,29 +110,24 @@ export class AuthService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...clientData } = payload as any;
 
-      // adjust this API call name/shape if your apiQueries uses a different mutation
-      const results = await this.apiQueries
-        .createClientMutation()
-        .mutateAsync(clientData);
+      // Use direct API call
+      const result = await api.createClient(clientData);
 
-      if (!results || !results.success) {
-        // API rejected — attempt to rollback the created auth user to avoid orphaned users
-        try {
-          await userCredential.user.delete();
-        } catch (rollbackErr) {
-          console.warn(
-            'Failed to rollback auth user after API failure',
-            rollbackErr
-          );
-        }
-
-        // Surface API error (attempt to prefer structured issues if present)
-        throw (
-          results?.issues ?? new Error('createClient API returned an error')
+      // The API call succeeded if no exception was thrown
+      console.log('Client created successfully:', result);
+    } catch (apiErr) {
+      // API rejected — attempt to rollback the created auth user to avoid orphaned users
+      try {
+        await userCredential.user.delete();
+        console.log('Rolled back auth user after API failure');
+      } catch (rollbackErr) {
+        console.warn(
+          'Failed to rollback auth user after API failure',
+          rollbackErr
         );
       }
-    } catch (apiErr) {
-      // Rethrow (user was already deleted above on API failure)
+
+      // Rethrow the API error
       throw apiErr;
     }
 
@@ -158,5 +154,10 @@ export class AuthService {
   /** Get current user snapshot (not observable) */
   getCurrentUser(): User | null {
     return this.auth.currentUser;
+  }
+
+  /** Send password reset email */
+  async sendPasswordReset(email: string): Promise<void> {
+    return await sendPasswordResetEmail(this.auth, email);
   }
 }

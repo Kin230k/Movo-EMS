@@ -9,8 +9,9 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DynamicQuestionRendererComponent } from '../../components/form/questions/dynamic-question-renderer.component';
-import { FormQuestionDto, QuestionTypeCode } from '../../shared/types/form';
+import { FormQuestionDto } from '../../shared/types/form';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
+import api from '../../core/api/api';
 
 type ManualQuestion = {
   id: string;
@@ -83,7 +84,7 @@ type ManualQuestion = {
                 type="radio"
                 name="final-review"
                 [(ngModel)]="overallReview"
-                [value]="'accepted'"
+                [value]="'ACCEPTED'"
               />
               Accept All Questions
             </label>
@@ -92,7 +93,7 @@ type ManualQuestion = {
                 type="radio"
                 name="final-review"
                 [(ngModel)]="overallReview"
-                [value]="'failed'"
+                [value]="'REJECTED'"
               />
               Fail All Questions
             </label>
@@ -276,18 +277,18 @@ type ManualQuestion = {
 })
 export class ManualQuestionsComponent implements OnInit {
   manualQuestions: ManualQuestion[] = [];
-  overallReview: 'accepted' | 'failed' | null = null;
+  overallReview: 'ACCEPTED' | 'REJECTED' | null = null;
   submissionId: string = '';
   reviewForm: FormGroup = new FormGroup({});
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
-  ngOnInit() {
-    this.route.params.subscribe((params) => {
+  async ngOnInit() {
+    this.route.params.subscribe(async (params) => {
       this.submissionId = params['submissionId'];
 
       if (this.submissionId) {
-        this.fetchQuestions(this.submissionId);
+        await this.fetchQuestions(this.submissionId);
       } else {
         console.warn('No submissionId found in route parameters');
         // Load default questions or show error
@@ -329,161 +330,75 @@ export class ManualQuestionsComponent implements OnInit {
     ];
   }
 
-  private fetchQuestions(submissionId: string) {
+  private async fetchQuestions(submissionId: string) {
     console.log('Fetching questions for submissionId:', submissionId);
 
-    // Mock data - replace with actual API call
-    const mockQuestions: Record<string, ManualQuestion[]> = {
-      'form-2-sub-2': [
-        {
-          id: 'q-1',
-          question: {
-            questionId: 'q-1',
-            typeCode: 'OPEN_ENDED',
-            questionText: 'Please describe the issue encountered.',
-            required: true,
-          },
-          answer: 'The app crashes when clicking save on the profile page.',
-          submissionId: 'form-2',
-          formTitle: 'Employee Survey',
-        },
-        {
-          id: 'q-2',
-          question: {
-            questionId: 'q-2',
-            typeCode: 'RADIO',
-            questionText: 'What is the severity of this issue?',
-            required: true,
-            options: [
-              { optionId: 'low', optionText: 'Low' },
-              { optionId: 'medium', optionText: 'Medium' },
-              { optionId: 'high', optionText: 'High' },
-              { optionId: 'critical', optionText: 'Critical' },
-            ],
-          },
-          answer: 'high',
-          submissionId: 'form-2',
-          formTitle: 'Employee Survey',
-        },
-        {
-          id: 'q-3',
-          question: {
-            questionId: 'q-3',
-            typeCode: 'MULTIPLE_CHOICE',
-            questionText: 'Which symptoms are you experiencing?',
-            required: false,
-            options: [
-              { optionId: 'crash', optionText: 'App crashes' },
-              { optionId: 'slow', optionText: 'Slow performance' },
-              { optionId: 'error', optionText: 'Error messages' },
-              { optionId: 'ui', optionText: 'UI glitches' },
-            ],
-          },
-          answer: ['crash', 'slow'],
-          submissionId: 'form-2',
-          formTitle: 'Employee Survey',
-        },
-      ],
-      'form-4': [
-        {
-          id: 'q-4',
-          question: {
-            questionId: 'q-4',
-            typeCode: 'DROPDOWN',
-            questionText: 'What is your role in the training program?',
-            required: true,
-            options: [
-              { optionId: 'trainer', optionText: 'Trainer' },
-              { optionId: 'trainee', optionText: 'Trainee' },
-              { optionId: 'coordinator', optionText: 'Coordinator' },
-              { optionId: 'observer', optionText: 'Observer' },
-            ],
-          },
-          answer: 'trainee',
-          submissionId: 'form-4',
-          formTitle: 'Training Registration',
-        },
-        {
-          id: 'q-5',
-          question: {
-            questionId: 'q-5',
-            typeCode: 'NUMBER',
-            questionText: 'How many years of experience do you have?',
-            required: false,
-            min: 0,
-            max: 50,
-          },
-          answer: '3',
-          submissionId: 'form-4',
-          formTitle: 'Training Registration',
-        },
-        {
-          id: 'q-6',
-          question: {
-            questionId: 'q-6',
-            typeCode: 'RATE',
-            questionText:
-              'How would you rate your satisfaction with the training?',
-            required: true,
-            min: 1,
-            max: 5,
-          },
-          answer: '4',
-          submissionId: 'form-4',
-          formTitle: 'Training Registration',
-        },
-        {
-          id: 'q-7',
-          question: {
-            questionId: 'q-7',
-            typeCode: 'SHORT_ANSWER',
-            questionText: 'What is your full name?',
-            required: true,
-          },
-          answer: 'John Doe',
-          submissionId: 'form-4',
-          formTitle: 'Training Registration',
-        },
-      ],
-      'form-1-sub-2': [
-        {
-          id: 'q-8',
-          question: {
-            questionId: 'q-8',
-            typeCode: 'RADIO',
-            questionText: 'Please verify the submission details.',
-            required: true,
-            options: [
-              {
-                optionId: 'verified',
-                optionText: 'Verified - All details correct',
-              },
-              {
-                optionId: 'needs_review',
-                optionText: 'Needs review - Issues found',
-              },
-              {
-                optionId: 'rejected',
-                optionText: 'Rejected - Invalid submission',
-              },
-            ],
-          },
-          answer: 'verified',
-          submissionId: 'form-1-sub-2',
-          formTitle: 'Submission Verification',
-        },
-      ],
-    };
+    try {
+      // Fetch manual answers by submission ID
+      const manualData: any = await api.getManualAnswersBySubmissionId({
+        submissionId,
+        projectId: '', // You might need to get this from route params or context
+      });
 
-    this.manualQuestions = mockQuestions[submissionId] || [];
-    console.log(
-      'Loaded questions:',
-      this.manualQuestions.length,
-      'questions found'
-    );
+      const payload = (manualData as any)?.result ?? manualData ?? {};
+
+      if (Array.isArray(payload.data)) {
+        // Transform API data to component format
+        this.manualQuestions = payload.data.map(
+          (answer: any, index: number) => ({
+            id: answer.questionId || `q-${index + 1}`,
+            question: {
+              questionId: answer.questionId,
+              typeCode: this.mapAnswerTypeToQuestionType(answer.answerType),
+              questionText: answer.questionText || 'Question',
+              required: false,
+              options: answer.options || [],
+            },
+            answer: this.extractAnswerValue(answer),
+            submissionId,
+            formTitle: payload.formTitle || 'Manual Review Form',
+          })
+        );
+      } else {
+        this.manualQuestions = [];
+      }
+    } catch (error) {
+      console.error('Error fetching manual questions:', error);
+      this.manualQuestions = [];
+    }
 
     // Initialize form controls for review
     this.initializeFormControls();
+  }
+
+  private mapAnswerTypeToQuestionType(
+    answerType: string
+  ): FormQuestionDto['typeCode'] {
+    switch (answerType) {
+      case 'text':
+        return 'OPEN_ENDED';
+      case 'rating':
+        return 'RATE';
+      case 'numeric':
+        return 'NUMBER';
+      case 'options':
+        return 'MULTIPLE_CHOICE';
+      default:
+        return 'OPEN_ENDED';
+    }
+  }
+
+  private extractAnswerValue(answer: any): string | string[] {
+    if (answer.optionIds && Array.isArray(answer.optionIds)) {
+      return answer.optionIds;
+    }
+    if (answer.rating !== undefined) {
+      return answer.rating.toString();
+    }
+    if (answer.numericResponse !== undefined) {
+      return answer.numericResponse.toString();
+    }
+    return answer.textResponse || '';
   }
 
   private initializeFormControls() {
@@ -504,14 +419,34 @@ export class ManualQuestionsComponent implements OnInit {
       }
     });
   }
-  submitReview() {
-    // TODO: Implement submit review
-    console.log('Submitting review');
-    console.log(this.overallReview);
-    console.log(this.reviewForm.value);
-    console.log(this.manualQuestions);
-    console.log(this.submissionId);
-    console.log(this.reviewForm.value);
+  async submitReview() {
+    if (!this.overallReview) {
+      alert('Please select an overall review decision.');
+      return;
+    }
+
+    try {
+      // Get project ID - you might need to get this from route params or context
+      const projectId = ''; // TODO: Get project ID from context
+
+      const result = await api.updateSubmissionStatus({
+        submissionId: this.submissionId,
+        outcome: this.overallReview,
+        decisionNotes: 'Manual review completed',
+        projectId,
+      });
+
+      if ((result as any).success) {
+        alert('Review submitted successfully!');
+        this.router.navigate(['/manual-submissions']);
+      } else {
+        console.error('Error submitting review:', (result as any).error);
+        alert('Error submitting review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Error submitting review. Please try again.');
+    }
   }
   goBack() {
     this.router.navigate(['/manual-submissions']);

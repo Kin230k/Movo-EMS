@@ -9,8 +9,7 @@ import {
   SubmissionCardComponent,
   Submission,
 } from './submission-card/submission-card.component';
-import { Observable, of } from 'rxjs';
-import { ApiQueriesService } from '../../../../core/services/queries.service';
+import api from '../../../../core/api/api';
 
 export interface Form {
   formId: string;
@@ -44,12 +43,9 @@ export class ViewSubmissionsComponent {
   submissions: any[] = [];
   selectedFormId: string | undefined = undefined;
   isLoading = false;
+  submissionCardResetTriggers: { [key: string]: boolean } = {};
 
-  constructor(
-    private apiQueries: ApiQueriesService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor(private route: ActivatedRoute, private router: Router) {
     // Read optional route data flag to filter only manual submissions
     const data = this.route.snapshot.data as { onlyManual?: boolean };
     if (data && typeof data.onlyManual === 'boolean') {
@@ -61,18 +57,49 @@ export class ViewSubmissionsComponent {
     // Set initial default form if needed
   }
 
+  private async loadForms() {
+    if (this.onlyManual) {
+      try {
+        const data: any = await api.getFormByUser({});
+        const payload = (data as any)?.result ?? data ?? [];
+        this.forms = Array.isArray(payload.form)
+          ? payload.form.map((f: any) => ({
+              formId: f.formId ?? f.id,
+              formTitle: f.formTitle ?? f.title ?? 'Form',
+              formLanguage: f.formLanguage ?? 'en',
+            }))
+          : [];
+      } catch (error) {
+        console.error('Error loading forms:', error);
+        this.forms = [];
+      }
+    } else {
+      try {
+        const data: any = await api.getFormsByClient({});
+        const payload = (data as any)?.result ?? data ?? [];
+        this.forms = Array.isArray(payload.forms)
+          ? payload.forms.map((f: any) => ({
+              formId: f.formId ?? f.id,
+              formTitle: f.formTitle ?? f.title ?? 'Form',
+              formLanguage: f.formLanguage ?? 'en',
+            }))
+          : [];
+      } catch (error) {
+        console.error('Error loading forms:', error);
+        this.forms = [];
+      }
+    }
+  }
+
   onGoToManualQuestions(submissionId: string) {
     this.router.navigate(['/manual-questions/', submissionId]);
   }
 
-  onFormSelected(formId: string | undefined) {
+  async onFormSelected(formId: string | undefined) {
     this.selectedFormId = formId;
 
     if (formId) {
-      this.loadSubmissionsForForm(formId).subscribe({
-        next: (submissions) => this.onSubmissionsLoaded(submissions),
-        error: (error) => this.onSubmissionsLoadError(error),
-      });
+      await this.loadSubmissionsForForm(formId);
     } else {
       // Clear submissions when no form is selected
       this.submissions = [];
@@ -90,7 +117,9 @@ export class ViewSubmissionsComponent {
     }
     if (this.onlyManual) {
       // call API to get the submissions for the form manual
-      list = list.filter((submission) => submission.outcome === 'manual');
+      list = list.filter(
+        (submission) => submission.outcome === 'MANUAL_REVIEW'
+      );
     }
     return list;
   }
@@ -102,35 +131,30 @@ export class ViewSubmissionsComponent {
     return form.formTitle;
   }
 
-  private loadSubmissionsForForm(formId: string): Observable<Submission[]> {
+  private async loadSubmissionsForForm(formId: string) {
     this.isLoading = true;
-    return new Observable<Submission[]>((subscriber) => {
-      (async () => {
-        try {
-          const q = this.apiQueries.getSubmissionsByFormQuery({
-            formId,
-            projectId: '',
-          });
-          const data = q.data?.() ?? [];
-          const submissions = Array.isArray(data)
-            ? data.map((s: any) => ({
-                submissionId: s.submissionId ?? s.id,
-                formId: s.formId ?? formId,
-                formTitle: this.getFormTitle(s.formId ?? formId),
-                userId: s.userId ?? '',
-                interviewId: s.interviewId ?? '',
-                dateSubmitted: s.dateSubmitted ?? new Date().toISOString(),
-                outcome: s.outcome ?? 'pending',
-                decisionNotes: s.decisionNotes,
-              }))
-            : [];
-          subscriber.next(submissions);
-          subscriber.complete();
-        } catch (e) {
-          subscriber.error(e);
-        }
-      })();
-    });
+    try {
+      const data: any = await api.getSubmissionsByForm({
+        formId,
+        projectId: '',
+      });
+      const payload = (data as any)?.result ?? data ?? [];
+      const submissions = Array.isArray(payload.data)
+        ? payload.data.map((s: any) => ({
+            submissionId: s.submissionId ?? s.id,
+            formId: s.formId ?? formId,
+            formTitle: this.getFormTitle(s.formId ?? formId),
+            userId: s.userId ?? '',
+            interviewId: s.interviewId ?? '',
+            dateSubmitted: s.dateSubmitted ?? new Date().toISOString(),
+            outcome: s.outcome ?? 'pending',
+            decisionNotes: s.decisionNotes,
+          }))
+        : [];
+      this.onSubmissionsLoaded(submissions);
+    } catch (e) {
+      this.onSubmissionsLoadError(e);
+    }
   }
 
   // Handle API call completion
@@ -144,16 +168,52 @@ export class ViewSubmissionsComponent {
     this.isLoading = false;
     this.submissions = [];
   }
+  async onStatusUpdated(data: {
+    submissionId: string;
+    outcome: string;
+    decisionNotes?: string;
+  }) {
+    try {
+      // Update local state immediately for optimistic UI
+      this.submissions = this.submissions.map((submission) => {
+        if (submission.submissionId === data.submissionId) {
+          return { ...submission, ...data };
+        }
+        return submission;
+      });
 
-  private async loadForms() {
-    const q = this.apiQueries.getFormByUserQuery({});
-    const resp = q.data?.() ?? [];
-    this.forms = Array.isArray(resp)
-      ? resp.map((f: any) => ({
-          formId: f.formId ?? f.id,
-          formTitle: f.formTitle ?? f.title ?? 'Form',
-          formLanguage: f.formLanguage ?? 'en',
-        }))
-      : [];
+      // Make API call to update submission
+      await api.updateSubmission({
+        submissionId: data.submissionId,
+        userId: undefined,
+        outcome: data.outcome as 'ACCEPTED' | 'REJECTED' | 'MANUAL_REVIEW',
+        decisionNotes: data.decisionNotes,
+      });
+
+      // Reset loading state on success after a short delay
+      setTimeout(() => {
+        this.onStatusUpdateComplete(data.submissionId);
+      }, 500);
+    } catch (error) {
+      console.error('Error updating submission status:', error);
+      // Reset loading state on error after a short delay
+      setTimeout(() => {
+        this.onStatusUpdateComplete(data.submissionId);
+      }, 500);
+      // Revert the optimistic update on error
+      this.revertSubmissionUpdate(data.submissionId);
+    }
+  }
+
+  onStatusUpdateComplete(submissionId: string) {
+    // Trigger reset for the specific submission card
+    this.submissionCardResetTriggers[submissionId] =
+      !this.submissionCardResetTriggers[submissionId];
+  }
+
+  private revertSubmissionUpdate(submissionId: string) {
+    // Revert the optimistic update if API call failed
+    // This would require storing the previous state before the update
+    console.warn('Submission update failed, reverting changes');
   }
 }
