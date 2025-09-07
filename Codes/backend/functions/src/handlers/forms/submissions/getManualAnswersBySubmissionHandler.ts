@@ -30,7 +30,7 @@ export async function getManualAnswersBySubmissionIdHandler(
   request: CallableRequest<GetManualAnswersBySubmissionIdData>
 ): Promise<GetManualAnswersBySubmissionIdResult> {
   const issues: FieldIssue[] = [];
-  const { submissionId, projectId } = request.data || {};
+  const { submissionId } = request.data || {};
 
   if (!submissionId) {
     issues.push({ field: 'submissionId', message: 'submissionId is required' });

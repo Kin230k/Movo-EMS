@@ -22,7 +22,7 @@ export async function getSubmissionsByFormHandler(
   request: CallableRequest<GetManualSubmissionsByFormIdData>
 ): Promise<GetManualSubmissionsByFormIdResult> {
   const issues: FieldIssue[] = [];
-  const { formId, projectId } = request.data || {};
+  const { formId } = request.data || {};
 
   if (!formId) issues.push({ field: 'formId', message: 'formId is required' });
 
