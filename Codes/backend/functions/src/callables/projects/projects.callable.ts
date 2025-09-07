@@ -14,6 +14,7 @@ import { deleteLocationHandler } from '../../handlers/projects/locations/deleteL
 import { getLocationByIdHandler } from '../../handlers/projects/locations/getLocationByIdHandler';
 import { updateLocationHandler } from '../../handlers/projects/locations/updateLocationHandler';
 import { getLocationsForClientHandler } from '../../handlers/projects/locations/getLocationsForClientHandler';
+import { getAllLocationsHandler } from '../../handlers/projects/locations/getAllLocationsHandler';
 
 // --- User Project Handlers ---
 import { createUserProjectHandler } from '../../handlers/projects/user_project/createUserProjectHandler';
@@ -65,6 +66,7 @@ export const deleteLocation = onCall(deleteLocationHandler);
 export const getLocation = onCall(getLocationByIdHandler);
 export const updateLocation = onCall(updateLocationHandler);
 export const getLocationsForClient = onCall(getLocationsForClientHandler);
+export const getAllLocations = onCall(getAllLocationsHandler);
 
 // --- User Project Callables ---
 export const createUserProject = onCall(createUserProjectHandler);

@@ -107,6 +107,7 @@ import {
   updateArea,
   getAreasByLocation,
   getAllAreas,
+  getAllLocations,
 } from './callables/projects/projects.callable';
 // Import ProjectUserRole callables
 import {
@@ -205,7 +206,7 @@ export {
   getLocation,
   updateLocation,
   getLocationsForClient,
-
+  getAllLocations,
   // User Projects
   createUserProject,
   deleteUserProject,
