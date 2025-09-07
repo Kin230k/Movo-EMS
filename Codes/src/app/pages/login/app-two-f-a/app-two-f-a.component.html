@@ -1,0 +1,71 @@
+<div class="logo">
+  <img src="../../../assets/images/logo.png" alt="Logo" />
+</div>
+
+<div class="login-container">
+  <div class="login-form">
+    <h2 class="login-title">{{ 'TWO_FA.TITLE' | translate }}</h2>
+
+    <p class="instruction">
+      {{ 'TWO_FA.INSTRUCTION' | translate }}
+    </p>
+
+    <form (ngSubmit)="onSubmit()" #verificationForm="ngForm">
+      <!-- حقل رقم الهاتف -->
+      <div class="phone-field">
+        <input
+          type="tel"
+          [placeholder]="'TWO_FA.PHONE_PLACEHOLDER' | translate"
+          [(ngModel)]="phoneNumber"
+          name="phone"
+          pattern="[0-9+]{10,15}"
+          required
+          #phoneInput="ngModel"
+          [class.invalid]="showError && !phoneNumber"
+        >
+      </div>
+
+      <!-- رسالة الخطأ -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div class="code-inputs-container">
+        <div class="code-inputs">
+          <input 
+            *ngFor="let digit of code; let i = index" 
+            #codeInput
+            type="text" 
+            maxlength="1" 
+            pattern="[0-9]*" 
+            inputmode="numeric" 
+            autocomplete="one-time-code" 
+            [value]="code[i]"
+            [name]="'code-' + i"
+            (input)="onInputChange($event, i)"
+            (keydown)="onKeyDown($event, i)"
+            (paste)="onPaste($event, i)"
+            (focus)="onInputFocus($event, i)"
+            [autofocus]="i === 0"
+            [class.invalid]="showError"
+            [attr.aria-label]="'رقم التحقق ' + (i + 1)"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <themed-button
+          type="submit"
+          [text]="'TWO_FA.VERIFY_BUTTON' | translate"
+        >
+        </themed-button>
+      </div>
+
+      <div class="resend-code">
+        {{ 'TWO_FA.NOT_RECEIVED' | translate }} 
+        <a (click)="resendCode()" [class.disabled]="isSubmitting">{{ 'TWO_FA.RESEND_LINK' | translate }}</a>
+      </div>
+    </form>
+  </div>
+</div>

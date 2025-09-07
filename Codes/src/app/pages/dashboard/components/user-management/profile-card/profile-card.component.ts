@@ -92,7 +92,6 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
   onDisableUser(evt?: MouseEvent) {
     evt?.stopPropagation();
     // open delete confirmation modal instead of immediate disable
-
     this.deleteModalOpen = true;
   }
 
