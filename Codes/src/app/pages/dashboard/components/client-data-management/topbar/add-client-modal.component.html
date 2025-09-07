@@ -1,4 +1,12 @@
 <div class="overlay" *ngIf="true" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "CLIENT_DATA_MANAGEMENT.CREATING_CLIENT" | translate }}
+    </div>
+  </div>
+
   <div class="modal" (click)="$event.stopPropagation()">
     <header class="modal-header">
       <h3>{{ "CLIENT_DATA_MANAGEMENT.ADD_CLIENT" | translate }}</h3>
@@ -107,8 +115,8 @@
                 type="button"
                 class="upload-btn"
                 (click)="fileInput.click()"
-                [disabled]="isUploading"
-                [class.uploading]="isUploading"
+                [disabled]="isUploading()"
+                [class.uploading]="isUploading()"
                 [class.error]="hasUploadError"
               >
                 {{ "CLIENT_DATA_MANAGEMENT.CHOOSE_IMAGE" | translate }}
@@ -116,7 +124,7 @@
             </div>
 
             <!-- Upload Progress -->
-            <div class="upload-progress" *ngIf="isUploading">
+            <div class="upload-progress" *ngIf="isUploading()">
               <div class="progress-bar">
                 <div
                   class="progress-fill"
@@ -131,8 +139,8 @@
               type="button"
               class="upload-action-btn"
               (click)="uploadImage()"
-              [disabled]="!selectedFile || isUploading"
-              *ngIf="selectedFile && !isUploading"
+              [disabled]="!selectedFile || isUploading()"
+              *ngIf="selectedFile && !isUploading()"
             >
               {{ "CLIENT_DATA_MANAGEMENT.UPLOAD_IMAGE" | translate }}
             </button>
@@ -161,7 +169,9 @@
         </div>
       </div>
 
-      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
     </section>
     <footer class="modal-footer">
       <button type="button" class="secondary-btn" (click)="onClose()">

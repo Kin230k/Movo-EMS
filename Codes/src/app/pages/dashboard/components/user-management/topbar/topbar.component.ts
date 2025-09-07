@@ -5,11 +5,12 @@ import { ThemedButtonComponent } from '../../../../../components/shared/themed-b
 import { AddRoleModalComponent } from './add-role-modal.component'; // adjust path as needed
 import { rolesDropDown } from '../../../../../shared/types/roles';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../../core/api/api';
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss'],
-  imports: [  
+  imports: [
     CommonModule,
     ComboSelectorComponent,
     ThemedButtonComponent,
@@ -19,8 +20,8 @@ import { TranslateModule } from '@ngx-translate/core';
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: { en: string; ar: string } }[] = [];
-  @Output() projectSelected = new EventEmitter<number>();
+  @Input() projects: { id: string; name: { en: string; ar: string } }[] = [];
+  @Output() projectSelected = new EventEmitter<string>();
 
   showAddRole = false;
 
@@ -34,20 +35,23 @@ export class TopbarComponent {
     this.showAddRole = false;
   }
 
-  onProjectAssigned(projectId: number) {
+  onProjectAssigned(projectId: string) {
     // The modal emitted a project assignment (e.g., after mock async succeeded and user selected)
     this.projectSelected.emit(projectId);
     this.showAddRole = false;
   }
-  onAssigned(payload: { projectId: number; roleId: string }) {
-    // handle role assignment; for now re-emit projectSelected and log role
-    this.projectSelected.emit(payload.projectId);
-    console.log(
-      'Assigned role:',
-      payload.roleId,
-      'to project:',
-      payload.projectId
-    );
-    this.showAddRole = false;
+  async onAssigned(payload: {
+    projectId: string;
+    roleId: string;
+    userId: string;
+  }) {
+    const mutate = await api.createProjectUserRole({
+      projectId: payload.projectId,
+      roleId: payload.roleId,
+      userId: payload.userId,
+    });
+    if (mutate.success) {
+      this.onModalClose();
+    }
   }
 }

@@ -1,19 +1,23 @@
+// project-management.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CardListComponent } from '../../../../components/shared/card-list/card-list.component';
-import { ProfileCardComponent } from './profile-card/profile-card.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 import {
   ScheduleCardComponent,
   ScheduleData,
 } from './schedule-card/schedule-card.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IdentityService } from '../../../../core/services/identity.service';
+import api from '../../../../core/api/api';
 import { TopbarComponent } from './topbar/topbar.component';
 import { AddScheduleModalComponent } from './topbar/add-schedule-modal.component';
 import { ComboSelectorComponent } from '../../../../components/shared/combo-selector/combo-selector.component';
 import { EditScheduleModalComponent } from './edit-schedule-modal/edit-schedule-modal.component';
 import { DeleteModalComponent } from '../../../../components/shared/delete-modal/delete-modal.component';
+import { ProfileModalComponent } from './profile-card/profile-modal/profile-modal.component';
+import { ProfileCardComponent } from './profile-card/profile-card.component';
 
 @Component({
   selector: 'app-project-management',
@@ -21,7 +25,6 @@ import { DeleteModalComponent } from '../../../../components/shared/delete-modal
   imports: [
     CommonModule,
     FormsModule,
-    CardListComponent,
     CardListSkeletionComponent,
     TranslateModule,
     TopbarComponent,
@@ -30,117 +33,81 @@ import { DeleteModalComponent } from '../../../../components/shared/delete-modal
     ComboSelectorComponent,
     EditScheduleModalComponent,
     DeleteModalComponent,
+    ProfileModalComponent,
+    ProfileCardComponent,
   ],
   templateUrl: './project-management.component.html',
   styleUrls: ['./project-management.component.scss'],
 })
 export class ProjectManagementComponent {
-  constructor(private translate: TranslateService) {}
+  constructor(
+    private translate: TranslateService,
+    private identity: IdentityService
+  ) {}
 
   activeTab: 'projects' | 'schedules' = 'projects';
   selectedProjectId: string = '';
 
-  mockProjects = [
-    {
-      projectId: 'slf',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project A', ar: 'المشروع A' },
-      badgeBackground: 'red',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf2',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project B', ar: 'المشروع B' },
-      badgeBackground: 'blue',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf3',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project C', ar: 'المشروع C' },
-      badgeBackground: 'green',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf4',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project D', ar: 'المشروع D' },
-      badgeBackground: 'yellow',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-    {
-      projectId: 'slf5',
-      clientName: 'ojdflsjf',
-      name: { en: 'Project E', ar: 'المشروع E' },
-      badgeBackground: 'purple',
-      startingDate: '2025-01-01',
-      endingDate: '2025-01-01',
-      description: { en: 'description', ar: 'description' },
-    },
-  ];
+  private _projects: any[] = [];
+  private _schedules: any[] = [];
+  private _isLoading = false;
+  private _error: any = null;
+
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      this._isLoading = true;
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._error = error;
+      this._projects = [];
+    } finally {
+      this._isLoading = false;
+    }
+  }
+
+  get mockProjects() {
+    return this._projects.map((p: any) => ({
+      ...p,
+      name: p.name,
+    }));
+  }
 
   // Stable transformed projects array for combo selector
-  transformedProjects: { id: string; name: { en: string; ar: string } }[] =
-    this.mockProjects.map((p) => ({ id: p.projectId, name: p.name }));
+  get transformedProjects(): {
+    id: string;
+    name: { en: string; ar: string };
+  }[] {
+    return (this.mockProjects || []).map((p: any) => ({
+      id: p.projectId,
+      name: p.name,
+    }));
+  }
 
-  // Mock schedules data
-  mockSchedules: ScheduleData[] = [
-    {
-      scheduleId: 'schedule-1',
-      projectId: 'slf',
-      startDateTime: '2025-01-15T09:00:00',
-      endDateTime: '2025-01-15T17:00:00',
-      createdAt: '2025-01-10T10:00:00',
-      projectName: { en: 'Project A', ar: 'المشروع A' },
-    },
-    {
-      scheduleId: 'schedule-2',
-      projectId: 'slf',
-      startDateTime: '2025-01-16T10:00:00',
-      endDateTime: '2025-01-16T18:00:00',
-      createdAt: '2025-01-11T11:00:00',
-      projectName: { en: 'Project A', ar: 'المشروع A' },
-    },
-    {
-      scheduleId: 'schedule-3',
-      projectId: 'slf2',
-      startDateTime: '2025-01-20T08:00:00',
-      endDateTime: '2025-01-20T16:00:00',
-      createdAt: '2025-01-12T12:00:00',
-      projectName: { en: 'Project B', ar: 'المشروع B' },
-    },
-    {
-      scheduleId: 'schedule-4',
-      projectId: 'slf3',
-      startDateTime: '2025-01-25T09:30:00',
-      endDateTime: '2025-01-25T17:30:00',
-      createdAt: '2025-01-13T13:00:00',
-      projectName: { en: 'Project C', ar: 'المشروع C' },
-    },
-  ];
+  schedules: ScheduleData[] = [];
 
-  profileCardComponent = ProfileCardComponent;
   scheduleCardComponent = ScheduleCardComponent;
 
   // Modal states
   showAddSchedule = false;
   showEditSchedule = false;
   showDeleteSchedule = false;
+  showProfileModal = false;
   selectedSchedule: ScheduleData | null = null;
-
-  private _isLoading = false;
-  // expose error as any so template can use error?.message
-  private _error: any = null;
-  private _isFinished = false;
+  selectedProjectData: any = null;
 
   get isLoading() {
     return this._isLoading;
@@ -149,71 +116,60 @@ export class ProjectManagementComponent {
     return this._error;
   }
   get isFinished() {
-    return this._isFinished;
+    return !this._isLoading && !this._error;
   }
 
   get filteredSchedules(): ScheduleData[] {
     if (!this.selectedProjectId) {
       return [];
     }
-    return this.mockSchedules.filter(
-      (schedule) => schedule.projectId === this.selectedProjectId
+    const proj = (this.mockProjects || []).find(
+      (p: any) => p.projectId === this.selectedProjectId
     );
+    const projectName = proj?.name;
+    return this._schedules
+      .filter((s: any) => s.projectId === this.selectedProjectId)
+      .map((s: any) => ({
+        scheduleId: s.scheduleId ?? s.id ?? `${s.projectId}-${s.startTime}`,
+        projectId: s.projectId,
+        startDateTime: s.startTime ?? s.startDateTime,
+        endDateTime: s.endTime ?? s.endDateTime,
+        createdAt: s.createdAt ?? new Date().toISOString(),
+        projectName,
+      }));
   }
 
   get selectedProject() {
-    return this.mockProjects.find(
-      (project) => project.projectId === this.selectedProjectId
+    return (this.mockProjects || []).find(
+      (project: any) => project.projectId === this.selectedProjectId
     );
   }
 
-  private async fetchProjects(): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockProjects || [];
+  private async setupSchedules(projectId: string): Promise<void> {
+    try {
+      const data: any = await api.getSchedulesByProjectOrLocation({
+        projectId,
+      });
+      const payload = (data as any)?.result ?? data ?? {};
+      this._schedules = Array.isArray(payload.schedules)
+        ? payload.schedules
+        : [];
+    } catch (error) {
+      console.error('Error loading schedules:', error);
+      this._schedules = [];
+    } finally {
+      this._isLoading = false;
+    }
   }
 
-  onProjectCreated(projectData: any) {
-    const newProject = {
-      projectId: Date.now().toString(),
-      clientName: 'New Client',
-      name: {
-        en: projectData.nameEn,
-        ar: projectData.nameAr,
-      },
-      badgeBackground: 'blue',
-      startingDate: projectData.startingDate,
-      endingDate: projectData.endingDate,
-      description: {
-        en: projectData.descriptionEn,
-        ar: projectData.descriptionAr,
-      },
-    };
-    this.mockProjects = [...this.mockProjects, newProject];
-    // keep transformed list in sync
-    this.transformedProjects = [
-      ...this.transformedProjects,
-      { id: newProject.projectId, name: newProject.name },
-    ];
-  }
-
-  onScheduleCreated(scheduleData: any) {
-    console.log('New schedule created:', scheduleData);
-    const selectedProject = this.mockProjects.find(
-      (p) => p.projectId === scheduleData.projectId
-    );
-    const newSchedule: ScheduleData = {
-      scheduleId: Date.now().toString(),
-      projectId: scheduleData.projectId,
-      startDateTime: scheduleData.startDateTime,
-      endDateTime: scheduleData.endDateTime,
-      createdAt: new Date().toISOString(),
-      projectName: selectedProject?.name,
-    };
-    this.mockSchedules = [...this.mockSchedules, newSchedule];
-  }
-
-  onProjectSelected(projectId: string | null) {
+  async onProjectSelected(projectId: string | null) {
     this.selectedProjectId = projectId ?? '';
+    if (this.selectedProjectId) {
+      this._isLoading = true;
+      await this.setupSchedules(this.selectedProjectId);
+    } else {
+      this._schedules = [];
+    }
   }
 
   setActiveTab(tab: 'projects' | 'schedules') {
@@ -226,20 +182,46 @@ export class ProjectManagementComponent {
     this.showEditSchedule = true;
   }
 
-  onScheduleEditUpdate(updateData: {
+  /**
+   * Convert a "datetime-local" (YYYY-MM-DDTHH:mm) into an ISO string by constructing
+   * a Date from local components. This preserves the wall-clock time the user selected,
+   * then returns the corresponding UTC ISO instant.
+   */
+  private localDatetimeToISOString(local: string): string {
+    // local expected shape "YYYY-MM-DDTHH:mm" (seconds optional)
+    const [datePart, timePart = '00:00'] = local.split('T');
+    const [y, m, d] = datePart.split('-').map((v) => Number(v));
+    const [hh, mm] = timePart.split(':').map((v) => Number(v));
+    // Construct using local components so the Date represents the local moment.
+    return new Date(y, m - 1, d, hh || 0, mm || 0).toISOString();
+  }
+
+  async onScheduleEditUpdate(updateData: {
     scheduleId: string;
     startDateTime: string;
     endDateTime: string;
   }) {
-    const scheduleIndex = this.mockSchedules.findIndex(
-      (s) => s.scheduleId === updateData.scheduleId
-    );
-    if (scheduleIndex !== -1) {
-      this.mockSchedules[scheduleIndex] = {
-        ...this.mockSchedules[scheduleIndex],
-        startDateTime: updateData.startDateTime,
-        endDateTime: updateData.endDateTime,
-      };
+    try {
+      const result = await api.updateSchedule({
+        scheduleId: updateData.scheduleId,
+        projectId: this.selectedProjectId, // Add required projectId
+        startTime: this.localDatetimeToISOString(updateData.startDateTime), // ensure ISO string
+        endTime: this.localDatetimeToISOString(updateData.endDateTime), // ensure ISO string
+      });
+
+      if ((result as any).success) {
+        console.log(
+          this.translate.instant('PROJECT_MANAGEMENT.SCHEDULE_UPDATED')
+        );
+        // Refresh schedules after update
+        if (this.selectedProjectId) {
+          await this.setupSchedules(this.selectedProjectId);
+        }
+      } else {
+        console.error((result as any).error);
+      }
+    } catch (error) {
+      console.error('Error updating schedule:', error);
     }
     this.showEditSchedule = false;
     this.selectedSchedule = null;
@@ -256,11 +238,27 @@ export class ProjectManagementComponent {
     this.showDeleteSchedule = true;
   }
 
-  onScheduleDeleteConfirm() {
+  async onScheduleDeleteConfirm() {
     if (this.selectedSchedule) {
-      this.mockSchedules = this.mockSchedules.filter(
-        (s) => s.scheduleId !== this.selectedSchedule!.scheduleId
-      );
+      try {
+        const result = await api.deleteSchedule({
+          scheduleId: this.selectedSchedule.scheduleId,
+        });
+
+        if ((result as any).success) {
+          console.log(
+            this.translate.instant('PROJECT_MANAGEMENT.SCHEDULE_DELETED')
+          );
+          // Refresh schedules after delete
+          if (this.selectedProjectId) {
+            await this.setupSchedules(this.selectedProjectId);
+          }
+        } else {
+          console.error((result as any).error);
+        }
+      } catch (error) {
+        console.error('Error deleting schedule:', error);
+      }
     }
     this.showDeleteSchedule = false;
     this.selectedSchedule = null;
@@ -279,6 +277,70 @@ export class ProjectManagementComponent {
   onScheduleModalClose() {
     this.showAddSchedule = false;
   }
+
+  // Refetch methods for modals to call after operations
+  async refetchProjects(): Promise<void> {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      this._isLoading = true;
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        this._projects = Array.isArray(payload.projects)
+          ? payload.projects
+          : [];
+      }
+    } catch (error) {
+      console.error('Error refetching projects:', error);
+      this._error = error;
+    } finally {
+      this._isLoading = false;
+    }
+  }
+
+  async refetchSchedules(): Promise<void> {
+    if (this.selectedProjectId) {
+      await this.setupSchedules(this.selectedProjectId);
+    }
+  }
+
+  async refetchAll(): Promise<void> {
+    await this.refetchProjects();
+    await this.refetchSchedules();
+  }
+
+  // Profile modal methods
+  onProfileEdit(projectData: any) {
+    console.log('Opening profile modal for project:', projectData);
+    this.selectedProjectData = projectData;
+    this.showProfileModal = true;
+  }
+
+  onProfileModalClose() {
+    this.showProfileModal = false;
+    this.selectedProjectData = null;
+  }
+
+  async onProfileModalEdit(updateData: any) {
+    console.log('Updating project with data:', updateData);
+    try {
+      await api.updateProject(updateData);
+      console.log('Project updated successfully');
+      this.onProfileModalClose();
+      // Refresh projects
+      await this.refetchProjects();
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert('Error updating project. Please try again.');
+    }
+  }
+
   displayProjectName(arg0: { en: string; ar: string }) {
     const lang =
       this.translate.currentLang === 'ar' ||

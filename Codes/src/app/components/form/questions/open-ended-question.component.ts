@@ -16,6 +16,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
       <textarea
         class="q-input q-textarea"
         [formControl]="control"
+        [disabled]="disabled"
         rows="4"
         (blur)="control.markAsTouched()"
       ></textarea>
@@ -44,6 +45,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
         background: rgba(var(--white-rgb), 0.9);
         color: var(--color-text);
       }
+
       .q-input:focus {
         outline: 2px solid var(--accent);
         border-color: var(--accent);
@@ -62,4 +64,5 @@ export class OpenEndedQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 }

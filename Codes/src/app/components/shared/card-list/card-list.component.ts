@@ -1,5 +1,5 @@
 // src/app/card-list/card-list.component.ts
-import { Component, Input, Type } from '@angular/core';
+import { Component, Input, Type, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -25,8 +25,40 @@ export class CardListComponent {
    */
   @Input() cardInputKey = 'data';
 
+  /**
+   * Event emitted when a card component emits an event
+   */
+  @Output() cardEvent = new EventEmitter<{
+    event: string;
+    data: any;
+    item: any;
+  }>();
+
   // Build inputs object for ngComponentOutlet (computed to support dynamic key)
   inputsFor(item: any) {
     return { [this.cardInputKey]: item };
+  }
+
+  // Handle component creation and set up event listeners
+  onComponentCreated(component: any, item: any) {
+    if (component && component.formDeleted) {
+      // Listen to formDeleted event from form card components
+      component.formDeleted.subscribe((data: any) => {
+        this.cardEvent.emit({
+          event: 'formDeleted',
+          data: data,
+          item: item,
+        });
+      });
+    }
+  }
+
+  // Handle events from dynamically rendered components
+  onCardEvent(event: any, eventName: string, item: any) {
+    this.cardEvent.emit({
+      event: eventName,
+      data: event,
+      item: item,
+    });
   }
 }

@@ -6,7 +6,7 @@ import { CreateAttendanceModalComponent } from './create-attendance-modal.compon
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 
 @Component({
-  selector: 'app-topbar',
+  selector: 'app-attendance-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.scss'],
   imports: [
@@ -19,33 +19,24 @@ import { ThemedButtonComponent } from '../../../../../components/shared/themed-b
   standalone: true,
 })
 export class TopbarComponent {
-  @Input() projects: { id: number; name: { ar: string; en: string } }[] = [];
+  @Input() projects: { id: string; name: { ar: string; en: string } }[] = [];
+  @Input() selectedProjectId: string | null = null;
+  @Input() usersForSelector: {
+    id: string | number;
+    name: { en: string; ar: string };
+    role?: string;
+    picture?: string;
+  }[] = [];
+  @Input() areasForSelector: {
+    id: string | number;
+    name: { en: string; ar: string };
+  }[] = [];
 
-  @Output() projectSelected = new EventEmitter<number>();
+  @Output() projectSelected = new EventEmitter<string>();
   @Output() createAttendance = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
 
   showCreateModal = false;
-
-  // Mocked data
-  mockUsers = [
-    {
-      id: 1,
-      name: { en: 'John Doe', ar: 'جون دو' },
-      role: 'Engineer',
-      picture: 'https://i.pravatar.cc/100?img=1',
-    },
-    {
-      id: 2,
-      name: { en: 'Jane Smith', ar: 'جين سميث' },
-      role: 'Manager',
-      picture: 'https://i.pravatar.cc/100?img=2',
-    },
-  ];
-
-  mockAreas = [
-    { id: 101, name: { en: 'Main Office', ar: 'المكتب الرئيسي' } },
-    { id: 102, name: { en: 'Warehouse', ar: 'المستودع' } },
-  ];
 
   openCreateModal() {
     this.showCreateModal = true;
@@ -58,5 +49,9 @@ export class TopbarComponent {
   handleCreateAttendance(payload: any) {
     this.createAttendance.emit(payload);
     this.showCreateModal = false;
+  }
+
+  handleModalRefetch() {
+    this.refetch.emit();
   }
 }

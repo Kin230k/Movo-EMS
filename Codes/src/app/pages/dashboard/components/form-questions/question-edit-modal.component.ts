@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -33,14 +33,16 @@ export class QuestionEditModalComponent {
   }[] = conditionOptions;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
 
   form: FormGroup;
   questionTypes = questionTypes;
+  isSubmitting = signal(false);
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      text: ['', Validators.required],
+      questionText: ['', Validators.required],
       description: [''],
-      type: ['', Validators.required],
+      typeCode: ['', Validators.required],
       options: this.fb.array([]),
       criteria: this.fb.array([]),
     });
@@ -49,9 +51,9 @@ export class QuestionEditModalComponent {
   ngOnChanges() {
     if (this.question) {
       this.form.patchValue({
-        text: this.question.get('text')?.value,
+        questionText: this.question.get('questionText')?.value,
         description: this.question.get('description')?.value,
-        type: this.question.get('type')?.value,
+        typeCode: this.question.get('typeCode')?.value,
       });
       const options = this.question.get('options') as FormArray<FormGroup>;
       const editOptions = this.form.get('options') as FormArray<FormGroup>;
@@ -71,7 +73,7 @@ export class QuestionEditModalComponent {
       srcCriteria.controls.forEach((c) => {
         editCriteria.push(
           this.fb.group({
-            condition: [c.get('condition')?.value || '=', Validators.required],
+            condition: [c.get('type')?.value || '=', Validators.required],
             value: [c.get('value')?.value || ''],
             valueTo: [c.get('valueTo')?.value || ''],
             effect: [c.get('effect')?.value || 'pass', Validators.required],
@@ -96,10 +98,10 @@ export class QuestionEditModalComponent {
   }
 
   onQuestionTypeSelect(selectedType: string | null) {
-    const typeControl = this.form.get('type');
+    const typeControl = this.form.get('typeCode');
     if (selectedType) {
       typeControl?.setValue(selectedType);
-    } else {
+    } else { 
       typeControl?.setValue('');
     }
     typeControl?.markAsTouched();
@@ -111,7 +113,7 @@ export class QuestionEditModalComponent {
     const idx = (criteria.controls as FormGroup[]).indexOf(criterion);
     if (idx === -1) return;
     const target = criteria.at(idx) as FormGroup;
-    target.get('condition')?.setValue(selectedCondition ?? '');
+    target.get('type')?.setValue(selectedCondition ?? '');
   }
 
   onRadioChange(selectedOptionIndex: number) {
@@ -130,7 +132,10 @@ export class QuestionEditModalComponent {
       this.form.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting.set(true);
     this.save.emit(this.form.value);
+    this.refetch.emit();
   }
 
   // Criteria helpers and filtering
@@ -140,17 +145,17 @@ export class QuestionEditModalComponent {
 
   getPassCriteria(): FormGroup[] {
     return (this.criteriaControls.controls as FormGroup[]).filter(
-      (c) => c.get('effect')?.value === 'pass'
+      (c) => c.get('effect')?.value === 'PASS'
     );
   }
 
   getFailCriteria(): FormGroup[] {
     return (this.criteriaControls.controls as FormGroup[]).filter(
-      (c) => c.get('effect')?.value === 'fail'
+      (c) => c.get('effect')?.value === 'FAIL'
     );
   }
 
-  addCriteria(effect: 'pass' | 'fail') {
+  addCriteria(effect: 'PASS' | 'FAIL') {
     this.criteriaControls.push(
       this.fb.group({
         condition: ['=', Validators.required],

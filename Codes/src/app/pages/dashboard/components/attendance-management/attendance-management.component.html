@@ -3,12 +3,15 @@
     <h1>{{ "ATTENDANCE_MANAGEMENT.TITLE" | translate }}</h1>
   </div>
 
-  <app-topbar
+  <app-attendance-topbar
     [projects]="projects"
+    [selectedProjectId]="selectedProjectId"
+    [usersForSelector]="usersForSelector"
+    [areasForSelector]="areasForSelector"
     (projectSelected)="onProjectSelected($event)"
     (createAttendance)="onAddAttendance($event)"
-  ></app-topbar>
-
+    (refetch)="refetchUsers()"
+  ></app-attendance-topbar>
   <div *ngIf="isLoading" class="card-list-skeleton">
     <app-card-list-skeletion></app-card-list-skeletion>
   </div>
@@ -26,6 +29,7 @@
     <app-card-list
       [items]="users"
       [cardComponent]="attendanceCardComponent"
+      (refetch)="refetchUsers()"
     ></app-card-list>
   </div>
 </div>

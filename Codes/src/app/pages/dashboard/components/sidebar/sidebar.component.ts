@@ -7,12 +7,21 @@ import { TranslateModule } from '@ngx-translate/core';
 import { filter, takeUntil } from 'rxjs/operators';
 import { ButtonComponent } from '../../../../components/shared/button/button';
 import { ResponsiveService } from '../../../../core/services/responsive.service';
+import { IdentityService } from '../../../../core/services/identity.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { LanguageSwitcherComponent } from '../../../../components/shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  imports: [CommonModule, RouterModule, ButtonComponent, TranslateModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ButtonComponent,
+    TranslateModule,
+    LanguageSwitcherComponent,
+  ],
   standalone: true,
 })
 export class SidebarComponent implements OnInit, OnDestroy {
@@ -46,7 +55,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // },
   ];
 
-  constructor(private router: Router, private responsive: ResponsiveService) {}
+  constructor(
+    private router: Router,
+    private responsive: ResponsiveService,
+    private identity: IdentityService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
     // subscribe to global isMobile
@@ -67,6 +81,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         if (this.isMobile) this.collapsed = true;
       });
+
+    // hide client-data-management entry for clients
+    this.identity.getIdentity().then((who) => {
+      if (who?.isClient) {
+        this.menu = this.menu.filter(
+          (item) => item.path !== 'client-data-management'
+        );
+      }
+    });
   }
 
   toggleSidebar() {
@@ -82,5 +105,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  async signOut() {
+    await this.auth.logout();
+    this.identity.resetIdentity();
+    this.router.navigate(['/login']);
   }
 }

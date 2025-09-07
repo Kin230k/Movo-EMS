@@ -3,61 +3,59 @@ import { CommonModule } from '@angular/common';
 import { CardListComponent } from '../../../../components/shared/card-list/card-list.component';
 import { TopbarComponent } from './topbar/topbar.component';
 import { ProfileCardComponent } from './profile-card/profile-card.component';
-import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../core/api/api';
+import { IdentityService } from '../../../../core/services/identity.service';
+import { CardListSkeletionComponent } from "../../../../components/shared/card-list-skeletion/card-list-skeletion.component";
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [
-    CommonModule,
-    CardListComponent,
-    TopbarComponent,
-    CardListSkeletionComponent,
-    TranslateModule,
-  ],
+  imports: [CommonModule, CardListComponent, TopbarComponent, TranslateModule, CardListSkeletionComponent],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
 export class UserManagementComponent {
-  projects = [
-    { id: 1, name: { en: 'Project A', ar: 'المشروع A' } },
-    { id: 2, name: { en: 'Project B', ar: 'المشروع B' } },
-    { id: 3, name: { en: 'Project C', ar: 'المشروع C' } },
-  ];
+  constructor(private identity: IdentityService) {}
 
-  private mockUsers: { [key: number]: any[] } = {
-    1: Array.from({ length: 3 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User A${i + 1}`, ar: `يوزر A${i + 1}` },
-      role: 'Main User',
-      phone: '0987654321',
-      email: 'testA@gmail.com',
-      rate: '1000$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-    2: Array.from({ length: 4 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User B${i + 1}`, ar: `يوزر B${i + 1}` },
-      role: 'Supervisor',
-      phone: '1234567890',
-      email: 'testB@gmail.com',
-      rate: '1200$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-    3: Array.from({ length: 2 }).map((_, i) => ({
-      userId: i + 1,
-      name: { en: `User C${i + 1}`, ar: `يوزر C${i + 1}` },
-      role: 'Senior Supervisor',
-      phone: '5555555555',
-      email: 'testC@gmail.com',
-      rate: '1500$',
-      picture: '/assets/images/image.png',
-      isPresent: Math.random() > 0.5,
-    })),
-  };
+  private _projects: any[] = [];
+
+  get projects() {
+    return this._projects.map((p: any) => ({ id: p.projectId, name: p.name }));
+  }
+
+  async ngOnInit() {
+    const who = await this.identity.getIdentity().catch(() => null);
+    try {
+      this._isLoading = true;
+      if (who?.isClient) {
+        const data: any = await api.getProjectsByClient({});
+        const payload = (data as any)?.result ?? data ?? {};
+        if (data.success) {
+          this._projects = Array.isArray(payload.projects)
+            ? payload.projects
+            : [];
+        } else {
+          this._error = data.issues[0].message;
+        }
+      } else {
+        const data: any = await api.getAllProjects();
+        const payload = (data as any)?.result ?? data ?? {};
+        if (data.success) {
+          this._projects = Array.isArray(payload.projects)
+            ? payload.projects
+            : [];
+        } else {
+          this._error = data.issues[0].message;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this._projects = [];
+    } finally {
+      this._isLoading = false;
+    }
+  }
 
   users: any[] = [];
   profileCardComponent = ProfileCardComponent;
@@ -77,7 +75,15 @@ export class UserManagementComponent {
     return this._isFinished;
   }
 
-  async onProjectSelected(projectId: number) {
+  async onProjectSelected(projectId: string | null) {
+    if (projectId === null) {
+      this.users = [];
+      this._isFinished = true;
+      this._isLoading = false;
+      this._error = null;
+      return;
+    }
+
     this._isLoading = true;
     this._error = null;
     this._isFinished = false;
@@ -85,6 +91,7 @@ export class UserManagementComponent {
 
     try {
       const users = await this.fetchUsers(projectId);
+      console.log(users);
       this.users = users;
       this._isFinished = true;
     } catch (err) {
@@ -95,8 +102,21 @@ export class UserManagementComponent {
     }
   }
 
-  private async fetchUsers(projectId: number): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return this.mockUsers[projectId] || [];
+  private async fetchUsers(projectId: string | number): Promise<any[]> {
+    try {
+      const data: any = await api.getProjectUsers({
+        projectId: String(projectId),
+      });
+      const payload = (data as any)?.result ?? data ?? {};
+      return Array.isArray(payload.users)
+        ? payload.users.map((u: any) => ({
+            ...u,
+            projectId: projectId,
+          }))
+        : [];
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
   }
 }

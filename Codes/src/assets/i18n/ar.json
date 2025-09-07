@@ -5,7 +5,7 @@
     "PASSWORD_PLACEHOLDER": "كلمة المرور",
     "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
     "BUTTON": "تسجيل الدخول",
-    "SWITCH_TO_ADMIN": "تسجيل دخول كمسؤول"
+    "SIGN_UP": "تسجيل الدخول"
   },
   "LOGIN_ADMIN": {
     "TITLE": "تسجيل دخول المسؤول",
@@ -14,7 +14,8 @@
     "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
     "BUTTON": "تسجيل الدخول",
     "REMEMBER_ME": "تذكرني",
-    "SWITCH_TO_USER": "تسجيل دخول المستخدم"
+    "SWITCH_TO_USER": "تسجيل دخول المستخدم",
+    "SIGN_UP": "تسجيل الدخول"
   },
   "SIDEBAR": {
     "USER_MANAGEMENT": "إدارة المستخدمين",
@@ -33,6 +34,8 @@
   "LOCATION_MANAGEMENT": {
     "LOCATION": "الموقع",
     "ZONE_NAME": "اسم المنطقة",
+    "ZONE_NAME_EN": "اسم المنطقة (انجليزي)",
+    "ZONE_NAME_AR": "اسم المنطقة (عربي)",
     "TAB_LOCATIONS": "المواقع",
     "TAB_ZONES": "المناطق",
     "ADD_LOCATION": "إضافة موقع",
@@ -93,7 +96,8 @@
     "REFRESH": "تحديث",
     "NO_EMAIL_HISTORY": "لا يوجد تاريخ للبريد الإلكتروني.",
     "SENT_TO": "مرسل إلى",
-    "RECIPIENTS": "مستلم"
+    "RECIPIENTS": "مستلم",
+    "EMAIL_USE_TEMPLATE": "استخدم قالب"
   },
   "CLIENT_DATA_MANAGEMENT": {
     "TITLE": "إدارة بيانات العميل",
@@ -109,7 +113,10 @@
       "NAME_REQUIRED": "يرجى إدخال اسم العميل باللغتين.",
       "EMAIL_REQUIRED": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
       "PHONE_REQUIRED": "يرجى إدخال رقم هاتف.",
-      "PASSWORD_REQUIRED": "يرجى إدخال كلمة مرور."
+      "PASSWORD_REQUIRED": "يرجى إدخال كلمة مرور.",
+      "FILE_TOO_LARGE": "حجم الملف كبير جداً.",
+      "FILE_READ_ERROR": "خطأ في قراءة الملف.",
+      "UPLOAD_FAILED": "فشل في الرفع."
     }
   },
   "PERMISSIONS_MANAGEMENT": {
@@ -134,12 +141,15 @@
     "STATUS": "الحالة",
     "ACCEPTED": "مقبول",
     "REJECTED": "مرفوض",
-    "MANUAL_REVIEW": "مراجعة يدوية"
+    "MANUAL_REVIEW": "مراجعة يدوية",
+    "VIEW_MANUAL_QUESTIONS": "عرض أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "عرض أسئلة يدوية لهذا التقديم"
   },
   "WELCOME": {
     "TITLE": "مرحباً بك في لوحة تحكم نظام إدارة الموظفين"
   },
   "ROLES": {
+    "USER": "مستخدم",
     "MARSHALL": "مارشال",
     "SUPERVISOR": "مشرف",
     "SENIOR_SUPERVISOR": "مشرف أول",
@@ -177,11 +187,27 @@
       "PICTURE_URL": "رابط الصورة",
       "USER": "المستخدم",
       "AREA": "المنطقة"
-    }
+    },
+    "OPEN_USER": "فتح المستخدم"
+  },
+  "ATTENDANCE": {
+    "TITLE": "إدارة الحضور",
+    "ADD_MANUAL": "إضافة الحضور (يدوية)",
+    "ADD": "إضافة",
+    "QR": "مسح الباركود لإضافة الحضور",
+    "QR_DESC": "استخدم عدسة الكاميرا لمسح الباركود الذي يحتوي على رقم المستخدم",
+    "START_SCAN": "ابدأ المسح",
+    "STOP_SCAN": "أوقف المسح",
+    "SIM_QR": "مسح الباركود (محاكاة)",
+    "LIST": "الحضور الأخير",
+    "NO_RECORDS": "لا يوجد حضور بعد",
+    "METHOD": "الطريقة",
+    "SELECT_ZONE": "اختر المنطقة",
+    "CHOOSE_ZONE": "اختر المنطقة"
   },
   "USER_MANGEMENT": {
     "TITLE": "إدارة المستخدمين",
-    "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
+    "NO_PROJECTS_FOUND": "لا يوجد مستخدمون.",
     "ERROR_LOADING_PROJECTS": "خطأ في تحميل المشاريع."
   },
   "PROJECT_MANAGEMENT": {
@@ -227,7 +253,12 @@
     "UPDATE_SCHEDULE": "تحديث الجدول الزمني",
     "DELETE_SCHEDULE_TITLE": "حذف الجدول الزمني",
     "DELETE_SCHEDULE_MESSAGE": "هل أنت متأكد من حذف هذا الجدول الزمني؟ لا يمكن التراجع عن هذا الإجراء.",
-    "PLACEHOLDER": "اختر المشروع"
+    "SCHEDULE_UPDATED": "تم تحديث الجدول الزمني بنجاح",
+    "SCHEDULE_DELETED": "تم حذف الجدول الزمني بنجاح",
+    "CREATING_SCHEDULE": "جار إنشاء الجدول الزمني...",
+    "PLACEHOLDER": "اختر المشروع",
+    "CREATING_PROJECT": "جار إنشاء المشروع...",
+    "UPDATING_PROJECT": "جار تحديث المشروع..."
   },
   "USER": {
     "ACTIONS": {
@@ -237,7 +268,13 @@
       "DISABLE_CONFIRM_TITLE": "تأكيد الغاء التفعيل",
       "DISABLE_CONFIRM_MESSAGE": "هل أنت متأكد من غياب المستخدم؟"
     },
-    "EDIT": "تعديل المستخدم"
+    "EDIT": "تعديل المستخدم",
+    "UPDATING_PROFILE": "جار تحديث الملف الشخصي..."
+  },
+  "LANGUAGE": {
+    "SELECT_LANGUAGE": "اختر اللغة",
+    "ENGLISH": "الإنجليزية",
+    "ARABIC": "العربية"
   },
   "COMMON": {
     "BUTTONS": {
@@ -246,7 +283,8 @@
       "DELETE": "حذف",
       "CANCEL": "إلغاء",
       "CREATE": "إنشاء",
-      "UPDATE": "تحديث"
+      "UPDATE": "تحديث",
+      "REMOVE": "إزالة"
     },
     "LABELS": {
       "ROLE": "الدور",
@@ -260,7 +298,14 @@
     "STATUS": {
       "PRESENT": "حضور",
       "ABSENT": "غياب"
-    }
+    },
+    "ERRORS": {
+      "REQUIRED": "مطلوب",
+      "TOO_LONG": "طويل جداً"
+    },
+    "LOADING": "جار التحميل...",
+    "SIGN_UP": "تسجيل الدخول",
+    "SIGN_OUT": "تسجيل الخروج"
   },
   "ADD_ROLE_MODAL": {
     "TITLE": "إضافة دور",
@@ -274,6 +319,10 @@
     "CHOOSE_ROLE_OPTION": "-- اختر دور --",
     "ASSIGN_ROLE_BTN": "تعيين الدور",
     "CANCEL_BTN": "إلغاء",
+    "ASSIGNING_ROLE": "جار تعيين الدور...",
+    "ASSIGNING_ROLE_DESCRIPTION": "جار تعيين الدور...",
+    "CHOOSE_PROJECT_OPTION": "-- اختر مشروع --",
+
     "ERRORS": {
       "EMAIL_REQUIRED": "يرجى إدخال البريد الإلكتروني.",
       "VERIFICATION_FAILED": "فشل التحقق من البريد الإلكتروني (محاكاة).",
@@ -328,6 +377,7 @@
     "MODAL": {
       "ADD_QUESTIONS_TITLE": "إضافة أسئلة",
       "EDIT_QUESTION_TITLE": "تعديل السؤال",
+      "UPDATING_QUESTION": "جار تحديث السؤال...",
       "TEXT_LABEL": "النص",
       "DESCRIPTION_LABEL": "الوصف",
       "TYPE_LABEL": "النوع",
@@ -362,6 +412,7 @@
     "SELECT_LOCATION_TO_CREATE_LOCATION_BASED_FORM": "يرجى اختيار موقع في الشريط العلوي لإنشاء نموزج مرتبط بالموقع.",
     "SELECTED_LOCATION": "الموقع المختار",
     "FORM_NAME": "اسم النموزج",
+    "FORM_NAME_PLACEHOLDER": "أدخل اسم النموزج",
     "ENTER_FORM_NAME": "أدخل اسم النموزج",
     "FORM_DETAILS": "تفاصيل النموزج",
     "FORM_TYPE": "نوع النموزج",
@@ -373,11 +424,20 @@
     "PLEASE_SELECT_A_PROJECT": "يرجى اختيار مشروع",
     "EDIT_FORM": "تعديل النموزج",
     "DELETE_FORM": "حذف النموزج",
+    "DELETE_FORM_CONFIRMATION": "هل أنت متأكد من أنك تريد حذف هذا النموزج؟ لا يمكن التراجع عن هذا الإجراء.",
     "LOCATION_BASED_FORM_TITLE": "نموزج مرتبط بالموقع",
     "PROJECT_BASED_FORM_TITLE": "نموزج مرتبط بالمشروع",
     "FORM_ID": "رقم النموزج",
     "CREATED": "تاريخ الإنشاء",
-    "UPDATED_AT": "تاريخ التحديث"
+    "UPDATED_AT": "تاريخ التحديث",
+    "ERROR_LOADING_FORMS": "خطأ في تحميل النماذج. يرجى المحاولة مرة أخرى.",
+    "NO_FORMS_FOUND": "لم يتم العثور على نماذج لهذا المشروع.",
+    "SELECTED_PROJECT": "المشروع المحدد",
+    "PROJECT_ID": "معرف المشروع",
+    "PROJECT_NAME": "اسم المشروع",
+    "LOADING_FORMS": "جاري تحميل النماذج...",
+    "CREATING_FORM": "جاري إنشاء النموزج...",
+    "PLEASE_ENTER_FORM_NAME": "يرجى إدخال اسم النموزج"
   },
   "INTERVIEWS": {
     "TITLE": "إدارة المقابلات",
@@ -404,15 +464,64 @@
     "BUTTON": "تم",
     "LINK_TO_LOGIN": "عد الى صفحة تسجيل الدخول",
     "TEXT2": "أدخل عنوان بريدك الإلكتروني للبدء سنرسل لك رابطًا يمكنك من خلاله تغيير كلمة المرور الخاصة بك!"
-  } ,  
-   "TWO_FA": {
-    "TITLE": "التحقق بخطوتين",
-    "INSTRUCTION": "أدخل الرمز المكون من 6 أرقام المرسل إلى هاتفك",
-    "PHONE_PLACEHOLDER": "أدخل رقم هاتفك ...",
-    "VERIFY_BUTTON": "تحقق من الرمز",
-    "NOT_RECEIVED": "لم يصل الرمز؟",
-    "RESEND_LINK": "إعادة الإرسال",
-    "SEND_CODE":"ارسل الكود"
-
+  },
+  "SIGNUP": {
+    "TITLE": "تسجيل الدخول",
+    "EMAIL_PLACEHOLDER": "أدخل البريد الإلكتروني ...",
+    "PASSWORD_PLACEHOLDER": "أدخل كلمة المرور ...",
+    "BUTTON": "تم",
+    "NAME_EN": "أدخل الاسم (انجليزي) ...",
+    "NAME_AR": "أدخل الاسم (عربي) ...",
+    "CONFIRM_PASSWORD": "أدخل كلمة المرور مرة أخرى ...",
+    "UPLOAD_PICTURE": "رفع الصورة",
+    "FORGET_PASSWORD": "نسيت كلمة المرور؟",
+    "SWITCH_TO_LOGIN": "عد الى صفحة تسجيل الدخول",
+    "CREATING": "جار إنشاء الحساب..."
+  },
+  "NAV": {
+    "MANUAL_SUBMISSIONS": "تقديمات يدوية",
+    "MANUAL_QUESTIONS": "أسئلة يدوية",
+    "TAKE_ATTENDANCE": "إدارة الحضور",
+    "PROJECTS": "المشاريع"
+  },
+  "MANUAL_QUESTIONS": {
+    "GO_BACK": "عد الى صفحة تقديمات يدوية",
+    "TITLE": "أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS": "عرض أسئلة يدوية",
+    "VIEW_MANUAL_QUESTIONS_DESCRIPTION": "عرض أسئلة يدوية لهذا التقديم"
+  },
+  "PROJECTS": {
+    "TITLE": "إدارة المشاريع",
+    "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
+    "LOADING": "جار تحميل المشاريع...",
+    "STARTING_DATE": "تاريخ البدء",
+    "ENDING_DATE": "تاريخ الانتهاء",
+    "FORM": "النموزج",
+    "OPEN_SELECTED_FORM": "فتح النموزج المختار",
+    "SELECTED_LOCATION_HAS_NO_FORM_CONFIGURED": "الموقع المختار لا يحتوي على نموزج مكون.",
+    "NO_FORM_IS_CONFIGURED_FOR_THIS_PROJECT": "لا يوجد نموزج مكون لهذا المشروع."
+  },
+  "CLIENT": {
+    "CREATE_TITLE": "إنشاء عميل",
+    "TITLE": "إنشاء عميل",
+    "NAME_EN": "أدخل الاسم (انجليزي) ...",
+    "NAME_AR": "أدخل الاسم (عربي) ...",
+    "CONTACT_EMAIL": "أدخل البريد الإلكتروني ...",
+    "CONTACT_PHONE": "أدخل رقم الهاتف ...",
+    "PASSWORD": "أدخل كلمة المرور ...",
+    "COMPANY_EN": "أدخل اسم الشركة (انجليزي) ...",
+    "COMPANY_AR": "أدخل اسم الشركة (عربي) ...",
+    "UPLOAD_LOGO": "رفع الشعار",
+    "CREATING": "جار إنشاء العميل...",
+    "CREATE_BUTTON": "إنشاع العميل",
+    "BACK_TO_LIST": "عد الى قائمة العملاء",
+    "BACK_TO_CLIENTS": "عد الى قائمة العملاء",
+    "GO_TO_LOGIN": "عد الى صفحة تسجيل الدخول"
+  },
+  "FORM_SUCCESS": {
+    "TITLE": "تم إرسال الطلب بنجاح!",
+    "MESSAGE": "شكراً لك على إرسال طلبك. تم تسجيل إجاباتك.",
+    "EMAIL_NOTICE": "يرجى التحقق من بريدك الإلكتروني لمعرفة حالة طلبك.",
+    "BUTTON_HOME": "العودة للمشاريع"
   }
 }

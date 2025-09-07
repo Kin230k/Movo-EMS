@@ -17,6 +17,10 @@ import {
   QueryClient,
   withDevtools,
 } from '@tanstack/angular-query-experimental';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { initializeApp } from 'firebase/app';
+import { provideFirebaseApp } from '@angular/fire/app';
+import { firebaseConfig } from '../../../environments/firebase.config';
 // Global error handler
 class GlobalErrorHandler implements ErrorHandler {
   handleError(error: unknown): void {
@@ -31,7 +35,26 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
 
     provideHttpClient(withInterceptorsFromDi()),
-    provideTanStackQuery(new QueryClient(), withDevtools()),
+    provideTanStackQuery(
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // Treat fresh for 5 minutes by default
+            staleTime: 5 * 60 * 1000,
+            // Reasonable cache GC window
+            gcTime: 15 * 60 * 1000,
+            // Avoid refetching on every focus which can flicker to stale
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: true,
+            refetchOnMount: false,
+            retry: 2,
+          },
+        },
+      }),
+      withDevtools()
+    ),
+    provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideAuth(() => getAuth()),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: '/assets/i18n/',

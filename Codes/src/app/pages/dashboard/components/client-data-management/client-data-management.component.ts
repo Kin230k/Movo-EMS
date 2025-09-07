@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../core/api/api';
 import { CardListComponent } from '../../../../components/shared/card-list/card-list.component';
 import { CardListSkeletionComponent } from '../../../../components/shared/card-list-skeletion/card-list-skeletion.component';
 import { ClientTopbarComponent } from './topbar/topbar.component';
@@ -19,7 +20,13 @@ import { ClientProfileCardComponent } from './profile-card/client-profile-card.c
   styleUrl: './client-data-management.component.scss',
 })
 export class ClientDataManagementComponent {
-  clients: any[] = [];
+  constructor() {}
+
+  private _clients: any[] = [];
+
+  get clients() {
+    return this._clients;
+  }
   profileCardComponent = ClientProfileCardComponent;
 
   private _isLoading = false;
@@ -42,34 +49,32 @@ export class ClientDataManagementComponent {
     this._isLoading = true;
     this._error = null;
     this._isFinished = false;
-    this.clients = [];
+    this._clients = [];
 
     try {
-      const clients = await this.fetchClients();
-      this.clients = clients;
+      const data: any = await api.getAllClients();
+      const payload = (data as any)?.result ?? data ?? [];
+      this._clients = Array.isArray(payload)
+        ? payload.map((c: any, idx: number) => ({
+            clientId: c.clientId ?? c.id ?? idx + 1,
+            name: c.name,
+            phone: c.contactPhone ?? c.phone ?? '',
+            email: c.contactEmail ?? c.email ?? '',
+            picture: c.logo ?? '/assets/images/image.png',
+            logo: c.logo ?? '/assets/images/image.png',
+            company: c.company ?? null,
+          }))
+        : [];
       this._isFinished = true;
     } catch (err) {
       this._error = err;
-      this.clients = [];
+      this._clients = [];
     } finally {
       this._isLoading = false;
     }
   }
 
-  async fetchClients(): Promise<any[]> {
-    await new Promise((r) => setTimeout(r, 900));
-    return (this.clients = Array.from({ length: 10 }).map((_, i) => ({
-      clientId: i + 1,
-      name: { en: `Client A${i + 1}`, ar: `عميل A${i + 1}` },
-      phone: '0987654321',
-      email: `clientA${i + 1}@example.com`,
-      picture: '/assets/images/image.png',
-      logo: '/assets/images/image.png',
-      company: { en: `Client A${i + 1}`, ar: `عميل A${i + 1}` },
-    })));
-  }
-
-  onClientCreated(payload: {
+  async onClientCreated(payload: {
     name: { en: string; ar: string };
     contactEmail: string;
     contactPhone: string;
@@ -77,16 +82,18 @@ export class ClientDataManagementComponent {
     logo?: string;
     company?: { en: string; ar: string } | null;
   }) {
-    const newClient = {
-      clientId: Date.now(),
-      name: payload.name,
-      phone: payload.contactPhone,
-      email: payload.contactEmail,
-      picture: payload.logo || '/assets/images/image.png',
-      logo: payload.logo || '/assets/images/image.png',
-      company: payload.company ?? null,
-      isPresent: true,
-    };
-    this.clients = [newClient, ...this.clients];
+    try {
+      await api.adminCreateClient(payload as any);
+      // Refresh the client list after creation
+      await this.onClientSelected();
+    } catch (error) {
+      console.error('Error creating client:', error);
+      alert('Error creating client. Please try again.');
+    }
+  }
+
+  // Refetch methods for modals
+  async refetchClients(): Promise<void> {
+    await this.onClientSelected();
   }
 }

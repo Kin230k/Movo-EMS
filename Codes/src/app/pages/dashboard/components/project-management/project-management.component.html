@@ -23,11 +23,10 @@
 
   <!-- Projects Tab Content -->
   <div *ngIf="activeTab === 'projects'" class="tab-content">
-    <app-topbar
+    <app-project-topbar
       [projects]="transformedProjects"
-      (projectCreated)="onProjectCreated($event)"
-      (scheduleCreated)="onScheduleCreated($event)"
-    ></app-topbar>
+      (addProject)="refetchProjects()"
+    ></app-project-topbar>
 
     <!-- show error -->
     <div *ngIf="error" class="error" role="alert">
@@ -54,10 +53,14 @@
       class="card-list-container"
       *ngIf="!isLoading && mockProjects && mockProjects.length > 0"
     >
-      <app-card-list
-        [items]="mockProjects"
-        [cardComponent]="profileCardComponent"
-      ></app-card-list>
+      <section class="card-list">
+        <app-profile-card
+          *ngFor="let project of mockProjects"
+          [data]="project"
+          (editProject)="onProfileEdit($event)"
+          (refetch)="refetchProjects()"
+        ></app-profile-card>
+      </section>
     </div>
   </div>
 
@@ -88,7 +91,7 @@
     <div class="schedules-content">
       <!-- Loading state -->
       <div *ngIf="isLoading" class="loading-state">
-        {{ "PROJECT_MANAGEMENT.LOADING_SCHEDULES" | translate }}
+        <app-card-list-skeletion></app-card-list-skeletion>
       </div>
 
       <!-- Error state -->
@@ -146,7 +149,7 @@
     *ngIf="showAddSchedule"
     [projects]="transformedProjects"
     (close)="onScheduleModalClose()"
-    (create)="onScheduleCreated($event)"
+    (refetch)="refetchSchedules()"
   ></app-add-schedule-modal>
 
   <!-- Edit Schedule Modal -->
@@ -165,4 +168,12 @@
     (close)="onScheduleDeleteClose()"
     (confirm)="onScheduleDeleteConfirm()"
   ></app-delete-modal>
+
+  <!-- Profile Edit Modal -->
+  <app-profile-modal
+    *ngIf="showProfileModal && selectedProjectData"
+    [data]="selectedProjectData"
+    (close)="onProfileModalClose()"
+    (edit)="onProfileModalEdit($event)"
+  ></app-profile-modal>
 </div>

@@ -45,6 +45,17 @@
 
 .card-list-skeleton {
   margin-top: 1rem;
+
+  .loading-message {
+    text-align: center;
+    margin-bottom: 1rem;
+
+    p {
+      color: var(--color-font-secondary);
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
 }
 
 .info-section {

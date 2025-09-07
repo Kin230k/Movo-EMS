@@ -4,7 +4,7 @@ import { ComboSelectorComponent } from '../../../../components/shared/combo-sele
 import { TranslateModule } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { SkeletonFormCardComponent } from '../../../../components/shared/skeleton-form-card/skeleton-form-card.component';
-import { delay } from 'rxjs/operators';
+import api from '../../../../core/api/api';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -27,51 +27,29 @@ export interface Form {
     SkeletonFormCardComponent,
   ],
   templateUrl: './emails.component.html',
-  styleUrl: './emails.component.scss',
+  styleUrls: ['./emails.component.scss'],
 })
 export class EmailsComponent implements OnInit {
   // Tab management (two tabs only: Send and History)
   activeTab: 'compose' | 'history' = 'compose';
 
-  // Mock forms data - in real app this would come from an API
-  forms: Form[] = [
-    { id: '1', title: 'Customer Feedback Form' },
-    { id: '2', title: 'Employee Survey' },
-    { id: '3', title: 'Project Evaluation' },
-    { id: '4', title: 'Training Registration' },
-  ];
+  // Forms loaded directly from API
+  private _forms: Form[] = [];
+  private _isFormsLoading = false;
 
-  formsForSelector = this.forms.map((form) => ({
-    id: form.id,
-    name: { en: form.title, ar: form.title },
-  }));
+  get forms(): Form[] {
+    return this._forms;
+  }
+  get formsForSelector() {
+    return (this.forms || []).map((form) => ({
+      id: form.id,
+      name: { en: form.title, ar: form.title },
+    }));
+  }
 
-  emails = [
-    {
-      id: '1',
-      title: 'Customer Feedback Form',
-      body: 'Customer Feedback Form Body',
-      formId: '1',
-    },
-    {
-      id: '2',
-      title: 'Employee Survey',
-      body: 'Employee Survey Body',
-      formId: '2',
-    },
-    {
-      id: '3',
-      title: 'Project Evaluation',
-      body: 'Project Evaluation Body',
-      formId: '3',
-    },
-    {
-      id: '4',
-      title: 'Training Registration',
-      body: 'Training Registration Body',
-      formId: '4',
-    },
-  ];
+  // Email templates list (awaiting backend endpoint). Keep empty to avoid mocks.
+  emails: Array<{ id: string; title: string; body: string; formId: string }> =
+    [];
 
   // Email history data (loaded per selected form)
   emailHistory: Array<{
@@ -87,32 +65,73 @@ export class EmailsComponent implements OnInit {
   isLoading = false;
 
   // Compose form
-  composeForm!: FormGroup;
+  composeForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
-
-  ngOnInit() {
-    this.initializeComposeForm({
-      recipientType: 'users',
-      customRecipients: '',
-      templateId: '',
-      subject: '',
-      body: '',
+  constructor(private fb: FormBuilder) {
+    // Initialize form immediately so template bindings are safe and the
+    // disabled state works predictably even while async data loads.
+    this.composeForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      subject: ['', Validators.required],
+      body: ['', Validators.required],
+      // If you later re-enable recipientType/customer fields, add them here
+      // recipientType: ['users', Validators.required],
+      // customRecipients: ['']
     });
   }
 
-  onFormSelected(formId: string | undefined) {
+  async ngOnInit() {
+    // Load forms for selectors directly from API
+    try {
+      this._isFormsLoading = true;
+      const data: any = await api.getFormsByClient({});
+      const payload = (data as any)?.result ?? data ?? {};
+      this._forms = Array.isArray(payload.forms)
+        ? payload.forms.map((f: any) => ({
+            id: String(f.formId ?? f.id),
+            title: f.formTitle ?? f.title ?? 'Form',
+          }))
+        : [];
+    } catch (error) {
+      console.error('Error loading forms:', error);
+      this._forms = [];
+    } finally {
+      this._isFormsLoading = false;
+    }
+
+    // Reset form to default values after initial load (keeps FormGroup instance)
+    this.resetComposeForm();
+  }
+
+  async onHistoryFormSelected(formId: string | undefined) {
     this.selectedFormId = formId;
+    this.emailHistory = [];
 
     if (formId) {
-      this.loadEmailsForForm(formId).subscribe({
-        next: (emails) => this.onEmailsLoaded(emails),
-        error: (error) => this.onEmailsLoadError(error),
+      // Load email templates
+      try {
+        const emails = await this.loadEmailsForForm(formId);
+        this.onEmailsLoaded(emails);
+      } catch (error) {
+        this.onEmailsLoadError(error);
+      }
+
+      // Load email history
+      this.loadEmailHistoryForForm(formId).subscribe({
+        next: (items) => {
+          this.emailHistory = items as any;
+          this.isHistoryLoading = false;
+        },
+        error: () => {
+          this.emailHistory = [];
+          this.isHistoryLoading = false;
+        },
       });
     } else {
-      // Reset emails when no form is selected
+      // Reset emails and history when no form is selected
       this.resetEmails();
       this.isLoading = false;
+      this.isHistoryLoading = false;
     }
   }
 
@@ -128,86 +147,33 @@ export class EmailsComponent implements OnInit {
       emailId: email.id,
       title: { en: email.title, ar: email.title }, // Simple mock for multilingual
       body: { en: email.body, ar: email.body }, // Simple mock for multilingual
-      formId: email.formId,
-      formTitle: this.getFormTitle(email.formId),
       createdAt: new Date().toISOString(), // Mock created date
     };
   }
 
-  // Mock API call - Angular Query compatible
-  private loadEmailsForForm(formId: string): Observable<any[]> {
+  // Load email templates for the selected form
+  private async loadEmailsForForm(formId: string): Promise<any[]> {
     this.isLoading = true;
-
-    // Mock API response with delay (simulating network request)
-    return of(this.getMockEmailsForForm(formId)).pipe(
-      delay(2000) // 2 second delay to show loading
-    );
+    try {
+      const response = await api.getEmailsByForm({ formId });
+      return response?.emails || [];
+    } catch (error) {
+      console.error('Error loading emails for form:', error);
+      return [];
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  private getMockEmailsForForm(formId: string): any[] {
-    return [
-      {
-        id: `${formId}-1`,
-        title: `Email Template 1 for Form ${formId}`,
-        body: `This is the body content for email template 1 related to form ${formId}`,
-        formId: formId,
-      },
-      {
-        id: `${formId}-2`,
-        title: `Email Template 2 for Form ${formId}`,
-        body: `This is the body content for email template 2 related to form ${formId}`,
-        formId: formId,
-      },
-    ];
-  }
-
-  // Mock history API call (future: wire to Angular Query)
+  // Placeholder until email history endpoint exists
   private loadEmailHistoryForForm(formId: string): Observable<any[]> {
     this.isHistoryLoading = true;
-    const history = [
-      {
-        id: `${formId}-h1`,
-        subject: `Welcome for form ${formId}`,
-        sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        body: 'Welcome for form 1',
-      },
-      {
-        id: `${formId}-h2`,
-        subject: `Reminder for form ${formId}`,
-        sentAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        body: 'Reminder for form 2',
-      },
-    ];
-    return of(history).pipe(delay(1500));
+    // No backend yet → return empty array without artificial delay
+    return of([]);
   }
 
   private resetEmails() {
-    this.emails = [
-      {
-        id: '1',
-        title: 'Customer Feedback Form',
-        body: 'Customer Feedback Form Body',
-        formId: '1',
-      },
-      {
-        id: '2',
-        title: 'Employee Survey',
-        body: 'Employee Survey Body',
-        formId: '2',
-      },
-      {
-        id: '3',
-        title: 'Project Evaluation',
-        body: 'Project Evaluation Body',
-        formId: '3',
-      },
-      {
-        id: '4',
-        title: 'Training Registration',
-        body: 'Training Registration Body',
-        formId: '4',
-      },
-    ];
+    this.emails = [];
   }
 
   getFormTitle(formId?: string): string {
@@ -227,8 +193,7 @@ export class EmailsComponent implements OnInit {
   onEmailsLoadError(error: any) {
     console.error('Error loading emails:', error);
     this.isLoading = false;
-    // Fallback to mock data
-    this.emails = this.getMockEmailsForForm(this.selectedFormId || '1');
+    this.emails = [];
   }
 
   // Tab management
@@ -236,30 +201,10 @@ export class EmailsComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  // Compose form methods
-  initializeComposeForm(initialValue: any) {
-    this.composeForm = this.fb.group({
-      email: [
-        initialValue?.email || '',
-        [Validators.required, Validators.email],
-      ], // <-- ADDED
-      formId: [initialValue?.formId || null],
-      recipientType: [
-        initialValue?.recipientType || 'users',
-        Validators.required,
-      ],
-      customRecipients: [initialValue?.customRecipients || ''],
-      templateId: [initialValue?.templateId || ''],
-      subject: [initialValue?.subject || '', Validators.required],
-      body: [initialValue?.body || '', Validators.required],
-    });
-  }
-
   onRecipientTypeChange() {
     // Reset form fields when recipient type changes
     this.composeForm.patchValue({
-      customRecipients: '',
-      templateId: '',
+      email: '',
     });
   }
 
@@ -269,7 +214,6 @@ export class EmailsComponent implements OnInit {
       if (template) {
         // Patch the template id so the form control exists and UI updates
         this.composeForm.patchValue({
-          templateId: templateId,
           subject: template.title,
           body: template.body,
         });
@@ -281,26 +225,28 @@ export class EmailsComponent implements OnInit {
     }
   }
 
-  sendEmail() {
+  async sendEmail() {
     if (this.composeForm.valid) {
-      const formData = this.composeForm.value;
+      try {
+        const formData = this.composeForm.value;
+        await api.sendEmail({
+          email: formData.email,
+          subject: formData.subject,
+          body: formData.body,
+        });
 
-      // Mock email sending
-      const newHistoryItem = {
-        id: Date.now().toString(),
-        subject: formData.subject,
-        sentAt: new Date(),
-        body: formData.body,
-      };
-
-      this.emailHistory.unshift(newHistoryItem);
-
-      // Reset form and switch to history tab
-      this.resetComposeForm();
-      this.setActiveTab('history');
-
-      // Show success message (you could use a toast service here)
-      alert('Email sent successfully!');
+        const newHistoryItem = {
+          id: Date.now().toString(),
+          subject: formData.subject,
+          sentAt: new Date(),
+          body: formData.body,
+        };
+        this.emailHistory.unshift(newHistoryItem);
+        this.resetComposeForm();
+        this.setActiveTab('history');
+      } catch (error) {
+        console.error('Error sending email:', error);
+      }
     }
   }
 
@@ -311,20 +257,23 @@ export class EmailsComponent implements OnInit {
       case 'form':
         return 25; // Mock: form recipients
       case 'custom':
-        return formData.customRecipients.split(',').length;
+        return formData.email.split(',').length;
       default:
         return 0;
     }
   }
 
   resetComposeForm() {
+    // Keep the same FormGroup instance to avoid template race conditions.
     this.composeForm.reset({
-      recipientType: 'users',
-      customRecipients: '',
-      templateId: '',
+      email: '',
       subject: '',
       body: '',
     });
+
+    // mark as pristine/touched states if needed
+    this.composeForm.markAsPristine();
+    this.composeForm.markAsUntouched();
   }
 
   openComposeModal() {
@@ -334,43 +283,22 @@ export class EmailsComponent implements OnInit {
   // Email card actions
   onEditEmail(emailData: any) {
     console.log('Edit email:', emailData);
-    // Navigate to edit modal or page
   }
 
   onDuplicateEmail(emailData: any) {
     console.log('Duplicate email:', emailData);
-    // Create duplicate template
   }
 
   onDeleteEmail(emailData: any) {
     console.log('Delete email:', emailData);
-    // Show delete confirmation
   }
 
   onSendEmail(emailData: any) {
     console.log('Send email template:', emailData);
-    // Pre-populate compose form with template data
     this.setActiveTab('compose');
     this.onTemplateSelected(emailData.emailId);
   }
 
-  // History methods
-  onHistoryFormSelected(formId: string | undefined) {
-    this.selectedFormId = formId;
-    this.emailHistory = [];
-    if (!formId) {
-      this.isHistoryLoading = false;
-      return;
-    }
-    this.loadEmailHistoryForForm(formId).subscribe({
-      next: (items) => {
-        this.emailHistory = items as any;
-        this.isHistoryLoading = false;
-      },
-      error: () => {
-        this.emailHistory = [];
-        this.isHistoryLoading = false;
-      },
-    });
-  }
+  // History methods - now also loads email templates
+  // The email history loading logic has been moved to the new onHistoryFormSelected method above
 }

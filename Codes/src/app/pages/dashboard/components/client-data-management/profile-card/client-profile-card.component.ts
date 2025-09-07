@@ -1,6 +1,8 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnDestroy,
   OnInit,
   ChangeDetectorRef,
@@ -22,6 +24,7 @@ import { EditClientModalComponent } from './edit-client-modal.component';
 })
 export class ClientProfileCardComponent implements OnInit, OnDestroy {
   @Input() data: any;
+  @Output() refetch = new EventEmitter<void>();
 
   modalOpen = false;
   isMenuOpen = false;
@@ -77,6 +80,10 @@ export class ClientProfileCardComponent implements OnInit, OnDestroy {
   handleModalEdit = (payload: any) => {
     this.data = { ...this.data, ...payload };
     this.closeModal();
+  };
+
+  handleModalRefetch = () => {
+    this.refetch.emit();
   };
 
   @HostListener('document:click', ['$event'])

@@ -6,6 +6,7 @@ import {
   HostListener,
   OnInit,
   OnDestroy,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -15,6 +16,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../../core/api/api';
 
 @Component({
   selector: 'app-add-project-modal',
@@ -24,8 +26,10 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./add-project-modal.component.scss'],
 })
 export class AddProjectModalComponent implements OnInit, OnDestroy {
+  isSubmitting = signal(false);
+  errorMessage = signal('');
   @Output() close = new EventEmitter<void>();
-  @Output() create = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
 
   form!: FormGroup;
   dataLoaded = true;
@@ -64,13 +68,36 @@ export class AddProjectModalComponent implements OnInit, OnDestroy {
     this.close.emit();
   }
 
-  onSave(evt?: MouseEvent) {
+  async onSave(evt?: MouseEvent) {
     evt?.stopPropagation();
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.create.emit(this.form.value);
+    // create project
+    this.isSubmitting.set(true);
+    const data = {
+      name: { en: this.form.value.nameEn, ar: this.form.value.nameAr },
+      startingDate: this.form.value.startingDate,
+      endingDate: this.form.value.endingDate,
+      description: {
+        en: this.form.value.descriptionEn,
+        ar: this.form.value.descriptionAr,
+      },
+    };
+
+    try {
+      await api.createProject(data);
+      // Success case - emit refetch and close
+      this.refetch.emit();
+      this.close.emit();
+    } catch (error: any) {
+      this.errorMessage.set(
+        error.message || 'An error occurred while creating project'
+      );
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 
   onClose(evt?: MouseEvent) {

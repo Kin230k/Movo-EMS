@@ -16,6 +16,7 @@ import { ProfileModalComponent } from './profile-modal/profile-modal.component';
 import { DeleteModalComponent } from '../../../../../components/shared/delete-modal/delete-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import api from '../../../../../core/api/api';
 
 @Component({
   selector: 'app-profile-card',
@@ -36,6 +37,7 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
   modalOpen = false;
   deleteModalOpen = false;
   isMenuOpen = false; // To toggle the visibility of the menu
+  isDeleting = false; // Loading state for delete operation
   private destroy$ = new Subject<void>();
 
   @ViewChild('menuWrapper') menuWrapper!: ElementRef;
@@ -98,26 +100,45 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     console.log('Edit user', this.data);
   }
 
-  handleModalEdit = (payload: any) => {
-    this.data = { ...this.data, ...payload };
-    console.log('User updated:', this.data);
+  handleModalEdit = async (payload: any) => {
+    payload = {
+      roleId: payload.role,
+      userId: this.data.userId,
+      projectId: this.data.projectId,
+    };
+    this.data = { ...this.data, role: payload.role };
+    await api.updateProjectUserRoleByUserAndProject(payload);
     this.closeModal();
   };
 
-  handleModalDisable = (payload: any) => {
+  handleModalDisable = async (payload: any) => {
     this.onDisableUser();
+
     this.closeModal();
   };
 
   closeDeleteModal() {
     this.deleteModalOpen = false;
+    this.isDeleting = false; // Reset loading state when modal closes
   }
 
-  confirmDisable() {
-    // emit or call disable logic here
-    console.log('Confirmed disable for', this.data);
-    this.deleteModalOpen = false;
-    this.closeModal();
+  async confirmDisable() {
+    try {
+      this.isDeleting = true;
+      const payload = {
+        userId: this.data.userId,
+        projectId: this.data.projectId,
+      };
+      await api.deleteProjectUserRoleByUserAndProject(payload);
+      // Only close the modal after successful API call
+      this.closeDeleteModal();
+    } catch (error) {
+      console.error('Error disabling user:', error);
+      // Keep modal open on error so user can try again
+      // You might want to show an error message here
+    } finally {
+      this.isDeleting = false;
+    }
   }
 
   get displayName(): string {

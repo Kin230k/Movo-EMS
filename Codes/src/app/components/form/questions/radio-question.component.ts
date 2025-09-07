@@ -15,7 +15,12 @@ import { FormQuestionDto } from '../../../shared/types/form';
       <label class="q-label">{{ question.questionText }}</label>
       <div class="radio-group">
         <label *ngFor="let opt of question.options || []" class="radio-item">
-          <input type="radio" [value]="opt.optionId" [formControl]="control" />
+          <input
+            type="radio"
+            [value]="opt.optionId"
+            [formControl]="control"
+            [disabled]="disabled"
+          />
           <span>{{ opt.optionText }}</span>
         </label>
       </div>
@@ -61,4 +66,5 @@ export class RadioQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 }

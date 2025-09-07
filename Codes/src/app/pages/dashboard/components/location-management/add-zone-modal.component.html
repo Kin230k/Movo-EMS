@@ -23,9 +23,13 @@
       ></app-combo-selector>
 
       <label class="label">{{
-        "LOCATION_MANAGEMENT.ZONE_NAME" | translate
+        "LOCATION_MANAGEMENT.ZONE_NAME_EN" | translate
       }}</label>
-      <input type="text" class="text-input" [(ngModel)]="name" />
+      <input type="text" class="text-input" [(ngModel)]="nameEn" />
+      <label class="label">{{
+        "LOCATION_MANAGEMENT.ZONE_NAME_AR" | translate
+      }}</label>
+      <input type="text" class="text-input" [(ngModel)]="nameAr" />
 
       <p class="error" *ngIf="error">{{ error }}</p>
 

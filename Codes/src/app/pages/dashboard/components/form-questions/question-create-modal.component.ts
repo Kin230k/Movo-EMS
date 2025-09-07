@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -31,8 +31,10 @@ export class QuestionCreateModalComponent {
     | [] = [];
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any[]>();
+  @Output() refetch = new EventEmitter<void>();
 
   form: FormGroup;
+  isSubmitting = signal(false);
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -46,9 +48,9 @@ export class QuestionCreateModalComponent {
 
   createItemGroup(): FormGroup {
     return this.fb.group({
-      text: ['', Validators.required],
+      questionText: ['', Validators.required],
       description: [''],
-      type: ['', Validators.required],
+      typeCode: ['', Validators.required],
       options: this.fb.array([]),
       criteria: this.fb.array([]),
     });
@@ -81,10 +83,10 @@ export class QuestionCreateModalComponent {
     return this.items.at(index).get('criteria') as FormArray<FormGroup>;
   }
 
-  addCriteria(index: number, effect: 'pass' | 'fail') {
+  addCriteria(index: number, effect: 'PASS' | 'FAIL') {
     this.getCriteriaControls(index).push(
       this.fb.group({
-        condition: ['=', Validators.required],
+        type: ['=', Validators.required],
         value: [''],
         valueTo: [''],
         effect: [effect, Validators.required],
@@ -104,13 +106,13 @@ export class QuestionCreateModalComponent {
 
   getPassCriteria(index: number): FormGroup[] {
     return (this.getCriteriaControls(index).controls as FormGroup[]).filter(
-      (c) => c.get('effect')?.value === 'pass'
+      (c) => c.get('effect')?.value === 'PASS'
     );
   }
 
   getFailCriteria(index: number): FormGroup[] {
     return (this.getCriteriaControls(index).controls as FormGroup[]).filter(
-      (c) => c.get('effect')?.value === 'fail'
+      (c) => c.get('effect')?.value === 'FAIL'
     );
   }
 
@@ -139,7 +141,7 @@ export class QuestionCreateModalComponent {
 
   onQuestionTypeSelect(selectedType: string | null, itemIndex: number) {
     const item = this.items.at(itemIndex);
-    const typeControl = item.get('type');
+    const typeControl = item.get('typeCode');
     if (selectedType) {
       typeControl?.setValue(selectedType);
     } else {
@@ -158,7 +160,7 @@ export class QuestionCreateModalComponent {
     const idx = (criteria.controls as FormGroup[]).indexOf(criterion);
     if (idx === -1) return;
     const target = criteria.at(idx) as FormGroup;
-    target.get('condition')?.setValue(selectedCondition ?? '');
+    target.get('type')?.setValue(selectedCondition ?? '');
   }
 
   onRadioChange(itemIndex: number, selectedOptionIndex: number) {
@@ -175,6 +177,9 @@ export class QuestionCreateModalComponent {
       this.form.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting.set(true);
     this.save.emit(this.form.value.items);
+    this.refetch.emit();
   }
 }

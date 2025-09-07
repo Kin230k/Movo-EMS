@@ -5,6 +5,7 @@ import { ComboSelectorComponent } from '../../../../../components/shared/combo-s
 import { AddFormModalComponent } from './add-form-modal.component';
 import { ThemedButtonComponent } from '../../../../../components/shared/themed-button/themed-button';
 import { TranslateModule } from '@ngx-translate/core';
+import api from '../../../../../core/api/api';
 export interface Project {
   id: string;
   name: { en: string; ar: string };
@@ -32,6 +33,7 @@ export class FormManagementTopbarComponent {
   @Input() projects: Project[] = [];
   @Input() locations: Location[] = [];
   @Output() projectSelected = new EventEmitter<string | null>();
+  @Output() refetch = new EventEmitter<void>();
 
   showAddFormModal = false;
   selectedProjectId: string | null = null;
@@ -51,15 +53,41 @@ export class FormManagementTopbarComponent {
     this.showAddFormModal = false;
   }
 
-  onFormCreated(formData: { projectId: string; locationId?: string }) {
-    // Navigate to create-form-questions with form data
-    this.router.navigate(['/dashboard/create-form-questions'], {
-      queryParams: {
+  async onFormCreated(formData: {
+    projectId: string;
+    locationId?: string;
+    formLanguage?: string;
+    formName?: string;
+  }) {
+    try {
+      const result = await api.createForm({
         projectId: formData.projectId,
         locationId: formData.locationId,
-        formName: (formData as any).formName,
-      },
-    });
-    this.showAddFormModal = false;
+        formLanguage: formData.formLanguage,
+        formTitle: formData.formName,
+      } as any);
+
+      if ((result as any).success) {
+        const formId = String(
+          (result as any)?.formId ?? (result as any)?.id ?? ''
+        );
+        this.router.navigate(['/dashboard/create-questions'], {
+          queryParams: {
+            projectId: formData.projectId,
+            locationId: formData.locationId,
+            formId,
+            formName: (formData as any).formName,
+          },
+        });
+        this.showAddFormModal = false;
+        // Emit refetch event to notify parent components
+        this.refetch.emit();
+      } else {
+        console.log('created', result);
+      }
+    } catch (error) {
+      console.error('Error creating form:', error);
+      alert('Error creating form. Please try again.');
+    }
   }
 }

@@ -1,9 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Project, Location } from './topbar.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { LanguageService } from '../../../../../core/services/language.service';
 import { ComboSelectorComponent } from '../../../../../components/shared/combo-selector/combo-selector.component';
 
 @Component({
@@ -22,6 +21,7 @@ export class AddFormModalComponent {
   @Output() formCreated = new EventEmitter<{
     projectId: string;
     locationId?: string;
+    formLanguage?: string;
     formName?: string;
   }>();
 
@@ -30,15 +30,11 @@ export class AddFormModalComponent {
 
   errorMessage = '';
   relationType: 'project' | 'location' = 'project';
+  isSubmitting = signal<boolean>(false);
 
-  constructor(
-    private languageService: LanguageService,
-    private translate: TranslateService
-  ) {}
+  constructor(private translate: TranslateService) {}
 
-  get currentLang(): 'en' | 'ar' {
-    return this.languageService.currentLang;
-  }
+  currentLang = signal<'en' | 'ar'>('en');
 
   get selectedProject(): Project | undefined {
     return this.projects.find((p) => p.id === this.selectedProjectId);
@@ -91,12 +87,14 @@ export class AddFormModalComponent {
       return;
     }
 
+    this.isSubmitting.set(true);
     this.formCreated.emit({
       projectId: this.selectedProjectId,
       locationId:
         this.relationType === 'location'
           ? this.selectedLocationId || undefined
           : undefined,
+      formLanguage: this.currentLang(),
       formName: this.formName.trim(),
     });
   }
@@ -112,7 +110,17 @@ export class AddFormModalComponent {
     console.log('Select form clicked - location:', this.selectedLocationId);
   }
 
+  onLanguageChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const selectedLang = target.value as 'en' | 'ar';
+    this.currentLang.set(selectedLang);
+  }
+
   onClose() {
     this.close.emit();
+  }
+
+  resetSubmittingState() {
+    this.isSubmitting.set(false);
   }
 }

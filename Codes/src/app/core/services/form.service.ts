@@ -1,108 +1,203 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { DynamicFormDto } from '../../shared/types/form';
+import { Injectable } from '@angular/core';
+import { DynamicFormDto, FormQuestionDto } from '../../shared/types/form';
+import api from '../api/api';
 
 @Injectable({ providedIn: 'root' })
 export class FormService {
-  private readonly http = inject(HttpClient);
+  constructor() {}
 
-  // Placeholder for future real API base URL
-  private readonly baseUrl = '/api/forms';
-
-  // Mocked API call; when backend is ready, swap to real GET
-  getFormById(
+  // Load a form definition using direct API calls
+  async getFormById(
     formId: string,
-    options?: { locationId?: string; projectId?: string }
-  ): Observable<DynamicFormDto> {
-    const { locationId, projectId } = options ?? {};
+    options?: { locationId?: string; projectId?: string; interviewId?: string }
+  ): Promise<DynamicFormDto> {
+    const { locationId, projectId, interviewId } = options ?? {};
 
-    // Example of how it will look with real HTTP call:
-    // let params = new HttpParams();
-    // if (locationId) params = params.set('locationId', locationId);
-    // if (projectId) params = params.set('projectId', projectId);
-    // return this.http.get<DynamicFormDto>(`${this.baseUrl}/${formId}`, { params });
+    try {
+      // Load form meta
+      const formData: any = await api.getForm({ formId });
+      const formPayload = (formData as any)?.result ?? formData ?? {};
 
-    // Mocked payload (simulate network)
-    const mock: DynamicFormDto = {
-      formId,
-      formTitle: 'Customer Feedback',
-      formLanguage: 'en',
-      questions: [
-        {
-          questionId: 'q1',
-          typeCode: 'OPEN_ENDED',
-          questionText: 'Tell us about your experience',
-          required: true,
-        },
-        {
-          questionId: 'q2',
-          typeCode: 'SHORT_ANSWER',
-          questionText: 'Your name',
-          required: true,
-        },
-        {
-          questionId: 'q3',
-          typeCode: 'NUMBER',
-          questionText: 'How many items did you buy?',
-          required: true,
-          min: 0,
-          max: 100,
-        },
-        {
-          questionId: 'q4',
-          typeCode: 'RATE',
-          questionText: 'Rate our service (1-5)',
-          required: true,
-          min: 1,
-          max: 5,
-        },
-        {
-          questionId: 'q5',
-          typeCode: 'DROPDOWN',
-          questionText: 'Select your city',
-          options: [
-            { optionId: 'c1', optionText: 'London' },
-            { optionId: 'c2', optionText: 'Dubai' },
-            { optionId: 'c3', optionText: 'Cairo' },
-          ],
-          required: true,
-        },
-        {
-          questionId: 'q6',
-          typeCode: 'RADIO',
-          questionText: 'Would you recommend us?',
-          options: [
-            { optionId: 'y', optionText: 'Yes' },
-            { optionId: 'n', optionText: 'No' },
-          ],
-          required: true,
-        },
-        {
-          questionId: 'q7',
-          typeCode: 'MULTIPLE_CHOICE',
-          questionText: 'Which services did you use?',
-          options: [
-            { optionId: 's1', optionText: 'Delivery' },
-            { optionId: 's2', optionText: 'Installation' },
-            { optionId: 's3', optionText: 'Support' },
-          ],
-        },
-      ],
-    };
+      // Load questions for the form or interview
+      let filtered: any[] = [];
+      if (interviewId) {
+        const interviewData: any = await api.getInterviewQuestions({
+          interviewId,
+        });
+        const interviewPayload =
+          (interviewData as any)?.result ?? interviewData ?? {};
+        filtered = Array.isArray(interviewPayload.questions)
+          ? interviewPayload.questions
+          : [];
+      } else {
+        console.log('formId', formId);
+        const questionsData: any = await api.getAllFormQuestions({ formId });
+        const questionsPayload =
+          (questionsData as any)?.result ?? questionsData ?? {};
 
-    // include query params in mock logic (no UI use, just to show it's wired)
-    const annotatedMock = {
-      ...mock,
-      formTitle:
-        locationId || projectId
-          ? `${mock.formTitle} • ${locationId ? 'Loc:' + locationId : ''} ${
-              projectId ? 'Proj:' + projectId : ''
-            }`.trim()
-          : mock.formTitle,
-    } as DynamicFormDto;
+        const list = Array.isArray(questionsPayload)
+          ? questionsPayload
+          : Array.isArray((questionsPayload as any)?.questions)
+          ? (questionsPayload as any).questions
+          : Array.isArray((questionsPayload as any)?.items)
+          ? (questionsPayload as any).items
+          : Array.isArray((questionsPayload as any)?.data)
+          ? (questionsPayload as any).data
+          : [];
+        console.log('list', list);
+        // The backend already receives formId; avoid over-filtering that can drop data
+        filtered = list;
+      }
 
-    return of(annotatedMock).pipe(delay(500));
+      const mapType = (t: any): FormQuestionDto['typeCode'] => {
+        const up = String(t || '').toUpperCase();
+        const allowed = [
+          'OPEN_ENDED',
+          'SHORT_ANSWER',
+          'NUMBER',
+          'RATE',
+          'DROPDOWN',
+          'RADIO',
+          'MULTIPLE_CHOICE',
+        ];
+        return (allowed as string[]).includes(up)
+          ? (up as FormQuestionDto['typeCode'])
+          : 'OPEN_ENDED';
+      };
+
+      const dto: DynamicFormDto = {
+        formId: String(formId),
+        formTitle:
+          formPayload?.formTitle ??
+          formPayload?.title ??
+          formPayload?.name ??
+          'Form',
+        formLanguage: formPayload?.formLanguage ?? 'en',
+        questions: filtered.map((q: any, idx: number) => ({
+          questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+          typeCode: mapType(q.type ?? q.typeCode),
+          questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
+          options: (
+            (q.options ?? q.answerOptions ?? q.choices ?? []) as any[]
+          ).map((opt: any, i: number) => ({
+            optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
+            optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
+          })),
+          required: !!q.required,
+          min: q.min,
+          max: q.max,
+        })),
+      };
+
+      // annotate meta if needed
+      if (locationId || projectId) {
+        dto.formTitle = `${dto.formTitle}`;
+      }
+
+      return dto;
+    } catch (error) {
+      console.error('Error loading form:', error);
+      // Fallback empty DTO
+      const empty: DynamicFormDto = {
+        formId: String(formId),
+        formTitle: 'Form',
+        formLanguage: 'en',
+        questions: [],
+      };
+      return empty;
+    }
+  }
+
+  // Separate: fetch only form meta (title, language)
+  async getFormMeta(
+    formId: string
+  ): Promise<{ formId: string; formTitle: string; formLanguage: string }> {
+    try {
+      const formData: any = await api.getForm({ formId });
+      const formPayload = (formData as any)?.result ?? formData ?? {};
+      return {
+        formId: String(formId),
+        formTitle:
+          formPayload?.formTitle ??
+          formPayload?.title ??
+          formPayload?.name ??
+          'Form',
+        formLanguage: formPayload?.formLanguage ?? 'en',
+      };
+    } catch (error) {
+      console.error('Error loading form meta:', error);
+      return { formId: String(formId), formTitle: 'Form', formLanguage: 'en' };
+    }
+  }
+
+  // Separate: fetch only questions (by form or interview)
+  async getFormQuestions(options: {
+    formId?: string;
+    interviewId?: string;
+  }): Promise<FormQuestionDto[]> {
+    const { formId, interviewId } = options;
+
+    try {
+      let raw: any;
+      if (interviewId) {
+        const interviewData: any = await api.getInterviewQuestions({
+          interviewId,
+        });
+        const interviewPayload =
+          (interviewData as any)?.result ?? interviewData ?? {};
+        raw = interviewPayload.questions || [];
+      } else {
+        const questionsData: any = await api.getAllFormQuestions({
+          formId: formId!,
+        });
+        const questionsPayload =
+          (questionsData as any)?.result ?? questionsData ?? {};
+        raw = questionsPayload;
+      }
+
+      const mapType = (t: any): FormQuestionDto['typeCode'] => {
+        const up = String(t || '').toUpperCase();
+        const allowed = [
+          'OPEN_ENDED',
+          'SHORT_ANSWER',
+          'NUMBER',
+          'RATE',
+          'DROPDOWN',
+          'RADIO',
+          'MULTIPLE_CHOICE',
+        ];
+        return (allowed as string[]).includes(up)
+          ? (up as FormQuestionDto['typeCode'])
+          : 'OPEN_ENDED';
+      };
+
+      const list = Array.isArray(raw)
+        ? raw
+        : Array.isArray((raw as any)?.questions)
+        ? (raw as any).questions
+        : Array.isArray((raw as any)?.items)
+        ? (raw as any).items
+        : Array.isArray((raw as any)?.data)
+        ? (raw as any).data
+        : [];
+
+      return (list as any[]).map((q: any, idx: number) => ({
+        questionId: String(q.questionId ?? q.id ?? `q-${idx + 1}`),
+        typeCode: mapType(q.type ?? q.typeCode),
+        questionText: q.text ?? q.title ?? q.questionText ?? 'Question',
+        options: (
+          (q.options ?? q.answerOptions ?? q.choices ?? []) as any[]
+        ).map((opt: any, i: number) => ({
+          optionId: String(opt.optionId ?? opt.id ?? `o-${i + 1}`),
+          optionText: opt.optionText ?? opt.text ?? opt.label ?? '',
+        })),
+        required: !!q.required,
+        min: q.min,
+        max: q.max,
+      }));
+    } catch (error) {
+      console.error('Error loading form questions:', error);
+      return [];
+    }
   }
 }

@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ToastComponent } from './components/shared/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, TranslateModule],
-  template: `<router-outlet></router-outlet>`,
+  imports: [RouterOutlet, TranslateModule, ToastComponent],
+  template: `
+    <router-outlet></router-outlet>
+    <app-toast></app-toast>
+  `,
 })
 export class App {
   protected title = 'movo-project';

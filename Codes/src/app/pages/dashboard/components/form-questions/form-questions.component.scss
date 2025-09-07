@@ -294,19 +294,19 @@ $spacing: 16px;
   &--secondary {
     background: $dark-secondary;
     color: var(--white);
-    border: 1px solid rgba(var(--bg-dark-rbg), 0.3);
+    border: 1px solid rgba(var(--bg-dark-rgb), 0.3);
   }
 
   &--dark {
     background: $dark-pill;
     color: var(--white);
-    border: 1px solid rgba(var(--bg-dark-rbg), 0.3);
+    border: 1px solid rgba(var(--bg-dark-rgb), 0.3);
   }
 
   &--secondary {
     background: $dark-secondary;
     color: var(--white);
-    border: 1px solid rgba(var(--bg-dark-rbg), 0.3);
+    border: 1px solid rgba(var(--bg-dark-rgb), 0.3);
   }
 
   &.small {

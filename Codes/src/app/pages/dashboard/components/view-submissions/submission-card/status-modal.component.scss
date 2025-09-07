@@ -2,7 +2,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(var(--bg-dark-rbg), 0.32);
+  background: rgba(var(--bg-dark-rgb), 0.32);
   backdrop-filter: blur(2px);
   z-index: 1200;
   display: flex;

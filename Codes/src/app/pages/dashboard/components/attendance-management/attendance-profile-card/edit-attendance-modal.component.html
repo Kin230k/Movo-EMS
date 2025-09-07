@@ -1,4 +1,12 @@
 <div class="modal-backdrop">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "ATTENDANCE_MANAGEMENT.UPDATING_ATTENDANCE" | translate }}
+    </div>
+  </div>
+
   <form class="modal" [formGroup]="form">
     <div class="modal-inner">
       <div class="modal-header">

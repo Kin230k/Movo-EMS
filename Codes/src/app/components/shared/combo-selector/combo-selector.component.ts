@@ -29,7 +29,7 @@ export class ComboSelectorComponent implements AfterViewInit, OnChanges {
 
   // Getter and setter for ngModel two-way binding
   get value(): any {
-    return this.selectedValue;
+    return this.getSelectedValue();
   }
 
   set value(val: any) {
@@ -68,13 +68,25 @@ export class ComboSelectorComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // ngModel will handle the value binding automatically
-    // No need for manual value setting
+    if (changes['selectedValue'] && this.selectElement) {
+      // Ensure the select element reflects the new selected value
+      setTimeout(() => {
+        if (this.selectElement) {
+          this.selectElement.nativeElement.value = this.getSelectedValue();
+        }
+      });
+    }
   }
 
   ngAfterViewInit() {
-    // ngModel will handle the initial value binding
-    // No need for manual value setting
+    // Ensure the initial selected value is properly set
+    if (this.selectElement && this.selectedValue) {
+      setTimeout(() => {
+        if (this.selectElement) {
+          this.selectElement.nativeElement.value = this.getSelectedValue();
+        }
+      });
+    }
   }
 
   // Helper method to compare values (handles string vs number comparison)

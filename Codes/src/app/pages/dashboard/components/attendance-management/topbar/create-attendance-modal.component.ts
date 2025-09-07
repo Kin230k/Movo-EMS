@@ -55,6 +55,7 @@ export class CreateAttendanceModalComponent implements OnInit, OnChanges {
 
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<any>(); // emits created attendance object
+  @Output() refetch = new EventEmitter<void>();
 
   form: FormGroup;
 
@@ -128,5 +129,6 @@ export class CreateAttendanceModalComponent implements OnInit, OnChanges {
     };
 
     this.create.emit(newAttendance);
+    this.refetch.emit();
   }
 }

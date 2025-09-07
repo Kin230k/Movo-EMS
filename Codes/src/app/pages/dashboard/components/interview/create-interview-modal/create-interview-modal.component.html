@@ -60,11 +60,31 @@
     </section>
 
     <footer class="modal-footer">
-      <button type="button" class="secondary-btn" (click)="onCancel()">
+      <!-- Error message display -->
+      <div class="error-message" *ngIf="createError()">
+        <small class="error-text">{{ createError() }}</small>
+      </div>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="onCancel()"
+        [disabled]="isCreating()"
+      >
         {{ "COMMON.BUTTONS.CANCEL" | translate }}
       </button>
-      <button type="button" class="primary-btn" (click)="onCreate()">
-        {{ "COMMON.BUTTONS.CREATE" | translate }}
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="onCreate()"
+        [disabled]="isCreating() || form.invalid"
+      >
+        <span *ngIf="isCreating()" class="loading-spinner"></span>
+        {{
+          isCreating()
+            ? ("COMMON.BUTTONS.CREATING" | translate)
+            : ("COMMON.BUTTONS.CREATE" | translate)
+        }}
       </button>
     </footer>
   </div>

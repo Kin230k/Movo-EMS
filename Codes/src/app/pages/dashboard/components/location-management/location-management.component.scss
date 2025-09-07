@@ -97,9 +97,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  border-radius: var(--radius-card, 12px);
+  border-radius: 1.5rem;
   background: var(--color-dark-text);
   border: 1px solid rgba(var(--white-rgb), 0.06);
+  color: var(--color-font, var(--white));
 }
 
 .zone-info {

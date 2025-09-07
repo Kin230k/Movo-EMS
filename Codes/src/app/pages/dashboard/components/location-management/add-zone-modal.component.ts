@@ -15,32 +15,40 @@ export class AddZoneModalComponent implements OnInit {
   @Input() locations: { id: string; name: { en: string; ar: string } }[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<{
-    name: string;
+    name: { en: string; ar: string };
     locationId?: string;
   }>();
 
-  name = '';
+  nameEn = '';
+  nameAr = '';
   selectedLocationId = '';
   error = '';
 
   ngOnInit() {}
 
   onLocationSelected(id: string | null) {
-    console.log('onLocationSelected', id);
     this.selectedLocationId = id || '';
   }
 
   validateAndCreate() {
-    if (!this.name) {
-      this.error = 'Please provide a name';
+    if (!this.nameAr) {
+      this.error = 'Please provide a nameAr';
+      return;
+    }
+    if (!this.nameEn) {
+      this.error = 'Please provide a nameEn';
       return;
     }
     if (!this.selectedLocationId) {
       this.error = 'Please select a location';
       return;
     }
+    console.log({
+      name: { en: this.nameEn, ar: this.nameAr },
+      locationId: this.selectedLocationId,
+    });
     this.create.emit({
-      name: this.name,
+      name: { en: this.nameEn, ar: this.nameAr },
       locationId: this.selectedLocationId,
     });
   }

@@ -31,58 +31,17 @@
       </div>
 
       <form class="compose-form" [formGroup]="composeForm">
-        <!-- Recipient Selection
-        <div class="form-group">
-          <label>{{ "EMAILS.RECIPIENTS" | translate }}</label>
-          <div class="recipient-selection">
-            <select
-              formControlName="recipientType"
-              class="recipient-type-select"
-              (change)="onRecipientTypeChange()"
-            >
-              <option value="users">
-                {{ "EMAILS.ALL_USERS" | translate }}
-              </option>
-              <option value="form">
-                {{ "EMAILS.FORM_RECIPIENTS" | translate }}
-              </option>
-              <option value="custom">
-                {{ "EMAILS.CUSTOM_RECIPIENTS" | translate }}
-              </option>
-            </select>
-
-            <app-combo-selector
-              *ngIf="composeForm.value.recipientType === 'form'"
-              [projects]="formsForSelector"
-              [selectedValue]="selectedFormId"
-              placeholder="{{ 'EMAILS.SELECT_FORM' | translate }}"
-              (projectSelected)="onFormSelected($event)"
-              class="form-selector"
-            >
-            </app-combo-selector>
-
-            <textarea
-              *ngIf="composeForm.value.recipientType === 'custom'"
-              formControlName="customRecipients"
-              placeholder="{{
-                'EMAILS.CUSTOM_RECIPIENTS_PLACEHOLDER' | translate
-              }}"
-              class="custom-recipients-input"
-              rows="3"
-            ></textarea>
-          </div>
-        </div> -->
-
         <!-- Email Input -->
         <div class="form-group">
           <label>{{ "EMAILS.EMAIL" | translate }}</label>
           <input
-            type="text"
+            type="email"
             formControlName="email"
             placeholder="{{ 'EMAILS.EMAIL_PLACEHOLDER' | translate }}"
             class="subject-input"
           />
         </div>
+
         <!-- Email Subject -->
         <div class="form-group">
           <label>{{ "EMAILS.SUBJECT" | translate }}</label>
@@ -118,7 +77,9 @@
             type="button"
             class="btn send-btn"
             (click)="sendEmail()"
-            [disabled]="composeForm.invalid"
+            [disabled]="
+              !composeForm || composeForm.invalid || composeForm.pending
+            "
           >
             {{ "EMAILS.SEND_EMAIL" | translate }}
           </button>
@@ -144,26 +105,37 @@
         </div>
       </div>
 
+      <!-- Email Templates Section -->
       <div
-        class="history-list"
-        *ngIf="!isHistoryLoading && emailHistory.length > 0; else noHistory"
+        class="email-templates-section"
+        *ngIf="selectedFormId && filteredEmails.length > 0"
       >
-        <div class="history-item" *ngFor="let item of emailHistory">
-          <div class="history-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
-              />
-            </svg>
-          </div>
-          <div class="history-content">
-            <div class="history-subject">{{ item.subject }}</div>
-            <div class="history-body">{{ item.body }}</div>
-            <div class="history-meta">
-              {{ item.sentAt | date : "short" }}
+        <h4>{{ "EMAILS.EMAIL_TEMPLATES" | translate }}</h4>
+        <div class="email-templates-grid">
+          <div
+            class="email-template-card"
+            *ngFor="let email of filteredEmails"
+            (click)="onSendEmail(getEmailData(email))"
+          >
+            <div class="template-header">
+              <h5>{{ email.title }}</h5>
+              <button class="use-template-btn" type="button">
+                {{ "EMAILS.USE_TEMPLATE" | translate }}
+              </button>
+            </div>
+            <div class="template-body">
+              <!-- diplay this with html enable -->
+              <div [innerHTML]="email.body"></div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-section" *ngIf="selectedFormId && isLoading">
+        <app-skeleton-form-card
+          *ngFor="let i of [1, 2, 3]"
+        ></app-skeleton-form-card>
       </div>
 
       <ng-template #noHistory>

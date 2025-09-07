@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -13,6 +13,11 @@ import { ImageUploadService } from '../../../../../core/services/image-upload.se
 })
 export class AddClientModalComponent {
   @Output() close = new EventEmitter<void>();
+
+  // Loading and error states
+  isSubmitting = signal(false);
+  isUploading = signal(false);
+  errorMessage = signal('');
   @Output() clientCreated = new EventEmitter<{
     name: { en: string; ar: string };
     contactEmail: string;
@@ -31,11 +36,8 @@ export class AddClientModalComponent {
   password = '';
   logo: string | undefined = undefined;
 
-  errorMessage = '';
-
   // Image upload properties
   selectedFile: File | null = null;
-  isUploading = false;
   uploadProgress = 0;
   previewUrl: string | null = null;
   hasUploadError = false;
@@ -50,30 +52,37 @@ export class AddClientModalComponent {
   }
 
   onSave() {
+    // Clear previous errors
+    this.errorMessage.set('');
+
     if (!this.nameEn.trim() || !this.nameAr.trim()) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.NAME_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.NAME_REQUIRED')
       );
       return;
     }
     if (!this.contactEmail.trim()) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.EMAIL_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.EMAIL_REQUIRED')
       );
       return;
     }
     if (!this.contactPhone.trim()) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.PHONE_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.PHONE_REQUIRED')
       );
       return;
     }
     if (!this.password.trim()) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.PASSWORD_REQUIRED'
+      this.errorMessage.set(
+        this.translate.instant(
+          'CLIENT_DATA_MANAGEMENT.ERRORS.PASSWORD_REQUIRED'
+        )
       );
       return;
     }
+
+    this.isSubmitting.set(true);
 
     this.clientCreated.emit({
       name: { en: this.nameEn.trim(), ar: this.nameAr.trim() },
@@ -86,6 +95,11 @@ export class AddClientModalComponent {
           ? { en: this.companyEn.trim(), ar: this.companyAr.trim() }
           : null,
     });
+
+    // Simulate async operation - in real implementation, this would be handled by the parent component
+    setTimeout(() => {
+      this.isSubmitting.set(false);
+    }, 1000);
   }
 
   onFileSelected(event: any) {
@@ -93,14 +107,16 @@ export class AddClientModalComponent {
     if (!file) return;
 
     // Clear previous errors
-    this.errorMessage = '';
+    this.errorMessage.set('');
     this.hasUploadError = false;
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.INVALID_FILE_TYPE'
+      this.errorMessage.set(
+        this.translate.instant(
+          'CLIENT_DATA_MANAGEMENT.ERRORS.INVALID_FILE_TYPE'
+        )
       );
       this.hasUploadError = true;
       this.clearFileSelection();
@@ -110,8 +126,8 @@ export class AddClientModalComponent {
     // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.FILE_TOO_LARGE'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.FILE_TOO_LARGE')
       );
       this.hasUploadError = true;
       this.clearFileSelection();
@@ -126,8 +142,8 @@ export class AddClientModalComponent {
       this.previewUrl = e.target?.result as string;
     };
     reader.onerror = () => {
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.FILE_READ_ERROR'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.FILE_READ_ERROR')
       );
       this.hasUploadError = true;
       this.clearFileSelection();
@@ -152,7 +168,7 @@ export class AddClientModalComponent {
     if (!this.selectedFile) return;
     console.log(this.selectedFile);
 
-    this.isUploading = true;
+    this.isUploading.set(true);
     this.uploadProgress = 0;
 
     try {
@@ -166,27 +182,29 @@ export class AddClientModalComponent {
           this.uploadProgress = progress.progress;
           if (progress.downloadURL) {
             this.logo = progress.downloadURL;
-            this.isUploading = false;
+            this.isUploading.set(false);
             this.selectedFile = null;
           }
         },
         error: (error) => {
           console.error('Upload error:', error);
-          this.errorMessage = this.translate.instant(
-            'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+          this.errorMessage.set(
+            this.translate.instant(
+              'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+            )
           );
           this.hasUploadError = true;
-          this.isUploading = false;
+          this.isUploading.set(false);
           this.uploadProgress = 0;
         },
       });
     } catch (error) {
       console.error('Upload error:', error);
-      this.errorMessage = this.translate.instant(
-        'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED')
       );
       this.hasUploadError = true;
-      this.isUploading = false;
+      this.isUploading.set(false);
     }
   }
 
@@ -195,8 +213,8 @@ export class AddClientModalComponent {
     this.previewUrl = null;
     this.selectedFile = null;
     this.uploadProgress = 0;
-    this.isUploading = false;
+    this.isUploading.set(false);
     this.hasUploadError = false;
-    this.errorMessage = '';
+    this.errorMessage.set('');
   }
 }

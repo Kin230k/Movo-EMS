@@ -40,6 +40,7 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
 
   @Output() edit = new EventEmitter<any>(); // emits updated attendance object
   @Output() delete = new EventEmitter<number>(); // emits userId to delete
+  @Output() refetch = new EventEmitter<void>();
 
   modalOpen = false;
   showDeleteModal = false;
@@ -129,6 +130,10 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
     this.showEditModal = false;
     // emit updated payload to parent to persist
     this.edit.emit(updated);
+  }
+
+  onModalRefetch() {
+    this.refetch.emit();
   }
 
   // Delete handlers

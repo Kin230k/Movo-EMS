@@ -36,15 +36,20 @@
       type="button"
       class="update-status-btn"
       (click)="openStatusModal()"
-      [text]="'VIEW_SUBMISSIONS.UPDATE_STATUS' | translate"
+      [text]="
+        onlyManual
+          ? ('VIEW_SUBMISSIONS.VIEW_MANUAL_QUESTIONS' | translate)
+          : ('VIEW_SUBMISSIONS.UPDATE_STATUS' | translate)
+      "
     >
     </themed-button>
   </div>
 
   <app-status-modal
     *ngIf="showStatusModal"
-    [currentStatus]="modalCurrentStatus"
+    [currentStatus]="submission.outcome"
     [decisionNotes]="modalDecisionNotes"
+    [isLoading]="isUpdatingStatus"
     (close)="closeStatusModal()"
     (save)="onStatusSaved($event)"
   ></app-status-modal>

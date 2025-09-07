@@ -5,6 +5,7 @@
       <ng-container
         [ngComponentOutlet]="cardComponent"
         [ngComponentOutletInputs]="inputsFor(it)"
+        (ngComponentOutletCreated)="onComponentCreated($event, it)"
       ></ng-container>
     </ng-container>
 

@@ -15,6 +15,7 @@ import { FormQuestionDto } from '../../../shared/types/form';
           <input
             type="checkbox"
             [checked]="isChecked(opt.optionId)"
+            [disabled]="disabled"
             (change)="toggle(opt.optionId, $event)"
           />
           <span>{{ opt.optionText }}</span>
@@ -59,6 +60,7 @@ export class MultipleChoiceQuestionComponent {
   @Input() question!: FormQuestionDto;
   @Input() control!: FormControl;
   @Input() showErrors = false;
+  @Input() disabled = false;
 
   get invalid(): boolean {
     const errs = this.control.errors;
@@ -75,6 +77,8 @@ export class MultipleChoiceQuestionComponent {
   }
 
   toggle(id: string, evt: Event) {
+    if (this.disabled) return;
+
     const checked = (evt.target as HTMLInputElement).checked;
     const current = ((this.control.value as string[]) || []).slice();
     const idx = current.indexOf(id);

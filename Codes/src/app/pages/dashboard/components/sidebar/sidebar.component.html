@@ -38,6 +38,7 @@
         />
       </svg>
     </app-button>
+    <app-language-switcher></app-language-switcher>
 
     <!-- use translated menu text -->
     <div class="menu-text" *ngIf="!collapsed || isMobile">
@@ -58,5 +59,13 @@
         </app-button>
       </a>
     </li>
+    <li class="menu-item">
+      <button class="menu-item-link" (click)="signOut()">
+        <app-button type="button" class="menu-item-btn">
+          {{ "COMMON.SIGN_OUT" | translate : { default: "Sign out" } }}
+        </app-button>
+      </button>
+    </li>
   </ul>
+  <div class="lang-container"></div>
 </aside>

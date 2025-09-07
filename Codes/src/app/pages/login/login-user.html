@@ -22,21 +22,19 @@
       >
       </app-input>
 
-      <div class="forgot-password">
-        <a href="">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+      <div class="forgot-password" (click)="goToForgetPassword()">
+        {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
       </div>
 
       <themed-button
-        type="submit"
+        type="button"
         [text]="'LOGIN.BUTTON' | translate"
         (onClick)="onLogin()"
       >
       </themed-button>
 
       <div class="switch-login-type">
-        <a (click)="goToAdminLogin()">
-          {{ 'LOGIN.SWITCH_TO_ADMIN' | translate }}
-        </a>
+        <a (click)="goToSignUp()"> {{ 'LOGIN.SIGN_UP' | translate }} </a>
       </div>
     </form>
   </div>
