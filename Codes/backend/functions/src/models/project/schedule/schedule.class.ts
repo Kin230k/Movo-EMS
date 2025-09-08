@@ -2,11 +2,11 @@ import { Operation } from '../../operation.enum';
 
 export class Schedule {
   constructor(
-    public createdAt: string,
     public startTime: string,
     public endTime: string,
-    public projectId: string,
-    public locationId: string,
+    public projectId?: string,
+    public locationId?: string,
+    public createdAt?: string,
     public scheduleId?: string
   ) {}
 

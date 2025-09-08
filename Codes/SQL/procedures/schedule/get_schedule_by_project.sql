@@ -1,16 +1,18 @@
-CREATE OR REPLACE FUNCTION get_schedule_by_project(p_project_id UUID)
+CREATE OR REPLACE FUNCTION get_schedule_by_project(p_auth_user_id UUID,p_project_id UUID)
 RETURNS TABLE (
     scheduleId UUID,
-    date DATE,
-    startTime TIME,
-    endTime TIME,
+    createdAt DATE,
+    startTime TIMESTAMP,
+    endTime TIMESTAMP,
     locationId UUID
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    CALL check_user_permission(p_auth_user_id, 'get_schedule_by_project');
+
+RETURN QUERY 
     SELECT 
         s.scheduleId,
-        s.date,
+        s.createdAt,
         s.startTime,
         s.endTime,
         s.locationId

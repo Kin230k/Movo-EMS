@@ -1,16 +1,31 @@
-CREATE OR REPLACE PROCEDURE update_project_user_role(
-    p_project_user_role_id UUID,
-    p_user_id UUID,
-    p_project_id UUID,
-    p_role_id UUID
+CREATE OR REPLACE PROCEDURE update_project_user_role(p_auth_user_id UUID,
+ p_project_user_role_id UUID,
+ p_user_id UUID DEFAULT NULL,
+ p_project_id UUID DEFAULT NULL,
+ p_role_id UUID DEFAULT NULL
 )
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+    role_name VARCHAR(20);
+    new_updated_at TIMESTAMP := CURRENT_TIMESTAMP;
 BEGIN
-    UPDATE PROJECT_USER_ROLES
-    SET 
-        userId = p_user_id,
-        projectId = p_project_id,
-        roleId = p_role_id
-    WHERE projectUserRoleId = p_project_user_role_id;
+ CALL check_user_permission(p_auth_user_id, 'update_project_user_role');
+
+ SELECT name->>'en' INTO role_name
+   FROM ROLES 
+    WHERE roleId = p_role_id;
+
+UPDATE PROJECT_USER_ROLES
+ SET
+ userId = COALESCE(p_user_id, userId),
+ projectId = COALESCE(p_project_id, projectId),
+ roleId = COALESCE(p_role_id, roleId),
+ updatedAt=new_updated_at
+ WHERE projectUserRoleId = p_project_user_role_id;
+
+ UPDATE USERS
+    SET role = role_name::user_role
+    WHERE userId = p_user_id;
 END;
 $$;

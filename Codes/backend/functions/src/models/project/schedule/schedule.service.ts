@@ -12,29 +12,28 @@ export class ScheduleService {
     locationId: string
   ): Promise<void> {
     const entity = new Schedule(
-      createdAt,
       startTime,
       endTime,
       projectId,
-      locationId
+      locationId,
+      createdAt
     );
     await scheduleMapper.save(entity);
   }
 
   static async updateSchedule(
     scheduleId: string,
-    createdAt: string,
     startTime: string,
     endTime: string,
-    projectId: string,
-    locationId: string
+    projectId?: string,
+    locationId?: string
   ): Promise<void> {
     const entity = new Schedule(
-      createdAt,
       startTime,
       endTime,
       projectId,
       locationId,
+      undefined,
       scheduleId
     );
     await scheduleMapper.save(entity);
@@ -50,5 +49,16 @@ export class ScheduleService {
 
   static async deleteSchedule(id: string): Promise<void> {
     await scheduleMapper.delete(id);
+  }
+
+  static async getSchedulesByLocation(locationId: string): Promise<Schedule[]> {
+    return await scheduleMapper.getByLocation(locationId);
+  }
+
+  static async getSchedulesByProjectOrLocation(
+    projectId?: string,
+    locationId?: string
+  ): Promise<Schedule[]> {
+    return await scheduleMapper.getByProjectOrLocation(projectId, locationId);
   }
 }

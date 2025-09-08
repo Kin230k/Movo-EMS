@@ -1,7 +1,12 @@
 CREATE TABLE QUESTIONS (
     questionId UUID PRIMARY KEY,
-    typeCode VARCHAR(30) NOT NULL REFERENCES QUESTION_TYPES(typeCode),
-    questionText JSONB NOT NULL,
-    formId UUID NOT NULL REFERENCES FORMS(formId),
-    interviewId UUID NOT NULL REFERENCES INTERVIEWS(interviewId)
+    typeCode question_types NOT NULL,
+    questionText TEXT NOT NULL,  -- Changed from JSONB to TEXT
+    formId UUID  REFERENCES FORMS(formId) ON DELETE CASCADE ON UPDATE CASCADE,
+    interviewId UUID  REFERENCES INTERVIEWS(interviewId) ON DELETE CASCADE ON UPDATE CASCADE
+    CHECK (
+       (formId  IS NOT NULL AND interviewId IS NULL)
+    OR (formId  IS     NULL AND interviewId IS NOT NULL)
+    )
 );
+

@@ -41,4 +41,29 @@ export class ProjectUserRoleService {
   static async deleteProjectUserRole(id: string): Promise<void> {
     await projectUserRoleMapper.delete(id);
   }
+  static async getProjectUserRolesByUserAndProject(
+    userId: string,
+    projectId: string
+  ): Promise<ProjectUserRole[]> {
+    return await projectUserRoleMapper.getByUserAndProject(userId, projectId);
+  }
+  static async getProjectUserRoleByUser(
+    userId: string
+  ): Promise<ProjectUserRole | null> {
+    return await projectUserRoleMapper.getProjectUserRoleByUser(userId);
+  }
+  static async deleteProjectUserRoleByUserProject(
+    projectId: string,
+    userId: string
+  ): Promise<void> {
+    await projectUserRoleMapper.deleteByUserAndProject(projectId, userId);
+  }
+    static async updateProjectUserRoleByUserProject(
+    userId: string,
+    projectId: string,
+    roleId:string
+  ): Promise<void> {
+    await projectUserRoleMapper.updateByUserAndProject(userId,projectId,roleId);
+  }
+
 }

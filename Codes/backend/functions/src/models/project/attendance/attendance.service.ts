@@ -1,20 +1,20 @@
 import { Attendance } from './attendance.class';
-import attendanceMapper from './attendance.mapper';
+import attendanceMapper,{UserAttendance} from './attendance.mapper';
+
 
 export class AttendanceService {
-  constructor() {}
+  private constructor() {}
 
+  // CREATE
   static async createAttendance(
-    date: string,
-    time: string,
-    signedWith: any,
+    attendanceTimestamp: string,
+    signedWith: 'BARCODE' | 'MANUAL',
     signedBy: string,
     userId: string,
     areaId: string
   ): Promise<void> {
     const entity = new Attendance(
-      date,
-      time,
+      attendanceTimestamp,
       signedWith,
       signedBy,
       userId,
@@ -23,10 +23,11 @@ export class AttendanceService {
     await attendanceMapper.save(entity);
   }
 
+  // UPDATE
   static async updateAttendance(
     attendanceId: string,
     attendanceTimestamp: string,
-    signedWith: any,
+    signedWith: 'BARCODE' | 'MANUAL',
     signedBy: string,
     userId: string,
     areaId: string
@@ -37,20 +38,34 @@ export class AttendanceService {
       signedBy,
       userId,
       areaId,
-      attendanceId
+      attendanceId,       // required for update
     );
     await attendanceMapper.save(entity);
   }
 
-  static async getAttendanceById(id: string): Promise<Attendance | null> {
-    return await attendanceMapper.getById(id);
+  // GET BY ID
+  static async getAttendanceById(attendanceId: string): Promise<Attendance | null> {
+    return await attendanceMapper.getById(attendanceId);
   }
 
+  // GET ALL
   static async getAllAttendances(): Promise<Attendance[]> {
     return await attendanceMapper.getAll();
   }
 
-  static async deleteAttendance(id: string): Promise<void> {
-    await attendanceMapper.delete(id);
+  // DELETE
+  static async deleteAttendance(attendanceId: string): Promise<void> {
+    await attendanceMapper.delete(attendanceId);
   }
+  static async getAttendancesByUser(userId: string): Promise<Attendance[]> {
+  return await attendanceMapper.getByUser(userId);
+}
+
+static async getAttendancesByProject(projectId: string): Promise<Attendance[]> {
+  return await attendanceMapper.getByProject(projectId);
+}
+static async getUsersAttendanceByProject(projectId: string): Promise<UserAttendance[]> {
+  return await attendanceMapper.getUserAttendancesByProject(projectId);
+}
+
 }
