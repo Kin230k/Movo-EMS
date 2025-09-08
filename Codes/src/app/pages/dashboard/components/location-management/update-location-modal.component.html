@@ -1,0 +1,88 @@
+<div class="overlay" (click)="onClose()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>
+        {{
+          "LOCATION_MANAGEMENT.UPDATE_LOCATION"
+            | translate : { default: "Update Location" }
+        }}
+      </h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <!-- Location names are hidden and non-editable as they shouldn't be changed -->
+      <input type="hidden" [(ngModel)]="nameEn" />
+      <input type="hidden" [(ngModel)]="nameAr" />
+
+      <label class="label">{{
+        "LOCATION_MANAGEMENT.PROJECT" | translate : { default: "Project" }
+      }}</label>
+      <app-combo-selector
+        [projects]="projects"
+        [selectedValue]="selectedProjectId"
+        (projectSelected)="onProjectSelect($event)"
+        [placeholder]="
+          'LOCATION_MANAGEMENT.SELECT_PROJECT'
+            | translate : { default: 'Select a project' }
+        "
+      ></app-combo-selector>
+
+      <div class="grid-2">
+        <div>
+          <label class="label">{{
+            "LOCATION_MANAGEMENT.LATITUDE" | translate : { default: "Latitude" }
+          }}</label>
+          <input
+            class="text-input"
+            type="number"
+            [(ngModel)]="latitude"
+            placeholder="24.774265"
+          />
+        </div>
+        <div>
+          <label class="label">{{
+            "LOCATION_MANAGEMENT.LONGITUDE"
+              | translate : { default: "Longitude" }
+          }}</label>
+          <input
+            class="text-input"
+            type="number"
+            [(ngModel)]="longitude"
+            placeholder="46.738586"
+          />
+        </div>
+      </div>
+
+      <div class="map-actions">
+        <button type="button" class="map-btn" (click)="useMyLocation()">
+          {{
+            "LOCATION_MANAGEMENT.USE_MY_LOCATION"
+              | translate : { default: "Use my location" }
+          }}
+        </button>
+        <button type="button" class="map-btn" (click)="confirmLocation()">
+          {{
+            "LOCATION_MANAGEMENT.CONFIRM_LOCATION"
+              | translate : { default: "Confirm location" }
+          }}
+        </button>
+      </div>
+
+      <div id="update-location-picker-map" class="map"></div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <div class="actions">
+        <button type="button" class="cancel-btn" (click)="onClose()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate : { default: "Cancel" } }}
+        </button>
+        <button type="button" class="update-btn" (click)="onUpdate()">
+          {{ "COMMON.BUTTONS.UPDATE" | translate : { default: "Update" } }}
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

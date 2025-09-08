@@ -1,0 +1,61 @@
+<!-- edit-schedule-modal.component.html -->
+<div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Loading overlay for form submission -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "PROJECT_MANAGEMENT.UPDATING_SCHEDULE" | translate }}
+  </div>
+</div>
+
+<aside
+  class="modal"
+  role="dialog"
+  aria-modal="true"
+  (click)="$event.stopPropagation()"
+>
+  <form
+    [formGroup]="form"
+    class="modal-form"
+    (submit)="$event.preventDefault(); onSave()"
+  >
+    <div class="modal-inner compact">
+      <!-- Modal header with title + close button -->
+      <header class="modal-header">
+        <h2 class="modal-title">
+          {{ "PROJECT_MANAGEMENT.EDIT_SCHEDULE" | translate }}
+        </h2>
+      </header>
+
+      <div class="fields">
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.START_DATE_TIME" | translate
+          }}</span>
+          <input type="datetime-local" formControlName="startDateTime" />
+        </label>
+
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.END_DATE_TIME" | translate
+          }}</span>
+          <input type="datetime-local" formControlName="endDateTime" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn neutral" (click)="onClose($event)">
+          {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn primary"
+          (click)="onSave($event)"
+          [disabled]="form.invalid"
+        >
+          {{ "PROJECT_MANAGEMENT.UPDATE_SCHEDULE" | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</aside>

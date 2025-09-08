@@ -1,0 +1,56 @@
+<article class="submission-card">
+  <div class="submission-header">
+    <div class="submission-id">
+      <strong>{{ "VIEW_SUBMISSIONS.SUBMISSION_ID" | translate }}:</strong>
+      {{ submission.submissionId }}
+    </div>
+    <div class="submission-outcome" *ngIf="submission.outcome">
+      <span class="outcome-badge" [ngStyle]="getOutcomeBadgeStyle()">
+        {{ submission.outcome | uppercase }}
+      </span>
+    </div>
+  </div>
+
+  <div class="submission-details">
+    <div class="detail-row">
+      <strong>{{ "VIEW_SUBMISSIONS.FORM_TITLE" | translate }}:</strong>
+      {{ submission.formTitle }}
+    </div>
+    <div class="detail-row">
+      <strong>{{ "VIEW_SUBMISSIONS.USER_ID" | translate }}:</strong>
+      {{ submission.userId }}
+    </div>
+
+    <div class="detail-row">
+      <strong>{{ "VIEW_SUBMISSIONS.DATE_SUBMITTED" | translate }}:</strong>
+      {{ formattedDate }}
+    </div>
+    <div class="detail-row">
+      <strong>{{ "VIEW_SUBMISSIONS.DECISION_NOTES" | translate }}:</strong>
+      {{ submission.decisionNotes || "N/A" }}
+    </div>
+  </div>
+
+  <div class="actions">
+    <themed-button
+      type="button"
+      class="update-status-btn"
+      (click)="openStatusModal()"
+      [text]="
+        onlyManual
+          ? ('VIEW_SUBMISSIONS.VIEW_MANUAL_QUESTIONS' | translate)
+          : ('VIEW_SUBMISSIONS.UPDATE_STATUS' | translate)
+      "
+    >
+    </themed-button>
+  </div>
+
+  <app-status-modal
+    *ngIf="showStatusModal"
+    [currentStatus]="submission.outcome"
+    [decisionNotes]="modalDecisionNotes"
+    [isLoading]="isUpdatingStatus"
+    (close)="closeStatusModal()"
+    (save)="onStatusSaved($event)"
+  ></app-status-modal>
+</article>

@@ -1,0 +1,215 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rgb), var(--backdrop-opacity));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.modal {
+  background: var(--bg-dark);
+  color: var(--white);
+  border-radius: 12px;
+  max-width: 500px;
+  width: 94%;
+  padding: 1.25rem;
+  box-shadow: 0 8px 30px var(--shadow-modal);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.close-btn {
+  background: transparent;
+  color: var(--white);
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+
+.selected-info {
+  padding: 0.65rem 0.75rem;
+  background-color: rgba(var(--white-rgb), 0.1);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+
+  .selected-label {
+    font-weight: 500;
+    color: var(--white);
+  }
+}
+
+.selected-item {
+  margin-top: 0.25rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.language-section,
+.location-section,
+.form-name-section {
+  margin-bottom: var(--margin-form);
+}
+
+.form-name-input {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: rgba(var(--white-rgb), 0.1);
+  color: var(--white);
+
+  &:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px rgba(var(--secondary-rgb), 0.25);
+  }
+
+  &::placeholder {
+    color: rgba(var(--white-rgb), 0.6);
+  }
+}
+
+.language-select {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #333;
+  color: var(--white);
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px rgba(var(--secondary-rgb), 0.25);
+  }
+
+  option {
+    background-color: var(--bg-dark);
+    color: var(--white);
+  }
+}
+
+.selection-summary {
+  padding: 0.75rem;
+  background-color: rgba(var(--white-rgb), 0.1);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+
+  h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--white);
+    font-size: 1rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.25rem;
+      color: rgba(var(--white-rgb), 0.8);
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.relation-type {
+  .radio-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .hint {
+    color: rgba(var(--white-rgb), 0.7);
+    font-size: 0.85rem;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.create-btn {
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid var(--color-medium-gray);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  color: var(--white);
+}
+
+.error {
+  color: var(--secondary);
+  font-size: 0.85rem;
+  background-color: var(--bg-dark);
+  padding: 0.5rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--secondary);
+}
+
+.overlay-msg {
+  color: var(--white);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(var(--white-rgb), 0.3);
+  border-radius: 50%;
+  border-top-color: var(--secondary);
+  animation: spin 1s ease-in-out infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

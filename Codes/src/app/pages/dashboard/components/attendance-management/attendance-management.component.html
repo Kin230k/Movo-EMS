@@ -1,0 +1,35 @@
+<div class="attendance-container">
+  <div class="header-section">
+    <h1>{{ "ATTENDANCE_MANAGEMENT.TITLE" | translate }}</h1>
+  </div>
+
+  <app-attendance-topbar
+    [projects]="projects"
+    [selectedProjectId]="selectedProjectId"
+    [usersForSelector]="usersForSelector"
+    [areasForSelector]="areasForSelector"
+    (projectSelected)="onProjectSelected($event)"
+    (createAttendance)="onAddAttendance($event)"
+    (refetch)="refetchUsers()"
+  ></app-attendance-topbar>
+  <div *ngIf="isLoading" class="card-list-skeleton">
+    <app-card-list-skeletion></app-card-list-skeletion>
+  </div>
+
+  <!-- show empty state if finished and no users -->
+  <div
+    *ngIf="!isLoading && isFinished && users && users.length === 0"
+    class="empty-state"
+  >
+    {{ "ATTENDANCE_MANAGEMENT.NO_USERS_FOUND" | translate }}
+  </div>
+
+  <!-- show real list when loaded -->
+  <div *ngIf="!isLoading && users && users.length > 0">
+    <app-card-list
+      [items]="users"
+      [cardComponent]="attendanceCardComponent"
+      (refetch)="refetchUsers()"
+    ></app-card-list>
+  </div>
+</div>

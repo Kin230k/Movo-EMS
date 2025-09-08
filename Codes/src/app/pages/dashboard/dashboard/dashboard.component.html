@@ -1,0 +1,30 @@
+<!-- src/app/pages/dashboard/dashboard/dashboard.component.html -->
+<div class="dashboard-root">
+  <app-sidebar
+    class="dashboard-sidebar"
+    role="navigation"
+    aria-label="Main menu"
+  ></app-sidebar>
+
+  <div class="dashboard-main" role="main">
+    <router-outlet></router-outlet>
+
+    <!-- <section class="dashboard-panel" aria-live="polite">
+      <div *ngIf="isLoading" class="loading">Loading dashboard...</div>
+
+      <div *ngIf="isError" class="error">
+        Error loading dashboard:
+        {{ error?.message || error || "Unknown" }}
+      </div>
+
+      <div *ngIf="!isLoading && !isError && data" class="stats">
+        <h2>Overview</h2>
+        <ul>
+          <li>Users: {{ data.users }}</li>
+          <li>Projects: {{ data.projects }}</li>
+          <li>Clients: {{ data.clients }}</li>
+        </ul>
+      </div>
+    </section> -->
+  </div>
+</div>

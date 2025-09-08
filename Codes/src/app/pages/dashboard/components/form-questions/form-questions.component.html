@@ -1,0 +1,148 @@
+<div class="page">
+  <!-- Header -->
+  <h1 class="title">{{`CREATE_FORM_QUESTIONS.TITLE` | translate}}</h1>
+  <!-- Question Type Selection -->
+  <div class="question-type-selection">
+    <div class="radio-group">
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="questionType"
+          value="form"
+          [checked]="selectedQuestionType === 'form'"
+          (change)="onQuestionTypeChange($event)"
+        />
+        <span class="radio-label">{{
+          "CREATE_FORM_QUESTIONS.FORM_QUESTIONS" | translate
+        }}</span>
+      </label>
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="questionType"
+          value="interview"
+          [checked]="selectedQuestionType === 'interview'"
+          (change)="onQuestionTypeChange($event)"
+        />
+        <span class="radio-label">{{
+          "CREATE_FORM_QUESTIONS.INTERVIEW_QUESTIONS" | translate
+        }}</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <form [formGroup]="form" class="toolbar-form">
+      <app-combo-selector
+        [projects]="projects"
+        [selectedValue]="form.get('projectId')?.value"
+        (projectSelected)="onProjectSelect($event)"
+        placeholder="{{ 'CREATE_FORM_QUESTIONS.PROJECT_NAME' | translate }}"
+      ></app-combo-selector>
+
+      <!-- Form Questions: Show form dropdown only -->
+      <ng-container *ngIf="selectedQuestionType === 'form'">
+        <app-combo-selector
+          [projects]="forms"
+          [selectedValue]="form.get('formId')?.value"
+          (projectSelected)="onFormSelect($event)"
+          placeholder="{{ 'CREATE_FORM_QUESTIONS.FORM_NAME' | translate }}"
+        ></app-combo-selector>
+      </ng-container>
+
+      <!-- Interview Questions: Show only interview dropdown -->
+      <ng-container *ngIf="selectedQuestionType === 'interview'">
+        <app-combo-selector
+          [projects]="interviews"
+          [selectedValue]="form.get('interviewId')?.value"
+          (projectSelected)="onInterviewSelect($event)"
+          placeholder="{{ 'CREATE_FORM_QUESTIONS.INTERVIEW_NAME' | translate }}"
+        ></app-combo-selector>
+      </ng-container>
+
+      <button
+        class="btn btn--purple"
+        (click)="addQuestion()"
+        [disabled]="!areAllDropdownsSelected()"
+      >
+        {{ "CREATE_FORM_QUESTIONS.ADD_QUESTION" | translate }}
+      </button>
+    </form>
+  </div>
+
+  <!-- Message when not all dropdowns are selected -->
+  <div *ngIf="!areAllDropdownsSelected()" class="info-message">
+    <p>{{ "CREATE_FORM_QUESTIONS.SELECT_ALL_DROPDOWNS" | translate }}</p>
+  </div>
+
+  <!-- Only show questions section when all dropdowns are selected -->
+  <div *ngIf="areAllDropdownsSelected()">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>{{ "CREATE_FORM_QUESTIONS.LOADING_QUESTIONS" | translate }}</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="hasError && !isLoading" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <h3>{{ "CREATE_FORM_QUESTIONS.ERROR_LOADING" | translate }}</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn--secondary" (click)="loadDataWhenReady()">
+        {{ "CREATE_FORM_QUESTIONS.RETRY" | translate }}
+      </button>
+    </div>
+
+    <!-- Questions content - only show when loaded and no error -->
+    <form
+      class="question-list"
+      [formGroup]="form"
+      (ngSubmit)="saveAll()"
+      *ngIf="!isLoading && !hasError"
+    >
+      <h3 class="section-title" *ngIf="hasLocalQuestions()">New Questions</h3>
+      <div *ngIf="questions.length === 0" class="empty-state">
+        <p>{{ "CREATE_FORM_QUESTIONS.NO_QUESTIONS" | translate }}</p>
+      </div>
+    </form>
+
+    <!-- API-loaded questions: read-only list with actions -->
+    <app-api-question-list
+      *ngIf="!isLoading && !hasError && isApiData"
+      [questions]="questions"
+      (edit)="onEditQuestion($event)"
+      (delete)="onDeleteQuestion($event)"
+    ></app-api-question-list>
+
+    <div class="actions" *ngIf="hasLocalQuestions()">
+      <button type="button" class="btn btn--secondary" (click)="saveDraft()">
+        {{ "CREATE_FORM_QUESTIONS.SAVE_DRAFT" | translate }}
+      </button>
+      <button type="button" class="btn btn--purple" (click)="saveAll()">
+        {{ "CREATE_FORM_QUESTIONS.SAVE_ALL_QUESTIONS" | translate }}
+      </button>
+    </div>
+
+    <!-- Edit Modal -->
+    <app-question-edit-modal
+      *ngIf="editModalVisible && editingQuestionIndex !== null"
+      [visible]="editModalVisible"
+      [question]="questions.at(editingQuestionIndex)"
+      [conditionOptions]="conditionOptions"
+      (close)="onModalClose()"
+      (save)="onModalSave($event)"
+      (refetch)="refetchQuestions()"
+    ></app-question-edit-modal>
+
+    <!-- Create Modal -->
+    <app-question-create-modal
+      *ngIf="createModalVisible"
+      [visible]="createModalVisible"
+      [questionTypes]="questionTypes"
+      [conditionOptions]="conditionOptions"
+      (close)="onCreateModalClose()"
+      (save)="onCreateModalSave($event)"
+      (refetch)="refetchQuestions()"
+    />
+  </div>
+</div>

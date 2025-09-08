@@ -1,0 +1,180 @@
+<div class="overlay" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "CLIENT_DATA_MANAGEMENT.UPDATING_CLIENT" | translate }}
+    </div>
+  </div>
+
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ "CLIENT_DATA_MANAGEMENT.EDIT_CLIENT" | translate }}</h3>
+      <button
+        class="close"
+        [attr.aria-label]="'COMMON.BUTTONS.CANCEL' | translate"
+        (click)="onClose()"
+      >
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <div class="fields">
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.CLIENT_NAME" | translate }} (EN)</label
+          >
+          <input
+            class="text-input"
+            [(ngModel)]="nameEn"
+            type="text"
+            placeholder="{{
+              'CLIENT_DATA_MANAGEMENT.ENTER_CLIENT_NAME' | translate
+            }}"
+          />
+        </div>
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.CLIENT_NAME" | translate }} (AR)</label
+          >
+          <input
+            class="text-input"
+            [(ngModel)]="nameAr"
+            type="text"
+            placeholder="{{
+              'CLIENT_DATA_MANAGEMENT.ENTER_CLIENT_NAME' | translate
+            }}"
+          />
+        </div>
+
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.EMAIL" | translate
+          }}</label>
+          <input
+            class="text-input"
+            [(ngModel)]="contactEmail"
+            type="email"
+            placeholder="name@example.com"
+          />
+        </div>
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.PHONE" | translate
+          }}</label>
+          <input
+            class="text-input"
+            [(ngModel)]="contactPhone"
+            type="text"
+            placeholder="05xxxxxxxx"
+          />
+        </div>
+
+        <div class="field">
+          <label class="label">{{
+            "CLIENT_DATA_MANAGEMENT.LOGO" | translate
+          }}</label>
+
+          <!-- Image Upload Section -->
+          <div class="image-upload-container">
+            <!-- Current Logo Preview -->
+            <div class="image-preview" *ngIf="logo || previewUrl">
+              <img
+                [src]="previewUrl || logo"
+                alt="Client logo preview"
+                class="preview-image"
+              />
+              <button
+                type="button"
+                class="remove-image-btn"
+                (click)="removeImage()"
+                [attr.aria-label]="'COMMON.BUTTONS.REMOVE' | translate"
+              >
+                ✕
+              </button>
+            </div>
+
+            <!-- File Input and Upload Controls -->
+            <div class="upload-controls" *ngIf="!logo && !previewUrl">
+              <input
+                type="file"
+                id="edit-client-logo-input"
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                style="display: none"
+              />
+              <button
+                type="button"
+                class="upload-btn"
+                (click)="fileInput.click()"
+                [disabled]="isUploading()"
+                [class.uploading]="isUploading()"
+                [class.error]="hasUploadError"
+              >
+                {{ "CLIENT_DATA_MANAGEMENT.CHOOSE_IMAGE" | translate }}
+              </button>
+            </div>
+
+            <!-- Upload Progress -->
+            <div class="upload-progress" *ngIf="isUploading()">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="uploadProgress"
+                ></div>
+              </div>
+              <span class="progress-text">{{ uploadProgress }}%</span>
+            </div>
+
+            <!-- Upload Button -->
+            <button
+              type="button"
+              class="upload-action-btn"
+              (click)="uploadImage()"
+              [disabled]="!selectedFile || isUploading()"
+              *ngIf="selectedFile && !isUploading()"
+            >
+              {{ "CLIENT_DATA_MANAGEMENT.UPLOAD_IMAGE" | translate }}
+            </button>
+
+            <!-- Uploading State -->
+            <div class="upload-loading-state" *ngIf="isUploading">
+              <div class="upload-spinner"></div>
+              <span class="upload-loading-text">
+                {{ "CLIENT_DATA_MANAGEMENT.UPLOADING" | translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.COMPANY" | translate }} (EN)</label
+          >
+          <input class="text-input" [(ngModel)]="companyEn" type="text" />
+        </div>
+        <div class="field">
+          <label class="label"
+            >{{ "CLIENT_DATA_MANAGEMENT.COMPANY" | translate }} (AR)</label
+          >
+          <input class="text-input" [(ngModel)]="companyAr" type="text" />
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <footer class="modal-footer">
+      <button type="button" class="secondary-btn" (click)="onClose()">
+        {{ "COMMON.BUTTONS.CANCEL" | translate }}
+      </button>
+      <button type="button" class="primary-btn" (click)="onSave()">
+        {{ "COMMON.BUTTONS.SAVE" | translate }}
+      </button>
+    </footer>
+  </div>
+</div>

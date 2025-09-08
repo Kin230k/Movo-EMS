@@ -1,0 +1,57 @@
+<article class="profile-card" (click)="$event.stopPropagation()">
+  <div
+    class="avatar"
+    title="{{ 'ATTENDANCE_MANAGEMENT.OPEN_USER' | translate }}"
+  >
+    <img src="{{ data.picture }}" alt="user image" class="user-image" />
+  </div>
+
+  <div class="meta">
+    <div class="meta-top">
+      <h3 class="name">{{ displayName }}</h3>
+    </div>
+
+    <div class="meta-body">
+      <p class="prestion" [ngClass]="{ active: data.isPresent }">
+        {{
+          data.isPresent
+            ? ("ATTENDANCE_MANAGEMENT.PRESENT" | translate)
+            : ("ATTENDANCE_MANAGEMENT.ABSENCE" | translate)
+        }}
+      </p>
+
+      <p class="date">
+        {{ "ATTENDANCE_MANAGEMENT.DATE" | translate }} :
+        {{ displayDate }}
+      </p>
+      <div class="role">{{ "ROLES." + getRole() | translate }}</div>
+    </div>
+  </div>
+
+  <div class="actions-container">
+    <button type="button" class="secondary-btn" (click)="openEdit($event)">
+      {{ "COMMON.BUTTONS.EDIT" | translate }}
+    </button>
+    <button type="button" class="secondary-btn" (click)="openDelete($event)">
+      {{ "COMMON.BUTTONS.DELETE" | translate }}
+    </button>
+  </div>
+
+  <!-- Delete modal -->
+  <app-delete-modal
+    *ngIf="showDeleteModal"
+    [title]="'ATTENDANCE_MANAGEMENT.DELETE_TITLE' | translate"
+    [message]="'ATTENDANCE_MANAGEMENT.DELETE_MESSAGE' | translate"
+    (close)="closeDelete()"
+    (confirm)="confirmDelete()"
+  ></app-delete-modal>
+
+  <!-- Edit modal -->
+  <app-edit-attendance-modal
+    *ngIf="showEditModal"
+    [data]="modalData"
+    (close)="closeEdit()"
+    (save)="onSaveEdit($event)"
+    (refetch)="onModalRefetch()"
+  ></app-edit-attendance-modal>
+</article>

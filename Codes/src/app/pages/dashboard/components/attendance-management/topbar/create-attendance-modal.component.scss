@@ -1,0 +1,74 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rgb), 0.32);
+  backdrop-filter: blur(2px);
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+}
+.modal {
+  max-width: 560px;
+  width: 94%;
+}
+.modal-inner {
+  background: var(--color-dark-text);
+  padding: 1rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 30px var(--shadow-modal);
+  color: var(--color-font);
+}
+.label {
+  display: block;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+.text-input {
+  width: 95%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--color-text);
+  color: var(--color-font);
+  border: 1px solid rgba(var(--white-rgb), 0.12);
+}
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.radio-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.btn {
+  min-width: 110px;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+.btn.danger {
+  background: var(--secondary);
+  color: var(--white);
+}
+.btn.neutral {
+  background: var(--white);
+  color: var(--color-dark-text);
+}
+.field-error {
+  margin-top: 6px;
+}
+.error-text {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 500;
+}

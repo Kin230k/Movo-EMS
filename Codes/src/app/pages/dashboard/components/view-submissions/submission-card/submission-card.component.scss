@@ -1,0 +1,113 @@
+.submission-card {
+  background: var(--bg-dark);
+  border-radius: var(--radius-card);
+  box-shadow: 0 0.5rem 0.5rem rgba(var(--shadow-dark), 0.25);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(var(--color-font-rgb), 0.1);
+
+  &:hover {
+    box-shadow: 0 0.9rem 0.55rem rgba(var(--shadow-dark), 0.25);
+  }
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(var(--color-font-rgb), 0.2);
+
+  .submission-id {
+    font-size: 0.9rem;
+    color: var(--color-font-secondary);
+
+    strong {
+      color: var(--color-font);
+      margin-right: 0.5rem;
+    }
+  }
+
+  .submission-outcome {
+    .outcome-badge {
+      display: inline-block;
+      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+      box-shadow: 0 2px 4px rgba(var(--shadow-dark), 0.1);
+    }
+  }
+}
+
+.submission-details {
+  color: var(--white);
+
+  .detail-row {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    strong {
+      color: var(--color-font);
+      margin-right: 0.5rem;
+      display: inline-block;
+      min-width: 120px;
+      font-weight: 600;
+    }
+
+    // Add subtle background for alternating rows
+    &:nth-child(even) {
+      background: rgba(var(--color-font-rgb), 0.02);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      margin-left: -0.25rem;
+      margin-right: -0.25rem;
+    }
+  }
+}
+
+// Mobile responsive styles
+@media (max-width: 768px) {
+  .submission-card {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  .submission-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    .submission-id {
+      font-size: 0.85rem;
+    }
+  }
+
+  .submission-details {
+    .detail-row {
+      strong {
+        min-width: auto;
+        margin-right: 0.25rem;
+        display: inline;
+      }
+
+      &:nth-child(even) {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0.125rem 0.25rem;
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+@media (prefers-color-scheme: dark) {
+  .submission-card {
+    background: rgba(var(--bg-dark-rgb), 0.95);
+    border-color: rgba(var(--color-font-rgb), 0.15);
+  }
+}

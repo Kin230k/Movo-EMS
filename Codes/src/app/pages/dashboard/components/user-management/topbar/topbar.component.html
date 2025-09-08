@@ -1,0 +1,23 @@
+<div class="container">
+  <app-combo-selector
+    class="combo-selector"
+    [projects]="projects"
+    (projectSelected)="projectSelected.emit($event)"
+    [placeholder]="'ATTENDANCE_MANAGEMENT.SELECT_PROJECT'"
+  ></app-combo-selector>
+
+  <!-- open the Add Role modal -->
+  <themed-button
+    [text]="'ROLES.ADD_ROLE' | translate"
+    (onClick)="openAddRole()"
+  ></themed-button>
+</div>
+
+<!-- Add Role modal -->
+<app-add-role-modal
+  *ngIf="showAddRole"
+  [projects]="projects"
+  [roles]="roles"
+  (close)="onModalClose()"
+  (assigned)="onAssigned($event)"
+></app-add-role-modal>

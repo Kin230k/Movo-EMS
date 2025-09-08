@@ -1,6 +1,7 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 service-account.json
 # Compiled output
+service-account.json
 /dist
 /tmp
 /out-tsc

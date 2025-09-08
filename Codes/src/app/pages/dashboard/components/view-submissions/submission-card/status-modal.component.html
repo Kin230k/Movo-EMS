@@ -1,0 +1,66 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isLoading">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "VIEW_SUBMISSIONS.UPDATING_STATUS" | translate }}
+    </div>
+  </div>
+
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-inner">
+      <header class="modal-header">
+        <h3 class="modal-title">
+          {{ "VIEW_SUBMISSIONS.UPDATE_STATUS" | translate }}
+        </h3>
+        <button class="close" aria-label="Close" (click)="onClose()">✕</button>
+      </header>
+
+      <div class="fields">
+        <div class="field">
+          <label class="label">{{
+            "VIEW_SUBMISSIONS.STATUS" | translate
+          }}</label>
+          <div class="radio-group">
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="ACCEPTED"
+              />
+              {{ "VIEW_SUBMISSIONS.ACCEPTED" | translate }}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="REJECTED"
+              />
+              {{ "VIEW_SUBMISSIONS.REJECTED" | translate }}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="status"
+                [(ngModel)]="selectedStatus"
+                value="MANUAL_REVIEW"
+              />
+              {{ "VIEW_SUBMISSIONS.MANUAL_REVIEW" | translate }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn neutral" (click)="onClose()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate }}
+        </button>
+        <button class="btn primary" (click)="onSave()">
+          {{ "COMMON.BUTTONS.SAVE" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

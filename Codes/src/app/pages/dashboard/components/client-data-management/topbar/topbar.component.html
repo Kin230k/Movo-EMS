@@ -1,0 +1,13 @@
+<div class="container">
+  <themed-button
+    text="{{ 'CLIENT_DATA_MANAGEMENT.ADD_CLIENT' | translate }}"
+    (onClick)="openAddClient()"
+    class="add-client-btn"
+  ></themed-button>
+</div>
+
+<app-add-client-modal
+  *ngIf="showAddClient"
+  (close)="onModalClose()"
+  (clientCreated)="onClientCreated($event)"
+></app-add-client-modal>

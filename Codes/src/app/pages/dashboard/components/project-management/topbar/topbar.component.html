@@ -1,0 +1,21 @@
+<div class="container">
+  <!-- open the Add Project modal -->
+  <themed-button
+    [text]="'PROJECT_MANAGEMENT.ADD_PROJECT' | translate"
+    (onClick)="openAddProject()"
+  ></themed-button>
+</div>
+
+<!-- Add Project modal -->
+<app-add-project-modal
+  *ngIf="showAddProject"
+  (close)="onModalClose()"
+  (refetch)="onProjectCreated()"
+></app-add-project-modal>
+
+<!-- Add Schedule modal -->
+<app-add-schedule-modal
+  *ngIf="showAddSchedule"
+  [projects]="projects"
+  (close)="onScheduleModalClose()"
+></app-add-schedule-modal>

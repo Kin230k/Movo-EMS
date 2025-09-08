@@ -1,0 +1,71 @@
+<aside
+  class="sidebar-wrap"
+  [class.collapsed]="collapsed"
+  [class.mobile]="isMobile"
+>
+  <div class="brand">
+    <app-button
+      type="button"
+      class="menu-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle menu"
+    >
+      <!-- menu icon -->
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 32 32"
+        stroke="#000"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.333 6.666L26.666 6.666"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5.333 16L26.666 16"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5.333 25.333L26.666 25.333"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </app-button>
+    <app-language-switcher></app-language-switcher>
+
+    <!-- use translated menu text -->
+    <div class="menu-text" *ngIf="!collapsed || isMobile">
+      {{ "SIDEBAR.MENU_LABEL" | translate }}
+    </div>
+  </div>
+
+  <ul class="menu-list" [class.open]="!collapsed">
+    <li *ngFor="let item of menu" class="menu-item">
+      <a
+        class="menu-item-link"
+        [routerLink]="['/dashboard', item.path]"
+        routerLinkActive="active"
+        (click)="onNavigate()"
+      >
+        <app-button type="button" class="menu-item-btn">
+          {{ item.labelKey | translate }}
+        </app-button>
+      </a>
+    </li>
+    <li class="menu-item">
+      <button class="menu-item-link" (click)="signOut()">
+        <app-button type="button" class="menu-item-btn">
+          {{ "COMMON.SIGN_OUT" | translate : { default: "Sign out" } }}
+        </app-button>
+      </button>
+    </li>
+  </ul>
+  <div class="lang-container"></div>
+</aside>

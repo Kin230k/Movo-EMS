@@ -1,0 +1,33 @@
+<div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Loading overlay for delete operation -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">{{ "COMMON.DELETING" | translate }}</div>
+</div>
+
+<aside
+  class="modal"
+  role="dialog"
+  aria-modal="true"
+  (click)="$event.stopPropagation()"
+>
+  <div class="modal-inner">
+    <header class="modal-header">
+      <h2 class="modal-title">{{ title | translate }}</h2>
+    </header>
+
+    <div class="modal-body">
+      <p class="message">{{ message | translate }}</p>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn danger" (click)="onConfirm($event)">
+        {{ confirmLabel | translate }}
+      </button>
+
+      <button type="button" class="btn neutral" (click)="onCancel($event)">
+        {{ cancelLabel | translate }}
+      </button>
+    </div>
+  </div>
+</aside>

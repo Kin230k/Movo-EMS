@@ -1,0 +1,126 @@
+/* overlay/backdrop */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rgb), var(--backdrop-opacity));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+/* modal card */
+.modal {
+  background: var(--bg-dark);
+  color: var(--white);
+  border-radius: 12px;
+  max-width: 20rem;
+  width: 94%;
+  padding: 1.25rem;
+  box-shadow: 0 8px 30px var(--shadow-modal);
+}
+
+/* header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.close-btn {
+  background: transparent;
+  color: var(--white);
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* body */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+
+input[type="email"] {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* actions */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.verify-btn {
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}
+
+/* error */
+.error {
+  color: var(--secondary);
+  font-size: 0.85rem;
+}
+
+/* project select and assign actions */
+.project-select {
+  margin-top: 0.75rem;
+}
+
+.assign-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.assign-btn {
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid var(--color-medium-gray);
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+}
+.role-select,
+.project-select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-light-gray);
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+.project-select {
+  margin-bottom: 0.5rem;
+}

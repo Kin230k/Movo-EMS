@@ -1,0 +1,64 @@
+/* reuse modal look-and-feel similar to existing modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-dark-rgb), 0.32);
+  backdrop-filter: blur(2px);
+  z-index: 1200;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1210;
+  max-width: 420px;
+  width: 94%;
+}
+
+.modal-inner {
+  background: var(--bg-dark);
+  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 30px var(--shadow-modal);
+  color: var(--color-font);
+}
+
+.modal-header {
+  margin-bottom: 0.75rem;
+}
+.modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.modal-body {
+  margin-bottom: 1rem;
+}
+.message {
+  color: rgba(var(--color-font-rgb), 0.95);
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  min-width: 110px;
+  padding: 0.58rem 0.9rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn.danger {
+  background: var(--secondary);
+  color: var(--white);
+}
+.btn.neutral {
+  background: var(--white);
+  color: var(--color-dark-text);
+}

@@ -1,0 +1,245 @@
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ImageUploadService } from '../../../../../core/services/image-upload.service';
+import api from '../../../../../core/api/api';
+
+@Component({
+  selector: 'app-edit-client-modal',
+  standalone: true,
+  templateUrl: './edit-client-modal.component.html',
+  styleUrls: ['./edit-client-modal.component.scss'],
+  imports: [CommonModule, FormsModule, TranslateModule],
+})
+export class EditClientModalComponent {
+  @Input() data: any;
+  @Output() close = new EventEmitter<void>();
+  @Output() save = new EventEmitter<any>();
+  @Output() refetch = new EventEmitter<void>();
+
+  // Loading and error states
+  isSubmitting = signal(false);
+  isUploading = signal(false);
+  errorMessage = signal('');
+
+  nameEn = '';
+  nameAr = '';
+  companyEn = '';
+  companyAr = '';
+  contactEmail = '';
+  contactPhone = '';
+  logo: string | undefined = undefined;
+
+  // Image upload properties
+  selectedFile: File | null = null;
+  uploadProgress = 0;
+  previewUrl: string | null = null;
+  hasUploadError = false;
+
+  constructor(
+    private translate: TranslateService,
+    private imageUploadService: ImageUploadService
+  ) {}
+
+  ngOnInit() {
+    const name = this.data?.name || {};
+    const company = this.data?.company || null;
+    this.nameEn = typeof name === 'string' ? name : name.en || '';
+    this.nameAr = typeof name === 'string' ? name : name.ar || '';
+    this.companyEn = company
+      ? typeof company === 'string'
+        ? company
+        : company.en || ''
+      : '';
+    this.companyAr = company
+      ? typeof company === 'string'
+        ? company
+        : company.ar || ''
+      : '';
+    this.contactEmail = this.data?.email || this.data?.contactEmail || '';
+    this.contactPhone = this.data?.phone || this.data?.contactPhone || '';
+    this.logo = this.data?.logo || this.data?.picture || '';
+
+    // Set preview URL if logo exists
+    if (this.logo) {
+      this.previewUrl = this.logo;
+    }
+  }
+
+  onClose() {
+    this.close.emit();
+  }
+
+  onSave() {
+    // Clear previous errors
+    this.errorMessage.set('');
+
+    if (!this.nameEn.trim() || !this.nameAr.trim()) {
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.NAME_REQUIRED')
+      );
+      return;
+    }
+    if (!this.contactEmail.trim()) {
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.EMAIL_REQUIRED')
+      );
+      return;
+    }
+    if (!this.contactPhone.trim()) {
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.PHONE_REQUIRED')
+      );
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    const payload = {
+      clientId: this.data?.clientId || this.data?.id,
+      name: { en: this.nameEn.trim(), ar: this.nameAr.trim() },
+      contactEmail: this.contactEmail.trim(),
+      contactPhone: this.contactPhone.trim(),
+      logo: this.logo,
+      company:
+        this.companyEn.trim() || this.companyAr.trim()
+          ? { en: this.companyEn.trim(), ar: this.companyAr.trim() }
+          : null,
+    } as const;
+
+    (async () => {
+      try {
+        await api.updateClient(payload as any);
+        this.save.emit(payload);
+        this.refetch.emit();
+        this.onClose();
+      } catch (error: any) {
+        console.error('Error updating client:', error);
+        this.errorMessage.set(
+          error?.message ||
+            this.translate.instant(
+              'CLIENT_DATA_MANAGEMENT.ERRORS.UPDATE_FAILED'
+            )
+        );
+      } finally {
+        this.isSubmitting.set(false);
+      }
+    })();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Clear previous errors
+    this.errorMessage.set('');
+    this.hasUploadError = false;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.errorMessage.set(
+        this.translate.instant(
+          'CLIENT_DATA_MANAGEMENT.ERRORS.INVALID_FILE_TYPE'
+        )
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.FILE_TOO_LARGE')
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+      return;
+    }
+
+    this.selectedFile = file;
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.previewUrl = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.FILE_READ_ERROR')
+      );
+      this.hasUploadError = true;
+      this.clearFileSelection();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private clearFileSelection() {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    // Reset file input
+    const fileInput = document.querySelector(
+      '#edit-client-logo-input'
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  async uploadImage() {
+    if (!this.selectedFile) return;
+
+    this.isUploading.set(true);
+    this.uploadProgress = 0;
+
+    try {
+      const upload$ = this.imageUploadService.uploadFile(
+        this.selectedFile,
+        `clients/${Date.now()}_${this.selectedFile.name}`
+      );
+
+      upload$.subscribe({
+        next: (progress) => {
+          this.uploadProgress = progress.progress;
+          if (progress.downloadURL) {
+            this.logo = progress.downloadURL;
+            this.isUploading.set(false);
+            this.selectedFile = null;
+          }
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          this.errorMessage.set(
+            this.translate.instant(
+              'CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED'
+            )
+          );
+          this.hasUploadError = true;
+          this.isUploading.set(false);
+          this.uploadProgress = 0;
+        },
+      });
+      console.log(upload$);
+    } catch (error) {
+      console.error('Upload error:', error);
+      this.errorMessage.set(
+        this.translate.instant('CLIENT_DATA_MANAGEMENT.ERRORS.UPLOAD_FAILED')
+      );
+      this.hasUploadError = true;
+      this.isUploading.set(false);
+    }
+  }
+
+  removeImage() {
+    this.logo = undefined;
+    this.previewUrl = null;
+    this.selectedFile = null;
+    this.uploadProgress = 0;
+    this.isUploading.set(false);
+    this.hasUploadError = false;
+    this.errorMessage.set('');
+  }
+}

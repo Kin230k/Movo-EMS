@@ -1,0 +1,63 @@
+<app-manual-navbar *ngIf="onlyManual"> </app-manual-navbar>
+<div class="view-submissions-container">
+  <div class="header-section">
+    <h1>{{ "VIEW_SUBMISSIONS.TITLE" | translate }}</h1>
+  </div>
+
+  <!-- Form selector section -->
+  <div class="form-selector-section">
+    <app-combo-selector
+      [projects]="formsForSelector"
+      [selectedValue]="selectedFormId"
+      placeholder="{{ 'VIEW_SUBMISSIONS.SELECT_FORM' | translate }}"
+      (projectSelected)="onFormSelected($event)"
+    >
+    </app-combo-selector>
+  </div>
+
+  <!-- Submissions section -->
+  <div
+    class="submissions-section"
+    *ngIf="filteredSubmissions.length > 0 || isLoading"
+  >
+    <div class="submissions-grid">
+      <!-- Show skeleton cards during loading -->
+      <ng-container *ngIf="isLoading">
+        <app-skeleton-form-card *ngFor="let i of [1, 2, 3]">
+        </app-skeleton-form-card>
+      </ng-container>
+
+      <!-- Show actual submission cards when not loading -->
+      <ng-container *ngIf="!isLoading">
+        <app-submission-card
+          *ngFor="let submission of filteredSubmissions"
+          [submission]="submission"
+          [onlyManual]="onlyManual"
+          [resetTrigger]="submissionCardResetTriggers[submission.submissionId]"
+          (goToManualQuestions)="onGoToManualQuestions($event)"
+          (statusUpdated)="onStatusUpdated($event)"
+          (statusUpdateComplete)="onStatusUpdateComplete($event)"
+        >
+        </app-submission-card>
+      </ng-container>
+
+      <!-- No submissions message -->
+      <div
+        class="no-submissions"
+        *ngIf="filteredSubmissions.length === 0 && selectedFormId && !isLoading"
+      >
+        <p>{{ "VIEW_SUBMISSIONS.NO_SUBMISSIONS_FOR_FORM" | translate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Initial state message -->
+  <div
+    class="initial-state"
+    *ngIf="!selectedFormId && !isLoading && filteredSubmissions.length === 0"
+  >
+    <p>
+      {{ "VIEW_SUBMISSIONS.SELECT_FORM_TO_VIEW_SUBMISSIONS" | translate }}
+    </p>
+  </div>
+</div>

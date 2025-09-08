@@ -1,0 +1,91 @@
+.profile-card {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(var(--bg-dark-rgb), 0.2);
+  border-radius: var(--radius-card);
+  background: var(--bg-dark);
+  color: var(--color-font);
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.client-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meta-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-font);
+}
+
+.company {
+  font-size: 12px;
+  color: var(--color-font-secondary);
+}
+
+.meta-body {
+  gap: 16px;
+  color: var(--color-font-secondary);
+}
+
+.actions-container {
+  position: relative;
+}
+
+.mobile-hamburger {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-font);
+}
+
+.actions {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  display: none;
+  background: var(--bg-dark);
+  border: 1px solid rgba(var(--bg-dark-rgb), 0.2);
+  border-radius: var(--radius-input);
+  box-shadow: 0 6px 24px var(--shadow-modal);
+  z-index: 100;
+}
+
+.actions.open {
+  display: block;
+}
+
+.action {
+  display: block;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-font);
+  font-family: var(--app-font);
+  transition: background-color 0.2s ease;
+}
+
+.action:hover {
+  background: rgba(var(--white-rgb), 0.1);
+}

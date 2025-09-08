@@ -1,0 +1,37 @@
+<div class="client-data-container">
+  <div class="header-section">
+    <h1>{{ "CLIENT_DATA_MANAGEMENT.TITLE" | translate }}</h1>
+  </div>
+
+  <app-client-topbar
+    (clientCreated)="onClientCreated($event)"
+  ></app-client-topbar>
+
+  <!-- show error -->
+  <div *ngIf="error" class="error" role="alert">
+    {{ "USER_MANGEMENT.ERROR_LOADING_PROJECTS" | translate }}
+  </div>
+
+  <!-- show skeleton placeholders when loading -->
+  <div *ngIf="isLoading" class="card-list-skeleton">
+    <app-card-list-skeletion></app-card-list-skeletion>
+  </div>
+
+  <!-- show empty state if finished and no clients -->
+  <div
+    *ngIf="!isLoading && isFinished && clients && clients.length === 0"
+    class="empty-state"
+  >
+    {{ "USER_MANGEMENT.NO_PROJECTS_FOUND" | translate }}
+  </div>
+
+  <!-- show real list when loaded -->
+  <div *ngIf="!isLoading && clients && clients.length > 0">
+    <app-card-list
+      [items]="clients"
+      [cardComponent]="profileCardComponent"
+      (refetch)="refetchClients()"
+    >
+    </app-card-list>
+  </div>
+</div>

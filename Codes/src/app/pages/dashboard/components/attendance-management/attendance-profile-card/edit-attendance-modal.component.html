@@ -1,0 +1,76 @@
+<div class="modal-backdrop">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "ATTENDANCE_MANAGEMENT.UPDATING_ATTENDANCE" | translate }}
+    </div>
+  </div>
+
+  <form class="modal" [formGroup]="form">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          {{ "ATTENDANCE_MANAGEMENT.EDIT_TITLE" | translate }}
+        </h3>
+      </div>
+
+      <div class="modal-body">
+        <div class="user-summary">
+          <img [src]="data?.picture" alt="avatar" class="avatar-sm" />
+          <div class="user-info">
+            <div class="name">
+              {{ data ? data.name["en"] || data.name["en"] : "" }}
+            </div>
+          </div>
+        </div>
+        <div class="fields">
+          <div class="field">
+            <label class="label"
+              >{{ "ATTENDANCE_MANAGEMENT.PRESENT" | translate }} :
+            </label>
+            <input
+              type="checkbox"
+              formControlName="isPresent"
+              [checked]="form.get('isPresent')?.value"
+              (change)="
+                form.get('isPresent')?.setValue($any($event.target).checked)
+              "
+            />
+          </div>
+          <div class="field">
+            <label class="label"
+              >{{ "ATTENDANCE_MANAGEMENT.DATE" | translate }} :
+            </label>
+            <input
+              type="datetime-local"
+              class="text-input"
+              formControlName="attendanceTimestamp"
+            />
+            <div
+              *ngIf="
+                form.get('attendanceTimestamp')?.invalid &&
+                (form.get('attendanceTimestamp')?.touched ||
+                  form.get('attendanceTimestamp')?.dirty)
+              "
+              class="field-error"
+            >
+              <small class="error-text">{{
+                "COMMON.ERRORS.REQUIRED" | translate
+              }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn neutral" (click)="onCancel()">
+          {{ "COMMON.BUTTONS.CANCEL" | translate }}
+        </button>
+        <button class="btn danger" (click)="onSave()">
+          {{ "COMMON.BUTTONS.SAVE" | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

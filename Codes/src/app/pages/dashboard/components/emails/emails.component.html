@@ -1,0 +1,161 @@
+<div class="emails-container">
+  <div class="header-section">
+    <h1>{{ "EMAILS.TITLE" | translate }}</h1>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tabs-section">
+    <div class="tabs">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'compose'"
+        (click)="setActiveTab('compose')"
+      >
+        {{ "EMAILS.SEND_TAB" | translate }}
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'history'"
+        (click)="setActiveTab('history')"
+      >
+        {{ "EMAILS.HISTORY_TAB" | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Compose Tab -->
+  <div *ngIf="activeTab === 'compose'" class="tab-content">
+    <div class="compose-section">
+      <div class="compose-header">
+        <h3>{{ "EMAILS.COMPOSE_NEW_EMAIL" | translate }}</h3>
+      </div>
+
+      <form class="compose-form" [formGroup]="composeForm">
+        <!-- Email Input -->
+        <div class="form-group">
+          <label>{{ "EMAILS.EMAIL" | translate }}</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="{{ 'EMAILS.EMAIL_PLACEHOLDER' | translate }}"
+            class="subject-input"
+          />
+        </div>
+
+        <!-- Email Subject -->
+        <div class="form-group">
+          <label>{{ "EMAILS.SUBJECT" | translate }}</label>
+          <input
+            type="text"
+            formControlName="subject"
+            placeholder="{{ 'EMAILS.SUBJECT_PLACEHOLDER' | translate }}"
+            class="subject-input"
+          />
+        </div>
+
+        <!-- Email Body -->
+        <div class="form-group">
+          <label>{{ "EMAILS.BODY" | translate }}</label>
+          <textarea
+            formControlName="body"
+            placeholder="{{ 'EMAILS.BODY_PLACEHOLDER' | translate }}"
+            class="body-input"
+            rows="10"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn cancel-btn"
+            (click)="resetComposeForm()"
+          >
+            {{ "COMMON.BUTTONS.CANCEL" | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn send-btn"
+            (click)="sendEmail()"
+            [disabled]="
+              !composeForm || composeForm.invalid || composeForm.pending
+            "
+          >
+            {{ "EMAILS.SEND_EMAIL" | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- History Tab -->
+  <div *ngIf="activeTab === 'history'" class="tab-content">
+    <div class="history-section">
+      <div class="section-header">
+        <h3>{{ "EMAILS.EMAIL_HISTORY" | translate }}</h3>
+        <div class="history-controls">
+          <app-combo-selector
+            [projects]="formsForSelector"
+            [selectedValue]="selectedFormId"
+            placeholder="{{ 'EMAILS.SELECT_FORM' | translate }}"
+            (projectSelected)="onHistoryFormSelected($event)"
+            class="form-selector"
+          >
+          </app-combo-selector>
+        </div>
+      </div>
+
+      <!-- Email Templates Section -->
+      <div
+        class="email-templates-section"
+        *ngIf="selectedFormId && filteredEmails.length > 0"
+      >
+        <h4>{{ "EMAILS.EMAIL_TEMPLATES" | translate }}</h4>
+        <div class="email-templates-grid">
+          <div
+            class="email-template-card"
+            *ngFor="let email of filteredEmails"
+            (click)="onSendEmail(getEmailData(email))"
+          >
+            <div class="template-header">
+              <h5>{{ email.title }}</h5>
+              <button class="use-template-btn" type="button">
+                {{ "EMAILS.USE_TEMPLATE" | translate }}
+              </button>
+            </div>
+            <div class="template-body">
+              <!-- diplay this with html enable -->
+              <div [innerHTML]="email.body"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-section" *ngIf="selectedFormId && isLoading">
+        <app-skeleton-form-card
+          *ngFor="let i of [1, 2, 3]"
+        ></app-skeleton-form-card>
+      </div>
+
+      <ng-template #noHistory>
+        <div class="no-history" *ngIf="!selectedFormId && !isHistoryLoading">
+          <p>{{ "EMAILS.SELECT_FORM" | translate }}</p>
+        </div>
+        <div
+          class="no-history"
+          *ngIf="
+            selectedFormId && !isHistoryLoading && emailHistory.length === 0
+          "
+        >
+          <p>{{ "EMAILS.NO_EMAIL_HISTORY" | translate }}</p>
+        </div>
+        <div class="history-loading" *ngIf="isHistoryLoading">
+          <app-skeleton-form-card
+            *ngFor="let i of [1, 2, 3, 4]"
+          ></app-skeleton-form-card>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

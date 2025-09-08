@@ -1,0 +1,92 @@
+<!-- add-project-modal.component.html -->
+<div class="modal-backdrop" (click)="onBackdropClick()"></div>
+<!-- Add this inside the form, at the beginning of modal-inner -->
+<div class="overlay" *ngIf="isSubmitting()">
+  <div class="spinner" role="status" aria-hidden="true"></div>
+  <div class="overlay-msg">
+    {{ "PROJECT_MANAGEMENT.CREATING_PROJECT" | translate }}
+  </div>
+</div>
+<aside
+  class="modal"
+  role="dialog"
+  aria-modal="true"
+  (click)="$event.stopPropagation()"
+>
+  <form
+    [formGroup]="form"
+    class="modal-form"
+    (submit)="$event.preventDefault(); onSave()"
+  >
+    <div class="modal-inner compact">
+      <!-- Modal header with title + close button -->
+      <header class="modal-header">
+        <h2 class="modal-title">
+          {{ "PROJECT_MANAGEMENT.ADD_PROJECT" | translate }}
+        </h2>
+      </header>
+
+      <div class="fields">
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.NAME_AR" | translate
+          }}</span>
+          <input type="text" formControlName="nameAr" />
+        </label>
+
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.NAME_EN" | translate
+          }}</span>
+          <input type="text" formControlName="nameEn" />
+        </label>
+
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.STARTING_DATE" | translate
+          }}</span>
+          <input type="date" formControlName="startingDate" />
+        </label>
+
+        <label class="field">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.ENDING_DATE" | translate
+          }}</span>
+          <input type="date" formControlName="endingDate" />
+        </label>
+
+        <label class="field description">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.DESCRIPTION_AR" | translate
+          }}</span>
+          <textarea formControlName="descriptionAr"></textarea>
+        </label>
+
+        <label class="field description">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.DESCRIPTION_EN" | translate
+          }}</span>
+          <textarea formControlName="descriptionEn"></textarea>
+        </label>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn neutral" (click)="onClose($event)">
+          {{ "PROJECT_MANAGEMENT.CANCEL" | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn primary"
+          (click)="onSave($event)"
+          [disabled]="form.invalid"
+        >
+          {{ "PROJECT_MANAGEMENT.CREATE" | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</aside>

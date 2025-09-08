@@ -1,0 +1,167 @@
+<div class="overlay" (click)="onClose()">
+  <!-- Loading overlay for form submission -->
+  <div class="overlay" *ngIf="isSubmitting()">
+    <div class="spinner" role="status" aria-hidden="true"></div>
+    <div class="overlay-msg">
+      {{ "FORM_MANAGEMENT.CREATING_FORM" | translate }}
+    </div>
+  </div>
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ "FORM_MANAGEMENT.ADD_NEW_FORM" | translate }}</h3>
+      <button class="close-btn" aria-label="Close" (click)="onClose()">
+        ✕
+      </button>
+    </header>
+
+    <section class="modal-body">
+      <!-- Language Selection -->
+      <div class="language-section">
+        <label class="label">{{
+          "LANGUAGE.SELECT_LANGUAGE" | translate
+        }}</label>
+        <select
+          class="language-select"
+          [value]="currentLang"
+          (change)="onLanguageChange($event)"
+        >
+          <option value="en">{{ "LANGUAGE.ENGLISH" | translate }}</option>
+          <option value="ar">{{ "LANGUAGE.ARABIC" | translate }}</option>
+        </select>
+      </div>
+
+      <!-- Selected Project Display -->
+      <div class="selected-info" *ngIf="selectedProject">
+        <label class="label">{{
+          "FORM_MANAGEMENT.SELECT_PROJECT" | translate
+        }}</label>
+        <div class="selected-item">
+          {{ selectedProject.name[currentLang()] }}
+        </div>
+      </div>
+
+      <!-- Location Selection (Readonly shown if chosen in topbar) -->
+      <div class="location-section" *ngIf="selectedLocationId">
+        <label class="label">{{
+          "FORM_MANAGEMENT.LOCATION" | translate
+        }}</label>
+        <div class="selected-info" *ngIf="selectedLocation">
+          <span class="selected-label"
+            >{{ "FORM_MANAGEMENT.SELECTED_LOCATION" | translate }}:</span
+          >
+          <div class="selected-item">
+            {{ selectedLocation.name[currentLang()] }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Relation Type Selection -->
+      <div class="relation-type">
+        <label class="label">{{
+          "FORM_MANAGEMENT.FORM_IS_RELATED_TO" | translate
+        }}</label>
+        <div class="radio-group">
+          <label>
+            <input
+              type="radio"
+              name="relationType"
+              value="project"
+              [(ngModel)]="relationType"
+              (change)="onRelationTypeChange()"
+            />
+            {{ "FORM_MANAGEMENT.PROJECT" | translate }}
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="relationType"
+              value="location"
+              [(ngModel)]="relationType"
+              (change)="onRelationTypeChange()"
+            />
+            {{ "FORM_MANAGEMENT.LOCATION" | translate }}
+          </label>
+        </div>
+        <p
+          class="hint"
+          *ngIf="relationType === 'location' && !selectedLocationId"
+        >
+          {{ "FORM_MANAGEMENT.PLEASE_SELECT_A_LOCATION" | translate }}
+        </p>
+      </div>
+
+      <!-- Form Name Input -->
+      <div class="form-name-section">
+        <label class="label">{{
+          "FORM_MANAGEMENT.FORM_NAME" | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-name-input"
+          [(ngModel)]="formName"
+          placeholder="{{
+            'FORM_MANAGEMENT.FORM_NAME_PLACEHOLDER' | translate
+          }}"
+        />
+      </div>
+
+      <!-- Location Selection (shown only when relation type is location) -->
+      <div class="location-selection" *ngIf="relationType === 'location'">
+        <label class="label">{{
+          "FORM_MANAGEMENT.SELECT_LOCATION" | translate
+        }}</label>
+        <app-combo-selector
+          [projects]="locations"
+          placeholder="{{ 'FORM_MANAGEMENT.SELECT_LOCATION' | translate }}"
+          (projectSelected)="onLocationSelected($event)"
+        ></app-combo-selector>
+      </div>
+
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <!-- Selection Summary -->
+      <div class="selection-summary" *ngIf="selectedProject">
+        <h4>{{ "FORM_MANAGEMENT.FORM_DETAILS" | translate }}:</h4>
+        <ul>
+          <!-- TODO: translate the project and location names in en ar based on the language -->
+          <li>
+            <strong>{{ "FORM_MANAGEMENT.PROJECT" | translate }}:</strong>
+            {{ selectedProject.name[currentLang()] }}
+          </li>
+          <li *ngIf="selectedLocation">
+            <strong>{{ "FORM_MANAGEMENT.LOCATION" | translate }}:</strong>
+            {{ selectedLocation.name[currentLang()] }}
+          </li>
+          <li>
+            <strong>{{ "FORM_MANAGEMENT.FORM_TYPE" | translate }}:</strong>
+            {{
+              relationType === "location"
+                ? ("FORM_MANAGEMENT.LOCATION_BASED_FORM" | translate)
+                : ("FORM_MANAGEMENT.PROJECT_BASED_FORM" | translate)
+            }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button type="button" class="cancel-btn" (click)="onClose()">
+          {{ "FORM_MANAGEMENT.CANCEL" | translate }}
+        </button>
+        <button type="button" class="create-btn" (click)="createForm()">
+          {{ "FORM_MANAGEMENT.CREATE_FORM" | translate }}
+        </button>
+
+        <!-- Select Form Button: only show when relation is location and a location is selected -->
+        <button
+          *ngIf="relationType === 'location' && selectedLocationId"
+          type="button"
+          class="select-form-btn"
+          (click)="onSelectForm()"
+        >
+          {{ "FORM_MANAGEMENT.SELECT_FORM" | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

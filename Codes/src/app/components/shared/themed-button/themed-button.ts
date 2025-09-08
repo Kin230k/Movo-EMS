@@ -1,0 +1,17 @@
+// components/shared/button/button.ts
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'themed-button',
+  imports: [CommonModule],
+  templateUrl: './themed-button.html',
+  styleUrls: ['./themed-button.scss'],
+  standalone: true,
+})
+export class ThemedButtonComponent {
+  @Input() type: string = 'button';
+  @Input() text: string = '';
+  @Input() disabled: boolean = false;
+  @Output() onClick = new EventEmitter<void>();
+}
