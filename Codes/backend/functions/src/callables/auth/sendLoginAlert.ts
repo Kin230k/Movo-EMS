@@ -1,4 +1,0 @@
-import { onCall } from 'firebase-functions/v2/https';
-import { sendLoginAlertHandler } from '../../handlers/auth/sendLoginAlertHandler';
-
-export const sendLoginAlert = onCall({}, sendLoginAlertHandler);

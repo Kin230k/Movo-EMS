@@ -34,7 +34,7 @@ export const sendEmail = async (
   const template = EMAIL_TEMPLATES[templateKey];
   if (!template) throw new Error(`Template ${templateKey} not found`);
 
-  const { subject, text, html } = template(...templateData);
+  const { subject, text, html } =await template(...templateData);
 
   try {
     await transporter.sendMail({
@@ -50,3 +50,24 @@ export const sendEmail = async (
     throw new functions.https.HttpsError('internal', 'Email sending failed');
   }
 };
+export const sendEmailManually = async (
+  to: string,
+  subject: string,
+  body: string,
+  attachments?: {
+    filename?: string;
+    content?: Buffer | string;
+    path?: string;
+    cid?: string;
+    contentType?: string;
+  }[]
+) => {
+  await transporter.sendMail({
+    from: EMAIL_FROM, // optional if transporter already has a default
+    to,
+    subject,
+    html: body,
+    attachments, // nodemailer will inline attachments with cid when referenced in the HTML
+  });
+};
+

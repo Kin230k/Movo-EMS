@@ -3,26 +3,37 @@ import { BaseMapper } from '../../base-mapper';
 import { Schedule } from './schedule.class';
 import type { QueryResult } from 'pg';
 import pool from '../../../utils/pool';
+import { CurrentUser } from '../../../utils/currentUser.class';
 
 export class ScheduleMapper extends BaseMapper<Schedule> {
   async save(entity: Schedule): Promise<void> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
     const op = entity.operation;
     const { scheduleId, createdAt, startTime, endTime, projectId, locationId } =
       entity;
 
+    // Validation
+    if (op === Operation.CREATE) {
+      if (!createdAt) throw new Error('Creation date is required');
+    }
+    if (!startTime) throw new Error('Start time is required');
+    if (!endTime) throw new Error('End time is required');
+
     if (op === Operation.UPDATE) {
-      if (!entity.scheduleId)
-        throw new Error('Schedule ID is required for update');
+      if (!scheduleId) throw new Error('Schedule ID is required for update');
       await pool.query('CALL update_schedule($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
         scheduleId,
-        createdAt,
         startTime,
         endTime,
         projectId,
         locationId,
       ]);
     } else {
-      await pool.query('CALL create_schedule($1, $2, $3, $4, $5)', [
+      await pool.query('CALL create_schedule($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
         createdAt,
         startTime,
         endTime,
@@ -33,32 +44,93 @@ export class ScheduleMapper extends BaseMapper<Schedule> {
   }
 
   async getById(id: string): Promise<Schedule | null> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!id) throw new Error('Schedule ID is required');
+
     const result: QueryResult = await pool.query(
-      'SELECT * FROM get_schedule_by_id($1)',
-      [id]
+      'SELECT * FROM get_schedule_by_id($1, $2)',
+      [currentUserId, id]
     );
     return result.rows.length ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async getAll(): Promise<Schedule[]> {
-    const result = await pool.query('SELECT * FROM get_all_schedules()');
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    const result = await pool.query('SELECT * FROM get_all_schedules($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
   async delete(id: string): Promise<void> {
-    await pool.query('CALL delete_schedule($1)', [id]);
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!id) throw new Error('Schedule ID is required');
+
+    await pool.query('CALL delete_schedule($1, $2)', [currentUserId, id]);
+  }
+
+  async getByLocation(locationId: string): Promise<Schedule[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!locationId) throw new Error('Location ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_schedule_by_location($1, $2)',
+      [currentUserId, locationId]
+    );
+    return result.rows.map(this.mapRowToEntity);
+  }
+
+  async getByProjectOrLocation(
+    projectId?: string,
+    locationId?: string
+  ): Promise<Schedule[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId && !locationId)
+      throw new Error('Either project ID or location ID is required');
+
+    const result = await pool.query(
+      'SELECT * FROM get_schedules_by_project_or_location($1, $2, $3)',
+      [currentUserId, projectId || null, locationId || null]
+    );
+    return result.rows.map(this.mapRowToEntity);
   }
 
   private mapRowToEntity = (row: any): Schedule => {
+        const starTime =
+      row.starttime instanceof Date
+        ? row.starttime.toISOString()
+        : row.starttime !== null && row.starttime !== undefined
+        ? String(row.starttime)
+        : null;
+
+    const endTime =
+      row.endtime instanceof Date
+        ? row.endtime.toISOString()
+        : row.endtime !== null && row.endtime !== undefined
+        ? String(row.endtime)
+        : null;
+        const createAt =
+      row.createdat instanceof Date
+        ? row.createdat.toISOString()
+        : row.createdat !== null && row.createdat !== undefined
+        ? String(row.createdat)
+        : null;
     return new Schedule(
-      row.createdAt,
-      row.startTime,
-      row.endTime,
-      row.projectId,
-      row.locationId,
-      row.scheduleId
+      starTime,
+      endTime,
+      row.projectid,
+      row.locationid,
+      createAt as string,
+      row.scheduleid
     );
   };
 }
+
 const scheduleMapper = new ScheduleMapper();
 export default scheduleMapper;

@@ -1,6 +1,7 @@
 import roleMapper from './role.mapper';
 import { Role } from './role.class';
 import { Multilingual } from '../../multilingual.type';
+import { UserService } from '../user/user.service';
 
 export class RoleService {
   constructor() {}
@@ -33,4 +34,15 @@ export class RoleService {
   static async deleteRole(id: string): Promise<void> {
     await roleMapper.delete(id);
   }
+
+  // Convenience passthrough for callers who want just the role name from a userId
+  static async getRoleByUserID(userId: string): Promise<string | null> {
+    return await UserService.getUserRoleById(userId);
+  }
+  // role.service.ts
+// Add this method to the RoleService class
+
+static async getRoleIdByhName(roleName: string): Promise<string | null> {
+  return await roleMapper.getRoleIdByName(roleName);
+}
 }

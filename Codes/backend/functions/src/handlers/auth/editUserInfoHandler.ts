@@ -6,6 +6,7 @@ import { FieldIssue } from '../../utils/types';
 import { UserService } from '../../models/auth/user/user.service';
 import { Multilingual } from '../../models/multilingual.type';
 import { firebaseUidToUuid } from '../../utils/firebaseUidToUuid';
+import { authenticateCaller } from '../../utils/authUtils';
 
 export interface EditUserInfoData {
   name: Multilingual;
@@ -19,14 +20,8 @@ export interface EditUserInfoResult {
 export async function editUserInfoHandler(
   request: CallableRequest<EditUserInfoData>
 ): Promise<EditUserInfoResult> {
-  if (!request.auth) {
-    return {
-      success: false,
-      issues: [
-        { field: 'auth', message: 'Must be signed in to edit user info' },
-      ],
-    };
-  }
+  const auth = await authenticateCaller(request);
+  if (!auth.success) return auth;
 
   const issues: FieldIssue[] = [];
   const { name, picture } = request.data;
@@ -41,7 +36,7 @@ export async function editUserInfoHandler(
 
   try {
     await UserService.editUserInfo(
-      firebaseUidToUuid(request.auth.uid),
+      firebaseUidToUuid(request.auth!.uid),
       name,
       picture
     );

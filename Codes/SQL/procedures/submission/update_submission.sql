@@ -1,22 +1,24 @@
-CREATE OR REPLACE PROCEDURE update_submission(
-    p_submission_id UUID,
-    p_form_id UUID,
-    p_user_id UUID,
-    p_interview_id UUID,
-    p_date_submitted TIMESTAMP,
-    p_outcome submission_outcome,
-    p_decision_notes TEXT
+CREATE OR REPLACE PROCEDURE update_submission(p_auth_user_id UUID,
+ p_submission_id UUID,
+ p_form_id UUID DEFAULT NULL,
+ p_user_id UUID DEFAULT NULL,
+ p_interview_id UUID DEFAULT NULL,
+ p_date_submitted TIMESTAMP DEFAULT NULL,
+ p_outcome submission_outcome DEFAULT NULL,
+ p_decision_notes TEXT DEFAULT NULL
 )
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    UPDATE SUBMISSIONS
-    SET 
-        formId = p_form_id,
-        userId = p_user_id,
-        interviewId = p_interview_id,
-        dateSubmitted = p_date_submitted,
-        outcome = p_outcome,
-        decisionNotes = p_decision_notes
-    WHERE submissionId = p_submission_id;
+ CALL check_user_permission(p_auth_user_id, 'update_submission');
+
+UPDATE SUBMISSIONS
+ SET
+ formId = COALESCE(p_form_id, formId),
+ userId = COALESCE(p_user_id, userId),
+ interviewId = COALESCE(p_interview_id, interviewId),
+ outcome = COALESCE(p_outcome::varchar(20), outcome),
+ decisionNotes = COALESCE(p_decision_notes, decisionNotes)
+ WHERE submissionId = p_submission_id;
 END;
 $$;

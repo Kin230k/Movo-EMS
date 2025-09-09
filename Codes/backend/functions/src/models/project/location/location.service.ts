@@ -26,7 +26,7 @@ export class LocationService {
   static async updateLocation(
     locationId: string,
     name: Multilingual,
-    projectId: string,
+    projectId: string | undefined,
     siteMap?: string,
     longitude?: number,
     latitude?: number
@@ -41,12 +41,21 @@ export class LocationService {
     );
     await locationMapper.save(entity);
   }
+
   static async getLocationById(id: string): Promise<Location | null> {
     return await locationMapper.getById(id);
   }
 
   static async getAllLocations(): Promise<Location[]> {
     return await locationMapper.getAll();
+  }
+
+  static async getLocationsByProject(projectId: string): Promise<Location[]> {
+    return await locationMapper.getByProject(projectId);
+  }
+
+  static async getLocationsByClient(clientId: string): Promise<Location[]> {
+    return await locationMapper.getByClient(clientId);
   }
 
   static async deleteLocation(id: string): Promise<void> {

@@ -6,9 +6,11 @@ RETURNS TABLE (
     siteMap VARCHAR(512),
     longitude NUMERIC,
     latitude NUMERIC
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    
+
+RETURN QUERY 
     SELECT 
         l.locationId,
         l.name,

@@ -2,15 +2,9 @@ import { CallableRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { EmailTemplateKey } from '../../utils/types';
 import { sendEmail } from '../../services/emailService';
-import { ActionCodeSettings } from 'firebase-admin/auth';
 import { auth } from 'firebase-admin';
 import { isValidEmail } from '../../utils/validators';
 import { FieldIssue } from '../../utils/types';
-
-const actionCodeSettings: ActionCodeSettings = {
-  url: process.env.URL_FINISH_SIGNUP ?? '',
-  handleCodeInApp: true,
-};
 
 export interface VerificationRequest {
   email: string;
@@ -40,10 +34,7 @@ export async function sendVerificationEmailHandler(
 
   let link: string;
   try {
-    link = await auth().generateEmailVerificationLink(
-      email,
-      actionCodeSettings
-    );
+    link = await auth().generateEmailVerificationLink(email);
     logger.log('Generated email verification link for', email);
   } catch (error: any) {
     logger.error('Error generating email verification link:', error);

@@ -1,16 +1,19 @@
-CREATE OR REPLACE PROCEDURE update_numeric_answer(
-    p_answer_id UUID,
-    p_response NUMERIC
+CREATE OR REPLACE PROCEDURE update_numeric_answer(p_auth_user_id UUID,
+ p_answer_id UUID,
+ p_response NUMERIC DEFAULT NULL
 )
-LANGUAGE plpgsql AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
 BEGIN
-    -- Validate response
-    IF p_response IS NULL THEN
-        RAISE EXCEPTION 'Response value cannot be NULL';
-    END IF;
+ CALL check_user_permission(p_auth_user_id, 'update_numeric_answer');
 
-    UPDATE NUMERIC_ANSWERS
-    SET response = p_response
-    WHERE answerId = p_answer_id;
+-- Validate response only when provided
+ IF p_response IS NULL THEN
+ RAISE EXCEPTION 'Response value cannot be NULL';
+ END IF;
+
+ UPDATE NUMERIC_ANSWERS
+ SET response = p_response
+ WHERE answerId = p_answer_id;
 END;
 $$;

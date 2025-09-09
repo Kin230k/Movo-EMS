@@ -3,9 +3,11 @@ RETURNS TABLE (
     areaId UUID,
     name JSONB,
     locationId UUID
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-    RETURN QUERY 
+    
+
+RETURN QUERY 
     SELECT 
         a.areaId,
         a.name,
