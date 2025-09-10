@@ -1,7 +1,16 @@
+// src/app/core/services/identity.service.ts
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, from, timer, throwError } from 'rxjs';
-import { catchError, retryWhen, scan, concatMap } from 'rxjs/operators';
-import * as api from '../api/api';
+import {
+  catchError,
+  retryWhen,
+  scan,
+  concatMap,
+  filter,
+  take,
+  timeout,
+} from 'rxjs/operators';
+import api from '../api/api';
 import { AuthService } from './auth.service';
 
 export type CallerIdentity = {
@@ -34,10 +43,28 @@ export class IdentityService {
     if (!this.loadingPromise) {
       this.loadingPromise = (async () => {
         try {
-          // First check if user is authenticated in Firebase
-          const firebaseUser = this.authService.getCurrentUser();
+          // First check if user is authenticated in Firebase (fast path)
+          let firebaseUser = this.authService.getCurrentUser();
 
-          // If not authenticated in Firebase, return all flags as false
+          // If there's no currentUser immediately available, we may be racing with
+          // the Firebase onAuthStateChanged update. Wait briefly (up to 3s) for the
+          // auth state to settle regardless of forceRefresh so callers that call
+          // getIdentity immediately after login get a chance to see the new user.
+          if (!firebaseUser) {
+            try {
+              firebaseUser = await firstValueFrom(
+                this.authService.currentUser$.pipe(
+                  filter((u): u is NonNullable<typeof u> => !!u),
+                  take(1),
+                  timeout(3000)
+                )
+              );
+            } catch {
+              // timeout or no update — fall back to treating as unauthenticated below
+            }
+          }
+
+          // If still not authenticated in Firebase, return all flags as false
           if (!firebaseUser) {
             const defaultIdentity: CallerIdentity = {
               isAdmin: false,
@@ -55,6 +82,16 @@ export class IdentityService {
           // Configuration (tweak as needed)
           const maxRetries = 6; // total attempts = 1 initial + up to 6 retries
           const baseDelayMs = 1000; // initial backoff (1s), then 2s, 4s, ...
+
+          // Ensure we have a fresh ID token so the callable runs as the new user immediately
+          try {
+            await firebaseUser.getIdToken(true);
+          } catch {}
+
+          // Invalidate any cached identity before refetching to ensure freshness
+          try {
+            api.invalidateApiCacheByFnPrefix('getCallerIdentity');
+          } catch {}
 
           const result: any = await firstValueFrom(
             from(api.getCallerIdentity()).pipe(

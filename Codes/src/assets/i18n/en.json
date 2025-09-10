@@ -5,7 +5,8 @@
     "PASSWORD_PLACEHOLDER": "Password",
     "FORGOT_PASSWORD": "Forgot password?",
     "BUTTON": "Log in",
-    "SIGN_UP": "Sign Up"
+    "SIGN_UP": "Sign Up",
+    "LOGGING_IN": "Logging in..."
   },
   "LOGIN_ADMIN": {
     "TITLE": "Log in as Admin",

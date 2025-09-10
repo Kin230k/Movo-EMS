@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
@@ -21,7 +21,7 @@ import { ToastService } from '../../core/services/toast.service';
   templateUrl: './login-user.html',
   styleUrls: ['./login-user.scss'],
 })
-export class LoginUser implements OnInit {
+export class LoginUser implements OnInit, OnDestroy {
   email: string = '';
   password: string = '';
 
@@ -37,16 +37,22 @@ export class LoginUser implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    const who = await this.identity.getIdentity(true);
-    if (who.isAdmin || who.isClient) {
-      this.router.navigate(['/dashboard']);
-    } else if (who.isWorker) {
-      this.router.navigate(['/take-attendance']);
-    } else if (who.isUser) {
-      this.router.navigate(['/projects']);
-    } else {
-      this.router.navigate(['/login']);
-    }
+    // Reactively navigate when identity changes (e.g., after login)
+    this.identitySub = this.identity.identity$.subscribe((who) => {
+      if (!who) return;
+      if (who.isAdmin || who.isClient) {
+        this.router.navigate(['/dashboard']);
+      } else if (who.isWorker) {
+        this.router.navigate(['/take-attendance']);
+      } else if (who.isUser) {
+        this.router.navigate(['/projects']);
+      }
+    });
+
+    // Trigger initial check
+    try {
+      await this.identity.getIdentity(true);
+    } catch {}
   }
 
   // Optional: switch language from this page
@@ -61,6 +67,7 @@ export class LoginUser implements OnInit {
 
     try {
       await this.auth.login(this.email, this.password);
+      // Force-refresh identity and navigate immediately
       const who = await this.identity.getIdentity(true);
       if (who.isAdmin || who.isClient) {
         this.router.navigate(['/dashboard']);
@@ -102,5 +109,11 @@ export class LoginUser implements OnInit {
   }
   goToSignUp() {
     this.router.navigate(['/signup']);
+  }
+
+  private identitySub?: { unsubscribe: () => void };
+
+  ngOnDestroy(): void {
+    this.identitySub?.unsubscribe?.();
   }
 }

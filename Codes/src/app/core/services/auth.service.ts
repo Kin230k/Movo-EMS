@@ -1,3 +1,4 @@
+
 // src/app/core/services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import {
@@ -48,6 +49,12 @@ export class AuthService {
     } catch (error) {
       throw error;
     }
+
+    // push the newly created user into our subject so callers who rely on
+    // currentUser$ don't have to wait for onAuthStateChanged to fire.
+    try {
+      this.currentUserSubject.next(userCredential.user);
+    } catch {}
 
     try {
       const result = await api.registerUser({
@@ -104,6 +111,11 @@ export class AuthService {
       throw err;
     }
 
+    // Immediately update subject so subscribers can react before onAuthStateChanged
+    try {
+      this.currentUserSubject.next(userCredential.user);
+    } catch {}
+
     // Call API to create client record (do NOT send password to API)
     try {
       // remove password before sending to API
@@ -127,6 +139,11 @@ export class AuthService {
         );
       }
 
+      // ensure our subject doesn't still contain the deleted user
+      try {
+        this.currentUserSubject.next(null);
+      } catch {}
+
       // Rethrow the API error
       throw apiErr;
     }
@@ -143,12 +160,30 @@ export class AuthService {
 
   /** Login with email + password */
   async login(email: string, password: string): Promise<UserCredential> {
-    return await signInWithEmailAndPassword(this.auth, email, password);
+    const credential = await signInWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
+
+    // Eagerly push the signed-in user into the BehaviorSubject so callers who
+    // immediately read currentUser$ or call getIdentity() won't race with
+    // onAuthStateChanged.
+    try {
+      this.currentUserSubject.next(credential.user);
+    } catch {}
+
+    return credential;
   }
 
   /** Logout the current user */
   async logout(): Promise<void> {
-    return await signOut(this.auth);
+    await signOut(this.auth);
+
+    // ensure subject is cleared immediately
+    try {
+      this.currentUserSubject.next(null);
+    } catch {}
   }
 
   /** Get current user snapshot (not observable) */

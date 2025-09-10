@@ -5,7 +5,8 @@
     "PASSWORD_PLACEHOLDER": "كلمة المرور",
     "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
     "BUTTON": "تسجيل الدخول",
-    "SIGN_UP": "تسجيل الدخول"
+    "SIGN_UP": "تسجيل الدخول",
+    "LOGGING_IN": "جاري تسجيل الدخول..."
   },
   "LOGIN_ADMIN": {
     "TITLE": "تسجيل دخول المسؤول",
@@ -15,7 +16,8 @@
     "BUTTON": "تسجيل الدخول",
     "REMEMBER_ME": "تذكرني",
     "SWITCH_TO_USER": "تسجيل دخول المستخدم",
-    "SIGN_UP": "تسجيل الدخول"
+    "SIGN_UP": "تسجيل الدخول",
+    "LOGGING_IN": "جاري تسجيل الدخول..."
   },
   "SIDEBAR": {
     "USER_MANAGEMENT": "إدارة المستخدمين",
