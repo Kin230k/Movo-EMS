@@ -16,6 +16,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { IdentityService } from '../../../../../core/services/identity.service';
 import api from '../../../../../core/api/api';
 
 @Component({
@@ -33,14 +34,28 @@ export class AddProjectModalComponent implements OnInit, OnDestroy {
 
   form!: FormGroup;
   dataLoaded = true;
+  isAdmin = false;
+  clients: Array<{ id: string; name: { en: string; ar: string } }> = [];
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private identity: IdentityService) {
     this.buildForm();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     // lock background scroll while modal exists
     document.body.style.overflow = 'hidden';
+    try {
+      const who = await this.identity.getIdentity();
+      this.isAdmin = !!who?.isAdmin;
+      if (this.isAdmin) {
+        // add clientId control for admins
+        this.form.addControl(
+          'clientId',
+          this.fb.control('', Validators.required)
+        );
+        await this.loadClients();
+      }
+    } catch {}
   }
 
   ngOnDestroy() {
@@ -56,6 +71,20 @@ export class AddProjectModalComponent implements OnInit, OnDestroy {
       descriptionAr: ['', Validators.required],
       descriptionEn: ['', Validators.required],
     });
+  }
+
+  private async loadClients() {
+    try {
+      const data: any = await api.getAllClients();
+      const payload = (data as any)?.result ?? data ?? [];
+      const list = Array.isArray(payload.clients) ? payload.clients : payload;
+      this.clients = (list ?? []).map((c: any, idx: number) => ({
+        id: c.clientId ?? c.id ?? `${idx + 1}`,
+        name: c.name ?? { en: c?.company?.en ?? '', ar: c?.company?.ar ?? '' },
+      }));
+    } catch (e: any) {
+      this.errorMessage.set(e?.message ?? 'Failed to load clients');
+    }
   }
 
   // keyboard: close on ESC
@@ -76,7 +105,7 @@ export class AddProjectModalComponent implements OnInit, OnDestroy {
     }
     // create project
     this.isSubmitting.set(true);
-    const data = {
+    const data: any = {
       name: { en: this.form.value.nameEn, ar: this.form.value.nameAr },
       startingDate: this.form.value.startingDate,
       endingDate: this.form.value.endingDate,
@@ -87,7 +116,12 @@ export class AddProjectModalComponent implements OnInit, OnDestroy {
     };
 
     try {
-      await api.createProject(data);
+      if (this.isAdmin) {
+        data.clientId = this.form.value.clientId;
+        await api.adminCreateProject(data);
+      } else {
+        await api.createProject(data);
+      }
       // Success case - emit refetch and close
       this.refetch.emit();
       this.close.emit();

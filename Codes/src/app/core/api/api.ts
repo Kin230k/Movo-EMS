@@ -82,6 +82,8 @@ function successMutationMessage(fnName: string): string {
     ? 'updated'
     : fnName.startsWith('delete')
     ? 'deleted'
+    : fnName.startsWith('adminCreate')
+    ? 'created'
     : 'processed';
   const entity = toSpacedWords(fnName.replace(/^(create|update|delete)/i, ''));
   return `${entity} ${action} successfully`;
@@ -349,6 +351,8 @@ export interface GetProjectUsersPayload {
 export interface getFormsByProjectPayload {
   projectId: string;
 }
+export interface GetAllFormsPayload {}
+
 export interface CreateClientPayload {
   name: Multilingual;
   contactEmail: string;
@@ -600,6 +604,9 @@ export interface CreateProjectPayload {
   endingDate: string;
   description?: Multilingual | null;
 }
+export interface AdminCreateProjectPayload extends CreateProjectPayload {
+  clientId: string;
+}
 export interface DeleteProjectPayload {
   projectId: string;
 }
@@ -812,6 +819,9 @@ export async function getFormsByProject(payload: getFormsByProjectPayload) {
 export async function getFormsByClient(payload: GetFormsByClientPayload) {
   return call('getFormsByClient', payload);
 }
+export async function getAllForms(payload: GetAllFormsPayload) {
+  return call('getAllForms', payload);
+}
 export async function getUserInfoByEmail(payload: GetUserInfoByEmailPayload) {
   return call('getUserInfoByEmail', payload);
 }
@@ -1005,6 +1015,9 @@ export async function deleteInterview(payload: DeleteInterviewPayload) {
 export async function createProject(payload: CreateProjectPayload) {
   return call('createProject', payload);
 }
+export async function adminCreateProject(payload: AdminCreateProjectPayload) {
+  return call('adminCreateProject', payload);
+}
 export async function deleteProject(payload: DeleteProjectPayload) {
   return call('deleteProject', payload);
 }
@@ -1157,6 +1170,7 @@ const api = {
   getProjectUsers,
   getFormsByProject,
   getFormsByClient,
+  getAllForms,
   createClient,
   adminCreateClient,
   approveRejectClient,
@@ -1204,6 +1218,7 @@ const api = {
   getInterviewByProject,
   deleteInterview,
   createProject,
+  adminCreateProject,
   deleteProject,
   getProject,
   updateProject,

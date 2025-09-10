@@ -99,6 +99,12 @@
     "EMAIL_USE_TEMPLATE": "Use Template"
   },
   "CLIENT_DATA_MANAGEMENT": {
+    "LOGO": "Logo",
+    "CHOOSE_IMAGE": "Choose Image",
+    "UPLOAD_IMAGE": "Upload Image",
+    "UPLOADING": "Uploading...",
+    "CLIENT": "Select Client",
+    "EDIT_CLIENT": "Edit Client",
     "TITLE": "Client Data Management",
     "ADD_CLIENT": "Add Client",
     "CLIENT_NAME": "Client Name",
@@ -194,6 +200,7 @@
     "ERROR_LOADING_PROJECTS": "Error loading projects."
   },
   "PROJECT_MANAGEMENT": {
+    "CLIENT": "Select Client",
     "TITLE": "Project Management",
     "NO_PROJECTS_FOUND": "No projects found.",
     "ERROR_LOADING_PROJECTS": "Error loading projects.",
@@ -260,6 +267,7 @@
     "ARABIC": "Arabic"
   },
   "COMMON": {
+    "SELECT": "Select",
     "BUTTONS": {
       "SAVE": "Save",
       "EDIT": "Edit",

@@ -101,6 +101,12 @@
   },
   "CLIENT_DATA_MANAGEMENT": {
     "TITLE": "إدارة بيانات العميل",
+    "LOGO": "الشعار",
+    "CHOOSE_IMAGE": "اختر الصورة",
+    "UPLOAD_IMAGE": "رفع الصورة",
+    "EDIT_CLIENT": "تعديل العميل",
+    "UPLOADING": "جار التحميل...",
+    "CLIENT": "اختر العميل",
     "ADD_CLIENT": "إضافة عميل",
     "CLIENT_NAME": "اسم العميل",
     "ENTER_CLIENT_NAME": "أدخل اسم العميل",
@@ -211,6 +217,8 @@
     "ERROR_LOADING_PROJECTS": "خطأ في تحميل المشاريع."
   },
   "PROJECT_MANAGEMENT": {
+    "UPLOADING": "جار التحميل...",
+    "CLIENT": "اختر العميل",
     "TITLE": "إدارة المشاريع",
     "NO_PROJECTS_FOUND": "لا يوجد مشاريع.",
     "ERROR_LOADING_PROJECTS": "خطأ في تحميل المشاريع.",
@@ -277,6 +285,7 @@
     "ARABIC": "العربية"
   },
   "COMMON": {
+    "SELECT": "اختر",
     "BUTTONS": {
       "SAVE": "حفظ",
       "EDIT": "تعديل",

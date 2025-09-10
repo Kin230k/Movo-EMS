@@ -140,7 +140,7 @@
             </button>
 
             <!-- Uploading State -->
-            <div class="upload-loading-state" *ngIf="isUploading">
+            <div class="upload-loading-state" *ngIf="isUploading()">
               <div class="upload-spinner"></div>
               <span class="upload-loading-text">
                 {{ "CLIENT_DATA_MANAGEMENT.UPLOADING" | translate }}

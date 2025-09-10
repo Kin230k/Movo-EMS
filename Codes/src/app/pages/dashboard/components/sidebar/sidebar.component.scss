@@ -4,10 +4,11 @@
   padding: 1.5rem;
   box-shadow: 0 0 0 1px var(--shadow-sidebar) inset;
   border-radius: 0 1rem 1rem 0;
-  height: 92vh;
+  height: 93vh;
   top: 0;
   position: sticky;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   width: 12rem; /* expanded width */
   transition: width 220ms cubic-bezier(0.2, 0.9, 0.2, 1), transform 220ms ease,
     padding 200ms ease;

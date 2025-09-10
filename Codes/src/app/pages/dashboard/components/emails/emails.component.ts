@@ -11,6 +11,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { IdentityService } from '../../../../core/services/identity.service';
 
 export interface Form {
   id: string;
@@ -67,7 +68,7 @@ export class EmailsComponent implements OnInit {
   // Compose form
   composeForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private identity: IdentityService) {
     // Initialize form immediately so template bindings are safe and the
     // disabled state works predictably even while async data loads.
     this.composeForm = this.fb.group({
@@ -81,9 +82,9 @@ export class EmailsComponent implements OnInit {
   }
 
   async ngOnInit() {
-    // Load forms for selectors directly from API
-    try {
-      this._isFormsLoading = true;
+    // Load forms for for each client or admin using identity service
+    const who = await this.identity.getIdentity().catch(() => null);
+    if (who?.isClient) {
       const data: any = await api.getFormsByClient({});
       const payload = (data as any)?.result ?? data ?? {};
       this._forms = Array.isArray(payload.forms)
@@ -92,11 +93,15 @@ export class EmailsComponent implements OnInit {
             title: f.formTitle ?? f.title ?? 'Form',
           }))
         : [];
-    } catch (error) {
-      console.error('Error loading forms:', error);
-      this._forms = [];
-    } finally {
-      this._isFormsLoading = false;
+    } else {
+      const data: any = await api.getAllForms({});
+      const payload = (data as any)?.result ?? data ?? {};
+      this._forms = Array.isArray(payload.forms)
+        ? payload.forms.map((f: any) => ({
+            id: String(f.formId ?? f.id),
+            title: f.formTitle ?? f.title ?? 'Form',
+          }))
+        : [];
     }
 
     // Reset form to default values after initial load (keeps FormGroup instance)

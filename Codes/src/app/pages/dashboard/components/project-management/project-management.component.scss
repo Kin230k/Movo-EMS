@@ -164,6 +164,11 @@
 .card-list-container {
   margin-top: 4rem;
 }
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 /* Error styling */
 .error {

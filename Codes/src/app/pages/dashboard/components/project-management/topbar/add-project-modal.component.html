@@ -27,6 +27,20 @@
       </header>
 
       <div class="fields">
+        <label class="field" *ngIf="isAdmin">
+          <span class="label">{{
+            "PROJECT_MANAGEMENT.CLIENT" | translate
+          }}</span>
+          <select formControlName="clientId">
+            <option value="" disabled selected>
+              {{ "COMMON.SELECT" | translate }}
+            </option>
+            <option *ngFor="let c of clients" [value]="c.id">
+              {{ c.name.en || c.name.ar }}
+            </option>
+          </select>
+        </label>
+
         <label class="field">
           <span class="label">{{
             "PROJECT_MANAGEMENT.NAME_AR" | translate
