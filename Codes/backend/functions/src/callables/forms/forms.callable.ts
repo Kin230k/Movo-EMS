@@ -20,6 +20,7 @@ import { getQuestionsByInterviewHandler } from '../../handlers/forms/core/questi
 import { getAllFormQuestionsHandler } from '../../handlers/forms/core/question/getAllFormQuestionsHandler';
 import { getFormQuestionsByProjectOrLocationHandler } from '../../handlers/forms/core/getFormQuestionsByProjectOrLocationHandler';
 import { getFormsByProjectHandler } from '../../handlers/forms/core/getFormsByProject';
+import { getAllFormsHandler } from '../../handlers/forms/core/getAllForms';
 
 // Submission handlers
 import { createSubmissionHandler } from '../../handlers/forms/submissions/createSubmissionHandler';
@@ -53,6 +54,7 @@ export const updateForm = onCall(updateFormHandler);
 export const getFormByUser = onCall(getFormByUserHandler);
 export const getFormsByProject = onCall(getFormsByProjectHandler);
 export const getFormsByClient = onCall(getFormsByClientHandler);
+export const getAllForms = onCall(getAllFormsHandler);
 // Question
 export const createQuestion = onCall(createQuestionHandler);
 export const deleteQuestion = onCall(deleteQuestionHandler);

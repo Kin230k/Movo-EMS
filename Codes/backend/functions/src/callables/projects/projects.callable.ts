@@ -50,9 +50,11 @@ import { getAreasByLocationHandler } from '../../handlers/projects/areas/getArea
 import { getAllAreasHandler } from '../../handlers/projects/areas/getAllAreasHandler';
 import { getAllProjectsHandler } from '../../handlers/projects/getAllProjectsHandler';
 import { getAllActiveProjectsHandler } from '../../handlers/projects/getAllActiveProjectsHandler';
+import { adminCreateProjectHandler } from '../../handlers/projects/adminCreateProjectHanlder';
 
 // --- Project Callables ---
 export const createProject = onCall(createProjectHandler);
+export const adminCreateProject = onCall(adminCreateProjectHandler);
 export const deleteProject = onCall(deleteProjectHandler);
 export const getProject = onCall(getProjectByIdHandler);
 export const updateProject = onCall(updateProjectHandler);

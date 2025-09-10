@@ -66,6 +66,7 @@ import {
   getFormsByProject,
   getFormsByClient,
   getEmailsByForm,
+  getAllForms,
 } from './callables/forms/forms.callable';
 
 // Import project-related callables
@@ -108,6 +109,7 @@ import {
   getAreasByLocation,
   getAllAreas,
   getAllLocations,
+  adminCreateProject,
 } from './callables/projects/projects.callable';
 // Import ProjectUserRole callables
 import {
@@ -166,6 +168,7 @@ export {
   getFormsByProject,
   getFormsByClient,
   getEmailsByForm,
+  getAllForms,
   // Forms - questions
   createQuestion,
   deleteQuestion,
@@ -192,6 +195,7 @@ export {
 
   // Projects
   createProject,
+  adminCreateProject,
   deleteProject,
   getProject,
   updateProject,

@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION get_all_forms(p_auth_user_id UUID)
 RETURNS TABLE (
     formId UUID,
