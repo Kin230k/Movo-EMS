@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../../components/shared/input/input';
 import { ThemedButtonComponent } from '../../components/shared/themed-button/themed-button';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 import { LanguageService } from '../../core/services/language.service'; // <-- centralized service
 import { AuthService } from '../../core/services/auth.service';
 import { IdentityService } from '../../core/services/identity.service';
@@ -11,13 +12,21 @@ import { ToastService } from '../../core/services/toast.service';
 @Component({
   selector: 'app-login-user',
   standalone: true,
-  imports: [InputComponent, ThemedButtonComponent, TranslateModule],
+  imports: [
+    CommonModule,
+    InputComponent,
+    ThemedButtonComponent,
+    TranslateModule,
+  ],
   templateUrl: './login-user.html',
   styleUrls: ['./login-user.scss'],
 })
 export class LoginUser implements OnInit {
   email: string = '';
   password: string = '';
+
+  // UI state as signals
+  isSubmitting = signal(false);
 
   constructor(
     private router: Router,
@@ -46,6 +55,10 @@ export class LoginUser implements OnInit {
   }
 
   async onLogin() {
+    if (this.isSubmitting()) return;
+
+    this.isSubmitting.set(true);
+
     try {
       await this.auth.login(this.email, this.password);
       const who = await this.identity.getIdentity(true);
@@ -61,6 +74,18 @@ export class LoginUser implements OnInit {
     } catch (err) {
       console.error('Login failed:', err);
       this.toast.error('Login failed. Please check your credentials.');
+    } finally {
+      this.isSubmitting.set(false);
+    }
+  }
+
+  async logout() {
+    try {
+      await this.auth.logout();
+      this.identity.resetIdentity();
+      this.router.navigate(['/login']);
+    } catch (err) {
+      console.error('Logout failed:', err);
     }
   }
 
@@ -70,7 +95,7 @@ export class LoginUser implements OnInit {
 
   onPasswordChange(value: string) {
     this.password = value;
-  } 
+  }
 
   goToForgetPassword() {
     this.router.navigate(['/forget-password']);

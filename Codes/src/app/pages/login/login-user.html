@@ -2,7 +2,18 @@
   <img src="../../../assets/images/logo.png" alt="" />
 </div>
 <div class="login-container">
-  <div class="login-form">
+  <div class="login-form" [class.loading]="isSubmitting()">
+    <!-- overlay spinner shown while submitting -->
+    <div
+      class="overlay"
+      *ngIf="isSubmitting()"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div class="spinner" role="status" aria-hidden="true"></div>
+      <div class="overlay-msg">{{ 'LOGIN.LOGGING_IN' | translate }}</div>
+    </div>
+
     <h2 class="login-title">{{ 'LOGIN.TITLE' | translate }}</h2>
 
     <form>

@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, from, timer, throwError } from 'rxjs';
 import { catchError, retryWhen, scan, concatMap } from 'rxjs/operators';
 import * as api from '../api/api';
+import { AuthService } from './auth.service';
 
 export type CallerIdentity = {
   isAdmin: boolean;
@@ -14,6 +15,7 @@ export type CallerIdentity = {
 
 @Injectable({ providedIn: 'root' })
 export class IdentityService {
+  private authService = inject(AuthService);
   private identitySubject = new BehaviorSubject<CallerIdentity | null>(null);
   identity$ = this.identitySubject.asObservable();
   private loadingPromise: Promise<CallerIdentity> | null = null;
@@ -31,11 +33,29 @@ export class IdentityService {
 
     if (!this.loadingPromise) {
       this.loadingPromise = (async () => {
-        // Configuration (tweak as needed)
-        const maxRetries = 6; // total attempts = 1 initial + up to 6 retries
-        const baseDelayMs = 1000; // initial backoff (1s), then 2s, 4s, ...
-
         try {
+          // First check if user is authenticated in Firebase
+          const firebaseUser = this.authService.getCurrentUser();
+
+          // If not authenticated in Firebase, return all flags as false
+          if (!firebaseUser) {
+            const defaultIdentity: CallerIdentity = {
+              isAdmin: false,
+              isClient: false,
+              isUser: false,
+              isWorker: false,
+              isCaller: false,
+              role: null,
+            };
+            this.identitySubject.next(defaultIdentity);
+            return defaultIdentity;
+          }
+
+          // User is authenticated in Firebase, proceed with API call
+          // Configuration (tweak as needed)
+          const maxRetries = 6; // total attempts = 1 initial + up to 6 retries
+          const baseDelayMs = 1000; // initial backoff (1s), then 2s, 4s, ...
+
           const result: any = await firstValueFrom(
             from(api.getCallerIdentity()).pipe(
               // Retry with exponential backoff up to maxRetries.
