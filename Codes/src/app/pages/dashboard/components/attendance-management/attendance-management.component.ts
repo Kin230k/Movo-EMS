@@ -78,22 +78,22 @@ export class AttendanceManagementComponent {
     this.users = [];
 
     try {
-      const data: any = await api.getProjectUsers({
+      const data: any = await api.getUserAttendancesByProject({
         projectId: String(projectId),
       });
       const payload = (data as any)?.result ?? data ?? {};
-      const normalizedUsers = Array.isArray(payload.users)
-        ? payload.users.map((u: any, idx: number) => ({
-            id: u.userId ?? u.id ?? idx + 1,
-            userId: String(u.userId ?? u.id ?? idx + 1),
-            name: u.name ?? {
-              en: u.displayName ?? 'User',
-              ar: u.displayName ?? 'User',
+      const normalizedUsers = Array.isArray(payload.data)
+        ? payload.data.map((a: any, idx: number) => ({
+            id: a.attendanceId ?? a.id ?? idx + 1,
+            userId: String(a.userId ?? a.id ?? idx + 1),
+            name: a.name ?? {
+              en: a.displayName ?? 'User',
+              ar: a.displayName ?? 'User',
             },
-            role: u.role ?? 'User',
-            isPresent: false,
-            attendanceTimestamp: new Date(),
-            picture: u.picture ?? '/assets/images/image.png',
+            role: a.role ?? 'User',
+            isPresent: true,
+            attendanceTimestamp: a.attendanceTimestamp,
+            picture: a.picture ?? '/assets/images/image.png',
           }))
         : [];
       this.users = normalizedUsers;
@@ -191,4 +191,10 @@ export class AttendanceManagementComponent {
     await this.refetchProjects();
     await this.refetchUsers();
   }
+  async onDeleteAttendance($event: Event) {
+    console.log('onDeleteAttendance', $event);
+    await api.deleteAttendance({ attendanceId: String($event) });
+    await this.refetchUsers();
+  }
+  async onEditAttendance($event: Event) {}
 }

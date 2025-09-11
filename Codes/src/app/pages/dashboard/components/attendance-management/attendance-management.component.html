@@ -30,6 +30,8 @@
       [items]="users"
       [cardComponent]="attendanceCardComponent"
       (refetch)="refetchUsers()"
+      (edit)="onEditAttendance($event)"
+      (delete)="onDeleteAttendance($event)"
     ></app-card-list>
   </div>
 </div>

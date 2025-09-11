@@ -19,6 +19,7 @@ import {
 } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { rolesLable } from '../../../../../../shared/types/roles';
+import { LanguageService } from '../../../../../../core/services/language.service';
 @Component({
   selector: 'app-profile-modal',
   standalone: true,
@@ -45,6 +46,13 @@ export class ProfileModalComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     if (this.data) {
+      // i send the name not the id so find the id form the roles list
+      console.log(this.data);
+      const roleId = this.roles.find(
+        (r) => r.key === this.data.role.toUpperCase().replace(' ', '_')
+      )?.value;
+      this.data.role = roleId;
+      console.log(this.data);
       this.patchForm(this.data);
       this.dataLoaded = true;
     }

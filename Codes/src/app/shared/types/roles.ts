@@ -8,6 +8,15 @@ export const rolesLable = [
   { value: '89898989-1230-8989-8989-898989898989', key: 'SYSTEM_ADMIN' },
 ];
 
+export const roleName = {
+  User: 'USER',
+  Marshall: 'MARSHALL',
+  Supervisor: 'SUPERVISOR',
+  'Senior Supervisor': 'SENIOR_SUPERVISOR',
+  'Super Admin': 'SUPER_ADMIN',
+  'Main User': 'MAIN_USER',
+  'System Admin': 'SYSTEM_ADMIN',
+};
 export const rolesDropDown = [
   {
     id: '89898989-1234-8989-8989-898989898989',

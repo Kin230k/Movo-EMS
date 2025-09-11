@@ -17,6 +17,7 @@ import { DeleteModalComponent } from '../../../../../components/shared/delete-mo
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import api from '../../../../../core/api/api';
+import { roleName } from '../../../../../shared/types/roles';
 
 @Component({
   selector: 'app-profile-card',
@@ -54,14 +55,7 @@ export class ProfileCardComponent implements OnInit, OnDestroy {
     });
   }
 
-  roles: any = {
-    Marshall: 'MARSHALL',
-    Supervisor: 'SUPERVISOR',
-    'Senior Supervisor': 'SENIOR_SUPERVISOR',
-    'Super Admin': 'SUPER_ADMIN',
-    'Main User': 'MAIN_USER',
-    'System Admin': 'SYSTEM_ADMIN',
-  };
+  roles: any = roleName;
 
   getRole() {
     return this.roles[this.data.role];

@@ -12,9 +12,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../../../../core/services/language.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { rolesBinding } from '../../../../../shared/types/roles';
+import { roleName } from '../../../../../shared/types/roles';
 import { EditAttendanceModalComponent } from './edit-attendance-modal.component';
 import { DeleteModalComponent } from '../../../../../components/shared/delete-modal/delete-modal.component';
+import api from '../../../../../core/api/api';
 
 @Component({
   selector: 'app-attendance-profile-card',
@@ -30,6 +31,7 @@ import { DeleteModalComponent } from '../../../../../components/shared/delete-mo
 })
 export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
   @Input() data!: {
+    id: string;
     userId: number;
     name: { en: string; ar: string } | string;
     role: string;
@@ -39,7 +41,7 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
   };
 
   @Output() edit = new EventEmitter<any>(); // emits updated attendance object
-  @Output() delete = new EventEmitter<number>(); // emits userId to delete
+  // @Output() delete = new EventEmitter<string>(); // emits userId to delete
   @Output() refetch = new EventEmitter<void>();
 
   modalOpen = false;
@@ -60,7 +62,7 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
     });
   }
 
-  roles: any = rolesBinding;
+  roles: any = roleName;
 
   getRole() {
     return this.roles[this.data.role];
@@ -146,8 +148,8 @@ export class AttendanceProfileCardComponent implements OnInit, OnDestroy {
     this.showDeleteModal = false;
   }
 
-  confirmDelete() {
+  async confirmDelete() {
+    await api.deleteAttendance({ attendanceId: String(this.data.id) });
     this.showDeleteModal = false;
-    this.delete.emit(this.data.userId);
   }
 }
