@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS get_user_attendances_by_project(p_auth_user_id UUID, p_project_id UUID);
 CREATE OR REPLACE FUNCTION get_user_attendances_by_project(
     p_auth_user_id UUID,
     p_project_id UUID
@@ -5,11 +6,12 @@ CREATE OR REPLACE FUNCTION get_user_attendances_by_project(
 RETURNS TABLE (
     userId UUID,
     name JSONB,
-    role TEXT,
-    userStatus TEXT,
-    picture TEXT,
+    role user_role,
+    userStatus user_status,
+    picture VARCHAR(512),
     attendanceTimestamp TIMESTAMP,
-    attendanceStatus TEXT
+    attendanceStatus TEXT,
+    attendanceId UUID
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -23,11 +25,12 @@ BEGIN
     SELECT 
         v.userId,
         v.name,
-        v.role,
-        v.userStatus,
+        v.role::user_role,
+        v.userStatus::user_status,
         v.picture,
         v.attendanceTimestamp,
-        v.attendanceStatus
+        v.attendanceStatus,
+        v.attendanceId
     FROM v_project_user_attendances v
     WHERE v.projectId = p_project_id;
 END;

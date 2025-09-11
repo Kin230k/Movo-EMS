@@ -8,7 +8,7 @@ import { Multilingual } from '../../multilingual.type';
 
 export enum enAttendanceStatus {
   present = 'present',
-  absent = 'absent'
+  absent = 'absent',
 }
 
 export interface UserAttendance {
@@ -19,6 +19,7 @@ export interface UserAttendance {
   picture: string | undefined;
   attendanceTimestamp: string;
   attendanceStatus: enAttendanceStatus;
+  attendanceId: string;
 }
 export class AttendanceMapper extends BaseMapper<Attendance> {
   async save(entity: Attendance): Promise<void> {
@@ -26,24 +27,42 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
     const op = entity.operation;
-    const { attendanceId, attendanceTimestamp, signedWith, signedBy, userId, areaId } = entity;
+    const {
+      attendanceId,
+      attendanceTimestamp,
+      signedWith,
+      signedBy,
+      userId,
+      areaId,
+    } = entity;
 
-    if (!attendanceTimestamp) throw new Error('Attendance timestamp is required');
+    if (!attendanceTimestamp)
+      throw new Error('Attendance timestamp is required');
     if (!signedWith) throw new Error('SignedWith is required');
     if (!userId) throw new Error('User ID is required');
     if (!areaId) throw new Error('Area ID is required');
 
     if (op === Operation.UPDATE) {
-      if (!attendanceId) throw new Error('Attendance ID is required for update');
-      await pool.query(
-        'CALL update_attendance($1, $2, $3, $4, $5, $6, $7)',
-        [currentUserId, attendanceId, attendanceTimestamp, signedWith, signedBy, userId, areaId]
-      );
+      if (!attendanceId)
+        throw new Error('Attendance ID is required for update');
+      await pool.query('CALL update_attendance($1, $2, $3, $4, $5, $6, $7)', [
+        currentUserId,
+        attendanceId,
+        attendanceTimestamp,
+        signedWith,
+        signedBy,
+        userId,
+        areaId,
+      ]);
     } else {
-      await pool.query(
-        'CALL create_attendance($1, $2, $3, $4, $5, $6)',
-        [currentUserId, attendanceTimestamp, signedWith, signedBy, userId, areaId]
-      );
+      await pool.query('CALL create_attendance($1, $2, $3, $4, $5, $6)', [
+        currentUserId,
+        attendanceTimestamp,
+        signedWith,
+        signedBy,
+        userId,
+        areaId,
+      ]);
     }
   }
 
@@ -61,7 +80,9 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
 
-    const result = await pool.query('SELECT * FROM get_all_attendances($1)', [currentUserId]);
+    const result = await pool.query('SELECT * FROM get_all_attendances($1)', [
+      currentUserId,
+    ]);
     return result.rows.map(this.mapRowToEntity);
   }
 
@@ -73,34 +94,33 @@ export class AttendanceMapper extends BaseMapper<Attendance> {
     await pool.query('CALL delete_attendance($1, $2)', [currentUserId, id]);
   }
   async getByUser(userId: string): Promise<Attendance[]> {
-  const currentUserId = CurrentUser.uuid;
-  if (!currentUserId) throw new Error('Current user UUID is not set');
-  if (!userId) throw new Error('User ID is required');
-  
-  
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!userId) throw new Error('User ID is required');
 
-  const result: QueryResult = await pool.query(
-    'SELECT * FROM get_attendance_by_user($1, $2)',
-    [currentUserId, userId]
-  );
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_attendance_by_user($1, $2)',
+      [currentUserId, userId]
+    );
 
+    return result.rows.map(this.mapRowToEntity);
+  }
+  // Add to attendance.mapper.ts
+  async getByProject(projectId: string): Promise<Attendance[]> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+    if (!projectId) throw new Error('Project ID is required');
 
-  return result.rows.map(this.mapRowToEntity);
-}
-// Add to attendance.mapper.ts
-async getByProject(projectId: string): Promise<Attendance[]> {
-  const currentUserId = CurrentUser.uuid;
-  if (!currentUserId) throw new Error('Current user UUID is not set');
-  if (!projectId) throw new Error('Project ID is required');
+    const result: QueryResult = await pool.query(
+      'SELECT * FROM get_attendances_by_project($1, $2)',
+      [currentUserId, projectId]
+    );
 
-  const result: QueryResult = await pool.query(
-    'SELECT * FROM get_attendances_by_project($1, $2)',
-    [currentUserId, projectId]
-  );
-
-  return result.rows.map(this.mapRowToEntity);
-}
-  async getUserAttendancesByProject(projectId: string): Promise<UserAttendance[]> {
+    return result.rows.map(this.mapRowToEntity);
+  }
+  async getUserAttendancesByProject(
+    projectId: string
+  ): Promise<UserAttendance[]> {
     const currentUserId = CurrentUser.uuid;
     if (!currentUserId) throw new Error('Current user UUID is not set');
     if (!projectId) throw new Error('Project ID is required');
@@ -113,13 +133,12 @@ async getByProject(projectId: string): Promise<Attendance[]> {
     return result.rows.map(this.mapRowToUserAttendance);
   }
 
-
-
   private mapRowToEntity = (row: any): Attendance => {
-        const attendanceTimeStamp =
+    const attendanceTimeStamp =
       row.attendancetimestamp instanceof Date
         ? row.attendancetimestamp.toISOString()
-        : row.attendancetimestamp !== null && row.attendancetimestamp !== undefined
+        : row.attendancetimestamp !== null &&
+          row.attendancetimestamp !== undefined
         ? String(row.attendancetimestamp)
         : null;
 
@@ -132,25 +151,28 @@ async getByProject(projectId: string): Promise<Attendance[]> {
       row.attendanceid
     );
   };
-   private mapRowToUserAttendance = (row: any): UserAttendance => {
-         const attendanceTimeStamp =
+  private mapRowToUserAttendance = (row: any): UserAttendance => {
+    const attendanceTimeStamp =
       row.attendancetimestamp instanceof Date
         ? row.attendancetimestamp.toISOString()
-        : row.attendancetimestamp !== null && row.attendancetimestamp !== undefined
+        : row.attendancetimestamp !== null &&
+          row.attendancetimestamp !== undefined
         ? String(row.attendancetimestamp)
         : null;
+    console.log(row);
+
     return {
-      userId: row.userId,
+      userId: row.userid,
       name: row.name,
       role: row.role,
-      userStatus: row.userStatus,
+      userStatus: row.userstatus,
       picture: row.picture,
       attendanceTimestamp: attendanceTimeStamp as string,
-      attendanceStatus: row.attendanceStatus as enAttendanceStatus
+      attendanceStatus: row.attendancestatus as enAttendanceStatus,
+      attendanceId: row.attendanceid,
     };
   };
 }
-
 
 const attendanceMapper = new AttendanceMapper();
 export default attendanceMapper;

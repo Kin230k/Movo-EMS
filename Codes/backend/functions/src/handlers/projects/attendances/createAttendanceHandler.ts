@@ -95,7 +95,7 @@ export async function createAttendanceHandler(
     await AttendanceService.createAttendance(
       new Date().toISOString(),
       signedWith,
-      auth.callerUuid,
+      auth.isAdmin ? '00000000-0000-0000-0000-000000000000' : auth.callerUuid,
       userId,
       areaId
     );

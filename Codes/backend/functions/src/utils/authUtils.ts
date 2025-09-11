@@ -422,8 +422,7 @@ export async function authorizeUserProjectAccessWorkerFirst(
         callerUuid,
         targetProjectId
       );
-
-    if (callerUserProject) {
+    if (callerUserProject.length > 0) {
       const callerUser = await UserService.getUserById(callerUuid);
       return {
         success: true,
@@ -449,6 +448,7 @@ export async function authorizeUserProjectAccessWorkerFirst(
 
     // 4) Fallback to admin (strongest)
     const callerAdmin = await AdminService.getAdminById(callerUuid);
+
     if (callerAdmin) {
       return {
         success: true,
