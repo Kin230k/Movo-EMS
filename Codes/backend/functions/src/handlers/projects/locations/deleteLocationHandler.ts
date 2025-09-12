@@ -6,22 +6,23 @@ import { LocationService } from '../../../models/project/location/location.servi
 import { authenticateClient } from '../../../utils/authUtils';
 
 export interface DeleteLocationData {
-  clientId: string;
   locationId: string;
 }
 
-export async function deleteLocationHandler(request: CallableRequest<DeleteLocationData>) {
+export async function deleteLocationHandler(
+  request: CallableRequest<DeleteLocationData>
+) {
   const issues: FieldIssue[] = [];
 
   const auth = await authenticateClient(request);
   if (!auth.success) return auth;
 
-  const { clientId, locationId } = request.data || {};
+  const { locationId } = request.data || {};
 
-  if (!clientId || !locationId) {
+  if (!locationId) {
     issues.push({
       field: 'input',
-      message: 'Missing required fields: clientId, locationId',
+      message: 'Missing required fields: locationId',
     });
     return { success: false, issues };
   }

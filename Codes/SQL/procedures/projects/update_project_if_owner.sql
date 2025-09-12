@@ -22,10 +22,6 @@ BEGIN
     RAISE EXCEPTION 'Project with ID % not found', p_project_id;
   END IF;
 
-  -- Check if the authenticated user is the owner (clientId)
-  IF v_client_id != p_auth_user_id THEN
-    RAISE EXCEPTION 'User % is not authorized to update this project', p_auth_user_id;
-  END IF;
 
   -- Validate date logic only when both dates provided
   IF p_starting_date IS NOT NULL AND p_ending_date IS NOT NULL AND p_starting_date > p_ending_date THEN

@@ -128,7 +128,13 @@ export class ProjectMapper extends BaseMapper<Project> {
     // collect unique locations; do NOT modify name (keep DB value as-is)
     const locationMap = new Map<
       string,
-      { locationId: string; name?: any; formId?: string | null }
+      {
+        locationId: string;
+        name?: any;
+        formId?: string | null;
+        formLanguage?: string;
+        formTitle?: string;
+      }
     >();
 
     for (const row of result.rows) {
@@ -146,6 +152,8 @@ export class ProjectMapper extends BaseMapper<Project> {
           locationId: locId,
           name: row.locationname === undefined ? undefined : row.locationname, // leave language object/string untouched
           formId: row.formid ? String(row.formid) : null,
+          formLanguage: row.form_language,
+          formTitle: row.form_title,
         });
       } else {
         // prefer first seen formId for that location
@@ -170,6 +178,8 @@ export class ProjectMapper extends BaseMapper<Project> {
       startingDate: startingDate ?? null,
       endingDate: endingDate ?? null,
       formId: projectFormId ?? null, // project-level form id (or null)
+      formLanguage: firstRow.form_language ?? null,
+      formTitle: firstRow.form_title ?? null,
       locations: locationsArray, // array of { locationId, name, formId } or null
     };
   }

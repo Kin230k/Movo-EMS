@@ -5,7 +5,6 @@ import type { QueryResult } from 'pg';
 import pool from '../../../../utils/pool';
 import { CurrentUser } from '../../../../utils/currentUser.class';
 
-
 export class QuestionMapper extends BaseMapper<Question> {
   async save(entity: Question): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -52,7 +51,9 @@ export class QuestionMapper extends BaseMapper<Question> {
       'SELECT * FROM get_question_by_id($1, $2)',
       [currentUserId, id]
     );
-    return result.rows.length ? this.mapRowToQuestion(result.rows[0]) : null;
+    return result.rows.length
+      ? (this.mapRowToQuestionPlain(result.rows[0]) as any)
+      : null;
   }
 
   async getAll(): Promise<Question[]> {
@@ -146,25 +147,27 @@ export class QuestionMapper extends BaseMapper<Question> {
     return result.rows.map(this.mapRowToQuestionPlain);
   }
 
-async getAllByInterviewId(interviewId: string): Promise<{ interviewTitle: string | null, questions: Question[] }> {
-  const currentUserId = CurrentUser.uuid;
-  if (!currentUserId) throw new Error('Current user UUID is not set');
-  
-  const result = await pool.query(
-    'SELECT * FROM get_questions_by_interview_id($1::uuid, $2::uuid)',
-    [currentUserId, interviewId]
-  );
-  
-  if (result.rows.length === 0) {
-    return { interviewTitle: null, questions: [] };
+  async getAllByInterviewId(
+    interviewId: string
+  ): Promise<{ interviewTitle: string | null; questions: Question[] }> {
+    const currentUserId = CurrentUser.uuid;
+    if (!currentUserId) throw new Error('Current user UUID is not set');
+
+    const result = await pool.query(
+      'SELECT * FROM get_questions_by_interview_id($1::uuid, $2::uuid)',
+      [currentUserId, interviewId]
+    );
+
+    if (result.rows.length === 0) {
+      return { interviewTitle: null, questions: [] };
+    }
+
+    // Assume all rows have the same interviewtitle; pluck from first row
+    const interviewTitle = result.rows[0].interviewtitle || null;
+    const questions = result.rows.map(this.mapRowToQuestionPlain);
+
+    return { interviewTitle, questions };
   }
-  
-  // Assume all rows have the same interviewtitle; pluck from first row
-  const interviewTitle = result.rows[0].interviewtitle || null;
-  const questions = result.rows.map(this.mapRowToQuestion);
-  
-  return { interviewTitle, questions };
-}
 
   async delete(id: string): Promise<void> {
     const currentUserId = CurrentUser.uuid;
@@ -183,10 +186,7 @@ async getAllByInterviewId(interviewId: string): Promise<{ interviewTitle: string
       row.questionid
     );
   };
-
-};
-
-
+}
 
 const questionMapper = new QuestionMapper();
 export default questionMapper;
