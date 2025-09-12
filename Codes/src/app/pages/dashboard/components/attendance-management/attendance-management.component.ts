@@ -98,7 +98,7 @@ export class AttendanceManagementComponent {
         : [];
       this.users = normalizedUsers;
       this.usersForSelector = normalizedUsers.map((u: any) => ({
-        id: u.id,
+        id: u.userId,
         name: u.name,
         role: u.role,
         picture: u.picture,

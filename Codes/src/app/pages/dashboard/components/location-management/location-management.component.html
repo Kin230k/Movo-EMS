@@ -42,7 +42,7 @@
       <app-location-card
         *ngFor="let loc of locations"
         [data]="loc"
-        (deleteLocation)="handleDeleteLocation($event)"
+        (deleteLocation)="confirmDeleteLocation(loc)"
         (updateLocation)="handleUpdateLocation($event)"
       ></app-location-card>
     </div>
@@ -61,6 +61,16 @@
       (close)="closeUpdateModal()"
       (update)="handleLocationUpdate($event)"
     ></app-update-location-modal>
+
+    <!-- Delete confirmation modal for locations -->
+    <app-delete-modal
+      *ngIf="isDeleteLocationModalOpen"
+      [title]="'LOCATION_MANAGEMENT.DELETE_LOCATION_TITLE' | translate"
+      [message]="'LOCATION_MANAGEMENT.DELETE_LOCATION_MESSAGE' | translate"
+      [loading]="isDeletingLocation"
+      (close)="handleCancelDeleteLocation()"
+      (confirm)="handleConfirmDeleteLocation()"
+    ></app-delete-modal>
   </div>
 
   <!-- ZONES TAB -->
@@ -86,27 +96,35 @@
       class="zone-list"
       *ngIf="selectedLocationForZones; else chooseLocation"
     >
-      <div *ngIf="zonesForSelectedLocation.length === 0" class="empty">
-        {{
-          "LOCATION_MANAGEMENT.NO_ZONES"
-            | translate : { default: "No zones found for this location" }
-        }}
+      <!-- Loading animation for zones -->
+      <div class="loading" *ngIf="loadingZones">
+        <app-card-list-skeletion></app-card-list-skeletion>
       </div>
 
-      <div class="zone-item" *ngFor="let z of zonesForSelectedLocation">
-        <div class="zone-info">
-          <!-- display localized name if it's an object, fallback to string -->
-          <div class="zone-name">
-            {{ z.name[currentLanguage] }}
-          </div>
-          <div class="meta">
-            {{ getLocationNameById(z.locationId) }}
-          </div>
+      <!-- Zone list content -->
+      <div *ngIf="!loadingZones">
+        <div *ngIf="zonesForSelectedLocation.length === 0" class="empty">
+          {{
+            "LOCATION_MANAGEMENT.NO_ZONES"
+              | translate : { default: "No zones found for this location" }
+          }}
         </div>
-        <div class="zone-actions">
-          <button class="delete-btn" (click)="confirmDeleteZone(z)">
-            {{ "COMMON.BUTTONS.DELETE" | translate : { default: "Delete" } }}
-          </button>
+
+        <div class="zone-item" *ngFor="let z of zonesForSelectedLocation">
+          <div class="zone-info">
+            <!-- display localized name if it's an object, fallback to string -->
+            <div class="zone-name">
+              {{ z.name[currentLanguage] }}
+            </div>
+            <div class="meta">
+              {{ getLocationNameById(z.locationId) }}
+            </div>
+          </div>
+          <div class="zone-actions">
+            <button class="delete-btn" (click)="confirmDeleteZone(z)">
+              {{ "COMMON.BUTTONS.DELETE" | translate : { default: "Delete" } }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -133,6 +151,7 @@
       *ngIf="isDeleteModalOpen"
       [title]="'LOCATION_MANAGEMENT.DELETE_ZONE_TITLE' | translate"
       [message]="'LOCATION_MANAGEMENT.DELETE_ZONE_MESSAGE' | translate"
+      [loading]="isDeletingZone"
       (close)="handleCancelDelete()"
       (confirm)="handleConfirmDeleteZone()"
     ></app-delete-modal>

@@ -1037,9 +1037,9 @@ export class FormQuestionsComponent
 
     // Update the form group
     qGroup.patchValue({
-      text: updated.text,
+      questionText: updated.questionText ?? qGroup.get('questionText')?.value,
       description: updated.description ?? qGroup.get('description')?.value,
-      type: updated.type,
+      typeCode: updated.typeCode ?? qGroup.get('typeCode')?.value,
     });
 
     // Update options if provided
@@ -1093,6 +1093,7 @@ export class FormQuestionsComponent
         } else {
           payload.interviewId = this.form.get('interviewId')?.value;
         }
+        console.log(payload, qGroup.value);
         await api.updateQuestion(payload);
       } catch (error) {
         console.error('Error updating question:', error);

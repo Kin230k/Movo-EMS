@@ -18,6 +18,7 @@ interface LocationSummary {
   locationId: string;
   name?: LocalizedString | string;
   formId?: string | null;
+  formTitle?: string | null;
 }
 interface ProjectSummary {
   projectId: string;
@@ -26,6 +27,7 @@ interface ProjectSummary {
   startingDate?: string | null;
   endingDate?: string | null;
   formId?: string | null;
+  formTitle?: string | null;
   locations?: LocationSummary[] | null;
 }
 
@@ -68,10 +70,10 @@ interface ProjectSummary {
         <hr class="divider" />
 
         <!-- direct form -->
-        <div *ngIf="project.formId" class="actions-row">
+        <div *ngIf="project.formTitle" class="actions-row">
           <p>
             {{ 'PROJECTS.FORM' | translate }}:
-            <strong>{{ project.formId }}</strong>
+            <strong>{{ project.formTitle }}</strong>
           </p>
           <themed-button
             [text]="
@@ -100,7 +102,7 @@ interface ProjectSummary {
               />
               <span class="loc-name">{{ displayName(loc.name) }}</span>
               <small class="loc-hint">{{
-                loc.formId ? 'Form ready' : 'No form'
+                loc.formTitle ? 'Form ready' : 'No form'
               }}</small>
             </label>
           </div>

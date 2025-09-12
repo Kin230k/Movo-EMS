@@ -58,6 +58,8 @@
     "CHOOSE_LOCATION_TO_VIEW_ZONES": "اختر موقع لعرض المناطق",
     "DELETE_ZONE_TITLE": "حذف المنطقة",
     "DELETE_ZONE_MESSAGE": "هل أنت متأكد من حذف هذه المنطقة؟",
+    "DELETE_LOCATION_TITLE": "حذف الموقع",
+    "DELETE_LOCATION_MESSAGE": "هل أنت متأكد من حذف هذا الموقع؟",
     "SELECT_LOCATION": "اختر الموقع"
   },
   "EMAILS": {
@@ -276,7 +278,9 @@
       "EDIT": "تعديل ",
       "OPEN_USER": "فتح المستخدم ",
       "DISABLE_CONFIRM_TITLE": "تأكيد الغاء التفعيل",
-      "DISABLE_CONFIRM_MESSAGE": "هل أنت متأكد من غياب المستخدم؟"
+      "DISABLE_CONFIRM_MESSAGE": "هل أنت متأكد من غياب المستخدم؟",
+      "CONFIRM_DISABLE_TITLE": "تأكيد الغاء التفعيل",
+      "CONFIRM_DISABLE_MESSAGE": "هل أنت متأكد من غياب المستخدم؟"
     },
     "EDIT": "تعديل المستخدم",
     "UPDATING_PROFILE": "جار تحديث الملف الشخصي..."

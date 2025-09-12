@@ -101,7 +101,7 @@ export class QuestionEditModalComponent {
     const typeControl = this.form.get('typeCode');
     if (selectedType) {
       typeControl?.setValue(selectedType);
-    } else { 
+    } else {
       typeControl?.setValue('');
     }
     typeControl?.markAsTouched();

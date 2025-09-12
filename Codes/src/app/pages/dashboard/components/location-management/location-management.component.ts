@@ -63,16 +63,21 @@ export class LocationManagementComponent {
   }> = [];
 
   private _areas: any[] = [];
+  private _loadingZones = false;
 
   // Location modals
   isAddModalOpen = false;
   isUpdateModalOpen = false;
+  isDeleteLocationModalOpen = false;
   selectedLocation: any = null;
+  locationToDelete: any = null;
+  isDeletingLocation = false;
 
   // Zone modals & state
   isAddZoneModalOpen = false;
   isDeleteModalOpen = false;
   zoneToDelete: any = null;
+  isDeletingZone = false;
 
   // zone filters - NOTE: removed selectedProjectForZones to force selection via location only
   selectedLocationForZones: string = '';
@@ -118,6 +123,7 @@ export class LocationManagementComponent {
     this.selectedLocationForZones = locationId || '';
     if (this.selectedLocationForZones) {
       try {
+        this._loadingZones = true;
         const data: any = await api.getAreasByLocation({
           locationId: this.selectedLocationForZones,
         });
@@ -126,6 +132,8 @@ export class LocationManagementComponent {
       } catch (error) {
         console.error('Error loading areas:', error);
         this._areas = [];
+      } finally {
+        this._loadingZones = false;
       }
     } else {
       this._areas = [];
@@ -165,18 +173,44 @@ export class LocationManagementComponent {
     } catch (error) {}
   }
 
-  async handleDeleteLocation(locationId: string) {
-    if (!confirm('Are you sure you want to delete this location?')) return;
-    try {
-      await api.deleteLocation({ locationId: String(locationId) } as any);
-      this._locations = this._locations.filter(
-        (loc) => loc.locationId !== locationId
-      );
-      this.zones = this.zones.filter((z) => z.locationId !== locationId);
-      // Emit refetch event to notify parent components
-      this.refetch.emit();
-    } catch (error) {
-      console.error('Error deleting location:', error);
+  // Open delete confirmation modal for location
+  confirmDeleteLocation(location: any) {
+    this.locationToDelete = location;
+    this.isDeleteLocationModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Cancel location delete modal
+  handleCancelDeleteLocation() {
+    this.locationToDelete = null;
+    this.isDeleteLocationModalOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  // Called by DeleteModal confirm for location
+  async handleConfirmDeleteLocation() {
+    if (this.locationToDelete && !this.isDeletingLocation) {
+      try {
+        this.isDeletingLocation = true;
+        await api.deleteLocation({
+          locationId: String(this.locationToDelete.locationId),
+        } as any);
+        this._locations = this._locations.filter(
+          (loc) => loc.locationId !== this.locationToDelete.locationId
+        );
+        this.zones = this.zones.filter(
+          (z) => z.locationId !== this.locationToDelete.locationId
+        );
+        // Emit refetch event to notify parent components
+        this.refetch.emit();
+      } catch (error) {
+        console.error('Error deleting location:', error);
+      } finally {
+        this.isDeletingLocation = false;
+        this.locationToDelete = null;
+        this.isDeleteLocationModalOpen = false;
+        document.body.style.overflow = '';
+      }
     }
   }
 
@@ -279,8 +313,9 @@ export class LocationManagementComponent {
 
   // called by DeleteModal confirm
   async handleConfirmDeleteZone() {
-    if (this.zoneToDelete) {
+    if (this.zoneToDelete && !this.isDeletingZone) {
       try {
+        this.isDeletingZone = true;
         await api.deleteArea({
           areaId: String(this.zoneToDelete.zoneId),
         } as any);
@@ -289,10 +324,14 @@ export class LocationManagementComponent {
         this.zoneToDelete = null;
         // Emit refetch event to notify parent components
         this.refetch.emit();
-      } catch (error) {}
+      } catch (error) {
+        console.error('Error deleting zone:', error);
+      } finally {
+        this.isDeletingZone = false;
+        this.isDeleteModalOpen = false;
+        document.body.style.overflow = '';
+      }
     }
-    this.isDeleteModalOpen = false;
-    document.body.style.overflow = '';
   }
 
   // cancel delete modal
@@ -385,5 +424,9 @@ export class LocationManagementComponent {
   }
   get loading() {
     return this._loading;
+  }
+
+  get loadingZones() {
+    return this._loadingZones;
   }
 }

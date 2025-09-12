@@ -336,7 +336,7 @@ export class FormPageComponent implements OnInit {
           ? 'numeric'
           : 'text') as 'text' | 'rating' | 'numeric' | 'options',
         textResponse: typeof answer === 'string' ? answer : undefined,
-        rating: typeof answer === 'number' ? answer : undefined,
+        numericResponse: typeof answer === 'number' ? answer : undefined,
         optionIds: Array.isArray(answer) ? answer : undefined,
       }));
 

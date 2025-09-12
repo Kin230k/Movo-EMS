@@ -55,6 +55,8 @@
     "PROJECT": "Project",
     "DELETE_ZONE_TITLE": "Delete Zone",
     "DELETE_ZONE_MESSAGE": "Are you sure you want to delete this zone?",
+    "DELETE_LOCATION_TITLE": "Delete Location",
+    "DELETE_LOCATION_MESSAGE": "Are you sure you want to delete this location?",
     "NO_ZONES_FOUND_FOR_LOCATION": "No zones found for this location.",
     "CHOOSE_LOCATION_TO_VIEW_ZONES": "Choose a location to view zones"
   },
@@ -257,7 +259,9 @@
       "EDIT": "Edit User",
       "OPEN_USER": "Open User",
       "DISABLE_CONFIRM_TITLE": "Confirm Disable",
-      "DISABLE_CONFIRM_MESSAGE": "Are you sure you want to disable the user?"
+      "DISABLE_CONFIRM_MESSAGE": "Are you sure you want to disable the user?",
+      "CONFIRM_DISABLE_TITLE": "Confirm Disable",
+      "CONFIRM_DISABLE_MESSAGE": "Are you sure you want to disable the user?"
     },
     "EDIT": "Edit User",
     "UPDATING_PROFILE": "Updating Profile..."
